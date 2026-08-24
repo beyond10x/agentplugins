@@ -47,7 +47,7 @@ $ claude --plugin-dir ./integrations/claude-code
 **From GitHub** — add the marketplace defined at the repository root, then install from it:
 
 ```
-/plugin marketplace add unrelated-predecessor/aep
+/plugin marketplace add beyond10x/aep
 /plugin install aep@aep
 ```
 
