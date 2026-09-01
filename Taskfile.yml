@@ -2,8 +2,16 @@ version: '3'
 
 tasks:
   check:
+    desc: Run the complete offline repository gate.
     cmds:
       - cargo fmt --all -- --check
       - cargo clippy --workspace --all-targets --locked -- -D warnings
       - cargo test --workspace --locked
       - cargo run --quiet --locked --bin agentplugins-check
+
+  site-build:
+    desc: Install and build the public Docusaurus documentation (network).
+    cmds:
+      - npm --prefix website ci
+      - npm --prefix website run typecheck
+      - npm --prefix website run build

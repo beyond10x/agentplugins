@@ -13,4 +13,9 @@ metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own ma
 skills or agents in its stated scope.
 
 Run `task check` before publishing. The gate fails on missing focused content, mismatched plugin
-names, a marketplace identity other than `beyond10x`, or any retired marketplace/repository name.
+names, a marketplace identity other than `beyond10x`, or plugin versions that disagree with the
+workspace release. Run `task site-build` for the public documentation under `website/`.
+
+The adopter guide is published at <https://beyond10x.github.io/agentplugins/>. This repository
+contains no credential or bot-token delivery machinery; release mutations are performed through
+the private organization tooling outside this tree.

@@ -1,0 +1,60 @@
+.hero {
+  margin: 0 auto;
+  max-width: 70rem;
+  padding: 7rem 1.5rem 4rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 6vw, 5.4rem);
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+  margin: 1rem auto 1.5rem;
+  max-width: 19ch;
+}
+
+.eyebrow {
+  color: var(--ifm-color-primary-light);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lead {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 1.18rem;
+  margin: 0 auto;
+  max-width: 48rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: 74rem;
+  padding: 0 1.5rem 6rem;
+}
+
+.card {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 1rem;
+  padding: 1.6rem;
+}
+
+.card h2 {font-size: 1.25rem;}
+
+@media (max-width: 760px) {
+  .grid {grid-template-columns: 1fr;}
+  .hero {padding-top: 4rem;}
+}

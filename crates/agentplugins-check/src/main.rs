@@ -1,7 +1,7 @@
 //! Validates the curated marketplace identity and focused plugin contents.
 
 use std::path::{Path, PathBuf};
-use std::process::ExitCode;
+use std::process::{Command, ExitCode};
 
 const PLUGINS: &[(&str, &[&str])] = &[
     (
@@ -42,6 +42,13 @@ fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
         .get("plugins")
         .and_then(serde_json::Value::as_array)
         .ok_or_else(|| format!("{relative} has no plugins array"))?;
+    if entries.len() != PLUGINS.len() {
+        return Err(format!(
+            "{relative} contains {} plugins; expected {} focused plugins",
+            entries.len(),
+            PLUGINS.len()
+        ));
+    }
     for (plugin, _) in PLUGINS {
         let count = entries
             .iter()
@@ -63,6 +70,14 @@ fn plugin(root: &Path, name: &str, required: &[&str]) -> Result<(), String> {
         if document.get("name").and_then(serde_json::Value::as_str) != Some(name) {
             return Err(format!("{name}/{relative} carries another plugin name"));
         }
+        if document.get("version").and_then(serde_json::Value::as_str)
+            != Some(env!("CARGO_PKG_VERSION"))
+        {
+            return Err(format!(
+                "{name}/{relative} does not carry workspace version {}",
+                env!("CARGO_PKG_VERSION")
+            ));
+        }
     }
     for relative in required {
         if !directory.join(relative).is_file() {
@@ -81,13 +96,49 @@ fn check(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
+fn verify_release(root: &Path, version: &str) -> Result<(), String> {
+    if version != env!("CARGO_PKG_VERSION") {
+        return Err(format!(
+            "tag `{version}` does not match workspace version {}",
+            env!("CARGO_PKG_VERSION")
+        ));
+    }
+
+    let changelog = std::fs::read_to_string(root.join("CHANGELOG.md"))
+        .map_err(|error| format!("reading CHANGELOG.md: {error}"))?;
+    let heading = format!("## [{version}] — ");
+    if !changelog.lines().any(|line| line.starts_with(&heading)) {
+        return Err(format!("CHANGELOG.md has no dated `{heading}` heading"));
+    }
+
+    let object_type = Command::new("git")
+        .args(["cat-file", "-t", &format!("refs/tags/{version}")])
+        .current_dir(root)
+        .output()
+        .map_err(|error| format!("running git cat-file: {error}"))?;
+    if !object_type.status.success() || object_type.stdout != b"tag\n" {
+        return Err(format!("`{version}` is missing or is not an annotated tag"));
+    }
+
+    Ok(())
+}
+
 fn main() -> ExitCode {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .and_then(Path::parent)
         .expect("checker is under the repository root")
         .to_path_buf();
-    match check(&root) {
+    let arguments = std::env::args().skip(1).collect::<Vec<_>>();
+    let result = match arguments.as_slice() {
+        [] => check(&root),
+        [release, verify, version] if release == "release" && verify == "verify" => {
+            check(&root).and_then(|()| verify_release(&root, version))
+        }
+        _ => Err("usage: agentplugins-check [release verify <version>]".to_owned()),
+    };
+
+    match result {
         Ok(()) => {
             println!(
                 "valid: marketplace beyond10x, {} focused plugin(s)",
@@ -113,5 +164,15 @@ mod tests {
             .and_then(Path::parent)
             .expect("checker is under repository root");
         check(root).expect("the committed marketplace validates");
+    }
+
+    #[test]
+    fn a_release_version_must_match_the_workspace() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        let error = verify_release(root, "9.9.9").expect_err("a mismatched version must fail");
+        assert!(error.contains("does not match workspace version"));
     }
 }

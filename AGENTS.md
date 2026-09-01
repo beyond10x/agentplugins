@@ -27,5 +27,15 @@
 task check
 ```
 
+The adopter-facing Docusaurus site lives under `website/` and is published at
+<https://beyond10x.github.io/agentplugins/>. A website change must also pass `task site-build`.
+The networked site build stays outside the offline Rust gate.
+
 Commit and push through the organization bot tooling owned by private Atlas. This repository never
 carries credential, token-minting or bot-authenticated git wrappers.
+
+## Releases
+
+Bare annotated tags are releases. Before tagging, `CHANGELOG.md`, the workspace version, and every
+plugin manifest version must agree. The release workflow reruns `task check`, builds the public
+site, verifies that agreement, and only then publishes the GitHub release.

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Agent Plugins mark">
+  <rect width="64" height="64" rx="14" fill="#17131f"/>
+  <path d="M17 20h13v10H20v14h10v-8h10v8h7V30H36V20h11" fill="none" stroke="#d3a6ff" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="17" cy="20" r="4" fill="#f0b35c"/>
+  <circle cx="47" cy="20" r="4" fill="#71d9bd"/>
+</svg>
