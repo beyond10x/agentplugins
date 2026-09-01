@@ -1,0 +1,44 @@
+{
+  "name": "beyond10x",
+  "interface": {
+    "displayName": "Beyond10x"
+  },
+  "plugins": [
+    {
+      "name": "aep-planning",
+      "source": {
+        "source": "local",
+        "path": "./plugins/aep-planning"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "adp",
+      "source": {
+        "source": "local",
+        "path": "./plugins/adp"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "ess-schema",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ess-schema"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

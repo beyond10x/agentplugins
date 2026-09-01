@@ -1,0 +1,18 @@
+{
+  "name": "aep-planning",
+  "version": "0.1.0",
+  "description": "Govern AEP planning artifacts and review plans without bypassing their lifecycle.",
+  "author": {
+    "name": "Beyond10x"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AEP Planning",
+    "shortDescription": "Govern plans through the AEP artifact store.",
+    "longDescription": "Create and review governed planning artifacts, decompose work, and reverse-engineer an existing repository through the canonical AEP command.",
+    "developerName": "Beyond10x",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use AEP planning to inspect the store and help me govern this work."
+  }
+}
