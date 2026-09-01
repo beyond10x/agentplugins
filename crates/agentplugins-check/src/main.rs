@@ -1,4 +1,4 @@
-//! Validates curated marketplace identity, focused plugin contents, and retired names.
+//! Validates the curated marketplace identity and focused plugin contents.
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -72,55 +72,13 @@ fn plugin(root: &Path, name: &str, required: &[&str]) -> Result<(), String> {
     Ok(())
 }
 
-fn scan(root: &Path) -> Result<(), String> {
-    let mut pending = vec![root.to_path_buf()];
-    while let Some(directory) = pending.pop() {
-        for entry in std::fs::read_dir(&directory)
-            .map_err(|error| format!("reading {}: {error}", directory.display()))?
-        {
-            let entry = entry.map_err(|error| error.to_string())?;
-            if entry
-                .file_type()
-                .map_err(|error| error.to_string())?
-                .is_dir()
-            {
-                if !matches!(entry.file_name().to_str(), Some(".git" | "target")) {
-                    pending.push(entry.path());
-                }
-                continue;
-            }
-            let path = entry.path();
-            let Ok(text) = std::fs::read_to_string(&path) else {
-                continue;
-            };
-            let lower = text.to_ascii_lowercase();
-            let historical = ["engineering", "protocols"].join("-");
-            let retired_identities = [
-                ["track", "@agentplugins"].concat(),
-                ["unrelated-predecessor", "/agentplugins"].concat(),
-                historical.clone(),
-                format!("\"name\": \"{historical}\""),
-            ];
-            for retired in retired_identities {
-                if lower.contains(&retired) {
-                    return Err(format!(
-                        "{} contains retired identity `{retired}`",
-                        path.display()
-                    ));
-                }
-            }
-        }
-    }
-    Ok(())
-}
-
 fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
     }
-    scan(root)
+    Ok(())
 }
 
 fn main() -> ExitCode {

@@ -1,7 +1,11 @@
 # AGENTS.md — agentplugins
 
-This repository serves Atlas O2 and O3 by publishing the curated instruction surface used to plan,
-develop, and validate work across harnesses.
+## Serves
+
+- **O2 — decisions as data, with evidence.** Publishes the curated AEP, ADP and ESS instruction
+  surfaces used to plan, develop and validate governed work.
+- **O3 — any harness, observed and compared.** Keeps those instruction surfaces portable across
+  supported agent harnesses.
 
 ## Invariants
 
@@ -23,5 +27,5 @@ develop, and validate work across harnesses.
 task check
 ```
 
-Commit and push through the organization bot tooling from a sibling repository until this
-repository has its own generated bot wrappers.
+Commit and push through the organization bot tooling owned by private Atlas. This repository never
+carries credential, token-minting or bot-authenticated git wrappers.
