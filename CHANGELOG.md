@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.1] — 2026-09-01
+
+- Make GitHub release publication idempotent so rerunning a successful tag publication preserves
+  the existing release instead of leaving a false-red workflow.
+
 ## [0.3.0] — 2026-09-01
 
 - Add the `workspace-hygiene` plugin with the `worktree` CLI-generated skill for consistent,
