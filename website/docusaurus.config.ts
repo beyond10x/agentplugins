@@ -1,7 +1,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import docsSystemPlugin from '@beyond10x/docs-system/docusaurus';
+import docsSystemPlugin, {ecosystemFooterGroup, ecosystemNavbarItems} from '@beyond10x/docs-system/docusaurus';
 
 const config: Config = {
   title: 'Beyond10x Agent Plugins',
@@ -43,7 +43,7 @@ const config: Config = {
       hideOnScroll: true,
       logo: {alt: 'Agent Plugins mark', src: 'img/mark.svg'},
       items: [
-        {href: 'https://beyond10x.github.io/getting-started/', label: 'beyond10x', position: 'left'},
+        ...ecosystemNavbarItems(),
         {to: '/docs/choose-a-plugin', label: 'Choose', position: 'left'},
         {to: '/docs/install', label: 'Install', position: 'left'},
         {to: '/docs/plugins/beyond10x', label: 'Reference', position: 'left'},
@@ -53,6 +53,7 @@ const config: Config = {
     footer: {
       style: 'dark',
       links: [
+        ecosystemFooterGroup(),
         {title: 'Use it', items: [
           {label: 'Choose a plugin', to: '/docs/choose-a-plugin'},
           {label: 'Install the marketplace', to: '/docs/install'},

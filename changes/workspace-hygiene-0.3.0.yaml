@@ -1,0 +1,15 @@
+schema: b10x-change/v1
+id: agentplugins/workspace-hygiene-0.3.0
+repository: agentplugins
+publishedAt: 2026-09-01T09:16:40Z
+title: Agents gain shared workspace-hygiene guidance
+summary: Agent Plugins 0.3.0 adds the workspace-hygiene plugin and a Worktree-generated skill for consistent, recoverable checkout lifecycle across supported agents.
+kind: capability
+impact: significant
+source:
+  url: https://github.com/beyond10x/agentplugins/releases/tag/0.3.0
+  version: 0.3.0
+journeys: [build-agents, operate-services]
+affectedSurfaces: [agentplugins/docs, worktree/docs]
+relations:
+  - {target: change:worktree/managed-worktrees-0.1.0, kind: depends-on, label: Uses the public Worktree lifecycle}

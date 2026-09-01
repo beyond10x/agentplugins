@@ -1,4 +1,4 @@
-schema: b10x-docs/v1
+schema: b10x-docs/v2
 repository:
   id: agentplugins
   url: https://github.com/beyond10x/agentplugins
@@ -22,6 +22,13 @@ surfaces:
     relationships:
       - {target: aep-service/docs, kind: supports, label: Adds governed planning guidance}
       - {target: ess/docs, kind: supports, label: Adds schema and projection guidance}
+    adoption:
+      label: Install a focused plugin
+      url: https://beyond10x.github.io/agentplugins/docs/install
+      mode: install
+      estimatedMinutes: 5
+      prerequisites: [A supported agent harness]
+      outcome: Install one scoped guidance plugin without copying its instructions.
     accent: "#d3a6ff"
     mark: website/static/img/mark.svg
-    shell: {integration: docusaurus, revision: 0cbd1f1b6951fec95767332e3a1792f838feb62d}
+    shell: {integration: docusaurus, revision: 73aefe1ca268cc853ed38fb23478454496462a03}
