@@ -25,3 +25,9 @@ workspace release. Run `task site-build` for the public documentation under `web
 The adopter guide is published at <https://beyond10x.github.io/agentplugins/>. This repository
 contains no credential or bot-token delivery machinery; release mutations are performed through
 the private organization tooling outside this tree.
+
+<!-- b10x-docs:start -->
+## Documentation
+
+[Agent Plugins documentation](https://beyond10x.github.io/docs/agentplugins/) · [Start](https://beyond10x.github.io/) · [Ecosystem](https://beyond10x.github.io/ecosystem/) · [Impact](https://beyond10x.github.io/changes/) · [Releases](https://beyond10x.github.io/releases/)
+<!-- b10x-docs:end -->
