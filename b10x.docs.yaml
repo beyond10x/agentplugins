@@ -20,7 +20,7 @@ surfaces:
       - {label: Plugin reference, url: https://beyond10x.github.io/agentplugins/docs/plugins/aep-planning, kind: reference}
       - {label: Source, url: https://github.com/beyond10x/agentplugins, kind: source}
     relationships:
-      - {target: aep/docs, kind: supports, label: Adds governed planning guidance}
+      - {target: aep-service/docs, kind: supports, label: Adds governed planning guidance}
       - {target: ess/docs, kind: supports, label: Adds schema and projection guidance}
     accent: "#d3a6ff"
     mark: website/static/img/mark.svg
