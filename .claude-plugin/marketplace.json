@@ -21,6 +21,11 @@
       "name": "ess-schema",
       "source": "./plugins/ess-schema",
       "description": "Validate ESS models and guide deterministic schema and OpenAPI projections."
+    },
+    {
+      "name": "workspace-hygiene",
+      "source": "./plugins/workspace-hygiene",
+      "description": "Manage isolated Git worktrees with explicit ownership and safe cleanup proof."
     }
   ]
 }

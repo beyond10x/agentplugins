@@ -1,0 +1,18 @@
+{
+  "name": "workspace-hygiene",
+  "version": "0.3.0",
+  "description": "Use the public worktree toolchain for safe, recoverable agent checkout lifecycle.",
+  "author": {
+    "name": "Beyond10x"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Workspace Hygiene",
+    "shortDescription": "Keep agent worktrees isolated and recoverable.",
+    "longDescription": "Create, lease, finish, audit, and safely clean Git worktrees through the versioned public worktree CLI instead of ad hoc host conventions.",
+    "developerName": "Beyond10x",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use the worktree skill to prepare an isolated checkout for this task and preserve safe cleanup evidence."
+  }
+}

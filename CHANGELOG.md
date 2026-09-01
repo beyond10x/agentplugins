@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0] — 2026-09-01
+
+- Add the `workspace-hygiene` plugin with the `worktree` CLI-generated skill for consistent,
+  recoverable Git worktree lifecycle across agent hosts.
+- Document installation and the separation between lifecycle guidance and the standalone public
+  Rust toolchain.
+
 ## [0.2.0] — 2026-09-01
 
 - Add the `beyond10x` front-door plugin for marketplace routing, public resource discovery, and

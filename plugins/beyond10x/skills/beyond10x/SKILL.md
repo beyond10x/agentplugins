@@ -24,6 +24,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep-planning` |
 | Scope and deliver accepted development work through a reviewed wave | `adp` |
 | Validate an ESS model or guide deterministic schema or OpenAPI projection | `ess-schema` |
+| Create, inspect, finish, or safely clean Git worktrees | `workspace-hygiene` |
 
 ## Preserve boundaries
 

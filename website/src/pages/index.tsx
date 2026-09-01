@@ -9,6 +9,7 @@ const plugins = [
   ['AEP Planning', 'Plan, decompose, review, and reverse-engineer governed work.', '/docs/plugins/aep-planning'],
   ['ADP', 'Scope stories and coordinate implementation waves with adversarial review.', '/docs/plugins/adp'],
   ['ESS Schema', 'Validate typed system specifications and guide deterministic projections.', '/docs/plugins/ess-schema'],
+  ['Workspace Hygiene', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/workspace-hygiene'],
 ];
 
 export default function Home(): ReactNode {
@@ -19,7 +20,7 @@ export default function Home(): ReactNode {
           <p className={styles.eyebrow}>Curated marketplace · beyond10x</p>
           <Heading as="h1">Give each agent only the engineering guidance it needs.</Heading>
           <p className={styles.lead}>
-            A lightweight front door routes work to three focused specialists and helps create
+            A lightweight front door routes work to four focused specialists and helps create
             portable plugins—without bundling credentials or hidden authority.
           </p>
           <div className={styles.actions}>

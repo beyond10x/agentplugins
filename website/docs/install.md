@@ -7,12 +7,12 @@ title: Install
 
 Use the GitHub repository `beyond10x/agentplugins` as the marketplace source in a supported agent
 client. The marketplace identity is `beyond10x`; the installable names are `beyond10x`,
-`aep-planning`, `adp`, and `ess-schema`.
+`aep-planning`, `adp`, `ess-schema`, and `workspace-hygiene`.
 
 ## Codex
 
 Open the Plugins surface, add the GitHub repository as a marketplace, then select the front door or
-one of the three specialists. Codex reads `.agents/plugins/marketplace.json` and the selected plugin's
+one of the four specialists. Codex reads `.agents/plugins/marketplace.json` and the selected plugin's
 `.codex-plugin/plugin.json`.
 
 ## Claude Code
@@ -23,7 +23,7 @@ plugin's `.claude-plugin/plugin.json`.
 
 ## Pinning
 
-For a reproducible team installation, pin the repository to a bare release tag such as `0.2.0`.
+For a reproducible team installation, pin the repository to a bare release tag such as `0.3.0`.
 The release gate validates both marketplace formats, every declared instruction file, the public
 documentation, and the version recorded by each plugin manifest.
 

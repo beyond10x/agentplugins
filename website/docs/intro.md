@@ -17,6 +17,7 @@ directly when the work is already clear.
 | [`aep-planning`](./plugins/aep-planning.md) | Governed plans and artifact stores | planning skill, decomposer, plan reviewer, reverse engineer |
 | [`adp`](./plugins/adp.md) | Governed development delivery | wave skill, story scoper, implementor, adversary |
 | [`ess-schema`](./plugins/ess-schema.md) | Executable system specifications | schema validation and deterministic projection guidance |
+| [`workspace-hygiene`](./plugins/workspace-hygiene.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
 The marketplace contains instructions, not credentials. A plugin does not acquire authority to
 write a repository, contact a service, or bypass an approval boundary merely because it is

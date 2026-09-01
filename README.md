@@ -2,12 +2,13 @@
 
 Curated marketplace identity: `beyond10x`.
 
-The repository deliberately contains four focused plugins:
+The repository deliberately contains five focused plugins:
 
 - `beyond10x`: marketplace navigation, public resource discovery, and portable plugin creation.
 - `aep-planning`: governed planning, decomposition, plan review, and reverse engineering.
 - `adp`: wave coordination, story scoping, implementation, and adversarial review.
 - `ess-schema`: ESS validation and deterministic schema/OpenAPI projection guidance.
+- `workspace-hygiene`: safe creation, leases, publication checks, and cleanup for Git worktrees.
 
 `beyond10x` is the front door, not a catch-all. It routes a task to the smallest specialist and
 keeps plugin-creation workflows portable by making shared skills the canonical implementation for
