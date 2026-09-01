@@ -5,6 +5,18 @@
   },
   "plugins": [
     {
+      "name": "beyond10x",
+      "source": {
+        "source": "local",
+        "path": "./plugins/beyond10x"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "aep-planning",
       "source": {
         "source": "local",

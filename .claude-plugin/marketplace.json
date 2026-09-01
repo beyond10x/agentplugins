@@ -3,6 +3,11 @@
   "owner": { "name": "beyond10x" },
   "plugins": [
     {
+      "name": "beyond10x",
+      "source": "./plugins/beyond10x",
+      "description": "Navigate Beyond10x resources and create portable Codex and Claude Code plugins."
+    },
+    {
       "name": "aep-planning",
       "source": "./plugins/aep-planning",
       "description": "Govern AEP planning artifacts, decomposition, review, and reverse engineering."

@@ -46,7 +46,7 @@ const config: Config = {
         {href: 'https://beyond10x.github.io/getting-started/', label: 'beyond10x', position: 'left'},
         {to: '/docs/choose-a-plugin', label: 'Choose', position: 'left'},
         {to: '/docs/install', label: 'Install', position: 'left'},
-        {to: '/docs/plugins/aep-planning', label: 'Reference', position: 'left'},
+        {to: '/docs/plugins/beyond10x', label: 'Reference', position: 'left'},
         {href: 'https://github.com/beyond10x/agentplugins', label: 'GitHub', position: 'right'},
       ],
     },
@@ -58,6 +58,7 @@ const config: Config = {
           {label: 'Install the marketplace', to: '/docs/install'},
         ]},
         {title: 'Plugins', items: [
+          {label: 'Beyond10x', to: '/docs/plugins/beyond10x'},
           {label: 'AEP Planning', to: '/docs/plugins/aep-planning'},
           {label: 'ADP', to: '/docs/plugins/adp'},
           {label: 'ESS Schema', to: '/docs/plugins/ess-schema'},

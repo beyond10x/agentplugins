@@ -7,6 +7,12 @@ title: Choose a plugin
 
 Start with the narrowest plugin that covers the task.
 
+## Finding the right surface or creating a plugin
+
+Use **Beyond10x** when you are unsure which specialist owns the work, need the public resource map,
+or want to create or port a plugin. Its plugin creator makes shared skills the canonical workflow
+so the capability works in Codex and Claude Code, while keeping host-specific wrappers explicit.
+
 ## Planning or understanding work
 
 Use **AEP Planning** when the repository has a governed artifact store, or when you need to turn a
@@ -25,4 +31,4 @@ a deterministic schema/OpenAPI projection. It reports unsupported semantics inst
 them.
 
 Installing more than one is reasonable when the work crosses those boundaries. Their scopes are
-complementary; there is no catch-all plugin.
+complementary. The Beyond10x front door routes to them; it does not absorb their instructions.

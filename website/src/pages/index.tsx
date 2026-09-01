@@ -5,6 +5,7 @@ import Heading from '@theme/Heading';
 import styles from './index.module.css';
 
 const plugins = [
+  ['Beyond10x', 'Route work, find public resources, and create portable plugins.', '/docs/plugins/beyond10x'],
   ['AEP Planning', 'Plan, decompose, review, and reverse-engineer governed work.', '/docs/plugins/aep-planning'],
   ['ADP', 'Scope stories and coordinate implementation waves with adversarial review.', '/docs/plugins/adp'],
   ['ESS Schema', 'Validate typed system specifications and guide deterministic projections.', '/docs/plugins/ess-schema'],
@@ -18,8 +19,8 @@ export default function Home(): ReactNode {
           <p className={styles.eyebrow}>Curated marketplace · beyond10x</p>
           <Heading as="h1">Give each agent only the engineering guidance it needs.</Heading>
           <p className={styles.lead}>
-            Three focused plugins keep planning, development coordination, and executable-system
-            modeling separate—without bundling credentials or hidden authority.
+            A lightweight front door routes work to three focused specialists and helps create
+            portable plugins—without bundling credentials or hidden authority.
           </p>
           <div className={styles.actions}>
             <Link className="button button--primary button--lg" to="/docs/choose-a-plugin">Choose a plugin</Link>

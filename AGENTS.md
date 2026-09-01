@@ -10,8 +10,9 @@
 ## Invariants
 
 - Marketplace identity is `beyond10x` in every marketplace format.
-- Keep exactly the focused plugin boundaries described in `README.md`; do not recreate a mixed
-  catch-all plugin.
+- Keep exactly the focused plugin boundaries described in `README.md`. The `beyond10x` front door
+  may route to specialists and teach portable plugin authoring, but it must not absorb their
+  workflows or become a mixed catch-all.
 - The AEP canonical command in instructions is `aep`. `protocol` is compatibility only and must not
   become the authored spelling again.
 - Do not mention or depend on retired plugin references, former marketplace identities, or the

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beyond10x Guide"
+  short_description: "Route work across Beyond10x plugins"
+  default_prompt: "Use $beyond10x to select the right Beyond10x plugin and resources for this task."

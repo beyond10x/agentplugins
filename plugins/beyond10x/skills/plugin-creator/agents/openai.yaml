@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beyond10x Plugin Creator"
+  short_description: "Build portable Codex and Claude plugins"
+  default_prompt: "Use $plugin-creator to create a plugin whose workflows work in Codex and Claude Code."

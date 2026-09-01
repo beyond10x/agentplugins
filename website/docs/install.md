@@ -6,13 +6,13 @@ title: Install
 # Install from the `beyond10x` marketplace
 
 Use the GitHub repository `beyond10x/agentplugins` as the marketplace source in a supported agent
-client. The marketplace identity is `beyond10x`; the installable names are `aep-planning`, `adp`,
-and `ess-schema`.
+client. The marketplace identity is `beyond10x`; the installable names are `beyond10x`,
+`aep-planning`, `adp`, and `ess-schema`.
 
 ## Codex
 
-Open the Plugins surface, add the GitHub repository as a marketplace, then select one of the three
-focused plugins. Codex reads `.agents/plugins/marketplace.json` and the selected plugin's
+Open the Plugins surface, add the GitHub repository as a marketplace, then select the front door or
+one of the three specialists. Codex reads `.agents/plugins/marketplace.json` and the selected plugin's
 `.codex-plugin/plugin.json`.
 
 ## Claude Code
@@ -23,10 +23,11 @@ plugin's `.claude-plugin/plugin.json`.
 
 ## Pinning
 
-For a reproducible team installation, pin the repository to a bare release tag such as `0.1.1`.
+For a reproducible team installation, pin the repository to a bare release tag such as `0.2.0`.
 The release gate validates both marketplace formats, every declared instruction file, the public
 documentation, and the version recorded by each plugin manifest.
 
 After installation, invoke the skill by its displayed name or ask the agent for the capability the
-plugin describes. Installation does not grant filesystem, network, credential, or approval
-authority; the host and repository rules still decide those boundaries.
+plugin describes. Start with `beyond10x` if you want the front door to select a specialist.
+Installation does not grant filesystem, network, credential, or approval authority; the host and
+repository rules still decide those boundaries.

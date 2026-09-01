@@ -5,7 +5,7 @@ repository:
 surfaces:
   - id: docs
     name: Agent Plugins
-    summary: Install focused AEP planning, ADP delivery, and ESS schema guidance from the curated beyond10x marketplace.
+    summary: Navigate and create portable plugins, or install focused AEP planning, ADP delivery, and ESS schema guidance from the curated beyond10x marketplace.
     kind: documentation
     canonicalUrl: https://beyond10x.github.io/agentplugins/
     maturity: development
@@ -13,11 +13,11 @@ surfaces:
     discoverability: public
     audiences: [adopter, developer]
     journeys: [plan-work, build-agents, specify]
-    capabilities: [governed-planning, development-waves, schema-validation]
+    capabilities: [plugin-routing, plugin-authoring, governed-planning, development-waves, schema-validation]
     sections:
       - {label: Choose a plugin, url: https://beyond10x.github.io/agentplugins/docs/choose-a-plugin, kind: guide}
       - {label: Install, url: https://beyond10x.github.io/agentplugins/docs/install, kind: quickstart}
-      - {label: Plugin reference, url: https://beyond10x.github.io/agentplugins/docs/plugins/aep-planning, kind: reference}
+      - {label: Plugin reference, url: https://beyond10x.github.io/agentplugins/docs/plugins/beyond10x, kind: reference}
       - {label: Source, url: https://github.com/beyond10x/agentplugins, kind: source}
     relationships:
       - {target: aep-service/docs, kind: supports, label: Adds governed planning guidance}

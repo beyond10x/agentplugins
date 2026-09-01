@@ -5,6 +5,15 @@ use std::process::{Command, ExitCode};
 
 const PLUGINS: &[(&str, &[&str])] = &[
     (
+        "beyond10x",
+        &[
+            "skills/beyond10x/SKILL.md",
+            "skills/beyond10x/references/resources.md",
+            "skills/plugin-creator/SKILL.md",
+            "skills/plugin-creator/references/compatibility.md",
+        ],
+    ),
+    (
         "aep-planning",
         &[
             "skills/planning/SKILL.md",
@@ -49,7 +58,15 @@ fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
             PLUGINS.len()
         ));
     }
-    for (plugin, _) in PLUGINS {
+    for (index, (plugin, _)) in PLUGINS.iter().enumerate() {
+        let actual = entries[index]
+            .get("name")
+            .and_then(serde_json::Value::as_str);
+        if actual != Some(plugin) {
+            return Err(format!(
+                "{relative} plugin {index} is {actual:?}; expected `{plugin}`"
+            ));
+        }
         let count = entries
             .iter()
             .filter(|entry| entry.get("name").and_then(serde_json::Value::as_str) == Some(plugin))

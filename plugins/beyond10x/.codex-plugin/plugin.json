@@ -1,0 +1,18 @@
+{
+  "name": "beyond10x",
+  "version": "0.2.0",
+  "description": "Route work to focused Beyond10x plugins and create portable plugins for Codex and Claude Code.",
+  "author": {
+    "name": "Beyond10x"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Beyond10x",
+    "shortDescription": "Navigate the marketplace and build plugins.",
+    "longDescription": "Find the focused Beyond10x plugin for a task, open the relevant public resources, and create shared-skill plugins that work in Codex and Claude Code.",
+    "developerName": "Beyond10x",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use Beyond10x to route this task or help me create a portable agent plugin."
+  }
+}

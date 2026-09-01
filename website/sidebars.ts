@@ -8,7 +8,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Plugin reference',
-      items: ['plugins/aep-planning', 'plugins/adp', 'plugins/ess-schema'],
+      items: ['plugins/beyond10x', 'plugins/aep-planning', 'plugins/adp', 'plugins/ess-schema'],
     },
     'trust-and-scope',
   ],
