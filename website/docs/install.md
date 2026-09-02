@@ -23,7 +23,7 @@ plugin's `.claude-plugin/plugin.json`.
 
 ## Pinning
 
-For a reproducible team installation, pin the repository to a bare release tag such as `0.3.2`.
+For a reproducible team installation, pin the repository to a bare release tag such as `0.3.3`.
 The release gate validates both marketplace formats, every declared instruction file, the public
 documentation, and the version recorded by each plugin manifest.
 

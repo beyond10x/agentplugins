@@ -1,6 +1,6 @@
 {
   "name": "adp",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Coordinate ADP implementation waves with scoped implementors and adversarial review.",
   "author": {
     "name": "Beyond10x"
