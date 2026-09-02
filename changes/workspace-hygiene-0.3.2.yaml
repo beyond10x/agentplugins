@@ -1,0 +1,15 @@
+schema: b10x-change/v1
+id: agentplugins/workspace-hygiene-0.3.2
+repository: agentplugins
+publishedAt: 2026-09-02T01:24:07Z
+title: Workspace cleanup becomes review-bound and recoverable
+summary: Agent Plugins 0.3.2 refreshes Workspace Hygiene so agents apply cleanup only to exact reviewed ids and safely reconcile interrupted provisioning, durable removals, missing records, and legacy trees.
+kind: capability
+impact: significant
+source:
+  url: https://github.com/beyond10x/agentplugins/releases/tag/0.3.2
+  version: 0.3.2
+journeys: [build-agents, operate-services]
+affectedSurfaces: [agentplugins/docs, worktree/docs]
+relations:
+  - {target: change:worktree/managed-worktrees-0.1.0, kind: depends-on, label: Uses the public Worktree lifecycle}

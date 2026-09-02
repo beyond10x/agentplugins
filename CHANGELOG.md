@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.2] — 2026-09-02
+
+- Refresh the generated `worktree` skill for review-bound cleanup, durable removal recovery,
+  interrupted-provisioning reconciliation, and explicit legacy-tree handling.
+- Pin the public installation guidance to the matching Worktree 0.3.0 safety release.
+
 ## [0.3.1] — 2026-09-01
 
 - Make GitHub release publication idempotent so rerunning a successful tag publication preserves
