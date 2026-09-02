@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: story:domain-first-rule
 kind: story
-status: active
+status: implemented
 title: An epic that introduces a new noun models it first
 relations:
 - decomposes: epic:second-adopter-feedback
-revision: 3
+revision: 4
 ---
 # Story: An epic that introduces a new noun models it first
 

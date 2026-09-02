@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: story:plan-time-critic-panel
 kind: story
-status: active
+status: implemented
 title: A plan-time critic panel with a bounded revision loop
 relations:
 - decomposes: epic:second-adopter-feedback
-revision: 3
+revision: 4
 ---
 # Story: A plan-time critic panel with a bounded revision loop
 

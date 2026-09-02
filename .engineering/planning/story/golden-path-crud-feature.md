@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: story:golden-path-crud-feature
 kind: story
-status: active
+status: implemented
 title: A golden-path page from feature idea to critiqued plan, with one worked CRUD feature
 relations:
 - decomposes: epic:second-adopter-feedback
-revision: 3
+revision: 4
 ---
 # Story: A golden-path page from feature idea to critiqued plan, with one worked CRUD feature
 

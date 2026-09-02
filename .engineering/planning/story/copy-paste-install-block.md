@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: story:copy-paste-install-block
 kind: story
-status: active
+status: implemented
 title: One copy-paste install block on the install page and the README
 relations:
 - decomposes: epic:second-adopter-feedback
-revision: 3
+revision: 4
 ---
 # Story: One copy-paste install block on the install page and the README
 

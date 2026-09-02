@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: story:decomposer-names-undecided-relations
 kind: story
-status: active
+status: implemented
 title: The decomposer names every undecided domain relation and stops there
 relations:
 - decomposes: epic:second-adopter-feedback
-revision: 3
+revision: 4
 ---
 # Story: The decomposer names every undecided domain relation and stops there
 
