@@ -14,6 +14,26 @@ The repository deliberately contains five focused plugins:
 keeps plugin-creation workflows portable by making shared skills the canonical implementation for
 Codex and Claude Code. It does not copy or replace the specialists' instructions.
 
+## Install
+
+`aep-planning` and `adp` drive the `aep` CLI and do nothing until an `aep` binary is on your
+`PATH`. It is published as a GitHub release of the sibling repository
+[`beyond10x/aep`](https://github.com/beyond10x/aep/releases) — current release `0.41.0`. Check it
+with `aep --version`, then paste this block into a Claude Code session:
+
+```text
+/plugin marketplace add beyond10x/agentplugins
+/plugin install aep-planning@beyond10x
+/plugin install adp@beyond10x
+/plugin install ess-schema@beyond10x
+```
+
+Add `/plugin install beyond10x@beyond10x` for the front door and
+`/plugin install workspace-hygiene@beyond10x` for managed worktrees. Codex offers the same plugins
+from the same repository, following `.agents/plugins/marketplace.json`; no slash-command equivalent
+is published, so add the repository as a marketplace from its Plugins surface. Pinning and the full
+walkthrough: [`website/docs/install.md`](website/docs/install.md).
+
 Codex marketplace metadata lives at `.agents/plugins/marketplace.json`; Claude plugin marketplace
 metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own manifest and only the
 skills or agents in its stated scope.

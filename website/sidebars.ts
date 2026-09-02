@@ -5,6 +5,7 @@ const sidebars: SidebarsConfig = {
     'intro',
     'choose-a-plugin',
     'install',
+    'golden-path',
     {
       type: 'category',
       label: 'Plugin reference',

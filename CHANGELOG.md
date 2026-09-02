@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.4.0] — 2026-09-02
+
+- Give `website/docs/install.md` and `README.md` one copy-paste install block — `/plugin marketplace
+  add beyond10x/agentplugins` plus `aep-planning`, `adp` and `ess-schema` — and say before it that
+  the planning and development plugins do nothing until the `aep` binary from the `beyond10x/aep`
+  releases is on `PATH`, checked with `aep --version`.
+- Add a golden-path page to the site: one recorded run from a feature idea to a critiqued plan on a
+  repository that already exists, with the prompts to paste and every CLI block produced by running
+  it under `aep` 0.41.0. The worked CRUD example shows the decomposer filing a `decision-blocker`
+  with a `blocks` edge for the one entity relation nobody had decided, rather than drafting stories
+  around it; the front door's resource list names the page.
+- Teach the `decomposer` agent to enumerate the epic's domain relations before drafting any story:
+  each is classified `inferable` — with the `path:line` or artifact that settles it, written into the
+  story body — or `requires-stakeholder-input`, which becomes a `decision-blocker` with a `blocks`
+  edge and no story, so an undecided relation reaches the operator as a question instead of a plan
+  that improvised the answer.
+- Add a plan-time critic panel to `aep-planning`: four read-only critics (acceptance, design, scope,
+  parallel safety) argue with a decomposition before an operator reads it, each verdict recorded as
+  an immutable `review-result` through `new --from`, revisions bounded at two rounds with open
+  findings reported. The plugin validator now requires the four critics and their rubric.
+- Add a domain-first guardrail to the planning skill: an epic or story that introduces a new noun
+  models it as an `ess/1` document (or imports one with `aep reverse openapi`) before stories are
+  written around it, with every unread relation marked `UNMAPPED:` rather than guessed.
+- Widen `ess-schema` to fire when a story or epic introduces an entity, and say how to start a
+  domain from nothing: the minimal `ess/1` document that `ess validate` accepts, the three refusals
+  that shape it, and the `UNMAPPED:` marker.
+- Adopt a planning store of this repository's own under `.engineering/`, pinned to the `aep`
+  protocol tree at its 0.41.0 commit; the epic and stories behind this release are its first entries.
+- Author the planning skill's first-store instruction as `aep artifact list`; `protocol` was the
+  one remaining authored spelling.
+
 ## [0.3.7] — 2026-09-02
 
 - Correct `story-migration`: a re-run does not replay, it is **refused**. 0.3.6 said the create

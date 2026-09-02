@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.3.7** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.4.0** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -47,10 +47,10 @@ gains a status. An agent that recites `draft → proposed → active` from memor
 propose an illegal move in a store that renamed one of them. Reading `aep artifact
 lifecycle story` costs one command and cannot be wrong.
 
-When a store is present but you have not looked at it yet in this session, start with `protocol
+When a store is present but you have not looked at it yet in this session, start with `aep
 artifact list` and `aep artifact kinds`. Two commands buy you the whole vocabulary.
 
-## 3. Six guardrails
+## 3. Seven guardrails
 
 These are inlined because they hold whatever the store's vocabulary is.
 
@@ -159,6 +159,19 @@ created decision-blocker:api-token-scope (open) at .engineering/planning/decisio
 `--withholds` is optional and names the evidence kind nobody can produce while this is open, so
 `aep artifact explain <blocked-id>` answers *why is there no record for the next move*. It only
 means something beside `blocks:`, and `validate` says so.
+
+**7. An epic or story that introduces a new noun models it first.** Where the artifact's outcome
+names an entity no `ess/1` document in the repository declares, do not decompose it and do not write
+stories around it. Draft the domain first — `aep reverse openapi --domain <name> --out <domain-doc>
+<openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
+`ess-schema` skill — run `ess validate --path <specification>`, and cite the file by path in the
+artifact body through `aep artifact body`. A noun with no typed home is the relation nobody can
+check later.
+
+The draft is a proposal, not a silent completion. Every relation you could not read from code, an
+OpenAPI document or an existing artifact is written into the domain with an `UNMAPPED:` marker and
+named again in your report; ESS refuses guessed semantics, and so does this. Where the noun is
+already declared, cite the existing document instead of drafting a second one.
 
 ## 4. Who decides
 
@@ -274,7 +287,90 @@ valid
 
 Had `validate` found something, its output would have gone to the operator unedited.
 
-## 7. Scoping what is already there
+## 7. Argue with the decomposition before the operator reads it
+
+§ 4 says a decomposition is drafted and reported rather than held for confirmation. That leaves one
+agent's reading of the work standing as the plan. **After you have reported it, put it in front of a
+panel of critics and revise what they find** — the operator then reads a plan that has already been
+argued with, and the findings nobody fixed, rather than a first draft with a hopeful tone.
+
+**Skip the step when fewer than two artifacts sit under the one you decomposed, and say in the
+report that you skipped it and why.** Three of the four perspectives compare items with each other,
+so on a set of one they have nothing to do and produce agreeable noise. Count the edges rather than
+guessing: `aep artifact list --format json` prints every artifact with its relations, and
+`aep artifact graph` draws the same edges — count the ones pointing at the artifact you decomposed.
+
+### Dispatch the four at once
+
+| Agent | The one question it asks |
+|---|---|
+| `aep-planning:plan-critic-acceptance` | could anybody ever tell whether these are done? |
+| `aep-planning:plan-critic-design` | is this set the right shape — coupling, cycles, a split abstraction? |
+| `aep-planning:plan-critic-scope` | is everything the parent promised claimed, and nothing else? |
+| `aep-planning:plan-critic-parallel-safety` | which two of these land on one file, and does the plan say so? |
+
+Name the agent type in full, with its plugin prefix, in your report. A built-in agent used where one
+of these exists is a deviation you report, not a substitution you make.
+
+**They run at once, and none of them sees another's findings.** That is the mechanism, not a
+scheduling convenience: four independent readings are worth more than four agents converging on the
+first one's framing. It is also why they are read-only — the journal is append-only and
+single-writer, so N critics writing it is a race. They return text; you write.
+
+Each returns a first line that is exactly `approve` or exactly `needs-revision`, then one line per
+finding in the form `artifact — reason — citation`. The rules they work to are in
+[references/critic-rubric.md](references/critic-rubric.md); read it before you judge a verdict, and
+before you decide a finding is not worth acting on.
+
+### Record every verdict, including the approvals
+
+One record per critic per round, holding that critic's returned text. An approval you did not record
+is the round nobody can see later, and it is the half that makes the record evidence rather than a
+complaint log.
+
+The kind that holds a verdict is immutable — `aep artifact body` refuses it, because a record that
+can be edited after the fact is not evidence — so the body arrives at creation or never:
+
+```console
+$ aep artifact lifecycle review-result
+review-result starts at active
+  active -> archived
+  archived -> nothing
+
+$ aep artifact new review-result acceptance-round-1 \
+    --title "Acceptance critic, round 1" \
+    --relate reviews:story:credential-store \
+    --relate reviews:story:registration-ceremony \
+    --from round-1-acceptance.md
+created review-result:acceptance-round-1 (active) at .engineering/planning/review-result/acceptance-round-1.md
+```
+
+* `--from` takes the critic's text **as it returned it**, written to a file first. Summarise it and
+  you have recorded your reading of the review rather than the review.
+* Repeat `--relate` once per artifact the critic judged. Read the edge name from
+  `aep artifact relations` before you rely on it, the way you would any other vocabulary.
+* Write them one at a time. Four critics return at once; the store takes one writer.
+* A later round is a **new** record, not an edit of the first. Two records that disagree are the
+  history of a plan changing its mind, which is the thing worth having.
+
+### Revise, at most twice
+
+On `needs-revision`, revise the drafts — never the record. Each finding names the one artifact a
+revision would change; rewrite that artifact's body through `aep artifact body <id> --from <path|->`
+with the complete body, or `--section <heading>` where one section changes, one artifact at a time.
+Then dispatch the same four again over the revised set.
+
+**Stop after the second round.** There is no third, and a panel that runs until it approves is a
+panel that has been talked into approving. Whatever is still open at that point goes in your report:
+one line per finding, verbatim from the critic with its citation, naming the record that holds it and
+the round it survived. Three open findings with citations serve an operator better than a plan four
+agents were argued into.
+
+A verdict is not a move. Whether an artifact advances is § 4's question and the store's; four agents
+approving its prose is not evidence anybody asked for. Finish the batch the way guardrail 3 says —
+`aep artifact validate`, output relayed verbatim.
+
+## 8. Scoping what is already there
 
 A store that does not record what its stories touch cannot be sequenced. Two items on one file
 conflict whichever order they land in, so *which surfaces does this touch* is the property that
@@ -294,4 +390,12 @@ separates them and why a scoper reports what it could **not** establish beside w
 The on-disk format — directory layout, filename and id rules, which frontmatter fields are
 machine-owned, and a complete example file — is in
 [references/store-conventions.md](references/store-conventions.md). Read it before changing a store
-document. Everything else is a question for the CLI.
+document.
+
+The rules every critic in § 7 works to — the two verdicts and what binds them to the findings, the
+`artifact — reason — citation` line, what is not a finding, why a critic writes nothing — are in
+[references/critic-rubric.md](references/critic-rubric.md). Read it before dispatching a panel or
+judging what one returned. It is rules only for the same reason this file is: it names no kind,
+status or relation.
+
+Everything else is a question for the CLI.

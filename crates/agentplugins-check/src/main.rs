@@ -17,10 +17,15 @@ const PLUGINS: &[(&str, &[&str])] = &[
         "aep-planning",
         &[
             "skills/planning/SKILL.md",
+            "skills/planning/references/critic-rubric.md",
             "skills/story-migration/SKILL.md",
             "agents/decomposer.md",
             "agents/plan-reviewer.md",
             "agents/reverse-engineer.md",
+            "agents/plan-critic-acceptance.md",
+            "agents/plan-critic-design.md",
+            "agents/plan-critic-scope.md",
+            "agents/plan-critic-parallel-safety.md",
         ],
     ),
     (
@@ -183,6 +188,53 @@ mod tests {
             .and_then(Path::parent)
             .expect("checker is under repository root");
         check(root).expect("the committed marketplace validates");
+    }
+
+    /// The four critics and the rubric they share are required content, not optional extras: a
+    /// panel missing one perspective still returns four confident verdicts, and nothing else in
+    /// this repository would notice the file had gone.
+    #[test]
+    fn a_deleted_critic_fails_the_check() {
+        let required: &[&str] = PLUGINS
+            .iter()
+            .find(|(name, _)| *name == "aep-planning")
+            .map(|(_, required)| *required)
+            .expect("aep-planning is one of the focused plugins");
+        let critic = "agents/plan-critic-design.md";
+        assert!(
+            required.contains(&critic),
+            "the critic panel must be required content"
+        );
+
+        let repository = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        let sandbox =
+            std::env::temp_dir().join(format!("agentplugins-check-critic-{}", std::process::id()));
+        let plugin_root = sandbox.join("plugins").join("aep-planning");
+        let write = |target: &Path, bytes: &str| {
+            std::fs::create_dir_all(target.parent().expect("every entry has a directory"))
+                .expect("the sandbox is writable");
+            std::fs::write(target, bytes).expect("the sandbox is writable");
+        };
+        for manifest in [".codex-plugin/plugin.json", ".claude-plugin/plugin.json"] {
+            let committed =
+                std::fs::read_to_string(repository.join("plugins/aep-planning").join(manifest))
+                    .expect("the committed manifest is readable");
+            write(&plugin_root.join(manifest), &committed);
+        }
+        for relative in required.iter().filter(|relative| **relative != critic) {
+            write(&plugin_root.join(relative), "");
+        }
+
+        let error = plugin(&sandbox, "aep-planning", required)
+            .expect_err("a plugin missing one of its critics must fail the check");
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+        assert_eq!(
+            error,
+            format!("plugin `aep-planning` is missing `{critic}`")
+        );
     }
 
     #[test]

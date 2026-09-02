@@ -1,0 +1,12 @@
+version: aep.project/1
+
+# Written by `protocol reverse init`. It points; it does not duplicate — a rule restated
+# here would be a second copy with no way to say which one is in force. Principles and
+# profiles of this project's own go under `principles/` and `profiles/` beside this file.
+protocol: adp/1
+profile: development.standard
+protocols: git+https://github.com/beyond10x/aep#b857bbebcb44f77275bc745659226f4826897e78
+
+summary: >-
+  Curated Codex and Claude Code plugins for AEP planning, ADP development and ESS validation,
+  planned in their own store.
