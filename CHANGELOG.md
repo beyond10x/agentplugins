@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.5] — 2026-09-02
+
+- Refresh the generated `worktree` skill so it records that `gc --repo` selects the activated
+  workspace profile rather than the repository, that its dry-run therefore lists trees belonging
+  to other repositories, and that `status` accepts no filter at all.
+- Pin the public installation guidance to the matching Worktree 0.3.2 release.
+
 ## [0.3.4] — 2026-09-02
 
 - Pin the documentation redirect façade to the 21-source Website verifier runtime.
