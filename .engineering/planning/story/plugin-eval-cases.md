@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:plugin-eval-cases
 kind: story
-status: draft
+status: active
 title: Every agent and skill has an eval case beside it
 summary: evals/ holds one eval-case/1 per critic, the decomposer, ess-schema, the golden path and the adversary, run by aep eval run --corpus evals and replayable offline.
 owner: plugins
@@ -10,7 +10,7 @@ tags:
 - evals
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 3
 ---
 # Story: Every agent and skill has an eval case beside it
 

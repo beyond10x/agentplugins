@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:wave-skill-selects-with-the-waves-verb
 kind: story
-status: draft
+status: implemented
 title: The wave skill selects on aep artifact waves when the binary has it
 summary: The selection step pastes waves, collisions and unassessed from the verb; pairwise prose only as a stated fallback.
 owner: plugins
@@ -10,7 +10,7 @@ tags:
 - wave
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 4
 ---
 # Story: The wave skill selects on `aep artifact waves` when the binary has it
 

@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:eval-ci-gates
 kind: story
-status: draft
+status: implemented
 title: CI validates the cases always and runs them live behind a label and a budget
 summary: task check validates and replays for free; eval.yml runs live only with the run-eval label, diff-scoped, under a budget variable, with the bot secret.
 owner: plugins
@@ -12,7 +12,7 @@ tags:
 relations:
 - decomposes: epic:ahead-of-the-alternative
 - depends_on: story:plugin-eval-cases
-revision: 1
+revision: 4
 ---
 # Story: CI validates the cases always and runs them live behind a label and a budget
 

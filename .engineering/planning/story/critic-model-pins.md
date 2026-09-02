@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:critic-model-pins
 kind: story
-status: draft
+status: implemented
 title: The four critics declare their model and effort
 summary: 'model: and effort: on plan-critic-*.md, refused by agentplugins-check when absent; default sonnet/high until the review-value table exists.'
 owner: plugins
@@ -10,7 +10,7 @@ tags:
 - critics
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 4
 ---
 # Story: The four critics declare their model and effort
 

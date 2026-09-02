@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:drive-entry-skill
 kind: story
-status: draft
+status: active
 title: /drive runs one story under aep drive from a Claude Code session
 summary: A skill that runs aep doctor then launches aep drive run for one story in a hermetic scratch home; blocked on the aep walk reaching complete.
 owner: plugins
@@ -10,7 +10,7 @@ tags:
 - drive
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 3
 ---
 # Story: `/drive` runs one story under `aep drive` from a Claude Code session
 

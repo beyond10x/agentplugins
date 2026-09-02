@@ -2,14 +2,14 @@
 format: aep.planning-md/1
 id: epic:ahead-of-the-alternative
 kind: epic
-status: draft
+status: active
 title: What the 2026-09-02 comparison left open, and the parts only this stack can do
 summary: Model pins, the wave skill on aep artifact waves, eval cases beside every agent and skill with free and label-gated CI, a /drive entry, relations cited from ESS, and recorded review outcomes.
 owner: plugins
 tags:
 - bench
 - comparison
-revision: 1
+revision: 3
 ---
 # Epic: What the 2026-09-02 comparison left open, and the parts only this stack can do
 

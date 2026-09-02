@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:review-outcome-recorded
 kind: story
-status: draft
+status: active
 title: The critic step and the wave record each review outcome
 summary: no-op, fixed or escalated written by the step that acted on a review-result; structured findings emitted by the rubric and the adversary.
 owner: plugins
@@ -11,7 +11,7 @@ tags:
 - review
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 3
 ---
 # Story: The critic step and the wave record each review's outcome
 

@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:ess-schema-cites-relations
 kind: story
-status: draft
+status: implemented
 title: 'A domain relation is a relations: entry, and the planning skill cites it'
 summary: 'ess-schema, guardrail 7, the decomposer and the golden path require a relation to be an ess/1 relations: entry once ESS ships the construct.'
 owner: plugins
@@ -10,7 +10,7 @@ tags:
 - ess
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 4
 ---
 # Story: A domain relation is a `relations:` entry, and the planning skill cites it
 

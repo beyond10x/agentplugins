@@ -2,12 +2,12 @@
 format: aep.planning-md/1
 id: story:finding-signature-ledger
 kind: story
-status: draft
+status: implemented
 title: The second adversary attack knows what the first found
 relations:
 - decomposes: epic:second-adopter-feedback
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 4
 ---
 # Story: The second adversary attack knows what the first found
 
