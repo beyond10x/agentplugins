@@ -1,0 +1,15 @@
+schema: b10x-change/v1
+id: agentplugins/aep-refs-0.3.7
+repository: agentplugins
+publishedAt: 2026-09-02T14:00:12Z
+title: Planning skills preserve external work references
+summary: Agent Plugins 0.3.7 teaches planning and story migration to record AEP 0.41.0 refs as typed frontmatter, documents the safe already-exists refusal on repeated migration, and corrects the guidance's published version claims.
+kind: capability
+impact: significant
+source:
+  url: https://github.com/beyond10x/agentplugins/releases/tag/0.3.7
+  version: 0.3.7
+journeys: [plan-work, build-agents]
+affectedSurfaces: [agentplugins/docs, aep/docs]
+relations:
+  - {target: change:aep/external-work-refs-0.41.0, kind: depends-on, label: Uses the typed AEP external-reference model}
