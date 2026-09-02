@@ -1,0 +1,4 @@
+interface:
+  display_name: "Story Migration"
+  short_description: "Migrate a legacy backlog into the AEP planning store"
+  default_prompt: "Migrate this repository's existing work tracking into the AEP planning store without deleting the sources, and backlink both directions."

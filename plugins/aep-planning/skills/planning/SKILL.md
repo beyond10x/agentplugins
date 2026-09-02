@@ -191,6 +191,11 @@ asked for. Everything else was already asked for when the work was.
 An empty store in a repository with 40,000 lines of code is not a blank page — it is a plan somebody
 has been carrying in their head. Do not open the editor and start typing epics.
 
+**If that plan is already written down somewhere — a story tree, a `TODO.md`, plan or issue
+documents — use the `story-migration` skill instead of this section.** Adopting beside a legacy
+backlog rather than migrating it produces two plans and no record that one replaced the other, and
+that has already happened once in this organisation.
+
 ```console
 $ aep reverse init --protocols <source> --profile <profile>
 $ aep reverse scan --format json
