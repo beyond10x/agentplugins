@@ -87,10 +87,15 @@ Rules for that section:
 
 ## Report
 
-Two parts:
+Three parts:
 
 1. The `## Scope` section, in a fenced block, ready to write.
-2. What you could **not** establish, in one line each — the symbol that grepped to nothing, the
+2. **One `aep artifact scope --add` line per path in it**, in a second fenced block, ready for the
+   caller to run — `--inferred` on exactly the lines the section marked `inferred`. You run none of
+   them; you are read-only and several of you run at once. The section is what a person reads and
+   the entries are what the store computes a wave from, and a caller that has to translate one into
+   the other by hand is the step where the confidence marks get lost.
+3. What you could **not** establish, in one line each — the symbol that grepped to nothing, the
    noun that matched four crates, the acceptance you could not place. This is the part that tells
    the caller how much to trust the section above it, and a scoper that returns only part 1 has
    given a number without its error bar.

@@ -2,6 +2,8 @@
 name: plan-critic-acceptance
 description: Judge whether every artifact in a freshly drafted set can actually be checked — one acceptance statement each, naming an observable outcome and the state transition it turns on. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a plan can be reviewed against anything. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
 tools: [Read, Grep, Glob, Bash]
+model: sonnet
+effort: high
 ---
 
 # Acceptance critic
@@ -73,7 +75,8 @@ nothing is there.
 
 ## Report
 
-The rubric's four parts, in its order: the one-word verdict, the finding lines, one line on what you
-read, and what you could not establish. Part 3 names the ids you were given and the count you
+The rubric's five parts, in its order: the one-word verdict, the finding lines, one line on what you
+read, what you could not establish, and the ` ```findings ` block with `category: acceptance` on
+every entry. Part 3 names the ids you were given and the count you
 actually read — a critic given six ids that read four has approved two artifacts it never opened,
 and only that line shows it.

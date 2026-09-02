@@ -12,7 +12,8 @@ repository that already exists and has never been planned.
 Every console block below is the output of actually running the command shown above it. None of it
 is written by hand; the only edit is that the recording machine's absolute paths are shortened to
 `…`. What the agents *say* is described in prose instead of quoted, because yours will not say it
-the same way.
+the same way. **Step 3 is the one exception and it says so**: it shows a document shape that the
+`ess` build behind this page cannot yet validate, marked rather than fabricated.
 
 The worked feature is deliberately small: a **commercial client** record that belongs to exactly one
 **account**, with create, read, update and delete. The interesting part is the one thing about it
@@ -20,8 +21,8 @@ nobody has decided, and what the plan does with that instead of guessing.
 
 ## Prerequisites
 
-Install `aep-planning` and `adp` from the marketplace — see [Install](./install.md) — and have the
-`aep` CLI on your PATH.
+Install `aep-planning`, `adp` and `ess-schema` from the marketplace — see [Install](./install.md) —
+and have the `aep` CLI on your PATH. Step 3 also uses the `ess` CLI.
 
 ```shell-session
 $ aep --version
@@ -102,12 +103,90 @@ writer: it owns the frontmatter, and it placed the epic at its kind's initial st
 typing one. Which statuses your store has is a question for the CLI, not for a page — `aep artifact
 kinds` and `aep artifact lifecycle epic` answer it, and they answer for *your* store.
 
-## 3. Decompose it
+## 3. Model the new noun before decomposing it
+
+*Commercial client* is a noun this repository has never typed. The planning skill's domain-first
+guardrail stops here rather than letting three stories be written around a shape nobody agreed on:
+a noun with no typed home is the relation nobody can check later.
+
+```text
+epic:commercial-clients introduces a noun with no typed home. Draft the smallest ess/1 domain that
+declares it and its relation to the account, validate it, and mark anything you cannot read from
+this repository as UNMAPPED rather than guessing it.
+```
+
+The relation is the point of the step. *Belongs to exactly one account* is a sentence in the epic;
+in the domain it is an entry a compiler checks:
+
+```yaml
+# domains/account.yaml
+domain: accounts.account
+
+entities:
+  - name: accounts.account.Account
+    identity:
+      name: account_id
+      type: Uuid
+    fields:
+      - name: name
+        type: String
+    relations:
+      - name: commercial_clients
+        kind: owns
+        target: accounts.account.CommercialClient
+        cardinality: many
+        via: account_id
+        # UNMAPPED: `owns` is read out of the epic — a commercial client belongs to exactly one
+        # account and has no meaning without it. What deleting the account *does* to them —
+        # refuse, or take them with it — is a command outcome and nothing here decides it.
+        # README.md:13 and src/accounts.py:30 both say it is open.
+    lifecycle:
+      initial: Active
+      states: [Active]
+      terminal: [Active]
+
+  - name: accounts.account.CommercialClient
+    identity:
+      name: client_id
+      type: Uuid
+    fields:
+      - name: account_id
+        type: Uuid
+      - name: name
+        type: String
+    lifecycle:
+      initial: Active
+      states: [Active]
+      terminal: [Active]
+```
+
+`via: account_id` sits on the **target** because the relation is `owns`: the child carries the field
+typed by the owner's identity. `ess validate` refuses a target that is not declared, a `via` that is
+missing or of the wrong type, and a second entity claiming to own the same one — which is what makes
+this worth writing down rather than asserting in a story body.
+
+:::note This block was recorded before ESS shipped relations
+
+This is the one step on the page with no recorded output, and it is marked rather than fabricated:
+the `ess` build behind this page has no `relations:` construct, so the document above is the shape to
+write and not one that has been validated end to end. Run `ess validate --path <specification>` and
+record what it prints here once the construct ships (`ess` `epic:entity-relations`); everything else
+on this page is real output.
+
+:::
+
+The `UNMAPPED:` marker is doing the same job here that the blocker does two steps down, one level
+lower: it is the question written where the answer would go, so the next reader finds it instead of
+finding a guess. Note what the relation entry *did* settle — with `owns` in the document, *leave the
+clients with no account* is no longer one of the answers, and the open question is down from three
+options to two.
+
+## 4. Decompose it
 
 ```text
 Decompose epic:commercial-clients. Before you draft a single story, list every domain relation the
 epic implies — entity to entity, cardinality, ownership, lifecycle coupling — and classify each one
-as inferable, with the path:line or artifact that settles it, or as needing a stakeholder decision.
+as inferable, citing the ess/1 document that settles it, or as needing a stakeholder decision.
 Draft no story that depends on a relation you could not settle.
 ```
 
@@ -115,9 +194,14 @@ The decomposer enumerates the relations before it drafts anything. For this epic
 
 | Relation | Classification | Settled by |
 |---|---|---|
-| commercial client to account: many-to-one, mandatory | `inferable` | the epic's own outcome |
-| the account is the owning side of the pair | `inferable` | the epic's own outcome |
-| what deleting an account does to the clients it holds | `requires-stakeholder-input` | nothing — `README.md:13` and `src/accounts.py:30` both say it is open |
+| commercial client to account: many-to-one, mandatory | `inferable` | `domains/account.yaml`, `Account.commercial_clients` — `cardinality: many` |
+| the account is the owning side of the pair | `inferable` | the same entry — `kind: owns` |
+| what deleting an account does to the clients it holds | `requires-stakeholder-input` | nothing — the `UNMAPPED:` marker beside that entry, and `README.md:13` and `src/accounts.py:30` |
+
+The first two citations point at a document `ess validate` accepted, not at a sentence in a story and
+not at a foreign key in `src/`. A `path:line` into code is admissible for a relation only when the
+classification carries the word `inferred` — because a constraint in code says what this
+implementation currently does, and says nothing about whether anybody decided it.
 
 Two are settled, so three stories are drafted against them:
 
@@ -134,9 +218,10 @@ Each `inferable` relation is written into the body of the story that rests on it
 so the next reader can check it instead of re-deriving it.
 
 The third relation is not settled, and the decomposer does not settle it. Deleting an account could
-refuse while clients remain, delete them with it, or leave them with no account; each answer
-produces a different story, and none of the three can be read out of the tree. So it becomes an
-artifact with an edge, rather than a sentence in a report nobody re-reads:
+refuse while clients remain, or delete them with it; each answer produces a different story, and
+neither can be read out of the tree. So it becomes an artifact with an edge, rather than a sentence
+in a report nobody re-reads — or an `UNMAPPED:` comment that only somebody opening the domain file
+would find:
 
 ```shell-session
 $ aep artifact lifecycle decision-blocker
@@ -168,7 +253,7 @@ $ aep artifact validate
 valid
 ```
 
-## 4. Scope the stories
+## 5. Scope the stories
 
 Nothing so far records which files each story touches, and that is the property that decides what
 can be worked at the same time: two stories on one file conflict whichever order they land in.
@@ -191,7 +276,7 @@ story:commercial-client-record body replaced (revision 2) at …/.engineering/pl
 Read the cited-or-inferred marking, not just the file list. A scope that mixes what was read with
 what was guessed gets trusted exactly where it is weakest.
 
-## 5. Run the critic panel
+## 6. Run the critic panel
 
 ```text
 Run the plan critics over epic:commercial-clients and its stories. Record every verdict, revise the
@@ -220,7 +305,7 @@ review-result starts at active
 There is no draft rung there and no way back: a verdict is written once and later archived, never
 edited. That is what makes it evidence rather than an opinion somebody kept updating.
 
-## 6. Implement one story through the wave
+## 7. Implement one story through the wave
 
 A draft is not implementable, and the store says so rather than letting you pretend otherwise:
 
@@ -255,6 +340,34 @@ When the run produces an observation that a later move needs — a test run, a r
 `aep artifact evidence` before the move, naming the source and where to look. `aep artifact move`
 finds evidence recorded against the artifact without being told. If it still refuses, the refusal
 names what is missing, and that sentence is what to relay.
+
+## 8. Drive the first story
+
+Everything in step 7 is an **instruction** an agent follows. The same story handed to the reference
+driver is walked by an engine that decides each transition instead — every state entered through a
+transition the engine returned, every gate it refuses printed with one reason per unmet requirement,
+and every status move made by the CLI and by nothing else.
+
+```text
+Drive story:commercial-client-record. Run aep doctor first and stop if anything fails, tell me what
+the run will cost before you launch it, and print the run id and how to follow it.
+```
+
+The `drive` skill checks the checkout, points `aep drive run` at the task document that names the
+story, launches it against the project's step map, and prints the run id. It moves no artifact
+itself — the moves are the driver's, which is the whole property being tested — and it relays a
+refusal (a held lock, missing evidence, two step maps that both fit) verbatim and stops.
+
+:::caution The walk has not reached `complete` yet
+
+This step is real and it does not finish. `aep`'s own `story:governed-dogfood-run` records two
+driven runs against real stories of its backlog: one stopped in `establish_verifiers` at $15.42, the
+other in `adversarial_verify` at $31.46, neither reaching the review step. **A run that wedges is a
+recorded result**, which is why those two are written down rather than retried until they worked —
+and it is what to expect from this step today. The skill says so before it launches anything, and
+the model spend is real, so it asks you for a budget rather than choosing one.
+
+:::
 
 ## What you should have
 

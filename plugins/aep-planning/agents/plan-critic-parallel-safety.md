@@ -2,6 +2,8 @@
 name: plan-critic-parallel-safety
 description: Judge whether a freshly drafted set could be worked at the same time — which items land on one file, whether the plan says so, and which items name no surface at all and are therefore unassessed rather than safe. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a set can be parallelised. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
 tools: [Read, Grep, Glob, Bash]
+model: sonnet
+effort: high
 ---
 
 # Parallel-safety critic
@@ -81,7 +83,9 @@ heading you looked under, plus the search that returned nothing.
 
 ## Report
 
-The rubric's four parts, in its order. In part 3, give the number of items whose surface you
+The rubric's five parts, in its order. In part 3, give the number of items whose surface you
 established **cited**, the number **inferred**, and the number you could not place at all — an
 `approve` over a set where three items were unplaceable is not an assessment, and only those three
-numbers show it.
+numbers show it. Part 5 carries `category: parallel-safety` on every entry, and a finding resting on
+an **inferred** surface says so in its `message`, because the block loses the qualifier the prose
+line carried otherwise.

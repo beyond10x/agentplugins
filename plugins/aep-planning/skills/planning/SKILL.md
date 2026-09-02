@@ -168,10 +168,22 @@ stories around it. Draft the domain first — `aep reverse openapi --domain <nam
 artifact body through `aep artifact body`. A noun with no typed home is the relation nobody can
 check later.
 
+**A relation between two nouns is modelled the same way the nouns are: as a `relations:` entry on
+the entity, in the `ess/1` document.** Not as a sentence in a story body, and not as a field somebody
+will recognise as a foreign key later. The entry names the far entity, whether this side owns it or
+merely references it, and the cardinality; `ess validate` refuses an entry whose target does not
+exist, whose linking field is missing or of the wrong type, and a second entity claiming to own the
+same one. That refusal is the whole value of writing it there: a relation in prose is checked by
+nobody.
+
 The draft is a proposal, not a silent completion. Every relation you could not read from code, an
 OpenAPI document or an existing artifact is written into the domain with an `UNMAPPED:` marker and
-named again in your report; ESS refuses guessed semantics, and so does this. Where the noun is
-already declared, cite the existing document instead of drafting a second one.
+named again in your report; ESS refuses guessed semantics, and so does this. **A relation whose
+cardinality you do not know is an `UNMAPPED:` marker too** — not an entry with a guessed
+cardinality beside a caveat. One-to-many and one-to-one produce different schemas, different
+lifecycles and different stories, so a guess there is not a smaller guess than inventing the
+relation. Where the noun is already declared, cite the existing document instead of drafting a
+second one.
 
 ## 4. Who decides
 
@@ -346,7 +358,10 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
 ```
 
 * `--from` takes the critic's text **as it returned it**, written to a file first. Summarise it and
-  you have recorded your reading of the review rather than the review.
+  you have recorded your reading of the review rather than the review. That includes the fenced
+  ` ```findings ` block the rubric has each critic close with: it is the half a program reads, and a
+  record whose findings were flattened into prose is one `aep artifact findings` cannot compare
+  against the next round.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
   `aep artifact relations` before you rely on it, the way you would any other vocabulary.
 * Write them one at a time. Four critics return at once; the store takes one writer.
@@ -365,6 +380,44 @@ panel that has been talked into approving. Whatever is still open at that point 
 one line per finding, verbatim from the critic with its citation, naming the record that holds it and
 the round it survived. Three open findings with citations serve an operator better than a plan four
 agents were argued into.
+
+### Record what became of every finding
+
+A `review-result` says what a critic thought. On its own it never says whether anybody acted, so a
+store full of them cannot answer *is this panel worth what it costs* — which is the question the
+model pin in [references/critic-rubric.md](references/critic-rubric.md) is waiting on. **After each
+revision round, record one outcome per finding**, against the artifact the finding named:
+
+```console
+$ aep artifact evidence story:credential-store --kind review_outcome \
+    --review review-result:acceptance-round-1 --outcome fixed
+```
+
+| Outcome | When you write it |
+|---|---|
+| `fixed` | the revision changed the artifact because of this finding. The change is in the body you rewrote and the revision number moved |
+| `no-op` | the finding held and the artifact needed no change — it was already covered elsewhere, or a sibling's revision answered it |
+| `escalated` | you did not act, and it goes to the operator open. Every finding still standing after the second round is this one |
+
+**The outcome is what you did, not what you think of the finding.** A finding you disagree with and
+did not act on is `escalated`, not `no-op`: `no-op` means the revision did not need to change
+anything, and using it for *I decided this critic was wrong* buries a disagreement the operator is
+entitled to read. Three outcomes, and none of them is a verdict on the critic.
+
+Every finding gets exactly one, including on a round where nothing changed, and including the
+findings of a critic that returned `approve` (there are none, so there is nothing to record). A
+round that recorded outcomes for the findings it acted on and none for the rest has produced the
+table's most misleading possible input.
+
+The verb takes the id of the artifact that was reviewed and the id of the record that reviewed it,
+so a finding is attributable to the round it came from without reading either body. Read
+`aep artifact evidence --help` for the flag spellings before you rely on the ones above; the kind
+list is closed and a refusal prints the whole of it (guardrail 1).
+
+**On a binary that predates the kind, the refusal prints the list and the outcome has nowhere to
+go.** Do not route around it by editing a file. Write the three counts — how many `fixed`, `no-op`
+and `escalated` — into your report and say which `aep` version refused, so the round is still
+readable and nobody records it as done. That is the one case where the outcome lives in prose.
 
 A verdict is not a move. Whether an artifact advances is § 4's question and the store's; four agents
 approving its prose is not evidence anybody asked for. Finish the batch the way guardrail 3 says —

@@ -176,8 +176,44 @@ anything; if your brief assigned you a base worktree, run there. With neither, t
 wave, which is the one error here that nothing downstream catches.
 
 State the commit or working tree your findings cover, so the coordinator can record them against
-something. What it does with them — a `review-result`, a story, a blocker, nothing — is its call
-and not yours.
+something. What it does with them — a story, a blocker, a route back to the implementor — is its
+call and not yours. It records the pass itself as a `review-result` holding your report as you
+returned it, which is why the next section exists.
+
+## The same findings, once more, in a fenced block
+
+The table above is for the coordinator to read. **Close your report with a ` ```findings ` block
+holding the same findings, and nothing that is not one of them** — that half is for a program. The
+coordinator records your report verbatim, so the block travels into the record, and
+`aep artifact findings` then compares your pass against the previous one by **signature**
+(`file:line` + verdict + origin) instead of by somebody re-reading two reports and deciding whether
+two differently-worded paragraphs are the same defect. Whether a second attack found residue or new
+ground is the number the third-attack decision turns on, and nothing but that comparison produces it.
+
+```findings
+- file: crates/aep-domain/src/requirement.rs
+  line: 214
+  category: contract-drift
+  severity: blocker
+  verdict: CONFIRMED
+  origin: introduced
+  message: the doc comment promises a refusal the function no longer performs, and the caller at :318 relies on the comment
+```
+
+| Field | What you put in it |
+|---|---|
+| `file`, `line` | the `file:line` the finding's *what was measured* row already carries. Where a finding is about a document rather than a line, `file` is the document and there is no `line` |
+| `category` | which row of *Where to attack* it came from, one word — `acceptance`, `boundary`, `mutant`, `contract-drift`, `property`, `concurrency`, `judgement` |
+| `severity` | `blocker` when the unit must not merge with it standing, `warning` when it should be fixed and does not hold the unit, `note` for the residue you would not have raised alone |
+| `verdict` | `CONFIRMED`, `NEEDS-CHANGE` or `INFEASIBLE` — the same word as the table row, unchanged |
+| `origin` | `introduced`, `pre-existing` or `undecided` — the same word as the table row. A guessed `pre-existing` routes a live defect out of the wave, and the block makes the guess durable |
+| `message` | one sentence, the finding itself. Not a second wording of the row you already wrote |
+
+**The block is a YAML list, and it is `[]` when you found nothing.** Finding nothing is a result
+(hard rule 4) and an empty block is how a later comparison can tell a pass that ran clean from a
+pass whose block somebody forgot. Every row in the table above appears in the block and nothing
+else does — a block that does not match the table is two accounts of one attack, and the reader has
+no way to know which is the one you meant.
 
 ## A bound this file cannot enforce, stated plainly
 
@@ -220,3 +256,5 @@ Then, in order:
    directory you pointed the compiler at. The coordinator cleans up what it can see, and one it was
    never told about is not found again by anything; it is found by the disk filling up, months
    later. If there are none, say *none*.
+7. The ` ```findings ` block — the same findings as part 4, in the fields above, `[]` when you found
+   nothing. Last, because it is for the program and parts 1 to 6 are for the coordinator.

@@ -2,6 +2,8 @@
 name: plan-critic-scope
 description: Judge a freshly drafted set against the artifact it was drafted from — every outcome the parent promises is claimed by something, and nothing is drafted that the parent did not ask for or explicitly excluded. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a breakdown still covers what it came from. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
 tools: [Read, Grep, Glob, Bash]
+model: sonnet
+effort: high
 ---
 
 # Scope critic
@@ -83,6 +85,8 @@ parent is a finding about the item.
 
 ## Report
 
-The rubric's four parts, in its order. In part 3, give the number of promises you extracted from the
+The rubric's five parts, in its order. In part 3, give the number of promises you extracted from the
 parent and how many you traced to an item; those two numbers are the check on your own reading, and
-a critic that reports a verdict without them has not shown its work.
+a critic that reports a verdict without them has not shown its work. Part 5 carries
+`category: scope` on every entry, and a gap's `file`/`line` is the parent's, because that is where a
+reader has to look to see it.

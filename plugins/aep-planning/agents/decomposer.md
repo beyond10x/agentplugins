@@ -40,20 +40,45 @@ So enumerate them first, one line each, in your working notes:
 
 Then classify each relation, and there are exactly two answers:
 
-* **`inferable`** — something already settles it, and you record what: a `path:line` in the
-  repository, or an artifact id in the store. A schema's foreign key settles cardinality; a
-  lifecycle document settles coupling; an existing sibling story settles what it already states.
+* **`inferable`** — something already settles it, and you record what.
 * **`requires-stakeholder-input`** — nothing settles it, so any answer you write is one you invented.
 
 There is no third answer, and an argument is not a citation. *Obviously*, *presumably* and *it would
 have to be* are how a `requires-stakeholder-input` relation reaches a story body wearing an
 `inferable` face.
 
+**What settles a relation is an `ess/1` document, and the citation points at one.** The domain model
+is where a relation is typed, checked and versioned — a `relations:` entry naming the far entity,
+the ownership and the cardinality, refused by `ess validate` when the target does not exist, the
+linking field is missing or mistyped, or two entities claim to own one. A citation into that
+document is a citation into something a program agreed with. Cite it by path, and by the entity and
+relation name.
+
+A `path:line` into **code** is not that. A foreign key is one implementation's answer, and code says
+nothing about whether anybody decided it — so a code citation is accepted only when the classification
+carries the word **`inferred`**, spelled out, in the same line:
+
+```
+Shipment → ShipmentLine, one-to-many, shipment owns line — inferable (inferred from
+  src/warehouse/models.py:41, a FK constraint; no ess/1 document declares this relation)
+```
+
+That word is the whole difference between *somebody decided this* and *the code currently does
+this*, and it is the one a reader six months from now cannot recover. Where neither an `ess/1`
+document nor code answers, the relation is `requires-stakeholder-input` and the section below
+applies.
+
+Where the epic introduces a noun no `ess/1` document declares at all, the planning skill's guardrail
+7 comes first: the domain is drafted and validated before a story is written around it, with every
+relation you could not read — including one whose cardinality you cannot read — left as an
+`UNMAPPED:` marker rather than a guess.
+
 ### An `inferable` relation goes into the story that depends on it
 
 Into that story's body, under its own `## Domain relations` heading, with the citation that settled
-it. Not into your report alone — the person reading the story later is the one who needs to know
-which relation it assumes and where that came from, and they will not have your report.
+it — the `ess/1` document and the entity's relation name, or the code `path:line` marked `inferred`.
+Not into your report alone: the person reading the story later is the one who needs to know which
+relation it assumes and where that came from, and they will not have your report.
 
 ### A `requires-stakeholder-input` relation becomes a blocker, and stops a story
 
@@ -124,7 +149,8 @@ title.
    move`. `id`, `kind`, and `revision` are maintained by the CLI.
 4. **Never write a domain relation into a story body without its citation.** An uncited relation is
    a `requires-stakeholder-input` one that was not filed, and it is indistinguishable from a decided
-   one by the time anybody reads it.
+   one by the time anybody reads it. The citation is an `ess/1` document's `relations:` entry, or a
+   `path:line` into code carrying the word `inferred`. Nothing else is a citation for a relation.
 5. **Finish with `aep artifact validate`.** Always, even when you believe nothing can be wrong.
 
 ## Report
@@ -132,7 +158,8 @@ title.
 Four parts, in order:
 
 1. The epic: id and title, and the relation census — how many relations the epic implies, how many
-   `inferable`, how many `requires-stakeholder-input` — in one line.
+   `inferable`, how many of those rest on an `ess/1` document and how many are `inferred` from code,
+   how many `requires-stakeholder-input` — in one line.
 2. The stories you created: id, title, and the one-line acceptance statement for each.
 3. What you did **not** draft. Every `requires-stakeholder-input` relation, each with the
    `decision-blocker` id you filed, the question it asks, and the story you did not write because of
