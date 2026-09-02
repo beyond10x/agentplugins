@@ -1,0 +1,142 @@
+format: trace-spec/1
+id: eval-case/ess-schema-new-entity
+title: The domain was written and validated before a story rested on it, and the unread relation stayed unread
+
+# **No row here reads the `SKILL.md`.** A check that greps a skill's markdown asserts that a sentence
+# is still written; every row below is about what the run did.
+#
+# The write rows scope to a **set** of verbs — `[Write, Edit, NotebookEdit]` — and not to `Write`
+# alone. `aep/conformance/eval/README.md` bought that rule with a live pilot: a run that wrote a file
+# that already existed did it with `Edit`, and a selector naming `Write` alone reported
+# `never_occurred` — the checker shrugging at work that had visibly happened. Dropping the tool scope
+# and matching `file_path` alone would be a real weakening, because `Read` carries a `file_path` too
+# and *read the domain first* is not *wrote the domain first*.
+
+expectations:
+  # --- the skill was reached at all -----------------------------------------------------------
+
+  - id: the-skill-was-offered
+    statement: the plugin loaded and offered the ESS skill, so a miss is not "it was not there"
+    # Advisory, and the case header says why: the skill's directory name and its frontmatter name
+    # differ, and nothing committed here establishes which one a harness qualifies. A live run
+    # settles it, and this row is where the answer lands.
+    severity: advisory
+    expect:
+      env.skill_available:
+        skill: ess-schema:ess-schema
+
+  # --- the smallest document that validates ---------------------------------------------------
+
+  - id: the-header-was-written
+    statement: an `ess/1` header naming the domain was written
+    expect:
+      tool.called:
+        tools: [Write, Edit, NotebookEdit]
+        args:
+          file_path: {glob: '*system.yaml'}
+        count: {at_least: 1}
+
+  - id: the-domain-file-was-written
+    statement: the domain declaring the entity was written
+    # The header's `domains:` list and the declaring source must agree in both directions — either
+    # half alone is a refusal, which the skill states and `ess validate` enforces. So a run that
+    # wrote only one of these two files cannot have exited 0 on the row below, and the two rows
+    # together are the shape of *the smallest document that validates*.
+    expect:
+      tool.called:
+        tools: [Write, Edit, NotebookEdit]
+        args:
+          file_path: {glob: '*/domains/*.yaml'}
+        count: {at_least: 1}
+
+  - id: the-specification-was-validated
+    statement: the specification was validated with `ess validate` after it was written
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'ess +validate'}
+        count: {at_least: 1}
+
+  # --- the ordering the skill exists to produce ------------------------------------------------
+
+  - id: the-domain-was-validated-before-a-story-rested-on-it
+    statement: the noun had a validated typed home before any story was written around it
+    # The skill's first sentence as an ordering: *"the domain is drafted first, so the noun has a
+    # typed home before stories are written around it."* First-occurrence ordering over the event
+    # sequence, the same shape `adp/default`'s red-before-green bound takes.
+    #
+    # `unk` when either side never occurs — *A before B* is undecidable when there is no A, and
+    # reporting it as a failure blames the wrong thing.
+    expect:
+      order:
+        first:
+          tool: Bash
+          args: {command: {regex: 'ess +validate'}}
+        before:
+          tool: Bash
+          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+
+  - id: no-projection-was-hand-written
+    statement: no generated schema or OpenAPI file was written by hand
+    # *"Use the projection command, never a handwritten parallel generator."* Non-vacuous: the run
+    # holds `Write` and `Edit` and used them, which `the-domain-file-was-written` is the control for
+    # over the same tool set. A projection that a run legitimately produced arrives through
+    # `ess generate` or `ess project`, which are `Bash` calls and not writes.
+    expect:
+      tool.absent:
+        tools: [Write, Edit, NotebookEdit]
+        args:
+          file_path: {glob: '*/generated/*'}
+
+  # --- the relation nothing settles -------------------------------------------------------------
+
+  - id: the-unread-relation-was-named-rather-than-typed
+    statement: the report names the relation it could not read instead of inventing a type for it
+    # *"Every relation you could not read … is written with an `UNMAPPED:` marker beside the place it
+    # would go, and named again in the report."* `text.matches` is the weakest kind in the vocabulary
+    # and this row is the *named again in the report* half, so it is advisory. The marker in the file
+    # is the half that matters and no `trace-spec/1` kind reads a file's contents; `ess validate`
+    # exiting 0 with the carrier absent is what a reader checks, in the shell.
+    severity: advisory
+    expect:
+      text.matches:
+        contains: 'UNMAPPED'
+
+  # --- the run's own record ---------------------------------------------------------------------
+
+  - id: the-scope-was-actually-tested
+    statement: the run reached outside its granted surface at least once, so the guardrail rows above decided something
+    severity: advisory
+    expect:
+      permission.denied:
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing machine-owned was hand-written, so no guard had to refuse anything
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  # --- advisory ---------------------------------------------------------------------------------
+
+  - id: turns-within-reason
+    statement: the domain draft did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 40}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

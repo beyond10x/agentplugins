@@ -3,6 +3,8 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
+mod evals;
+
 const PLUGINS: &[(&str, &[&str])] = &[
     (
         "beyond10x",
@@ -117,7 +119,7 @@ fn check(root: &Path) -> Result<(), String> {
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
     }
-    Ok(())
+    evals::evals(root)
 }
 
 fn verify_release(root: &Path, version: &str) -> Result<(), String> {
@@ -154,12 +156,18 @@ fn main() -> ExitCode {
         .expect("checker is under the repository root")
         .to_path_buf();
     let arguments = std::env::args().skip(1).collect::<Vec<_>>();
+    if let Some(code) = evals::cli(&root, &arguments) {
+        return code;
+    }
     let result = match arguments.as_slice() {
         [] => check(&root),
         [release, verify, version] if release == "release" && verify == "verify" => {
             check(&root).and_then(|()| verify_release(&root, version))
         }
-        _ => Err("usage: agentplugins-check [release verify <version>]".to_owned()),
+        _ => Err(
+            "usage: agentplugins-check [release verify <version> | evals | evals scope <path>...]"
+                .to_owned(),
+        ),
     };
 
     match result {

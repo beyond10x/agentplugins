@@ -1,0 +1,69 @@
+format: eval-case/1
+id: decomposer-relation-census
+title: An undecided domain relation became a decision-blocker with a blocks edge, and no story
+workflow: adp/default
+states: [decompose]
+arm: plugin
+verdict: held
+
+# Which repository files this case is a case about. `task check` refuses a case whose `agents:` or
+# `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
+# cases whose subject the pull request touched.
+subject:
+  # The agent alone. Every row below is about what the decomposer did, and scoping to the planning
+  # skill as well would put a paid run on this case every time an unrelated section of it moved.
+  agents: [aep-planning:decomposer]
+
+# `aep/conformance/eval/decomposer-charter` already covers the decomposer's **charter** — it moved
+# nothing, it validated the store. This case covers the behaviour 0.4.0 added on top of it and that
+# nothing measures: **the relation census**. The agent file's § *Name the relations first* says an
+# epic that introduces a noun implies relations, that a decomposition written without listing them
+# does not leave them open but *answers* them silently inside a story body, and that there are
+# exactly two classifications with no third.
+#
+# The half this case is scoped to is the expensive half: a `requires-stakeholder-input` relation
+# becomes a `decision-blocker` carrying a `blocks` edge, filed **before** any story is drafted, and
+# no story is drafted that depends on the answer.
+#
+# ## The claim a transcript cannot decide, said here rather than left to be found
+#
+# **Which** story would have depended on the undecided relation is not in the event stream. A
+# transcript can say a blocker was filed, that it carried a `blocks` edge, and that it was filed
+# before the first story — that last one is the agent file's own ordering rule, verbatim: *"File one
+# per relation, before you draft."* It cannot say that the set of stories that were drafted excludes
+# the one the answer would have shaped, because that is a judgement about prose. That half is
+# `aep artifact blocked` and a person reading report part 3, and it stays there.
+#
+# So `the-blocker-precedes-the-first-story` is the strongest form of *and no story* available here,
+# and it is named as weaker than the sentence it stands in for.
+#
+# ## The spelling of the CLI, and why the rows carry both
+#
+# This repository's instructions spell the command `aep`; the binary's `--version` and usage lines
+# print `protocol`, and an adopter may have either on `PATH`. A row naming one spelling reports
+# `never_occurred` against a run that did the work under the other. Every command matcher below is a
+# regex over both — a widening of what can witness the claim, never of the claim.
+
+task: |
+  Decompose `epic:commercial-clients` with the `aep-planning:decomposer` agent.
+
+  Before you draft a single story, enumerate every domain relation the epic implies — the two
+  entities in the direction the relation runs, cardinality, ownership, lifecycle coupling — and
+  classify each one: `inferable`, with the `path:line` or artifact id that settles it, or
+  `requires-stakeholder-input`.
+
+  File each `requires-stakeholder-input` relation as a `decision-blocker` with an edge to what it
+  stops, before you draft anything, and draft no story that depends on the answer. Ask the CLI for
+  the edge name and for the blocker's lifecycle rather than assuming either.
+
+  Nothing else. Do not move anything, and do not touch an artifact you did not create.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
+
+# The run did nothing wrong; what gaps is an observation about the evidence, not about the run.
+advisory_gaps:
+  - expectation: the-scope-was-actually-tested
+    why: >-
+      No transcript is recorded for this case yet, so nothing has tested the guardrail rows. When
+      one is, this line states what that run's `permission_denials` said rather than predicting it.

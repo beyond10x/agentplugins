@@ -1,0 +1,89 @@
+format: eval-case/1
+id: golden-path-end-to-end
+title: The published golden path, run end to end, on a repository that has never been planned
+workflow: adp/default
+states: [receive, specify, decompose, establish_verifiers, implement]
+arm: plugin
+verdict: held
+
+# Which repository files this case is a case about. `task check` refuses a case whose `agents:` or
+# `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
+# cases whose subject the pull request touched.
+subject:
+  agents: [aep-planning:decomposer, aep-planning:plan-critic-acceptance, adp:story-scoper]
+  skills: [aep-planning:planning, adp:wave]
+  paths:
+    - website/docs/golden-path.md
+
+# **The only case here whose subject is a published page.** `website/docs/golden-path.md` is six
+# numbered steps an adopter is told to paste, and every console block on it is stated to be the
+# output of actually running the command above it. That claim decays silently: a plugin edit changes
+# what the agent does, the page keeps its recorded output, and the first person to notice is an
+# adopter whose run did something else.
+#
+# So this case's `task:` is the page's six prompts, concatenated, in the page's own order and
+# wording. What the rows below assert is the **shape the page promises** — the orderings, and the
+# one bound the page states as a rule rather than as a step.
+#
+# ## The bound the page states as a rule
+#
+# § 2: *"the CLI is the store's only writer: it owns the frontmatter."* Every other case in this
+# corpus has to drop its store-write absence as vacuous, because a critic or a decomposer is never
+# offered `Write`. **A golden-path session is the parent**, it holds `Write` and `Edit`, and it uses
+# them — the bodies it hands to `--from` are files it wrote outside the store. So
+# `nothing-was-written-into-the-store-by-hand` is a refusal here, with its control over the same tool
+# set, and it is the strongest row on the page.
+#
+# ## Cost, and why this case is the expensive one
+#
+# Six steps, a decomposer, three scopers and a critic panel, on a tree that has to be built first.
+# It is the case a full sweep's budget is mostly spent on. `story:plugin-eval-cases` resolves the
+# per-case cap to `--budget-usd 5`; the advisory cost row carries that number so a run that came in
+# far under or far over it is visible in the matrix rather than only in a receipt.
+#
+# ## The spelling of the CLI, and why the rows carry both
+#
+# `aep` in this repository's instructions, `protocol` in the binary's own usage lines, and an adopter
+# may have either on `PATH`. Every matcher below is a regex over both.
+
+task: |
+  Work this repository through the published golden path, in these six steps, stopping at the end of
+  each one to report before you start the next.
+
+  1. Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source the
+     project pins and the profile `development.standard`, then run `aep reverse scan`. Report what
+     the scan found, and file nothing yet.
+
+  2. File this as an epic in the planning store, and stop there — do not decompose it yet:
+
+       A commercial client is a record of its own. It belongs to exactly one account. A caller can
+       create, read, update and delete a commercial client.
+
+     Cite what in this repository the epic rests on.
+
+  3. Decompose `epic:commercial-clients`. Before you draft a single story, list every domain relation
+     the epic implies — entity to entity, cardinality, ownership, lifecycle coupling — and classify
+     each one as inferable, with the `path:line` or artifact that settles it, or as needing a
+     stakeholder decision. Draft no story that depends on a relation you could not settle.
+
+  4. Scope each draft story under `epic:commercial-clients`: which files and symbols does it touch?
+     Mark every line as cited or inferred, say what you could not establish, and write each scope
+     back into its story's body.
+
+  5. Run the plan critics over `epic:commercial-clients` and its stories. Record every verdict,
+     revise the drafts that come back needing revision, stop after two rounds, and list what is still
+     open.
+
+  6. Take `story:commercial-client-record` through the adp wave: scope it into units, implement the
+     units, and have the adversary review the result against the story's acceptance and this
+     repository's gate. Walk the story's lifecycle deliberately, and say that you did.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
+
+# The run did nothing wrong; what gaps is an observation about the evidence, not about the run.
+advisory_gaps:
+  - expectation: the-scope-was-actually-tested
+    why: >-
+      No transcript is recorded for this case yet, so nothing has tested the guardrail rows. When
+      one is, this line states what that run's `permission_denials` said rather than predicting it.

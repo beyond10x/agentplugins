@@ -1,0 +1,138 @@
+format: trace-spec/1
+id: eval-case/plan-critic-acceptance-verdict
+title: The acceptance critic argued, the caller recorded the verdict, and nothing moved
+
+# **No row here reads `plugins/aep-planning/agents/plan-critic-acceptance.md`.** A check that greps an
+# agent's markdown asserts that a sentence is still written, which is the failure mode a behavioural
+# case exists to remove. Every row below is about what the run did.
+#
+# Every negative bound has a positive control over the **same tool**, because `tool.absent` is green
+# against a transcript carrying none of the agent's calls at all. If a harness stops surfacing a
+# subagent's tool calls in the session transcript, the control goes red and this case fails loudly
+# instead of reporting a green wall of vacuous absences.
+
+expectations:
+  # --- the agent was reached at all ----------------------------------------------------------
+
+  - id: the-critic-was-offered
+    statement: the plugin loaded and offered the acceptance critic, so a miss is not "it was not there"
+    expect:
+      env.agent_available:
+        agent: aep-planning:plan-critic-acceptance
+
+  - id: a-subagent-actually-ran
+    statement: the critique went through a subagent rather than being improvised by the parent session
+    # Without it the whole case is green when the agent was never reached: the parent would have
+    # made the same CLI calls and satisfied every other row.
+    expect:
+      subagent.spawned:
+        count: {at_least: 1}
+
+  # --- the verdict became evidence ------------------------------------------------------------
+
+  - id: the-verdict-is-a-review-result-created-from-a-body-file
+    statement: the caller recorded the verdict as a `review-result` whose body arrived with the record
+    # `review-result` is immutable — `aep artifact new --help` says it *"refuses every edit after the
+    # fact, which is what makes it evidence"* — so `--from` is not one way to write the body, it is
+    # the only one. A row asserting `artifact new review-result` alone would pass on a record whose
+    # body is still the kind's template.
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(?s)(aep|protocol) artifact new +review-result.*--from'}
+        count: {at_least: 1}
+
+  - id: the-critic-read-the-store-before-judging
+    statement: the run ran the store's read verbs, so the absences below are refusals and not an empty transcript
+    # The positive control, over the same tool the absences are scoped to. It is also the
+    # non-vacuity floor: a verdict over a set nobody opened is an empty `approve`.
+    #
+    # Read: `aep artifact kinds` and `aep artifact lifecycle <kind>` — the agent file tells it to ask rather than assume what a terminal status is called.
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact (show|kinds|lifecycle)'}
+        count: {at_least: 1}
+
+  # --- proposes, never performs ---------------------------------------------------------------
+
+  - id: nothing-was-moved
+    statement: no artifact was promoted on the strength of a verdict
+    # The charter's bound, stated as a fact about the run's shell calls: `artifact move` is the only
+    # verb that changes a status, and the store's frontmatter is the CLI's.
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact +move'}
+
+  - id: no-judged-body-was-rewritten
+    statement: the critic's verdict did not turn into an edit of the thing it judged
+    # One round was asked for. A panel loop revises drafts through `aep artifact body` on
+    # `needs-revision`, and that is correct behaviour in a panel case; it is not this case, whose
+    # task says one round and no revision.
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact +body'}
+
+  # --- the run's own record -------------------------------------------------------------------
+
+  - id: the-scope-was-actually-tested
+    statement: the run reached outside its granted surface at least once, so the guardrail rows above decided something
+    # A row asserting an **absence** passes by construction on a scoped arm, where the toolset
+    # refuses the call before it runs. A control that cannot fail has stopped testing anything.
+    #
+    # Advisory because it does not judge the run — a run that never reached outside its scope is not
+    # a bad run — it judges whether the evidence above it is worth anything.
+    severity: advisory
+    expect:
+      permission.denied:
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing machine-owned was hand-written, so no guard had to refuse anything
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  # --- advisory --------------------------------------------------------------------------------
+
+  - id: the-report-carried-one-of-the-two-verdict-words
+    statement: the final text carries `approve` or `needs-revision`
+    # `text.matches` is the weakest kind in the vocabulary and its own documentation says to avoid it
+    # everywhere else. Advisory for exactly that reason, and for a second one that is specific here:
+    # it reads the **session's** final text, which is the caller's summary and not the critic's first
+    # line. The verdict's real home is `the-verdict-is-a-review-result-created-from-a-body-file`.
+    severity: advisory
+    expect:
+      text.matches:
+        regex: '(approve|needs-revision)'
+
+  - id: turns-within-reason
+    statement: the critique did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 40}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    # `story:plugin-eval-cases` resolves the per-live-run budget to `--budget-usd 5` per case.
+    # Advisory: a cold cache or a longer argument is not a charter violation, and a cost row that
+    # gates would turn a correct run red for a reason that is not about behaviour. The cap that
+    # actually stops a spend is the runner's, checked before each spawn.
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

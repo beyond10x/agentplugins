@@ -1,5 +1,39 @@
 # Changelog
 
+## [Unreleased]
+
+- Add `evals/`: one `eval-case/1` per agent and per user-facing skill — the four plan critics, the
+  decomposer's relation census, `ess-schema` on a new entity, the published golden path end to end,
+  and the wave's adversary — each judged by its own `trace-spec/1` document and run by
+  `aep eval run --corpus evals`. Every row is about what a run did; none greps the agent's markdown,
+  because a check that asserts a sentence is still written is the thing a behavioural case replaces.
+- Record no transcript and synthesize none. Each case's `recorded/` carries a README naming the live
+  command that would fill it, its budget, and what the working tree has to hold for the case to
+  measure anything. The two existing transcript sets were checked and neither fits: `aep`'s
+  conformance corpus states that its files are structurally faithful and not observed, and
+  `aep eval run --stream` refuses them besides (`EVAL-STREAM-004`); `metaharness`'s check inputs are
+  stated to be hand-written.
+- Teach `agentplugins-check` the corpus, in a module of its own: every case's `id` is its directory
+  name, its expectations document parses and declares one kind per expectation, and its `subject:`
+  resolves to an agent or a skill this repository actually ships — read from the file's own
+  frontmatter, not from its directory, because `ess-schema`'s skill directory and declared name
+  differ. `task check` gains it for free; `task evals` runs that half alone.
+- Replay whatever transcripts exist with `aep eval run --stream`, which spends nothing. An empty
+  `recorded/`, and a machine with no `aep` on `PATH`, are printed notices and never a red gate — the
+  same position the runner itself takes on a missing `metaharness`. A recorded stream without the run
+  manifest beside it *is* refused: a transcript with no observation date cannot be replayed into a
+  document that reproduces.
+- Add `.github/workflows/eval.yml`: the live arm runs only with the `run-eval` label or a manual
+  dispatch, only for the cases whose subject the diff touched, under `EVAL_BUDGET_USD` (default 20).
+  A run needing more than the budget is refused **before a tool is installed**, with the four numbers
+  that decided it in the check summary, and the `aep eval matrix` table is posted as the job summary.
+  The credential is the organization bot's and is refused by name when absent; a personal key is
+  never a substitute.
+- Add `README.md` § Evals with the arithmetic: 8 cases at a $5 per-case cap is $40 for one full live
+  run of one arm on one harness, against a $20 default budget — so a full sweep does not fit its own
+  default and is refused rather than silently truncated. What fits is the diff-scoped run a pull
+  request touching one agent actually selects.
+
 ## [0.4.0] — 2026-09-02
 
 - Give `website/docs/install.md` and `README.md` one copy-paste install block — `/plugin marketplace

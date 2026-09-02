@@ -1,0 +1,72 @@
+format: eval-case/1
+id: plan-critic-parallel-safety-verdict
+title: The parallel-safety critic returned one verdict and the caller recorded it
+workflow: adp/default
+states: [decompose]
+arm: plugin
+verdict: held
+
+# Which repository files this case is a case about. `task check` refuses a case whose `agents:` or
+# `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
+# cases whose subject the pull request touched.
+subject:
+  agents: [aep-planning:plan-critic-parallel-safety]
+  paths:
+    # The rubric, not the whole planning skill: the rubric holds the verdict rule every row here
+    # rests on, and scoping to the skill directory would put a paid run on this case every time an
+    # unrelated section of `SKILL.md` moved.
+    - plugins/aep-planning/skills/planning/references/critic-rubric.md
+
+# What this case is about, in one line: **a critic argues and the caller records**, and the two
+# halves are one run. The critic's own charter says it records nothing
+# (`plugins/aep-planning/skills/planning/references/critic-rubric.md` § *You change nothing*:
+# *"You do not record your own verdict. The caller writes the record"*), so a case scoped to the
+# subagent alone could not observe the thing that makes a verdict worth having — that it became an
+# immutable `review-result` in the store instead of a paragraph in a session nobody kept.
+#
+# Concurrency is the lane. Checkability is `plan-critic-acceptance`'s, the split `plan-critic-design`'s, coverage `plan-critic-scope`'s.
+#
+# ## The spelling of the CLI, and why the rows carry both
+#
+# This repository's instructions spell the command `aep` (`AGENTS.md` § *Invariants*), and the
+# binary's own `--version` and usage lines print `protocol`. An adopter may have either name on
+# `PATH`. A row naming one spelling reports `never_occurred` against a run that did the work under
+# the other — the checker shrugging at work that visibly happened, which is the argument
+# `aep/conformance/eval/README.md` makes for scoping a write to a *set* of verbs. So every command
+# matcher below is a regex over both spellings. It is a widening of what can witness the claim,
+# never of the claim.
+#
+# ## Not asserted here, and named rather than left to be discovered
+#
+# **That the critic changed no file.** The honest form of that is a clean working tree, and no
+# `trace-spec/1` kind reads a file or the git index. What is below is that no *write verb* was
+# called, which is weaker. The store-side half is `aep artifact validate` and `git status`, and it
+# stays in the shell.
+#
+# **A `tool.absent` over `Write` or `Edit` scoped to the critic.** The charter grants
+# `[Read, Grep, Glob, Bash]`, so neither tool is ever offered to it and such a row would be true of
+# every possible run — indistinguishable from a check that was switched off. The caller *does* hold
+# them, and legitimately writes the verdict body to a file outside the store to hand to `--from`, so
+# there is no session-wide form of the row either.
+
+task: |
+  Run the `aep-planning:plan-critic-parallel-safety` agent over the stories drafted under
+  `epic:commercial-clients`, and judge which pair of drafted items lands on one surface, and whether the plan says so.
+
+  Give the critic the story ids and the epic id, and nothing else.
+
+  When it returns, record its verdict: write its report to a file outside the planning store and
+  create it as a `review-result` through `aep artifact new … --from`, carrying an edge to the
+  artifact it judged. Ask the CLI for the edge name rather than assuming one.
+
+  One round. Do not revise a draft, do not run the panel again, and move nothing.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
+
+# The run did nothing wrong; what gaps is an observation about the evidence, not about the run.
+advisory_gaps:
+  - expectation: the-scope-was-actually-tested
+    why: >-
+      No transcript is recorded for this case yet, so nothing has tested the guardrail rows. When
+      one is, this line states what that run's `permission_denials` said rather than predicting it.

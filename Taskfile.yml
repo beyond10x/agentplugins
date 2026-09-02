@@ -7,7 +7,15 @@ tasks:
       - cargo fmt --all -- --check
       - cargo clippy --workspace --all-targets --locked -- -D warnings
       - cargo test --workspace --locked
+      # Also validates every case under `evals/` and replays whatever transcripts are recorded
+      # beside them, both free: an empty `recorded/` and a machine with no `aep` on PATH are
+      # printed notices, never a red gate. `task evals` runs that half alone.
       - cargo run --quiet --locked --bin agentplugins-check
+
+  evals:
+    desc: Validate the eval corpus and replay every recorded transcript (free, no model call).
+    cmds:
+      - cargo run --quiet --locked --bin agentplugins-check -- evals
 
   site-build:
     desc: Install and build the public Docusaurus documentation (network).

@@ -1,0 +1,244 @@
+# The paid half of the eval programme. The free half is `task check`, which runs on every pull
+# request through `ci.yml` and is what blocks a merge; this workflow informs and never gates
+# (`story:eval-ci-gates` § Out of Scope: *the live gate informs; the structural gate blocks*).
+#
+# Nothing here spawns without all four of: the `run-eval` label or a manual dispatch, a case whose
+# subject the diff touched, a budget that covers the run, and the organization bot's model
+# credential. Each of the four refuses by name, and the first three refuse before a tool is even
+# installed.
+name: Eval
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+  workflow_dispatch:
+    inputs:
+      case:
+        description: One case directory, such as evals/adversary-tests-only. Empty runs the whole corpus.
+        required: false
+        type: string
+      budget_usd:
+        description: The cap for this invocation, in US dollars. Empty uses the EVAL_BUDGET_USD variable.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eval-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live:
+    name: Live eval
+    # The label is the switch. `types: [labeled]` is in the trigger so that adding it to an open
+    # pull request starts a run, rather than needing a push before anything notices.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || contains(github.event.pull_request.labels.*.name, 'run-eval')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      # `story:eval-ci-gates` resolves the default to 20; `story:plugin-eval-cases` resolves the
+      # per-case cap to 5. Both are operator decisions. The first is overridable by the repository
+      # variable and by a dispatch; the second only by editing this line, because a per-case cap a
+      # caller can raise is not a cap.
+      EVAL_BUDGET_USD: ${{ inputs.budget_usd || vars.EVAL_BUDGET_USD || '20' }}
+      EVAL_CASE_USD: '5'
+      # Pinned. An eval whose runner moved between two runs measured two things.
+      AEP_VERSION: '0.42.0'
+      METAHARNESS_VERSION: '0.4.2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+
+      # --- what to run, before anything is installed and long before anything is spawned ---------
+
+      # The diff scope is computed by this repository's own checker and not by `grep` over YAML:
+      # `AGENTS.md` § *Invariants* says anything executable here is Rust, and a scope built from
+      # substrings returns nothing the first time a field is reindented — silently, which for a paid
+      # gate reads exactly like a pull request that touched no plugin.
+      #
+      # Each selected line is `<case directory>\t<plugin directory>`, because `aep eval run
+      # --plugin-dir` takes one and which plugin a case needs is a property of the case.
+      - name: Scope the run to the cases whose subject the diff touched
+        id: scope
+        env:
+          CASE: ${{ inputs.case }}
+          BASE: ${{ github.base_ref }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          check() { cargo run --quiet --locked --bin agentplugins-check -- "$@"; }
+          if [[ "$EVENT" == "workflow_dispatch" ]]; then
+            # Everything a case can be about, so that a dispatch runs the whole corpus.
+            check evals scope $(git ls-files 'plugins/**' 'website/**') > all.tsv
+            if [[ -n "$CASE" ]]; then
+              awk -F'\t' -v want="$CASE" '$1 == want' all.tsv > selected.tsv
+              test -s selected.tsv || { echo "::error::no case at $CASE"; exit 1; }
+            else
+              cp all.tsv selected.tsv
+            fi
+          else
+            git fetch --no-tags origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
+            changed="$(git diff --name-only "origin/${BASE}...HEAD")"
+            echo "changed files:"; echo "$changed"
+            if [[ -z "$changed" ]]; then
+              : > selected.tsv
+            else
+              check evals scope $changed > selected.tsv
+            fi
+          fi
+          count="$(wc -l < selected.tsv | tr -d ' ')"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "the diff selects $count case(s):"; cat selected.tsv
+
+      - name: Nothing to run
+        if: steps.scope.outputs.count == '0'
+        run: |
+          {
+            echo "## Live eval — not run"
+            echo
+            echo "No case's subject is in this diff, so there is nothing a paid run would measure."
+            echo "The corpus was still validated for free by \`task check\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # --- the budget, checked before a tool is installed and before a cent can be spent ----------
+
+      # `aep eval run --budget-usd` is the runner's own cap and it is passed below as the second line
+      # of defence. It is not the first, because it is enforced **per spawn against the assumed
+      # rate**: a sweep too large for its budget would launch, spend, and stop partway.
+      # `story:eval-ci-gates` asks for a refusal *before* spawning, and that is an arithmetic this
+      # workflow can do while nothing is running.
+      - name: Refuse a run that would exceed the budget
+        if: steps.scope.outputs.count != '0'
+        env:
+          COUNT: ${{ steps.scope.outputs.count }}
+        run: |
+          set -euo pipefail
+          needed="$(awk -v n="$COUNT" -v c="$EVAL_CASE_USD" 'BEGIN{printf "%.2f", n*c}')"
+          echo "needed: \$$needed for $COUNT case(s) at \$$EVAL_CASE_USD each"
+          echo "cap:    \$$EVAL_BUDGET_USD (EVAL_BUDGET_USD)"
+          if awk -v a="$needed" -v b="$EVAL_BUDGET_USD" 'BEGIN{exit !(a>b)}'; then
+            {
+              echo "## Live eval — refused before spawning"
+              echo
+              echo "| | |"
+              echo "|---|---|"
+              echo "| cases selected | $COUNT |"
+              echo "| per-case cap | \$$EVAL_CASE_USD |"
+              echo "| this run would need | \$$needed |"
+              echo "| \`EVAL_BUDGET_USD\` | \$$EVAL_BUDGET_USD |"
+              echo
+              echo "Nothing was installed and nothing was spawned. Raise the \`EVAL_BUDGET_USD\`"
+              echo "repository variable, or dispatch this workflow with a single \`case\`."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::a live run of $COUNT case(s) needs \$$needed and the budget is \$$EVAL_BUDGET_USD"
+            exit 1
+          fi
+
+      # The credential is the organization bot's, delivered as a repository secret, and it is checked
+      # for **by name before anything is installed**. This repository carries no credential machinery
+      # of its own (`AGENTS.md`), and `release.yml` names exactly one credential —
+      # `${{ github.token }}`, the Actions bot, which authenticates to GitHub and to nothing else. A
+      # model credential is therefore a secret the organization sets on this repository, named after
+      # the `b10x-bot[bot]` identity `b10x-docs-pages.yml` gates on.
+      #
+      # A personal key must never appear here. `env.api_key_source` exists in the `trace-spec/1`
+      # vocabulary because an exported key once took precedence over a login and billed an account
+      # with no credits.
+      - name: Refuse without the bot's credential
+        if: steps.scope.outputs.count != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.B10X_BOT_ANTHROPIC_API_KEY }}
+        run: |
+          if [[ -z "${ANTHROPIC_API_KEY}" ]]; then
+            echo "::error::secrets.B10X_BOT_ANTHROPIC_API_KEY is not set on this repository. A live arm needs the organization bot's credential; a personal key is never an acceptable substitute."
+            exit 1
+          fi
+
+      # --- the pinned tools -----------------------------------------------------------------------
+
+      # Built from the pinned release tag rather than downloaded, because neither sibling publishes a
+      # Linux binary asset: `aep/.github/workflows/release.yml` creates the release from the tag's
+      # CHANGELOG section and uploads nothing. The version is what is pinned either way, and it is
+      # the version that decides what was measured.
+      - name: Install the pinned aep and metaharness release binaries
+        if: steps.scope.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          cargo install --locked --git https://github.com/beyond10x/aep --tag "$AEP_VERSION" aep
+          cargo install --locked --git https://github.com/beyond10x/metaharness --tag "$METAHARNESS_VERSION" metaharness
+          aep --version
+          metaharness --version
+
+      # --- the run --------------------------------------------------------------------------------
+
+      # One invocation per case. `--assume-usd-per-run` is the per-case cap and not the runner's 0.25
+      # default, so the runner's own pre-spawn check is made against the number this workflow
+      # budgeted with rather than against an optimistic one.
+      - name: Run the live arm
+        if: steps.scope.outputs.count != '0'
+        env:
+          METAHARNESS_LIVE: '1'
+          ANTHROPIC_API_KEY: ${{ secrets.B10X_BOT_ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/eval-out"
+          observed="$(date -u +%Y-%m-%d)"
+          while IFS=$'\t' read -r case plugin; do
+            [[ -n "$case" ]] || continue
+            echo "::group::$case"
+            aep eval run \
+              --case "$case" \
+              --arm plugin \
+              --harness claude \
+              --plugin-dir "$plugin" \
+              --cwd "$GITHUB_WORKSPACE" \
+              --budget-usd "$EVAL_BUDGET_USD" \
+              --assume-usd-per-run "$EVAL_CASE_USD" \
+              --observed-at "$observed" \
+              --redact \
+              --out "$RUNNER_TEMP/eval-out"
+            echo "::endgroup::"
+          done < selected.tsv
+
+      # The deliverable. `aep eval matrix` computes no score and refuses to — three columns, and a
+      # scalar could only be produced by counting an unobservable expectation as a pass or as a
+      # failure. What lands in the summary is the table, unmodified.
+      #
+      # `always()` so that a run stopped by its own budget still publishes the cells it did produce.
+      - name: Post the matrix as the job summary
+        if: always() && steps.scope.outputs.count != '0'
+        run: |
+          set -uo pipefail
+          {
+            echo "## Live eval"
+            echo
+            echo "\`aep\` $AEP_VERSION · \`metaharness\` $METAHARNESS_VERSION · cap \$$EVAL_BUDGET_USD · ${{ steps.scope.outputs.count }} case(s)"
+            echo
+            if aep eval matrix "$RUNNER_TEMP/eval-out" --format text > matrix.txt 2> matrix.err; then
+              echo '```'
+              cat matrix.txt
+              echo '```'
+            else
+              echo "No matrix was assembled:"
+              echo
+              echo '```'
+              cat matrix.err
+              echo '```'
+            fi
+            echo
+            echo "The three columns are held, contradicted, and nobody found out. There is no score:"
+            echo "folding the third column into either of the others is the one dishonest number this"
+            echo "programme refuses to compute."
+          } >> "$GITHUB_STEP_SUMMARY"

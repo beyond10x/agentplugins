@@ -1,0 +1,156 @@
+format: trace-spec/1
+id: eval-case/decomposer-relation-census
+title: The undecided relation reached the store as a question, before any story was drafted
+
+# **No row here reads `plugins/aep-planning/agents/decomposer.md`.** A check that greps an agent's
+# markdown asserts that a sentence is still written, which is the failure mode a behavioural case
+# exists to remove. Every row below is about what the run did.
+#
+# Every negative bound has a positive control over the **same tool**, because `tool.absent` is green
+# against a transcript carrying none of the agent's calls at all.
+#
+# **Deliberately not here:** a `tool.absent` over `Write` or `Edit` under `.engineering/planning`.
+# The charter grants `[Read, Grep, Glob, Bash]`, so neither tool is ever offered and such a row would
+# be true of every possible run — indistinguishable from a check that was switched off. A vacuous row
+# is worse than a missing one because it reads like coverage.
+
+expectations:
+  # --- the agent was reached at all ----------------------------------------------------------
+
+  - id: the-agent-was-offered
+    statement: the plugin loaded and offered the decomposer, so a miss is not "it was not there"
+    expect:
+      env.agent_available:
+        agent: aep-planning:decomposer
+
+  - id: a-subagent-actually-ran
+    statement: the work went through a subagent rather than being done inline by the parent session
+    expect:
+      subagent.spawned:
+        count: {at_least: 1}
+
+  # --- the census produced a blocker, and the blocker carries the edge ------------------------
+
+  - id: an-undecided-relation-became-a-decision-blocker
+    statement: the run filed a `decision-blocker` for the relation nothing settles
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact new +decision-blocker'}
+        count: {at_least: 1}
+
+  - id: the-blocker-carries-a-blocks-edge
+    statement: the blocker is attached to the work it stops, so a command finds it and a reader does not have to
+    # The edge is the point of the exercise: a question in a report is read once; a blocker with an
+    # edge is found by `aep artifact blocked`. Both spellings of writing it are in scope — the
+    # `--relate` at creation the agent file shows, and a later `aep artifact relate` — because the
+    # claim is that the edge exists, not which verb wrote it.
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(--relate +blocks:|artifact +relate .*blocks:)'}
+        count: {at_least: 1}
+
+  - id: the-blocker-precedes-the-first-story
+    statement: the blocker was filed before anything was drafted, which is the ordering the census exists to produce
+    # The agent file's own rule, verbatim: *"File one per relation, before you draft."* This is the
+    # strongest transcript-side form of *and no story* — see the case's header for what it does not
+    # say. `unk` when either side never occurs, which is the honest verdict for a run that drafted
+    # nothing or filed nothing.
+    expect:
+      order:
+        first:
+          tool: Bash
+          args: {command: {regex: '(aep|protocol) artifact new +decision-blocker'}}
+        before:
+          tool: Bash
+          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+
+  # --- the charter's hard rules, with their control -------------------------------------------
+
+  - id: no-status-was-moved
+    statement: the decomposer moved no artifact through its lifecycle, the blockers it filed included
+    # Hard rule 1. Stated as a fact about the run's shell calls, which is where a move would have to
+    # happen: `artifact move` is the only verb that changes a status.
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact +move'}
+
+  - id: artifacts-were-created-through-the-cli
+    statement: the run created artifacts with the CLI, so the absence above is a refusal and not an empty transcript
+    # The positive control, over the same tool the absence is scoped to. It doubles as the
+    # non-vacuity floor: an assertion about the created set is true of the empty set.
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact new'}
+        count: {at_least: 1}
+
+  - id: the-lifecycle-was-asked-for-rather-than-assumed
+    statement: the run asked the CLI what the blocker family's member is called and where it starts
+    # The agent file is explicit that `aep artifact kinds` names the blocker *family*, not the
+    # member, and that the lifecycle is what answers for the member. A decomposer that assumed
+    # `open` and was right is indistinguishable from one that asked, except here.
+    severity: advisory
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact (lifecycle|kinds|relations)'}
+        count: {at_least: 1}
+
+  - id: the-store-was-validated
+    statement: the agent ran the store's own validator before reporting
+    # Hard rule 5: always, even when you believe nothing can be wrong.
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) artifact +validate'}
+        count: {at_least: 1}
+
+  # --- the run's own record -------------------------------------------------------------------
+
+  - id: the-scope-was-actually-tested
+    statement: the run reached outside its granted surface at least once, so the guardrail rows above decided something
+    # A row asserting an **absence** passes by construction on a scoped arm, where the toolset
+    # refuses the call before it runs. A control that cannot fail has stopped testing anything.
+    # Advisory: it judges the evidence, not the run.
+    severity: advisory
+    expect:
+      permission.denied:
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing machine-owned was hand-written, so no guard had to refuse anything
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  # --- advisory --------------------------------------------------------------------------------
+
+  - id: turns-within-reason
+    statement: the decomposition did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 40}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0
