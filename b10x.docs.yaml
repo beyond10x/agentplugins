@@ -17,7 +17,7 @@ surfaces:
     outcome: Install one scoped guidance plugin without copying its instructions.
     prerequisites:
     - A supported agent harness
-    url: https://beyond10x.github.io/docs/agentplugins/install
+    url: https://beyond10x.github.io/docs/agentplugins/install/
   audiences:
   - adopter
   - developer
@@ -51,13 +51,13 @@ surfaces:
   sections:
   - kind: guide
     label: Choose a plugin
-    url: https://beyond10x.github.io/docs/agentplugins/choose-a-plugin
+    url: https://beyond10x.github.io/docs/agentplugins/choose-a-plugin/
   - kind: quickstart
     label: Install
-    url: https://beyond10x.github.io/docs/agentplugins/install
+    url: https://beyond10x.github.io/docs/agentplugins/install/
   - kind: reference
     label: Plugin reference
-    url: https://beyond10x.github.io/docs/agentplugins/plugins/beyond10x
+    url: https://beyond10x.github.io/docs/agentplugins/plugins/beyond10x/
   - kind: source
     label: Source
     url: https://github.com/beyond10x/agentplugins
