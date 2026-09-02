@@ -9,6 +9,23 @@ CLI answers all four at the moment you need them and a prose copy here would be 
 duplicate that goes stale the first time a store renames something. `SKILL.md` § 2 has the table of
 questions and the commands that answer them; ask before you rely on a name.
 
+## What a critic costs
+
+Every `plan-critic-*.md` declares `model: sonnet` and `effort: high` in its frontmatter, and
+`agentplugins-check` refuses one that declares neither — a critic with no pin runs on whatever the
+calling session happened to be on, so four verdicts arrive at four prices nobody can compare
+afterwards.
+
+**The pin is a default, not a measurement.** Nothing here has yet measured what a plan critique is
+worth at one model against another; `sonnet`/`high` is the pairing the compared third-party panel
+uses, adopted so that the cost is *stated* while the number is missing. It is expected to change
+once there is a review-value table to read — the per-finding outcomes the caller records after a
+revision round (`SKILL.md` § 7) are the input to that table. Until then, do not read the pin as a
+finding about which model critiques best.
+
+The decomposer, the adversary and the implementor carry no pin. They are the judgement-heavy roles
+and stay on the session's model until a table says otherwise.
+
 ## What a critic is
 
 A critic argues with a plan **before** an operator reads it. It is not a second opinion that agrees,
@@ -61,6 +78,40 @@ list.
 citations. Where the evidence is a thing that is **missing**, cite the file and the heading you
 looked under and say what was not there; a missing thing has a location too.
 
+## The same findings, once more, in a fenced block
+
+A prose line is for the operator; a fenced block is for a program. **Close your report with a
+` ```findings ` block holding the same findings you just wrote as lines, and nothing that is not
+one of them.** The caller records your text verbatim as a `review-result`, so the block travels into
+the record and `aep artifact findings` can compare one round against the next by signature instead
+of by re-reading two paragraphs.
+
+```findings
+- file: .engineering/planning/story/credential-store.md
+  line: 19
+  category: acceptance
+  severity: blocker
+  verdict: needs-revision
+  origin: introduced
+  message: the acceptance names no state before the work, so it reads the same on an empty store as on a populated one
+```
+
+| Field | What you put in it |
+|---|---|
+| `file`, `line` | the two halves of the citation you already wrote. Where the citation is a command rather than a path, `file` is the command and there is no `line` |
+| `category` | your lane, one word — the perspective your agent file gives you |
+| `severity` | `blocker` when the plan should not reach the operator unchanged, `warning` when it should change and does not stop the plan. **Never `note`**: a note is not a finding, and the section above says where it goes instead |
+| `verdict` | your one-word verdict, repeated on every entry, so a finding read out of the record still carries it |
+| `origin` | `introduced` when this drafted set created the defect, `pre-existing` when it holds against artifacts that were already there, `undecided` when you could not tell. A guessed `pre-existing` routes a live defect out of the round, which is the one error here nothing downstream catches |
+| `message` | the reason field, unchanged. Not a second wording of it |
+
+The block is a YAML list, so on `approve` it is still there and it is `[]`. An absent block and an
+empty one are different facts, and only one of them says a critic ran.
+
+The field names above are what the record's reader parses. When it and this table disagree, the
+reader is right: `aep artifact findings --format json` prints what it read back, and one run of it
+settles the question faster than an argument about a schema.
+
 ## What is not a finding
 
 * **Thinness in something the store has not promoted yet.** An artifact at the start of its
@@ -112,3 +163,5 @@ reading a plan four agents were talked into approving.
 4. **What you could not establish**, one line each, or *none*. The body that cites nothing, the
    symbol that grepped to nothing, the question that is outside your lane. A critic that returns
    only the first three parts has given a verdict without its error bar.
+5. The ` ```findings ` block — the same findings as part 2, in the fields above, `[]` on `approve`.
+   Last, because it is for the program and parts 1 to 4 are for the person.

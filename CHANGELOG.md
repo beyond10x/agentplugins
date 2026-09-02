@@ -1,5 +1,57 @@
 # Changelog
 
+## [Unreleased]
+
+- Pin the four plan critics: `model: sonnet` and `effort: high` in the frontmatter of every
+  `plan-critic-*.md`, refused by `agentplugins-check` when either is missing. The rubric states the
+  pin and states that it is a **default** — the pairing the compared third-party panel uses, adopted
+  so the cost is written down while no local measurement exists — expected to change once there is a
+  review-value table to read. The decomposer, adversary and implementor stay unpinned.
+- Have the wave select on `aep artifact waves` rather than on its own reading of the pairs: the
+  selection step runs the verb first and pastes its waves, collisions and unassessed lists into the
+  proposal verbatim, dispatches a scoper for every unassessed story before proposing, and falls back
+  to the pairwise prose reading only on `unrecognized subcommand` — saying so, with the version. A
+  new *Failure modes* section decides the case the two paths will hit most: **the verb wins, and the
+  disagreement is reported**, because the verb reads a record anybody can re-read and the prose
+  reading is one agent's inference that will not survive the session.
+- Write a story's scope twice — the `## Scope` section for a person, and `aep artifact scope --add`
+  entries for the store, carrying the same `cited`/`inferred` mark. A prose section alone leaves the
+  next wave re-deriving what this one established.
+- Record what became of every review finding. The critic step writes one `review_outcome` per
+  finding after a revision round (`fixed`, `no-op`, `escalated`), and the wave writes one as it takes
+  each row of the adversary route table — the outcome is the row it took, not an opinion of the
+  finding. Both say what to do on a binary that refuses the kind: put the counts in the report,
+  never hand-edit a store file.
+- Have the critic rubric and the adversary close their reports with a fenced ` ```findings ` block —
+  the same findings as the prose, with `file`, `line`, `category`, `severity`, `verdict`, `origin`
+  and `message` — so a later pass is compared by signature instead of by re-reading two reports. The
+  wave records each adversary pass as a `review-result` holding that block, and before deciding on a
+  third attack it runs `aep artifact findings` and pastes the carried, new and resolved lists.
+- Require a domain relation to be a `relations:` entry in an `ess/1` document. `ess-schema`'s minimal
+  document carries one `owns` relation and its refusal list gains the three that come with it — an
+  unknown target, a missing or mistyped `via`, a second owner — with `via` on the target for `owns`
+  and on the source for `references`. Guardrail 7 says the same, and adds that a relation whose
+  cardinality is unknown is an `UNMAPPED:` marker rather than an entry with a guessed value.
+- Require the decomposer's `inferable` citation for a relation to point at an `ess/1` document. A
+  `path:line` into code is admissible only when the classification carries the word `inferred`,
+  because a foreign key says what one implementation currently does and nothing about whether anybody
+  decided it; the relation census now reports the split.
+- Add step 3 to the golden path — model the new noun before decomposing it — carrying the `owns`
+  relation between account and commercial client, with the delete behaviour left `UNMAPPED:`. That
+  narrows the page's open question from three answers to two before the blocker is filed. Its
+  document block is marked as **recorded before ESS shipped relations**, to be re-recorded when the
+  construct lands, rather than showing output nobody produced.
+- Add a `drive` skill to `adp`: `/drive <story-id>` runs `aep doctor` and stops on a `fail`, points
+  `aep drive run` at the task document naming the story, launches it against the project's step map
+  with a budget the operator states, and prints the run id. Each `llm` step's session is spawned by
+  the driver through `metaharness run claude` into metaharness's own hermetic scratch home; where
+  that nested launch is refused or unsupported the skill prints the exact terminal command instead
+  and stops, rather than working around it. It moves no artifact, relays refusals verbatim, and says
+  plainly that the walk has not reached `complete` on the `aep` side — two recorded runs stopped at
+  `establish_verifiers` and `adversarial_verify` — so a driven run today is an experiment with a
+  known cost. `aep drive watch` does not exist yet, so it prints the `scripts/drive-watch` path the
+  `aep` repository documents. The golden path gains it as a final step.
+
 ## [0.4.0] — 2026-09-02
 
 - Give `website/docs/install.md` and `README.md` one copy-paste install block — `/plugin marketplace

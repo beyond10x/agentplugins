@@ -127,9 +127,29 @@ Each section says where the work lands and marks every line `cited` or `inferred
 confidence line before you trust the surface: a wave whose disjointness rests on a `low` scope is a
 wave that finds out at merge time, with N agents' work already spent.
 
+**Write the scope twice: as the section, and as typed entries.** The section is for a person; the
+entries are what the store can compute a wave from. One `aep artifact scope` call per path, carrying
+the same confidence mark the scoper returned:
+
+```console
+$ aep artifact scope story:credential-store --add crates/aep-cli/src/planning.rs
+$ aep artifact scope story:credential-store --add crates/aep-domain/src/lib.rs --inferred
+```
+
+The flag is the difference between a surface somebody read out of the body and one an agent
+guessed from a noun, and it survives into the verb below — which is how the proposal can say which
+units rest on cited scope. A prose section alone leaves the next wave re-deriving what this one
+already established, which is exactly the state the scoping step exists to end.
+
+Where the binary answers `unrecognized subcommand`, write the section and say in the proposal that
+the typed entries could not be written and why. Do not hand-edit a store file to add them: the CLI
+is the store's only writer, here as everywhere.
+
 **A story whose scope cannot be established is not thereby safe.** It is unassessed. Say so, and
 either scope it properly or leave it out — those are the two honest options and *assume it is
-fine* is not among them.
+fine* is not among them. The verb below returns the unassessed set by name; **dispatch a scoper for
+every id in it and write what comes back, before you propose anything.** An unassessed story in a
+proposal is a story the coordinator declined to scope, not a story that could not be scoped.
 
 ### Choose on three properties, in this order
 
@@ -137,7 +157,8 @@ fine* is not among them.
    A story that cannot be finished tonight is not a candidate however good it is.
 2. **Surfaces that do not overlap.** This is the one that decides whether a wave is possible at
    all. Two agents editing one file is a merge conflict whichever order they finish in, and no
-   amount of disk or parallelism helps.
+   amount of disk or parallelism helps. **The verb above answers this property**; the other two are
+   still yours, and a set the verb returned is a set of candidates rather than a wave.
 3. **Blast radius of one package.** The first wave's point is the loop, not the difficulty.
 
 **A wave of one is a wave.** If exactly one candidate passes those three properties, propose it
@@ -146,15 +167,39 @@ alone and run it. The loop is the same at N=1 — propose, dispatch, attack, gat
 arrives stops the loop and buys nothing; padding the set with a candidate that failed a property is
 worse than that. Say in the proposal that N is one, and why the others were left out.
 
-### Name the overlap risk honestly, per pair
+### Ask the store which sets are disjoint, before you judge a single pair
 
-Read each candidate's body for the paths it cites. Then say, for every pair in the proposed set,
-whether they touch the same package.
+**Run the verb first.** It reads the typed scope entries the step above wrote and returns the
+disjoint sets, the pairs it had to exclude, and the stories it could not place:
+
+```console
+$ aep artifact waves --kind story --status draft --format json
+```
+
+Three lists come back — the waves, the collisions, and the unassessed — and **all three go into the
+proposal verbatim.** Not summarised, not filtered to the set you liked: a collision the verb
+excluded is the reason the wave is the size it is, and an operator who cannot see it is approving a
+selection rather than reading one. Paste the ids as the verb printed them.
+
+Exit status 2 is a **cycle** in the declared dependencies, not an empty answer. Relay it, name the
+ids, and stop — a cycle is a defect in the plan and the fix is an edge somebody removes, not a wave
+you assemble by hand around it.
+
+**The fallback is the old pairwise reading, and it is announced.** Where the installed binary
+answers `unrecognized subcommand`, the verb does not exist yet: read each candidate's body for the
+paths it cites, say for every pair in the proposed set whether they touch the same package, and
+**write in the proposal that the selection was made by reading pairs because `aep artifact waves`
+was not available, with the version `aep --version` printed.** A proposal that does not say which
+path it took leaves the operator unable to tell a computed selection from a judged one, and those
+carry different weight.
 
 **Where a story cites no path, write *blast radius unknown* — do not guess.** A story that names no
 file is not thereby safe; it is unassessed, and saying so is the finding. A proposal that quietly
 assumes disjointness is the one that produces a conflict at merge time, with N agents' work already
 spent.
+
+**When the verb and your own reading disagree, the verb wins and the disagreement is reported.** See
+*Failure modes* below; this is the one that will happen most often and it is not a tie.
 
 ### Check what the store will demand on the way out
 
@@ -190,11 +235,13 @@ it when a unit changes stage. It is then the input the cleanup step reads and th
 coordinator recovers from after a compaction, instead of both of those living in a context window
 that may not last the wave.
 
-Report: the units with the objective each serves, the overlap risk per pair, what you deliberately
-left out and why, the pre-flight numbers from below so the operator approves a wave whose cost is
-known, and **one line naming the commits approval authorises** — N unit commits, the merges, the
-closing store commit, the merge to the base branch, and nothing else. If the operator's standing
-rule is *never commit unasked*, that line is the whole of the exception they are granting.
+Report: the units with the objective each serves, the verb's three lists verbatim — the waves, every
+collision it excluded and every unassessed story — which selection path you took, whether each
+unit's scope is **cited** or **inferred**, what you deliberately left out and why, the pre-flight
+numbers from below so the operator approves a wave whose cost is known, and **one line naming the
+commits approval authorises** — N unit commits, the merges, the closing store commit, the merge to
+the base branch, and nothing else. If the operator's standing rule is *never commit unasked*, that
+line is the whole of the exception they are granting.
 
 Two items in that report are fixed text rather than judgement.
 
@@ -393,6 +440,34 @@ Before that column existed, both adversaries of one wave supplied the distinctio
 a judgement per finding, read out of paragraphs. The column makes the common case mechanical. The
 `undecided` row is the one you may not push back onto an agent.
 
+**Record each adversary pass as one `review-result` before you route it**, holding that pass's
+report as it returned — including the fenced ` ```findings ` block the adversary closes with, byte
+for byte. It is an immutable kind, so the body arrives at creation through `new --from` and never
+after. Two things depend on the record existing: the outcome you write next names it, and the
+ledger below compares this pass against the one before it. A pass that was read and not recorded is
+a pass no later command can see.
+
+**Record the outcome of each finding as you take its row.** The row you took *is* the outcome, so
+this costs one command and no judgement — and without it the review-result you wrote says what an
+adversary thought and nothing about whether it mattered, which is the half that would tell anybody
+whether attacking twice is worth what it costs:
+
+```console
+$ aep artifact evidence story:credential-store --kind review_outcome \
+    --review review-result:adversary-unit-3-pass-1 --outcome fixed
+```
+
+| The row you took | The outcome you record |
+|---|---|
+| back to the implementor, and the correction landed | `fixed` |
+| filed as its own story, or the unit shipped without changing for it | `no-op` |
+| it went to a person — a `pre-existing` defect nobody will take, an `undecided` you could not settle, a unit that left the wave | `escalated` |
+
+Write them at the same time as you route, not at the close: a wave that batches them writes them
+from memory two hours later, and the one it forgets is the one it argued about. Where the binary
+refuses the kind, put the three counts in the closing report and name the version that refused —
+never hand-edit a store file to add them.
+
 **"The same implementor" is sometimes not there any more.** A sub-agent is gone once its session has
 been compacted, and a killed one cannot be resumed. When the agent the second row names cannot be
 reached, use a fresh implementor handed the brief file, the unit's diff, the findings, and what has
@@ -420,8 +495,29 @@ something: on the wave of 2026-08-30 two units came back with 4 then 3 findings,
 third would likely find more, and that is the argument for a person deciding rather than a number.
 After two attacks, hand it over — do not open a third.
 
+**Before you decide anything about a third attack, ask the store what the second pass actually
+found.** Both adversary passes were recorded as `review-result`s carrying a fenced findings block,
+so the comparison is a command rather than a reading of two reports:
+
+```console
+$ aep artifact findings story:credential-store --format json
+```
+
+It returns three lists between the two latest review-results — **carried**, **new** and
+**resolved** — and **all three go into the hand-over verbatim**, with their counts. Signature, not
+prose: two findings worded differently at one `file:line` with one verdict and one origin are the
+same finding, and nothing but a signature comparison says so.
+
+The three lists are what the decision turns on, and they are not interchangeable. A second pass of 6
+that is 6 **new** is a unit whose ground keeps moving; a second pass of 6 that is 5 **carried** is a
+correction that did not land, which is the case the fresh-implementor row above exists for. Read the
+lists before you read the counts.
+
+Where the binary answers `unrecognized subcommand`, compare the two findings blocks yourself on
+`file:line` + verdict + origin, and say in the hand-over that the ledger was computed by hand.
+
 **The hand-over carries the trend, not just the verdict.** State findings per pass, how many were
-regressions of an earlier pass, and whether the count rose or fell. Two passes finding 5 then 1 and
+carried from an earlier pass, and whether the count rose or fell. Two passes finding 5 then 1 and
 two passes finding 5 then 6 are different situations, and they currently reach a person looking
 identical. Four waves' worth of observed pairs: 4 then 9, 3 then 4, 5 then 6, 6 then 6 — none with a
 regression of the earlier pass, all diverging or flat. That is the number the decision turns on and
@@ -622,6 +718,33 @@ a model limit and relaunched about eight identical tasks, paying twice for work 
 committed. Resume rather than restart, and wait for the limit to clear before you do: another wave
 stalled 47 minutes recovering four agents by hand, and one session idled three hours on a single
 killed agent that nobody noticed was gone.
+
+## Failure modes
+
+Cases with a decided answer, so that a coordinator meeting one does not have to invent one.
+
+**The verb and the prose disagree.** `aep artifact waves` puts two stories in one wave and your own
+reading of their bodies says they collide — or the reverse. **The verb wins, and the disagreement is
+reported in the proposal**, naming both stories, the surface your reading found, and which of the
+two conclusions each rests on.
+
+The reason it is not a tie: the verb reads the typed scope entries, which are a record somebody
+wrote deliberately and that anybody can re-read; your reading is one agent's inference over prose,
+made once, in a context that will not survive the session. Deferring to it would make the selection
+unreproducible, which is the property the verb was added to get.
+
+**Reporting it is not optional, and it is the useful half.** A disagreement is one of exactly two
+things and both need a person: the scope entries are wrong — write the correction back through
+`aep artifact scope` and say you did — or your reading found a coupling the entries cannot express,
+which is a finding about the story's `## Scope` section and belongs in the proposal. Silently
+following the verb loses both.
+
+**The verb is not there.** `unrecognized subcommand` means the installed binary predates it. Fall
+back to the pairwise reading and say so, with the version — the selection step above states this
+in full.
+
+**The verb exits 2.** A cycle in the declared dependencies. Relay the ids and stop; do not assemble
+a wave around it.
 
 ## Reference
 

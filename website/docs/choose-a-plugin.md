@@ -22,7 +22,10 @@ work, but the planning skill remains responsible for legal lifecycle moves.
 ## Delivering a development story
 
 Use **ADP** when an accepted story is ready to scope and implement. Its wave guidance defines
-coordination and review roles. It does not make a draft plan implementation-ready.
+coordination and review roles for an interactive session; its `drive` skill hands one story to
+the reference driver instead, where the bounds are decided by the engine rather than followed by
+an agent — and it says before it launches that the driven walk has not yet reached `complete`.
+Neither makes a draft plan implementation-ready.
 
 ## Validating a system contract
 

@@ -44,6 +44,26 @@ entities:
     fields:
       - name: destination
         type: String
+    relations:
+      - name: lines
+        kind: owns
+        target: warehouse.shipment.ShipmentLine
+        cardinality: many
+        via: shipment_id
+    lifecycle:
+      initial: Draft
+      states: [Draft]
+      terminal: [Draft]
+
+  - name: warehouse.shipment.ShipmentLine
+    identity:
+      name: line_id
+      type: Uuid
+    fields:
+      - name: shipment_id
+        type: Uuid
+      - name: sku
+        type: String
     lifecycle:
       initial: Draft
       states: [Draft]
@@ -57,7 +77,11 @@ $ ess validate --path <specification>
 warehouse v1 — 2 file(s), valid
 ```
 
-That is the verbatim output of `ess` 0.3.0 over exactly those two files, exit status 0.
+**That output was recorded before ESS shipped relations.** It is the verbatim output of `ess` 0.3.0,
+exit status 0, over the two files **without** the `relations:` block and its second entity — that
+build has no relation construct at all. Re-run it and re-record this block once `ess` ships one
+(`ess` `epic:entity-relations`); until then treat the block above as the shape to write and the
+console line as evidence only for the half of the document that predates it.
 
 Every line above is load-bearing, and the refusals say why. An entity without `identity`, `fields`
 or `lifecycle` is refused as a missing field. A state with no outgoing transition must be listed
@@ -65,6 +89,24 @@ under `terminal:`, or the compiler refuses it as `dead_end_state`. A transition 
 takes is refused as `missing_causation` — so a first domain has one state and no transitions, and
 gains a second state only together with the outcome that moves it. The header's `domains:` list and
 the declaring source must agree in both directions; either half alone is a refusal.
+
+**A relation is an entry, not a convention.** Two entities linked by a field that happens to be
+named after the other one are not related as far as anything can check; the `relations:` entry is
+what makes the link a fact a program reads. Three more refusals come with it, and they are the
+reason it is worth writing:
+
+| Refused | What it means |
+|---|---|
+| an unknown `target` | the far entity is not declared anywhere in the specification. A relation to a noun nobody typed is the failure the guardrail exists to catch, and it now fails at `validate` rather than at the first schema projection |
+| a missing or mistyped `via` | the linking field is not there, or it is not the type of the identity it is supposed to carry. `via` lives on whichever side holds the field: on the **target** for `owns` — the child's field typed by the owner's identity — and on the **source** for `references` |
+| a second owner | two entities both claiming to `own` the same one. Ownership decides what a delete does, and two answers to that is not a richer model, it is an undecided question written down twice |
+
+`owns` and `references` are not stylistic. `owns` says the far side does not stand on its own — it
+has no meaning without its owner, so a delete of the owner cannot leave it behind; `references` says
+it does stand on its own and outlives the link. What the delete *does* — refuse while children
+remain, or take them with it — is a command outcome and not a field of the relation, so `owns`
+narrows that question without answering it. Where you cannot say which kind it is, that is the
+`UNMAPPED:` case below and not a coin toss.
 
 Grow it from there — types, commands, events, views, and a component that owns the domain — running
 `ess validate` after each addition rather than at the end.
@@ -76,6 +118,17 @@ it would go, and named again in the report:
 ```yaml
       # UNMAPPED: the epic says a shipment has a carrier; no code, contract or
       # artifact here says what a carrier is. Ask before typing it.
+```
+
+**A relation whose cardinality or ownership you cannot read is `UNMAPPED:`, not an entry with a
+plausible value.** `cardinality: many` and `cardinality: one` project different schemas and imply
+different stories, and `owns` against `references` decides whether the far side can stand on its own
+at all — so a guess there is not a smaller guess than inventing the relation. Write the marker
+where the entry would go:
+
+```yaml
+      # UNMAPPED: a shipment has lines, and nothing here says whether deleting the
+      # shipment deletes them (owns) or orphans them (references). Ask.
 ```
 
 Imports never guess, and a domain an agent drafts is an import. Never invent a field type, a

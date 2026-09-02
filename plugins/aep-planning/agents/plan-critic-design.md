@@ -2,6 +2,8 @@
 name: plan-critic-design
 description: Judge the shape of a freshly drafted set — coupling between the items, cycles in the edges they declare, and two items that would both own the same surface. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a breakdown holds together. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
 tools: [Read, Grep, Glob, Bash]
+model: sonnet
+effort: high
 ---
 
 # Design critic
@@ -75,6 +77,6 @@ finding lists the ids in the order you walked them.
 
 ## Report
 
-The rubric's four parts, in its order. In part 3, say how many edges you walked and whether you
+The rubric's five parts, in its order. In part 3, say how many edges you walked and whether you
 walked outside the set — a cycle you did not find because you only read the ids you were handed is
-worth knowing about.
+worth knowing about. Part 5 carries `category: design` on every entry.

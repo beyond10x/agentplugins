@@ -32,6 +32,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
         "adp",
         &[
             "skills/wave/SKILL.md",
+            "skills/drive/SKILL.md",
             "agents/story-scoper.md",
             "agents/implementor.md",
             "agents/adversary.md",
@@ -111,12 +112,88 @@ fn plugin(root: &Path, name: &str, required: &[&str]) -> Result<(), String> {
     Ok(())
 }
 
+/// The frontmatter keys every plan critic has to declare.
+const CRITIC_PINS: &[&str] = &["model", "effort"];
+
+/// Read the YAML frontmatter block of a markdown file, without a YAML parser: the block is the
+/// lines between the first `---` and the next one, and a file that does not open with `---` has
+/// none at all.
+fn frontmatter(text: &str) -> Option<&str> {
+    let body = text.strip_prefix("---\n")?;
+    let end = body.find("\n---")?;
+    Some(&body[..=end])
+}
+
+/// A plan critic states what it costs to run. `model:` and `effort:` decide which model answers a
+/// plan critique and how hard it thinks, and a critic that declares neither is routed by whatever
+/// the calling session happened to be on — so four verdicts arrive with no comparable price and no
+/// way to tell an expensive panel from a cheap one after the fact.
+///
+/// Read as text rather than parsed: the keys are single-line scalars at the top level of the block,
+/// and a YAML dependency for two `key:` prefixes would be a parser to keep in step with whichever
+/// one each harness uses.
+fn critic_pins(root: &Path) -> Result<(), String> {
+    let directory = root.join("plugins/aep-planning/agents");
+    let mut entries = std::fs::read_dir(&directory)
+        .map_err(|error| format!("reading {}: {error}", directory.display()))?
+        .map(|entry| entry.map(|entry| entry.path()))
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| format!("reading {}: {error}", directory.display()))?
+        .into_iter()
+        .filter(|path| {
+            let is_markdown = path
+                .extension()
+                .and_then(|extension| extension.to_str())
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("md"));
+            is_markdown
+                && path
+                    .file_name()
+                    .and_then(|name| name.to_str())
+                    .is_some_and(|name| name.starts_with("plan-critic-"))
+        })
+        .collect::<Vec<_>>();
+    entries.sort();
+
+    if entries.is_empty() {
+        return Err(format!(
+            "no `plan-critic-*.md` under {}",
+            directory.display()
+        ));
+    }
+
+    for path in entries {
+        let text = std::fs::read_to_string(&path)
+            .map_err(|error| format!("reading {}: {error}", path.display()))?;
+        let name = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or_default()
+            .to_owned();
+        let block = frontmatter(&text)
+            .ok_or_else(|| format!("plan critic `{name}` has no frontmatter block"))?;
+        for key in CRITIC_PINS {
+            let declared = block.lines().any(|line| {
+                line.strip_prefix(key)
+                    .and_then(|rest| rest.strip_prefix(':'))
+                    .is_some_and(|value| !value.trim().is_empty())
+            });
+            if !declared {
+                return Err(format!(
+                    "plan critic `{name}` declares no `{key}:` in its frontmatter"
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
     }
+    critic_pins(root)?;
     Ok(())
 }
 
@@ -235,6 +312,65 @@ mod tests {
             error,
             format!("plugin `aep-planning` is missing `{critic}`")
         );
+    }
+
+    /// A critic that declares no `model:`/`effort:` runs on whatever the calling session was on,
+    /// which is the state 0.4.0 shipped in and which nothing here noticed. The check reads the
+    /// frontmatter block, so this test exercises the reader on the shapes it has to tell apart
+    /// rather than the four committed files, which the check below already covers.
+    #[test]
+    fn a_critic_without_both_pins_fails_the_check() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-pins-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let agents = sandbox.join("plugins/aep-planning/agents");
+        let write = |name: &str, body: &str| {
+            std::fs::create_dir_all(&agents).expect("the sandbox is writable");
+            std::fs::write(agents.join(name), body).expect("the sandbox is writable");
+        };
+
+        let pinned = "---\nname: plan-critic-design\nmodel: sonnet\neffort: high\n---\n\nbody\n";
+        write("plan-critic-design.md", pinned);
+        critic_pins(&sandbox).expect("a critic carrying both keys passes");
+
+        write(
+            "plan-critic-design.md",
+            "---\nname: plan-critic-design\nmodel: sonnet\n---\n\nbody\n",
+        );
+        assert_eq!(
+            critic_pins(&sandbox).expect_err("a critic missing `effort:` must fail"),
+            "plan critic `plan-critic-design.md` declares no `effort:` in its frontmatter"
+        );
+
+        write(
+            "plan-critic-design.md",
+            "---\nname: plan-critic-design\nmodel:\neffort: high\n---\n\nbody\n",
+        );
+        assert_eq!(
+            critic_pins(&sandbox).expect_err("a key with no value is not a declaration"),
+            "plan critic `plan-critic-design.md` declares no `model:` in its frontmatter"
+        );
+
+        write("plan-critic-design.md", "no frontmatter here\n");
+        assert_eq!(
+            critic_pins(&sandbox).expect_err("a critic with no frontmatter must fail"),
+            "plan critic `plan-critic-design.md` has no frontmatter block"
+        );
+
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+    }
+
+    /// The committed critics carry the pin. This is the half of the check that would catch a fifth
+    /// critic added without one.
+    #[test]
+    fn every_committed_critic_declares_its_pin() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        critic_pins(root).expect("every committed plan critic declares `model:` and `effort:`");
     }
 
     #[test]
