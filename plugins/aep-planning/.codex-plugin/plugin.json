@@ -1,6 +1,6 @@
 {
   "name": "aep-planning",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Govern AEP planning artifacts and review plans without bypassing their lifecycle.",
   "author": {
     "name": "Beyond10x"

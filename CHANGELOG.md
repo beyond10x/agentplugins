@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.4] — 2026-09-02
+
+- Pin the documentation redirect façade to the 21-source Website verifier runtime.
+
 ## [0.3.3] — 2026-09-02
 
 - Refresh the generated `worktree` skill for the guarded recovery of finished external legacy
