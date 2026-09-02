@@ -6,6 +6,7 @@ status: draft
 title: The second adversary attack knows what the first found
 relations:
 - decomposes: epic:second-adopter-feedback
+- decomposes: epic:ahead-of-the-alternative
 revision: 1
 ---
 # Story: The second adversary attack knows what the first found
