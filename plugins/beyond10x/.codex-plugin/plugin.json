@@ -1,6 +1,6 @@
 {
   "name": "beyond10x",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Route work to focused Beyond10x plugins and create portable plugins for Codex and Claude Code.",
   "author": {
     "name": "Beyond10x"

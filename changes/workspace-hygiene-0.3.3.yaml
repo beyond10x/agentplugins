@@ -1,0 +1,15 @@
+schema: b10x-change/v1
+id: agentplugins/workspace-hygiene-0.3.3
+repository: agentplugins
+publishedAt: 2026-09-02T02:25:27Z
+title: Workspace Hygiene guides guarded stale-relocation recovery
+summary: Agent Plugins 0.3.3 refreshes Workspace Hygiene so agents can recover a finished external legacy tree stranded by stale pre-0.3 relocation intent without bypassing exact source, destination, HEAD, proof, or confirmation gates.
+kind: capability
+impact: significant
+source:
+  url: https://github.com/beyond10x/agentplugins/releases/tag/0.3.3
+  version: 0.3.3
+journeys: [build-agents, operate-services]
+affectedSurfaces: [agentplugins/docs, worktree/docs]
+relations:
+  - {target: change:worktree/external-retirement-recovery-0.3.1, kind: depends-on, label: Uses guarded Worktree stale-relocation recovery}

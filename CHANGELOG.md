@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.3] — 2026-09-02
+
+- Refresh the generated `worktree` skill for the guarded recovery of finished external legacy
+  trees stranded by stale pre-0.3 relocation intent.
+- Pin the public installation guidance to the matching Worktree 0.3.1 safety release.
+
 ## [0.3.2] — 2026-09-02
 
 - Refresh the generated `worktree` skill for review-bound cleanup, durable removal recovery,
