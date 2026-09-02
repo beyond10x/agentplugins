@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.7] — 2026-09-02
+
+- Correct `story-migration`: a re-run does not replay, it is **refused**. 0.3.6 said the create
+  command's idempotency key made an identical migration replay; running one against a real store
+  showed the create rejected with `already exists at <path>`. Equally safe, different mechanism —
+  and the sentence as written told a reader to expect a write that never happens. The refusal is now
+  quoted, with the exit code to expect and the two things to check on the second run.
+- Teach both skills AEP's `refs:` field, released in AEP 0.41.0. A ticket id found in a legacy file
+  becomes `--ref jira:DEV-630` in frontmatter rather than only a line of prose, so
+  `aep artifact list --ref jira:DEV-630` answers *what, here, is this ticket*; the URL is configured
+  once in `.engineering/project.yaml` instead of copied into every artifact.
+- Correct the version line in `planning` and `adp/wave`: both claimed 0.3.3 while their manifests
+  had moved on.
+
 ## [0.3.6] — 2026-09-02
 
 - Add the `story-migration` skill to `aep-planning`: migrate a repository's existing story tree,

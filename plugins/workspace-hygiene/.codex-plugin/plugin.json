@@ -1,6 +1,6 @@
 {
   "name": "workspace-hygiene",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Use the public worktree toolchain for safe, recoverable agent checkout lifecycle.",
   "author": {
     "name": "Beyond10x"

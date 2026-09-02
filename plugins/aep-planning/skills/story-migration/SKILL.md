@@ -3,7 +3,7 @@ name: story-migration
 description: Migrate a repository's legacy work tracking — story trees, TODO.md, plan and issue documents — into the governed AEP planning store, without deleting or rewriting the sources. Use when the user asks to migrate, import, port or convert an existing backlog into AEP, when a repository is adopting AEP and already has work written down somewhere, or when a store has been adopted beside a legacy backlog nobody retired. Read it before creating the first artifact in a repository that already tracks work in markdown.
 ---
 
-**Skill version 0.3.6** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.3.7** — the version in `.claude-plugin/plugin.json`.
 
 # Migrating legacy tracking into the store
 
@@ -87,8 +87,8 @@ things if it is not held to a rule.
   `<kind>:<slug>` and a number carries no meaning outside its old tree.
 - **Status** — read from the document's own words and **quote those words in the body**. Prose is
   the evidence for the rung, so it travels with it.
-- **Ticket ids** — `DEV-\d+`, `S-\d+` and similar become body references and, where the tracker has
-  a URL, a link. Never an artifact id.
+- **Ticket ids** — `DEV-\d+`, `S-\d+` and similar become a `--ref` (see § 4), and a body reference
+  beside it for a human to read. Never an artifact id.
 - **Dates** — see § 4. They are retained, in the body, from git.
 - **Anything with no source** — left unset. A migration does not get to decide a priority nobody
   wrote down.
@@ -144,10 +144,20 @@ start writing to find out whether the classification was right.
 document, at two layers, and the refusal names the path. Treat it as the answer: either the
 artifact is already migrated, or the slug collides and needs a different one.
 
-**A re-run is safe.** The create command's idempotency key is derived from the artifact id, so
-re-running an identical migration replays rather than duplicating. This is the property that makes
-the whole procedure repeatable, and it is worth testing: run it twice, and the second run must
-leave the tree unchanged.
+**A re-run is safe, and the mechanism is refusal.** Running the migration a second time creates
+nothing: every `new` is rejected because the document is already there.
+
+```console
+$ aep artifact new story dispatch-retry-backoff --title "…"
+error: `story:dispatch-retry-backoff` already exists at story/dispatch-retry-backoff.md — creating
+over a document is how a plan item's body disappears, and there is no undo in a tool that has not
+committed anything
+```
+
+Expect that output on the second run, and expect a non-zero exit from each create. A script that
+stops at the first failure will stop here; let it continue, and count what it created. **Verify it:
+run the migration twice and check that the artifact count is unchanged and `git status` shows no new
+file under `.engineering/planning/`.**
 
 **Status is never written directly.** `aep artifact new` has no `--status` flag; every artifact is
 created at its kind's initial rung and walks up through `aep artifact move`. Do not hand-edit
@@ -158,10 +168,25 @@ which is what makes it expensive.
 slugify helper in the CLI, so derive it and check it before calling `new`; a title with a colon, an
 ampersand or a leading digit-free symbol will be refused.
 
+**A ticket id is a reference, not a sentence.** A legacy file naming `DEV-630` or a Zendesk number
+carries a join to a system that is still the real tracker. Record it with `--ref`, which puts it in
+frontmatter where `aep artifact list --ref jira:DEV-630` can find it:
+
+```console
+$ aep artifact new story dispatch-retry-backoff --title "…" --ref jira:DEV-630
+$ aep artifact set story:presence-sync-race --ref jira:DEV-425 --ref zendesk:8812
+```
+
+Write the link too, but write it **once**: `.engineering/project.yaml` takes a `providers:` map
+(`jira: https://acme.atlassian.net/browse/{key}`) and `aep artifact show` builds the URL from it. A
+URL pasted into every artifact is the same fact copied N times, and after a tracker migration it is
+the copies that are wrong. Keep the human-readable line in the body as well when the source had one
+— the body is what a person reads — but the `refs:` entry is what a tool reads.
+
 **Dates come from git, never from the filesystem.** A fresh checkout resets mtime, and a migration
 run against one would date every artifact to the day it ran. AEP frontmatter carries no timestamp
-field on purpose, and `aep artifact set` writes only `--title`, `--summary`, `--owner` and tags —
-there is no door for an arbitrary key. So dates live in the body:
+field on purpose, and `aep artifact set` writes only `--title`, `--summary`, `--owner`, tags and
+references — there is no door for an arbitrary key. So dates live in the body:
 
 ```markdown
 ## Provenance
