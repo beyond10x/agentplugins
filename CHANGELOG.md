@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.6] — 2026-09-02
+
+- Add the `story-migration` skill to `aep-planning`: migrate a repository's existing story tree,
+  `TODO.md`, plan and issue documents into the planning store without deleting or rewriting the
+  sources, and backlink both directions so no repository ends up with two plans.
+- Retain each source's dates in the migrated artifact's body, read from git rather than from
+  filesystem mtime, because AEP frontmatter carries no timestamp field and a fresh checkout would
+  date every artifact to the day the migration ran.
+- Point `planning` § 5 at it, so adoption in a repository that already tracks work does not start
+  by hand-writing a second backlog.
+
 ## [0.3.5] — 2026-09-02
 
 - Refresh the generated `worktree` skill so it records that `gc --repo` selects the activated
