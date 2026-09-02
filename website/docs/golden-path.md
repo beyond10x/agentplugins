@@ -23,7 +23,7 @@ nobody has decided, and what the plan does with that instead of guessing.
 Install `aep-planning` and `adp` from the marketplace — see [Install](./install.md) — and have the
 `aep` CLI on your PATH.
 
-```console
+```shell-session
 $ aep --version
 protocol 0.41.0
 ```
@@ -46,7 +46,7 @@ development.standard, then run `aep reverse scan`. Report what the scan found, a
 Two commands and a report is the whole of this step. A scan is evidence, not a plan, and an agent
 that starts drafting artifacts out of one has skipped the part where you get to disagree with it.
 
-```console
+```shell-session
 $ aep reverse init --protocols 'git+https://github.com/beyond10x/aep#b857bbebcb44f77275bc745659226f4826897e78' --profile development.standard
 …/.engineering/project.yaml written
   protocol source resolves to …/aep/protocol-sources/cd43e0b7f3341c9d6329bc502188182e1b0f38df9eda89fd7546517a078e2573/snapshots/b857bbebcb44f77275bc745659226f4826897e78
@@ -57,7 +57,7 @@ $ aep reverse init --protocols 'git+https://github.com/beyond10x/aep#b857bbebcb4
 source pinned to a branch rather than a commit — which is why the source above carries a full commit
 hash.
 
-```console
+```shell-session
 $ aep reverse scan
 aep.reverse-scan/1
 
@@ -92,7 +92,7 @@ File this as an epic in the planning store, and stop there — do not decompose 
 Cite what in this repository the epic rests on.
 ```
 
-```console
+```shell-session
 $ aep artifact new epic commercial-clients --title "Commercial clients on an account" --summary "A commercial client that belongs to exactly one account, with create, read, update and delete." --from epic-body.md
 created epic:commercial-clients (draft) at …/.engineering/planning/epic/commercial-clients.md
 ```
@@ -121,7 +121,7 @@ The decomposer enumerates the relations before it drafts anything. For this epic
 
 Two are settled, so three stories are drafted against them:
 
-```console
+```shell-session
 $ aep artifact new story commercial-client-record --title "Create and read a commercial client on one account" --relate decomposes:epic:commercial-clients --from record-body.md
 created story:commercial-client-record (draft) at …/.engineering/planning/story/commercial-client-record.md
 $ aep artifact new story commercial-client-amendment --title "Update and delete a commercial client" --relate decomposes:epic:commercial-clients --from amendment-body.md
@@ -138,7 +138,7 @@ refuse while clients remain, delete them with it, or leave them with no account;
 produces a different story, and none of the three can be read out of the tree. So it becomes an
 artifact with an edge, rather than a sentence in a report nobody re-reads:
 
-```console
+```shell-session
 $ aep artifact lifecycle decision-blocker
 decision-blocker starts at open
   cleared -> nothing
@@ -151,7 +151,7 @@ The `blocks` edge is the point of the whole exercise. A question in a report is 
 with an edge is found by a command, and `--withholds` names the evidence nobody can produce while it
 stands:
 
-```console
+```shell-session
 $ aep artifact blocked
 decision-blocker:account-deletion-cascade  decision  open, withholding approval  Nobody has decided what happens to an account's commercial clients when the account is deleted
   blocks epic:commercial-clients  draft  Commercial clients on an account
@@ -162,7 +162,7 @@ the question that blocked it — here, that blocker. **The fourth is the one to 
 complete output of `aep artifact validate`, verbatim, with its exit status. If it exited 1, nothing
 else in the report is safe to act on. Here it did not:
 
-```console
+```shell-session
 $ aep artifact validate
 5 file(s) in …/.engineering/planning: 5 artifact(s)
 valid
@@ -183,7 +183,7 @@ The scopers are read-only, so run one per story and run them at once. The write-
 store's journal is append-only and parallel writers race — and it goes through the CLI like every
 other change to a body:
 
-```console
+```shell-session
 $ aep artifact body story:commercial-client-record --from record-body.md
 story:commercial-client-record body replaced (revision 2) at …/.engineering/planning/story/commercial-client-record.md
 ```
@@ -210,7 +210,7 @@ With fewer than two stories under the epic the step is skipped, and says so.
 Every verdict is recorded as an artifact carrying a `reviews` edge to what it judged, so the plan
 you end up with also carries the argument that produced it:
 
-```console
+```shell-session
 $ aep artifact lifecycle review-result
 review-result starts at active
   active -> archived
@@ -224,7 +224,7 @@ edited. That is what makes it evidence rather than an opinion somebody kept upda
 
 A draft is not implementable, and the store says so rather than letting you pretend otherwise:
 
-```console
+```shell-session
 $ aep artifact move story:commercial-client-record --to implemented
 story:commercial-client-record is draft; a story may move to: proposed, archived
 $ echo $?
@@ -234,7 +234,7 @@ $ echo $?
 That refusal is the answer, not an obstacle: it names every status legal from where the artifact
 stands. Walk it, deliberately, and say that you did:
 
-```console
+```shell-session
 $ aep artifact move story:commercial-client-record --to proposed
 story:commercial-client-record moved draft -> proposed (revision 3)
 $ aep artifact move story:commercial-client-record --to active
@@ -258,7 +258,7 @@ names what is missing, and that sentence is what to relay.
 
 ## What you should have
 
-```console
+```shell-session
 $ aep artifact list
 decision-blocker:account-deletion-cascade  decision-blocker  open    Nobody has decided what happens to an account's commercial clients when the account is deleted
 epic:commercial-clients                    epic              draft   Commercial clients on an account                                                                blocked: decision
