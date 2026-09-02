@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.5.0] — 2026-09-03
 
 - Add `evals/`: one `eval-case/1` per agent and per user-facing skill — the four plan critics, the
   decomposer's relation census, `ess-schema` on a new entity, the published golden path end to end,

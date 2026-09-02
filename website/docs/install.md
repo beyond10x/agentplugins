@@ -55,7 +55,7 @@ The `aep` binary requirement above applies unchanged.
 
 ## Pinning
 
-For a reproducible team installation, pin the repository to a bare release tag such as `0.4.0`.
+For a reproducible team installation, pin the repository to a bare release tag such as `0.5.0`.
 The release gate validates both marketplace formats, every declared instruction file, the public
 documentation, and the version recorded by each plugin manifest.
 
