@@ -1,8 +1,12 @@
 # `recorded/` — the golden path, end to end
 
-**Empty on purpose, and this file says what would fill it.** No transcript of this case has been
-recorded, and none was synthesized: a hand-written transcript here would be a fixture the case's own
-rows were fitted to, which measures the document and not the plugin.
+**One recording, and this file says how it was made.**
+`claude-plugin-golden-path-end-to-end.events.jsonl` is a live run of 2026-09-03: 2,120 events, 141
+turns, 15 sub-agents, $22.53, and 27 of 27 expectations `ok`. Its manifest is beside it, which is
+where `task check` reads the observation date to replay it.
+
+Nothing here is ever synthesized. A hand-written transcript would be a fixture the case's own rows
+were fitted to, which measures the document and not the plugin.
 
 ## What the first run of it found, before anything is recorded here
 

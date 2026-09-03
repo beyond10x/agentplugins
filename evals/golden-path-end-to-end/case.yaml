@@ -65,9 +65,11 @@ subject:
 #
 # Eight steps, an ESS model, a decomposer, three scopers, a critic panel, and an experimental driven
 # run on a tree that has to be built first.
-# It is the case a full sweep's budget is mostly spent on. `story:plugin-eval-cases` resolves the
-# per-case cap to `--budget-usd 5`; the advisory cost row carries that number so a run that came in
-# far under or far over it is visible in the matrix rather than only in a receipt.
+# It is the case a full sweep's budget is mostly spent on, and the only one the corpus's own
+# `--budget-usd 5` cannot finish under: `story:plugin-eval-cases` resolves that cap for the other
+# seven, and this case is run at 25. The advisory cost row carries 24 rather than 25 on purpose —
+# see `expectations.trace.yaml` — so a run that came in far under or far over is visible in the
+# matrix rather than only in a receipt.
 #
 # ## The spelling of the CLI, and why the rows carry both
 #

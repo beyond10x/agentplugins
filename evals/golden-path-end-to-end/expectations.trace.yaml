@@ -348,8 +348,10 @@ expectations:
     # (`session.ended` subtype `error_max_budget_usd`). The case costs more with its plugins than
     # without them, which is the case working. The runner passes the same number as `--budget-usd`,
     # and since aep 0.45.0 as the session's own `--max-budget-usd`, so the number here is the one
-    # the run is actually stopped at.
+    # the run is actually stopped at — so this row carries one dollar less than that. A row set to
+    # the cap itself can only fail by the cap's own overshoot, which measures the governor and not
+    # the case; at 24 against a cap of 25 it says something about a run that observed $22.53.
     severity: advisory
     expect:
       cost.total:
-        at_most_usd: 25.0
+        at_most_usd: 24.0

@@ -59,8 +59,7 @@ Free, offline, and part of `task check`:
 
 ```console
 $ task evals
-notice: 8 eval case(s) validated; no transcript is recorded under any `recorded/`, so nothing was
-replayed. Each case's `recorded/README.md` carries the live command that would produce one.
+valid: 8 eval case(s), 1 recorded transcript(s) replayed
 ```
 
 It validates every case, resolves every `subject:` to an agent or a skill that exists here, and

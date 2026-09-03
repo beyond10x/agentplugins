@@ -33,6 +33,7 @@
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use serde::Deserialize;
 
@@ -56,6 +57,9 @@ const STREAM_SUFFIX: &str = ".events.jsonl";
 
 /// How the run manifest beside a recorded stream is named.
 const MANIFEST_SUFFIX: &str = ".manifest.yaml";
+
+/// How many times this process has replayed a corpus, so two calls never share a directory.
+static REPLAYS: AtomicUsize = AtomicUsize::new(0);
 
 /// What this case is about: the agents, skills and paths a change to which should re-run it.
 ///
@@ -514,12 +518,17 @@ fn pinned_plugins(manifest: &Path) -> Result<Vec<String>, String> {
 /// `<plugin>:` prefix of each agent and skill; the one that is not pinned is the one that arrived as
 /// `--plugin-dir`, and its directory is `plugins/<name>` by this repository's own layout.
 ///
-/// A case whose subject names exactly one plugin and whose manifest pins none needs no arguments at
-/// all: a single-plugin stream is unambiguous and `aep` reads the treatment out of it.
-fn treatment_args(case: &Case, manifest: &Path) -> Result<Vec<String>, String> {
-    let pins = pinned_plugins(manifest)?;
+/// A case whose manifest pins none needs no arguments at all: a single-plugin stream is unambiguous
+/// and `aep` reads the treatment out of it.
+///
+/// **Nothing here refuses.** `--plugin-dir` reaches only the spawn a replay never performs —
+/// `aep`'s `ingest_recorded` resolves the treatment from `--plugin` alone — so a subject whose
+/// remainder is not exactly one plugin is not a reason to fail the gate. The pins go, and `aep`
+/// answers with `EVAL-STREAM-009` if it genuinely cannot decide. A gate that refused here would
+/// stop a replay that would have succeeded, over an argument the reader discards.
+fn treatment_args(case: &Case, pins: Vec<String>) -> Vec<String> {
     if pins.is_empty() {
-        return Ok(Vec::new());
+        return Vec::new();
     }
     let mut named: Vec<String> = case
         .subject
@@ -541,26 +550,20 @@ fn treatment_args(case: &Case, manifest: &Path) -> Result<Vec<String>, String> {
         .iter()
         .filter(|name| !pinned_names.contains(&name.as_str()))
         .collect();
-    let [directory] = directories.as_slice() else {
-        return Err(format!(
-            "{}'s subject names {} plugin(s) that its manifest does not pin ({}); exactly one of \
-             them was the `--plugin-dir` treatment and this gate cannot tell which",
-            case.id,
-            directories.len(),
-            directories
-                .iter()
-                .map(|name| name.as_str())
-                .collect::<Vec<_>>()
-                .join(", ")
-        ));
-    };
-
-    let mut args = vec!["--plugin-dir".to_owned(), format!("plugins/{directory}")];
+    // The pins are what `aep` actually reads back: `ingest_recorded` resolves the treatment from
+    // `--plugin` alone, and `--plugin-dir` reaches only the spawn this path never performs. So an
+    // ambiguous remainder is not a reason to refuse a replay — it is a reason to send the pins and
+    // let `aep` answer, which it does with `EVAL-STREAM-009` if it genuinely cannot.
+    let mut args = Vec::new();
+    if let [directory] = directories.as_slice() {
+        args.push("--plugin-dir".to_owned());
+        args.push(format!("plugins/{directory}"));
+    }
     for pin in pins {
         args.push("--plugin".to_owned());
         args.push(pin);
     }
-    Ok(args)
+    args
 }
 
 /// Replays one recorded stream through `aep eval run --stream`, which spends nothing.
@@ -589,7 +592,7 @@ fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), S
         .args(["--stream".as_ref(), stream.as_os_str()])
         .args(["--out".as_ref(), out.as_os_str()])
         .args(["--observed-at", &observed_at(&manifest)?])
-        .args(treatment_args(&arm, &manifest)?)
+        .args(treatment_args(&arm, pinned_plugins(&manifest)?))
         .arg("--redact")
         .current_dir(root)
         // Nothing here may spawn anything, whatever the caller exported. `--stream` never reaches
@@ -676,7 +679,16 @@ pub(crate) fn evals(root: &Path) -> Result<(), String> {
         return Ok(());
     };
 
-    let out = std::env::temp_dir().join(format!("agentplugins-evals-{}", std::process::id()));
+    // Per **call**, not per process. Two of this crate's own tests reach here — the corpus one and
+    // the marketplace one — and `cargo test` runs them on threads of one process, so a directory
+    // named for the pid is one directory shared by both: whichever finishes first runs the
+    // `remove_dir_all` below while the other is still writing into it. That was invisible until a
+    // transcript was actually committed, because before that the replay never ran.
+    let out = std::env::temp_dir().join(format!(
+        "agentplugins-evals-{}-{}",
+        std::process::id(),
+        REPLAYS.fetch_add(1, Ordering::Relaxed)
+    ));
     let mut replayed = 0_usize;
     let mut failure = None;
     for stream in &recorded {
@@ -828,6 +840,76 @@ mod tests {
             .and_then(Path::parent)
             .expect("checker is under the repository root")
             .to_path_buf()
+    }
+
+    /// A case carrying only the two fields `treatment_args` reads.
+    fn case_about(plugins: &[&str]) -> Case {
+        Case {
+            format: CASE_FORMAT.to_owned(),
+            id: "a-case".to_owned(),
+            title: String::new(),
+            workflow: String::new(),
+            states: Vec::new(),
+            arm: "plugin".to_owned(),
+            verdict: "held".to_owned(),
+            subject: Subject {
+                agents: plugins.iter().map(|p| format!("{p}:an-agent")).collect(),
+                skills: Vec::new(),
+                paths: Vec::new(),
+            },
+            task: String::new(),
+            expectations: String::new(),
+            recorded: String::new(),
+            advisory_gaps: Vec::new(),
+            violated: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn the_treatment_a_replay_repeats_is_the_subject_minus_the_pins() {
+        // The golden path's own shape: three plugins in the subject, two of them pinned by the
+        // manifest, so the third is what arrived as `--plugin-dir`.
+        let case = case_about(&["aep-planning", "adp", "ess-schema"]);
+        let pins = vec![
+            "beyond10x/agentplugins@adp@0.6.1".to_owned(),
+            "beyond10x/agentplugins@ess-schema@0.6.1".to_owned(),
+        ];
+        assert_eq!(
+            treatment_args(&case, pins),
+            vec![
+                "--plugin-dir",
+                "plugins/aep-planning",
+                "--plugin",
+                "beyond10x/agentplugins@adp@0.6.1",
+                "--plugin",
+                "beyond10x/agentplugins@ess-schema@0.6.1",
+            ]
+        );
+    }
+
+    #[test]
+    fn a_case_whose_manifest_pins_nothing_repeats_nothing() {
+        // A single-plugin stream is unambiguous and `aep` reads the treatment out of it, so a
+        // replay that added arguments would be inventing the experiment.
+        assert!(treatment_args(&case_about(&["adp"]), Vec::new()).is_empty());
+    }
+
+    #[test]
+    fn an_ambiguous_remainder_sends_the_pins_rather_than_failing_the_gate() {
+        // `--plugin-dir` reaches only the spawn a replay never performs. Refusing here would stop
+        // a replay that would have succeeded, over an argument `aep` discards.
+        let two_left = case_about(&["aep-planning", "adp", "ess-schema", "extra"]);
+        let pins = vec!["beyond10x/agentplugins@adp@0.6.1".to_owned()];
+        let args = treatment_args(&two_left, pins.clone());
+        assert!(!args.iter().any(|a| a == "--plugin-dir"), "{args:?}");
+        assert_eq!(args, vec!["--plugin", "beyond10x/agentplugins@adp@0.6.1"]);
+
+        // And when every subject plugin is pinned, the remainder is empty rather than wrong.
+        let all_pinned = case_about(&["adp"]);
+        assert_eq!(
+            treatment_args(&all_pinned, pins),
+            vec!["--plugin", "beyond10x/agentplugins@adp@0.6.1"]
+        );
     }
 
     #[test]
