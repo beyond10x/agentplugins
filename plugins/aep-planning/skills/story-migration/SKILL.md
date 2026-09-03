@@ -195,7 +195,7 @@ Migrated from `.agents/plans/DEV-630_dispatch-retry-backoff.md`.
 
 - First written 2026-06-16 · last touched 2026-06-16 · 1 revision
 - Status quoted from that file, line 17: **PLANNED — not yet implemented**
-- Ticket [DEV-630](https://babelforce.atlassian.net/browse/DEV-630)
+- Ticket [DEV-630](https://example.atlassian.net/browse/DEV-630)
 ```
 
 The three git facts, in order:
