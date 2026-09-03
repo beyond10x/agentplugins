@@ -486,6 +486,83 @@ fn observed_at(manifest: &Path) -> Result<String, String> {
         .ok_or_else(|| format!("{} states no `observed_at`", manifest.display()))
 }
 
+/// The `plugin:` spellings a run manifest's `plugins:` list names, in order.
+///
+/// One `- plugin: <repo>@<name>@<pin>` line each. Read as text rather than through a typed reader
+/// because this gate needs one field of a document `aep` owns, and a struct here would be a second
+/// definition of that document to keep in step.
+fn pinned_plugins(manifest: &Path) -> Result<Vec<String>, String> {
+    let text = std::fs::read_to_string(manifest)
+        .map_err(|error| format!("reading {}: {error}", manifest.display()))?;
+    Ok(text
+        .lines()
+        .filter_map(|line| line.trim().strip_prefix("- plugin:"))
+        .map(|rest| rest.trim().to_owned())
+        .filter(|value| !value.is_empty())
+        .collect())
+}
+
+/// The plugin arguments a replay must repeat, because a run's treatment is not in its stream.
+///
+/// `aep eval run --stream` refuses `EVAL-STREAM-009` when a stream attests more than one installed
+/// plugin and nothing on the command line says which of them was the treatment — *"which of them
+/// was the treatment is not this reader's guess to make"*. It is right to: the manifest carries one
+/// `plugin_digest`, and a reader that picked would be authoring the experiment.
+///
+/// The two documents beside the stream do say. The manifest's `plugins:` names every pin, verbatim,
+/// which is what `--plugin` took. The case's `subject` names every plugin the case is about, as the
+/// `<plugin>:` prefix of each agent and skill; the one that is not pinned is the one that arrived as
+/// `--plugin-dir`, and its directory is `plugins/<name>` by this repository's own layout.
+///
+/// A case whose subject names exactly one plugin and whose manifest pins none needs no arguments at
+/// all: a single-plugin stream is unambiguous and `aep` reads the treatment out of it.
+fn treatment_args(case: &Case, manifest: &Path) -> Result<Vec<String>, String> {
+    let pins = pinned_plugins(manifest)?;
+    if pins.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut named: Vec<String> = case
+        .subject
+        .agents
+        .iter()
+        .chain(case.subject.skills.iter())
+        .filter_map(|qualified| qualified.split(':').next())
+        .map(str::to_owned)
+        .collect();
+    named.sort();
+    named.dedup();
+
+    let pinned_names: Vec<&str> = pins
+        .iter()
+        .filter_map(|pin| pin.rsplit_once('@').map(|(head, _)| head))
+        .filter_map(|head| head.rsplit_once('@').map(|(_, name)| name))
+        .collect();
+    let directories: Vec<&String> = named
+        .iter()
+        .filter(|name| !pinned_names.contains(&name.as_str()))
+        .collect();
+    let [directory] = directories.as_slice() else {
+        return Err(format!(
+            "{}'s subject names {} plugin(s) that its manifest does not pin ({}); exactly one of \
+             them was the `--plugin-dir` treatment and this gate cannot tell which",
+            case.id,
+            directories.len(),
+            directories
+                .iter()
+                .map(|name| name.as_str())
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
+    };
+
+    let mut args = vec!["--plugin-dir".to_owned(), format!("plugins/{directory}")];
+    for pin in pins {
+        args.push("--plugin".to_owned());
+        args.push(pin);
+    }
+    Ok(args)
+}
+
 /// Replays one recorded stream through `aep eval run --stream`, which spends nothing.
 fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), String> {
     let directory = stream
@@ -512,6 +589,7 @@ fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), S
         .args(["--stream".as_ref(), stream.as_os_str()])
         .args(["--out".as_ref(), out.as_os_str()])
         .args(["--observed-at", &observed_at(&manifest)?])
+        .args(treatment_args(&arm, &manifest)?)
         .arg("--redact")
         .current_dir(root)
         // Nothing here may spawn anything, whatever the caller exported. `--stream` never reaches

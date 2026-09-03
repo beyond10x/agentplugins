@@ -1,0 +1,18 @@
+format: eval.run-manifest/1
+arm: plugin
+harness: claude
+workflow: adp/default
+case: case:golden-path-end-to-end
+plugin_digest: 35c6eab573700a4f6f11a6af33c07804a7c60b40697b07a940f7b477d3054377
+plugins:
+  - plugin: beyond10x/agentplugins@adp@0.6.1
+    digest: 64a8357e4f19f80bce0775c0a6270dd5b23f29709f97325e2b336f7733da4c28
+  - plugin: beyond10x/agentplugins@ess-schema@0.6.1
+    digest: 9e94e5b15115d43b1f26a829c7f5704b1424e79cfbe7f157713fd2588cd1a37f
+model: claude-opus-5[1m]
+harness_version: claude 2.1.259
+transcript_digest: d95c060b1bb5abf47491f80c75d4dc0ebebc18560691eea770815a9afa299791
+observed_at: 2026-09-03
+cost_micro_usd: 22528343
+tokens: 15536297
+wall_time_ms: 3762058
