@@ -7,7 +7,7 @@ title: ESS Schema
 Use this plugin when an agent works with an Executable System Specification or a supported
 projection.
 
-Its schema-validation skill guides the agent to:
+Its `ess-schema` skill guides the agent to:
 
 - validate before compiling or projecting;
 - preserve ordered, deterministic output;

@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.6.0] — 2026-09-03
 
 - Rename the ESS skill's directory from `skills/schema-validation` to `skills/ess-schema`, its frontmatter name: the harness lists a skill by its directory and the eval rows and `agentplugins-check` resolve by the frontmatter name, so the first recording showed the skill offered and called on turn 1 while the row said it was not. The invocation is now `/ess-schema:ess-schema`.
 - Give the planning and wave skills a non-interactive rule. Where the task says to run without
