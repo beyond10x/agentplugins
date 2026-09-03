@@ -49,7 +49,7 @@ jobs:
       EVAL_BUDGET_USD: ${{ inputs.budget_usd || vars.EVAL_BUDGET_USD || '20' }}
       EVAL_CASE_USD: '5'
       # Pinned. An eval whose runner moved between two runs measured two things.
-      AEP_VERSION: '0.42.0'
+      AEP_VERSION: '0.44.0'
       METAHARNESS_VERSION: '0.4.2'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -168,15 +168,21 @@ jobs:
 
       # --- the pinned tools -----------------------------------------------------------------------
 
-      # Built from the pinned release tag rather than downloaded, because neither sibling publishes a
-      # Linux binary asset: `aep/.github/workflows/release.yml` creates the release from the tag's
-      # CHANGELOG section and uploads nothing. The version is what is pinned either way, and it is
-      # the version that decides what was measured.
+      # AEP is the exact x86-64 Linux archive attached to the pinned release, checked against that
+      # release's SHA256SUMS before it is installed. Metaharness does not yet publish a binary asset,
+      # so its exact tag remains the source-build fallback.
       - name: Install the pinned aep and metaharness release binaries
         if: steps.scope.outputs.count != '0'
         run: |
           set -euo pipefail
-          cargo install --locked --git https://github.com/beyond10x/aep --tag "$AEP_VERSION" aep
+          target=x86_64-unknown-linux-gnu
+          archive="aep-${AEP_VERSION}-${target}.tar.gz"
+          release="https://github.com/beyond10x/aep/releases/download/${AEP_VERSION}"
+          curl --fail --location --remote-name "${release}/${archive}"
+          curl --fail --location --remote-name "${release}/SHA256SUMS"
+          grep "  ${archive}$" SHA256SUMS | sha256sum --check -
+          tar -xzf "$archive"
+          install -m 0755 "aep-${AEP_VERSION}-${target}/aep" "$HOME/.cargo/bin/aep"
           cargo install --locked --git https://github.com/beyond10x/metaharness --tag "$METAHARNESS_VERSION" metaharness
           aep --version
           metaharness --version

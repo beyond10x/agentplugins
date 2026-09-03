@@ -7,7 +7,7 @@ description: The curated beyond10x marketplace for focused engineering-agent gui
 
 # Focused guidance, explicit scope
 
-The `beyond10x` marketplace publishes a front door and three specialist plugins. Install the front
+The `beyond10x` marketplace publishes a front door and four specialist plugins. Install the front
 door when you want routing, ecosystem resources, or portable plugin creation. Install a specialist
 directly when the work is already clear.
 

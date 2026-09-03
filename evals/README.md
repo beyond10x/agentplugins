@@ -22,7 +22,7 @@ A case is four things and no others:
 | `plan-critic-parallel-safety-verdict` | `aep-planning:plan-critic-parallel-safety` | the same, for the concurrency lane |
 | `decomposer-relation-census` | `aep-planning:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
 | `ess-schema-new-entity` | `ess-schema:ess-schema` | the noun got a validated typed home before a story rested on it, and the unread relation stayed unread |
-| `golden-path-end-to-end` | `website/docs/golden-path.md` | the six published steps in the published order, with the CLI as the store's only writer |
+| `golden-path-end-to-end` | `website/docs/golden-path.md` | the eight published steps in the published order, with the CLIs as the stores' only writers |
 | `adversary-tests-only` | `adp:adversary` | tests were written, `src/` was not touched, and no `aep artifact` command ran |
 
 ## `recorded/` is empty, and that is stated rather than implied

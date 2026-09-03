@@ -11,17 +11,17 @@ verdict: held
 # cases whose subject the pull request touched.
 subject:
   agents: [aep-planning:decomposer, aep-planning:plan-critic-acceptance, adp:story-scoper]
-  skills: [aep-planning:planning, adp:wave]
+  skills: [aep-planning:planning, ess-schema:ess-schema, adp:wave, adp:drive]
   paths:
     - website/docs/golden-path.md
 
-# **The only case here whose subject is a published page.** `website/docs/golden-path.md` is six
+# **The only case here whose subject is a published page.** `website/docs/golden-path.md` is eight
 # numbered steps an adopter is told to paste, and every console block on it is stated to be the
 # output of actually running the command above it. That claim decays silently: a plugin edit changes
 # what the agent does, the page keeps its recorded output, and the first person to notice is an
 # adopter whose run did something else.
 #
-# So this case's `task:` is the page's six prompts, concatenated, in the page's own order and
+# So this case's `task:` is the page's eight prompts, concatenated, in the page's own order and
 # wording. What the rows below assert is the **shape the page promises** — the orderings, and the
 # one bound the page states as a rule rather than as a step.
 #
@@ -36,7 +36,8 @@ subject:
 #
 # ## Cost, and why this case is the expensive one
 #
-# Six steps, a decomposer, three scopers and a critic panel, on a tree that has to be built first.
+# Eight steps, an ESS model, a decomposer, three scopers, a critic panel, and an experimental driven
+# run on a tree that has to be built first.
 # It is the case a full sweep's budget is mostly spent on. `story:plugin-eval-cases` resolves the
 # per-case cap to `--budget-usd 5`; the advisory cost row carries that number so a run that came in
 # far under or far over it is visible in the matrix rather than only in a receipt.
@@ -47,7 +48,7 @@ subject:
 # may have either on `PATH`. Every matcher below is a regex over both.
 
 task: |
-  Work this repository through the published golden path, in these six steps, stopping at the end of
+  Work this repository through the published golden path, in these eight steps, stopping at the end of
   each one to report before you start the next.
 
   1. Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source the
@@ -61,22 +62,29 @@ task: |
 
      Cite what in this repository the epic rests on.
 
-  3. Decompose `epic:commercial-clients`. Before you draft a single story, list every domain relation
+  3. `epic:commercial-clients` introduces a noun with no typed home. Draft the smallest `ess/1`
+     domain that declares it and its relation to the account, validate it, and mark anything you
+     cannot read from this repository as `UNMAPPED:` rather than guessing it.
+
+  4. Decompose `epic:commercial-clients`. Before you draft a single story, list every domain relation
      the epic implies — entity to entity, cardinality, ownership, lifecycle coupling — and classify
      each one as inferable, with the `path:line` or artifact that settles it, or as needing a
      stakeholder decision. Draft no story that depends on a relation you could not settle.
 
-  4. Scope each draft story under `epic:commercial-clients`: which files and symbols does it touch?
+  5. Scope each draft story under `epic:commercial-clients`: which files and symbols does it touch?
      Mark every line as cited or inferred, say what you could not establish, and write each scope
      back into its story's body.
 
-  5. Run the plan critics over `epic:commercial-clients` and its stories. Record every verdict,
+  6. Run the plan critics over `epic:commercial-clients` and its stories. Record every verdict,
      revise the drafts that come back needing revision, stop after two rounds, and list what is still
      open.
 
-  6. Take `story:commercial-client-record` through the adp wave: scope it into units, implement the
+  7. Take `story:commercial-client-record` through the adp wave: scope it into units, implement the
      units, and have the adversary review the result against the story's acceptance and this
      repository's gate. Walk the story's lifecycle deliberately, and say that you did.
+
+  8. Drive `story:commercial-client-record`. Run `aep doctor` first and stop if anything fails, tell
+     me what the run will cost before you launch it, and print the run id and how to follow it.
 
 expectations: expectations.trace.yaml
 recorded: recorded/

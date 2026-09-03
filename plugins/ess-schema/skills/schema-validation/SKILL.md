@@ -77,11 +77,10 @@ $ ess validate --path <specification>
 warehouse v1 — 2 file(s), valid
 ```
 
-**That output was recorded before ESS shipped relations.** It is the verbatim output of `ess` 0.3.0,
-exit status 0, over the two files **without** the `relations:` block and its second entity — that
-build has no relation construct at all. Re-run it and re-record this block once `ess` ships one
-(`ess` `epic:entity-relations`); until then treat the block above as the shape to write and the
-console line as evidence only for the half of the document that predates it.
+That is the verbatim output of ESS `0.5.1`, exit status 0, over both files as printed—including the
+`relations:` block and its second entity. It is a validated starting point, not an illustrative
+shape. Change the names and semantics to match the repository you actually read, then validate the
+changed specification again.
 
 Every line above is load-bearing, and the refusals say why. An entity without `identity`, `fields`
 or `lifecycle` is refused as a missing field. A state with no outgoing transition must be listed

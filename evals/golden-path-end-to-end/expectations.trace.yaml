@@ -1,12 +1,12 @@
 format: trace-spec/1
 id: eval-case/golden-path-end-to-end
-title: The six steps happened in the order the page publishes, and the CLI stayed the store's only writer
+title: The eight steps happened in the order the page publishes, and the CLIs stayed the stores' only writers
 
 # **No row here reads `website/docs/golden-path.md`.** A check that greps the page asserts that a
 # sentence is still written, and the page's own claim is that its blocks are what running the
 # commands produced — which only a run can hold it to.
 #
-# Six steps make this the longest case in the corpus and the one most exposed to `unk`: `order` is
+# Eight steps make this the longest case in the corpus and the one most exposed to `unk`: `order` is
 # undecidable when either side never occurs, so a run that stopped at step 3 reports `unk` on the
 # later orderings rather than gapping them. That is the honest verdict — nobody found out — and the
 # rows that *do* gap on a short run are the ones about the steps it reached.
@@ -15,7 +15,7 @@ expectations:
   # --- the surfaces the page names were offered -------------------------------------------------
 
   - id: the-decomposer-was-offered
-    statement: the plugin loaded and offered the decomposer, which step 3 dispatches
+    statement: the plugin loaded and offered the decomposer, which step 4 dispatches
     expect:
       env.agent_available:
         agent: aep-planning:decomposer
@@ -27,10 +27,10 @@ expectations:
         skill: aep-planning:planning
 
   - id: the-wave-skill-was-offered
-    statement: the wave skill was among those the harness offered, which step 6 runs
+    statement: the wave skill was among those the harness offered, which step 7 runs
     # **Advisory because of the runner, not because of the claim.** `aep eval run --plugin-dir` is
     # single-valued at 0.42.0 (`crates/protocol-cli/src/eval.rs`: `plugin_dir: Option<PathBuf>`), and
-    # this is the one case whose six steps span two plugins. A run launched through that verb
+    # this is the one case whose eight steps span three plugins. A run launched through that verb
     # installs `aep-planning` and this row gaps for a reason that is not about the plugins; a run
     # launched through `metaharness run claude --plugin-dir A --plugin-dir B`, which does take
     # several, satisfies it. Gating it would fail the supported invocation.
@@ -38,6 +38,22 @@ expectations:
     expect:
       env.skill_available:
         skill: adp:wave
+
+  - id: the-ess-skill-was-offered
+    statement: the ESS skill was among those the harness offered, which step 3 runs
+    # Advisory for the same single-plugin runner limitation described on the wave row.
+    severity: advisory
+    expect:
+      env.skill_available:
+        skill: ess-schema:ess-schema
+
+  - id: the-drive-skill-was-offered
+    statement: the experimental drive skill was among those the harness offered, which step 8 runs
+    # Advisory for the same single-plugin runner limitation described on the wave row.
+    severity: advisory
+    expect:
+      env.skill_available:
+        skill: adp:drive
 
   - id: the-work-was-fanned-out
     statement: the page's sub-agents ran as sub-agents
@@ -64,10 +80,10 @@ expectations:
           tool: Bash
           args: {command: {regex: '(aep|protocol) artifact new'}}
 
-  # --- steps 2 and 3: the epic before its stories, the blocker before both ------------------------
+  # --- steps 2 through 4: the epic and validated model before stories, the blocker before work ----
 
   - id: the-epic-was-filed-before-it-was-decomposed
-    statement: step 2 finished before step 3 started
+    statement: step 2 finished before step 4 started
     expect:
       order:
         first:
@@ -77,9 +93,20 @@ expectations:
           tool: Bash
           args: {command: {regex: '(aep|protocol) artifact new +story'}}
 
+  - id: the-domain-was-validated-before-it-was-used
+    statement: step 3 validated the typed domain before step 4 created a story that rests on it
+    expect:
+      order:
+        first:
+          tool: Bash
+          args: {command: {regex: 'ess +validate'}}
+        before:
+          tool: Bash
+          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+
   - id: the-undecided-relation-became-a-blocker-with-an-edge
     statement: the relation the tree does not settle reached the store as a blocked question
-    # § 3: *"The `blocks` edge is the point of the whole exercise. A question in a report is read
+    # § 4: *"The `blocks` edge is the point of the whole exercise. A question in a report is read
     # once; a blocker with an edge is found by a command."* One row over both halves, because a
     # blocker without the edge is the failure this asserts against and a run that wrote them in two
     # commands satisfies the alternation.
@@ -92,7 +119,7 @@ expectations:
 
   - id: nothing-was-promoted-before-the-blocker-was-filed
     statement: the blocked question was in the store before any artifact moved through its lifecycle
-    # Step 3 precedes step 6, and step 6 is where the first `move` happens. Gating rather than
+    # Step 4 precedes step 7, and step 7 is where the first `move` happens. Gating rather than
     # advisory because the page's whole argument is that the question lands *before* work is
     # scheduled around it.
     expect:
@@ -104,11 +131,11 @@ expectations:
           tool: Bash
           args: {command: {regex: '(aep|protocol) artifact +move'}}
 
-  # --- step 5: every verdict is recorded ----------------------------------------------------------
+  # --- step 6: every verdict is recorded ----------------------------------------------------------
 
   - id: every-verdict-became-a-review-result
     statement: the panel's verdicts were recorded as immutable `review-result` artifacts, body and all
-    # § 5: *"Every verdict is recorded as an artifact carrying a `reviews` edge to what it judged."*
+    # § 6: *"Every verdict is recorded as an artifact carrying a `reviews` edge to what it judged."*
     # `review-result` refuses every edit after the fact, so the body has to arrive with the record —
     # `--from` is the only way it can, which is why this row asserts the pair and not the verb.
     expect:
@@ -118,11 +145,11 @@ expectations:
           command: {regex: '(?s)(aep|protocol) artifact new +review-result.*--from'}
         count: {at_least: 1}
 
-  # --- step 6: the lifecycle is walked, not jumped ------------------------------------------------
+  # --- step 7: the lifecycle is walked, not jumped ------------------------------------------------
 
   - id: the-story-was-walked-through-its-lifecycle
     statement: the story reached `active` through the moves the store allows rather than in one jump
-    # § 6 shows the store refusing `draft -> implemented` and naming what is legal from where the
+    # § 7 shows the store refusing `draft -> implemented` and naming what is legal from where the
     # artifact stands, then walking it. Two moves is the floor; a run that walked further is fine.
     expect:
       tool.called:
@@ -130,6 +157,19 @@ expectations:
         args:
           command: {regex: '(aep|protocol) artifact +move'}
         count: {at_least: 2}
+
+  # --- step 8: the experimental driver is preflighted ---------------------------------------------
+
+  - id: the-driver-was-checked-before-it-was-launched
+    statement: the experimental driven run was preflighted before any model-backed walk began
+    expect:
+      order:
+        first:
+          tool: Bash
+          args: {command: {regex: '(aep|protocol) +doctor'}}
+        before:
+          tool: Bash
+          args: {command: {regex: '(aep|protocol) +drive +run'}}
 
   # --- the rule the page states, and the only non-vacuous store-write bound in this corpus --------
 
@@ -160,7 +200,7 @@ expectations:
 
   - id: the-store-was-validated
     statement: the store's own validator ran
-    # § 3: *"The fourth is the one to read first: the complete output of `aep artifact validate`,
+    # § 4: *"The fourth is the one to read first: the complete output of `aep artifact validate`,
     # verbatim, with its exit status. If it exited 1, nothing else in the report is safe to act on."*
     expect:
       tool.called:
@@ -194,8 +234,8 @@ expectations:
   # --- advisory -------------------------------------------------------------------------------------
 
   - id: turns-within-reason
-    statement: six steps did not become a loop
-    # The page's own run is six steps with a fan-out in two of them; a bound below that would fail a
+    statement: eight steps did not become a loop
+    # The page's own run is eight steps with a fan-out in two of them; a bound below that would fail a
     # correct run, and a much higher one would not catch a loop. Advisory either way: a long run is a
     # cost finding, not a charter violation, and the cap that actually stops a spend is the runner's.
     severity: advisory

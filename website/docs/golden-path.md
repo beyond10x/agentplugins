@@ -12,8 +12,7 @@ repository that already exists and has never been planned.
 Every console block below is the output of actually running the command shown above it. None of it
 is written by hand; the only edit is that the recording machine's absolute paths are shortened to
 `…`. What the agents *say* is described in prose instead of quoted, because yours will not say it
-the same way. **Step 3 is the one exception and it says so**: it shows a document shape that the
-`ess` build behind this page cannot yet validate, marked rather than fabricated.
+the same way. The commands were refreshed against AEP `0.44.0` and ESS `0.5.1`.
 
 The worked feature is deliberately small: a **commercial client** record that belongs to exactly one
 **account**, with create, read, update and delete. The interesting part is the one thing about it
@@ -26,7 +25,9 @@ and have the `aep` CLI on your PATH. Step 3 also uses the `ess` CLI.
 
 ```shell-session
 $ aep --version
-protocol 0.41.0
+protocol 0.44.0
+$ ess --version
+ess 0.5.1
 ```
 
 That build produced every output on this page. The binary prints `protocol` in `--version` and in
@@ -40,7 +41,7 @@ directory yet.
 
 ```text
 Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source
-git+https://github.com/beyond10x/aep#b857bbebcb44f77275bc745659226f4826897e78 and the profile
+git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45 and the profile
 development.standard, then run `aep reverse scan`. Report what the scan found, and file nothing yet.
 ```
 
@@ -48,9 +49,9 @@ Two commands and a report is the whole of this step. A scan is evidence, not a p
 that starts drafting artifacts out of one has skipped the part where you get to disagree with it.
 
 ```shell-session
-$ aep reverse init --protocols 'git+https://github.com/beyond10x/aep#b857bbebcb44f77275bc745659226f4826897e78' --profile development.standard
+$ aep reverse init --protocols 'git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45' --profile development.standard
 …/.engineering/project.yaml written
-  protocol source resolves to …/aep/protocol-sources/cd43e0b7f3341c9d6329bc502188182e1b0f38df9eda89fd7546517a078e2573/snapshots/b857bbebcb44f77275bc745659226f4826897e78
+  protocol source resolves to …/aep/protocol-sources/cd43e0b7f3341c9d6329bc502188182e1b0f38df9eda89fd7546517a078e2573/snapshots/8b4342a41fdd914341d9a479627ed76240f88d45
   profile development.standard
 ```
 
@@ -119,6 +120,16 @@ The relation is the point of the step. *Belongs to exactly one account* is a sen
 in the domain it is an entry a compiler checks:
 
 ```yaml
+# system.yaml
+format: ess/1
+system: accounts
+version: v1
+
+domains:
+  - accounts.account
+```
+
+```yaml
 # domains/account.yaml
 domain: accounts.account
 
@@ -165,15 +176,13 @@ typed by the owner's identity. `ess validate` refuses a target that is not decla
 missing or of the wrong type, and a second entity claiming to own the same one — which is what makes
 this worth writing down rather than asserting in a story body.
 
-:::note This block was recorded before ESS shipped relations
+```shell-session
+$ ess validate --path <specification>
+accounts v1 — 2 file(s), valid
+```
 
-This is the one step on the page with no recorded output, and it is marked rather than fabricated:
-the `ess` build behind this page has no `relations:` construct, so the document above is the shape to
-write and not one that has been validated end to end. Run `ess validate --path <specification>` and
-record what it prints here once the construct ships (`ess` `epic:entity-relations`); everything else
-on this page is real output.
-
-:::
+ESS `0.5.1` validated both files and the ownership relation end to end. That validation is what lets
+the next step cite the domain as evidence rather than treating the YAML as illustrative prose.
 
 The `UNMAPPED:` marker is doing the same job here that the blocker does two steps down, one level
 lower: it is the question written where the answer would go, so the next reader finds it instead of

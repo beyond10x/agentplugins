@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+- Correct the adopter path to install and verify the current AEP and ESS release binaries, pin the
+  Claude Code marketplace source, reload installed plugins, and state that `ess-schema` requires
+  the `ess` CLI.
+- Re-record the eight-step golden path against AEP 0.44.0 and ESS 0.5.1 now that ESS validates
+  entity relations, and keep its behavioural eval aligned with all eight published prompts.
+
 ## [0.5.0] — 2026-09-03
 
 - Add `evals/`: one `eval-case/1` per agent and per user-facing skill — the four plan critics, the
