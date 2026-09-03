@@ -2,7 +2,7 @@
 format: aep.planning-md/1
 id: story:non-interactive-golden-path
 kind: story
-status: draft
+status: implemented
 title: The golden path runs without an operator, and says so at every stop
 summary: Every operator stop becomes a recorded approval-record with the reason non-interactive; the P1 golden-path case ended after step 1 with 10 gaps because nobody was there to continue.
 owner: plugins
@@ -11,7 +11,7 @@ tags:
 - golden-path
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 1
+revision: 4
 ---
 # Story: The golden path runs without an operator, and says so at every stop
 
