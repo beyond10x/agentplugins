@@ -60,10 +60,3 @@ task: |
 
 expectations: expectations.trace.yaml
 recorded: recorded/
-
-# The run did nothing wrong; what gaps is an observation about the evidence, not about the run.
-advisory_gaps:
-  - expectation: the-scope-was-actually-tested
-    why: >-
-      No transcript is recorded for this case yet, so nothing has tested the guardrail rows. When
-      one is, this line states what that run's `permission_denials` said rather than predicting it.

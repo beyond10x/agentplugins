@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+- Fix `the-scope-was-actually-tested`, which gapped in all eight eval cases on their first live
+  recording (2026-09-03) without one of the eight runs doing anything wrong. It asserted
+  `permission.denied: {at_least: 1}` against a seam that observes and never adjudicates — every
+  `session.started` records `permission_mode: default` and every `tool.decided` reads
+  `decision: allow`, `decided_by: observe` — and it contradicted `nothing-was-refused` directly below
+  it, which asserts `{at_most: 0}` over the same quantity. The row now selects **what the run
+  touched**, one surface per case, in `trace-spec/1`'s neutral `operations:`/`subject:` selector.
+  Re-checked offline against the eight recordings the gap counts go 2→1, 1→0, 2→1, 10→9 and 1→0 four
+  times, with exactly one row's verdict moving in each. `evals/README.md` § *A control has to be able
+  to pass* carries the argument, including why a subject glob is anchored with a leading `*` rather
+  than written relative to the case's `--cwd`.
+- State the adversary's authoring order where its charter lists its steps, and again in its report
+  format: the failing case is written and its red output captured **before** the suite is run. The
+  first recording of `adversary-tests-only` ran `task check` and wrote the case afterwards, which the
+  charter's own `cases: executed <before>→<after>` line invited; hard rule 3 now names the two honest
+  sources of `<before>` and refuses a pre-emptive suite run.
+- Sharpen the `ess-schema` trigger: an entity introduction names the noun *and* something typed about
+  it — an identifier, a field, or a relation to another noun — and a repository with no `system.yaml`
+  anywhere is called out as in scope rather than left to be read into "whether or not a specification
+  exists yet". The 0.4.0 widening is kept verbatim; the added sentences exclude the planning prose
+  that merely mentions a noun.
+- Record what the first recording actually settled about `the-skill-was-offered`, which is not what
+  it looked like: the harness lists the ESS skill by its **directory**,
+  `ess-schema:schema-validation`, while the case asserts the frontmatter name, `ess-schema:ess-schema`.
+  The skill was offered and the run invoked it as its first tool call, so what gaps is the spelling —
+  not the trigger and not the run. Closing it means either renaming the skill directory or re-spelling
+  the row against what `agentplugins-check` resolves, and neither is taken here.
+
 ## [0.5.1] — 2026-09-03
 
 - Correct the adopter path to install and verify the current AEP and ESS release binaries, pin the
