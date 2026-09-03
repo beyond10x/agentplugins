@@ -47,10 +47,10 @@ mkdir -p "$HOME/.local/bin"
 install -m 0755 "aep-${B10X_AEP_VERSION}-${B10X_TARGET}/aep" "$HOME/.local/bin/aep"
 ```
 
-Install ESS `0.5.1` the same way:
+Install ESS `0.9.2` the same way:
 
 ```bash
-B10X_ESS_VERSION=0.5.1
+B10X_ESS_VERSION=0.9.2
 B10X_ESS_ARCHIVE="ess-${B10X_ESS_VERSION}-${B10X_TARGET}.tar.gz"
 B10X_ESS_RELEASE="https://github.com/beyond10x/ess/releases/download/${B10X_ESS_VERSION}"
 curl --fail --location --remote-name "${B10X_ESS_RELEASE}/${B10X_ESS_ARCHIVE}"
@@ -75,7 +75,7 @@ aep --version
 ess --version
 ```
 
-The expected lines are `protocol 0.44.0` and `ess 0.5.1`. (`aep` retains `protocol` as its version
+The expected lines are `protocol 0.44.0` and `ess 0.9.2`. (`aep` retains `protocol` as its version
 label for compatibility.) `command not found` means the affected plugin will install and then stop
 at its first CLI command. Only the `beyond10x` front door needs neither binary.
 
@@ -84,14 +84,14 @@ at its first CLI command. Only the `beyond10x` front door needs neither binary.
 Copy the whole block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.5.1
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.6.2
 /plugin install aep-planning@beyond10x
 /plugin install adp@beyond10x
 /plugin install ess-schema@beyond10x
 /reload-plugins
 ```
 
-The first line registers the repository at the immutable `0.5.1` release; each install names its
+The first line registers the repository at the immutable `0.6.2` release; each install names its
 plugin in the `<plugin>@beyond10x` form. `/reload-plugins` activates them immediately. Add
 `/plugin install beyond10x@beyond10x` for the front door and
 `/plugin install workspace-hygiene@beyond10x` for managed worktrees. Claude Code reads
@@ -101,17 +101,42 @@ commands and supported marketplace sources.
 
 ## Codex
 
-Codex offers the same five plugins from the same repository under the same `beyond10x` identity,
-but no slash-command equivalent of the block above is published, so this page does not print one.
-Add the release-pinned GitHub repository as a marketplace from the Plugins surface, then select the
-front door or one of the four specialists. The authoritative description of what Codex will find is
+Codex offers the same five plugins from the same repository under the same `beyond10x` identity.
+For a fresh installation, run this release-pinned block:
+
+```bash
+codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.6.2
+codex plugin add beyond10x@beyond10x
+codex plugin add aep-planning@beyond10x
+codex plugin add adp@beyond10x
+codex plugin add ess-schema@beyond10x
+codex plugin add workspace-hygiene@beyond10x
+```
+
+An immutable marketplace pin does not advance when `codex plugin marketplace upgrade` runs. To
+replace an older pin, remove the installed plugins and marketplace registration, then run the fresh
+block above:
+
+```bash
+codex plugin remove beyond10x@beyond10x
+codex plugin remove aep-planning@beyond10x
+codex plugin remove adp@beyond10x
+codex plugin remove ess-schema@beyond10x
+codex plugin remove workspace-hygiene@beyond10x
+codex plugin marketplace remove beyond10x
+```
+
+The commands leave every focused plugin installed and enabled. Start a new Codex thread afterwards;
+plugin instructions are injected when a thread starts, not retroactively into a running thread.
+The same plugins remain available from the Plugins surface. The authoritative description of what
+Codex will find is
 [`.agents/plugins/marketplace.json`](https://github.com/beyond10x/agentplugins/blob/main/.agents/plugins/marketplace.json)
 in this repository; Codex reads it together with the selected plugin's `.codex-plugin/plugin.json`.
 The `aep` and `ess` binary requirements above apply unchanged.
 
 ## Pinning
 
-The block above is already pinned to the bare `0.5.1` release tag. Upgrade by changing that tag
+The blocks above are already pinned to the bare `0.6.2` release tag. Upgrade by changing that tag
 deliberately, re-registering the marketplace source, and running `/reload-plugins`. The release gate
 validates both marketplace formats, every declared instruction file, the public documentation, and
 the version recorded by each plugin manifest.

@@ -18,14 +18,14 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 `aep-planning` and `adp` drive the `aep` CLI; `ess-schema` drives the `ess` CLI. Install the
 verified Linux or macOS archives for [AEP `0.44.0`](https://github.com/beyond10x/aep/releases/tag/0.44.0)
-and [ESS `0.5.1`](https://github.com/beyond10x/ess/releases/tag/0.5.1) first, then check them with
+and [ESS `0.9.2`](https://github.com/beyond10x/ess/releases/tag/0.9.2) first, then check them with
 `aep --version` and `ess --version`. The complete download and checksum commands are in
 [`website/docs/install.md`](website/docs/install.md).
 
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.5.1
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.6.2
 /plugin install aep-planning@beyond10x
 /plugin install adp@beyond10x
 /plugin install ess-schema@beyond10x
@@ -34,9 +34,8 @@ Paste this pinned block into a Claude Code session:
 
 Add `/plugin install beyond10x@beyond10x` for the front door and
 `/plugin install workspace-hygiene@beyond10x` for managed worktrees. Codex offers the same plugins
-from the same repository, following `.agents/plugins/marketplace.json`; no slash-command equivalent
-is published, so add the release-pinned repository from its Plugins surface. The full walkthrough is
-in [`website/docs/install.md`](website/docs/install.md).
+from the same repository, following `.agents/plugins/marketplace.json`; its exact non-interactive
+CLI bootstrap and upgrade commands are in [`website/docs/install.md`](website/docs/install.md).
 
 Codex marketplace metadata lives at `.agents/plugins/marketplace.json`; Claude plugin marketplace
 metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own manifest and only the

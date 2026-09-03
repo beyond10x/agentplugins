@@ -10,11 +10,14 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 ## Select the smallest surface
 
 1. Identify the user's immediate decision or outcome.
-2. Select one plugin from the routing table. Select several only when the task genuinely crosses
+2. For non-trivial implementation, cross-repository work, or release/deployment changes in a
+   Beyond10x repository, route through `aep-planning` first so the owning artifact, relations, and
+   scope exist before implementation continues.
+3. Select one plugin from the routing table. Select several only when the task genuinely crosses
    their boundaries.
-3. If the selected plugin is installed, use its skill or agent. If it is unavailable, name the
+4. If the selected plugin is installed, use its skill or agent. If it is unavailable, name the
    plugin, link its reference page, and explain that its specialist instructions are not loaded.
-4. For a general ecosystem question, answer from
+5. For a general ecosystem question, answer from
    [references/resources.md](references/resources.md) without selecting a specialist.
 
 | Request | Route |
