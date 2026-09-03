@@ -12,7 +12,8 @@ branch, and closed on one gate run. This skill makes *your* session the coordina
 
 It is deliberately in two stages with a stop between them. Stage 1 proposes and halts; the operator
 approves; stage 2 runs. A sub-agent cannot ask the operator anything, so the approval has to live
-here, in the session that can.
+here, in the session that can — when there is one. *When the run is non-interactive*, below, says
+what happens to each of the two stops when there is not.
 
 ## The cycle a wave is one turn of
 
@@ -260,6 +261,52 @@ the copy it had loaded, and described that as having run the implementor.
 rather than a target. This is a proposal, not the plan: the plan is the page you just wrote, and one
 line linking to it carries the rest. The store requirements you satisfied, the lifecycle you read
 and the scopers you ran are how you did the work, not what the operator decides on.
+
+### When the run is non-interactive
+
+The stage-1 stop assumes somebody is there to take it. Sometimes nobody is — the task says *run
+without stopping* or *no operator is present*, or the harness gives no operator turn at all: a batch
+or print-mode session, an `aep eval run` case, a dispatch. **A coordinator that ends its turn at the
+stop in one of those has produced a page nobody will read and no wave.** Decide which kind of run
+this is before stage 1, the way `aep-planning`'s planning skill § 4 *When there is no operator* sets
+out, and say which in the report.
+
+**Record the stop and run it.** One `approval-record` through the CLI, before the first dispatch:
+
+```console
+$ aep artifact new approval-record wave-proposal-2026-09-03 \
+    --title "Wave proposal accepted with no operator present" \
+    --tag non-interactive --relate decides:story:credential-store \
+    --from bypass-body.md
+```
+
+The kind and the two commands that settle it are the planning skill's to explain. What is specific
+to a wave is what the body has to hold, and it is the proposal's own load-bearing half: the units
+and the objective each serves, the verb's three lists verbatim, which selection path you took, the
+pre-flight numbers, and **the line naming the commits the bypass authorises** — the same line stage
+1 states, now standing on a record instead of on an operator's sentence. **The page is still
+written.** Approval never removed the page, and a bypass removes less than an approval does.
+
+**The bypass covers the asking, and nothing else.**
+
+| The stop | Non-interactive |
+|---|---|
+| the stage-1 proposal | recorded, and the wave runs |
+| a decision an implementor handed back that is yours anyway | it was never a stop — take it, as always |
+| a red unit after two attacks | **it still leaves the wave.** Record the escalation, `--tag non-interactive`, naming the unit and the two passes; go on with the units that are green. It does not merge |
+| a gate that is not green | **still not green.** A bypass record is not an exit status |
+| an open `decision-blocker` on a story in the set | the story leaves the set. Never `move <blocker> --to cleared` |
+| a move whose evidence the run did not produce | still refused, with the refusal verbatim in the record |
+| **the release** | **not bypassable.** Record that the wave reached it, and end there — no tag, no version bump, no push |
+
+The last row is what the two-stop shape exists for. `release` stops for a person because nothing
+mechanical enforces the procedure and it has already slipped once here; a run with nobody watching
+is the case that matters most, not least. A non-interactive wave closes at the merge into the base
+branch, writes what it did, and leaves the release to whoever reads the record.
+
+**Say it in the closing report:** that the run was non-interactive, how that was detected, and the id
+of every `approval-record` it wrote. A bypass nobody can list afterwards is indistinguishable from a
+coordinator that never stopped at all.
 
 ### After approval, do not stop again until the release
 

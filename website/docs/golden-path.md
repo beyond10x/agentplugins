@@ -7,7 +7,10 @@ description: One worked run, from a feature idea to a critiqued plan, on a repos
 # From a feature idea to a critiqued plan
 
 You type the prompts on this page; the agent runs the commands. It is one run end to end, on a
-repository that already exists and has never been planned.
+repository that already exists and has never been planned. If nobody is going to be there to type
+them — a batch run, an eval case, anything with no operator turn — read [Running it without an
+operator](#running-it-without-an-operator) at the foot of the page first: it is one extra sentence in
+front of step 1, and without it the run ends at the first stop.
 
 Every console block below is the output of actually running the command shown above it. None of it
 is written by hand; the only edit is that the recording machine's absolute paths are shortened to
@@ -402,3 +405,57 @@ guidance is to express a reusable role as a skill rather than as an agent wrappe
 and what lands in the store, is the same.
 
 :::
+
+## Running it without an operator
+
+Every step above hands the run back to you: it stops, you read what came back, you type the next
+prompt. A run with nobody there has nobody to hand it to, so it stops once and is finished. One did,
+on 2026-09-03: a single headless session over these eight prompts adopted the repository, scanned it,
+wrote *step 1 — adopted, scanned* and ended — no wave, no fan-out, no blocker with an edge, no
+verdicts recorded, and the store never validated. Ten of the checks this page is held to came back as
+gaps and seven held, and nothing the run did was wrong; there was just nobody to continue it.
+
+**One sentence in front of step 1 fixes it.** This is the instruction to give:
+
+```text
+Run this without stopping: no operator is present, so at every point you would pause for one — the
+wave proposal, a critic round, a blocker, a move the store gates on evidence — record one
+`approval-record` through `aep artifact new`, tagged `non-interactive`, naming the stop and what you
+decided in the operator's absence, and continue. Do not clear a blocker, do not publish and do not
+release.
+```
+
+The eight prompts then follow unchanged.
+
+### What gets recorded at each stop
+
+One record per stop, written **at** the stop and through the CLI like every other change to the
+store — `aep artifact kinds` lists `approval-record`, and `aep artifact lifecycle approval-record`
+answers that it declares no lifecycle, so creating it is the whole of the bypass. Afterwards,
+`aep artifact list --kind approval-record` is the list of every place the run decided something you
+would have decided.
+
+| Where the page waits | What the run records | What it does next |
+|---|---|---|
+| **step 4** — the decomposer files `decision-blocker:account-deletion-cascade` and drafts no story behind it | the blocker id, and the story it did not draft | drafts the two stories that do not depend on the answer |
+| **step 6** — a critic round comes back `needs-revision` | one record per round, holding the verdict nobody was there to read | revises through `aep artifact body`, runs the second round, stops at two, lists what is still open |
+| **step 7** — the wave proposal | the units, the commits an approval would have authorised, the pre-flight numbers | writes the wave page anyway, then dispatches |
+| **step 7** — `aep artifact move` refuses for want of evidence | the refusal, verbatim | records the evidence if the run actually observed it; otherwise leaves the story where it stands and goes on with what is not blocked |
+| **step 8** — the driven run's budget | the budget the instruction named | launches. Where the instruction named none, it records that and prints the command rather than choosing a number to spend |
+
+### What a headless run cannot do
+
+These are not stops it may record its way past. They are the four things the absence of an operator
+does not supply:
+
+| | Why |
+|---|---|
+| **clear a blocker** | `aep artifact move decision-blocker:account-deletion-cascade --to cleared` *is* the answer to the question, and the question is the thing nobody was there to answer. The blocker stands and the epic stays blocked — which is the correct end state, not a gap |
+| **publish** | a push, a tag and a version bump are the repository's release procedure, and none of them is a step of this plan |
+| **release** | the wave's second stop, and the one that is not bypassable. Nothing mechanical enforces a release procedure, so a run nobody is watching is the case that stop exists for. The run closes at the merge and leaves the release |
+| **turn a refusal into a pass** | a move whose evidence does not exist is still refused and a red gate is still red. A bypass record is not an exit status, and evidence is never recorded for an observation the run did not make |
+
+So a headless run ends roughly where step 8 ends anyway — the driven walk has not reached `complete`
+yet either. The difference is everything steps 2 through 7 produce: an epic, a validated domain,
+three stories, a blocker with an edge, four verdicts, one story through a wave — in the store, with
+every stop it passed sitting beside them as an artifact somebody can read.

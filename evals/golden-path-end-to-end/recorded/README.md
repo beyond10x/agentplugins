@@ -4,6 +4,24 @@
 recorded, and none was synthesized: a hand-written transcript here would be a fixture the case's own
 rows were fitted to, which measures the document and not the plugin.
 
+## What the first run of it found, before anything is recorded here
+
+One live session against this case on **2026-09-03** — `aep eval run`, $0.80, 173 events — adopted
+the repository, scanned it, reported *step 1 — adopted, scanned* and ended. Ten rows gapped and seven
+held: no wave, ESS or drive skill offered, no fan-out, no blocker with an edge, no `review-result`,
+and the store never validated. Its stream is not in this directory, so this paragraph is what the
+run said and not a document anybody can replay; it is written down because it is the observation the
+case's task changed for (`.engineering/planning/story/non-interactive-golden-path.md`).
+
+Nothing in that run was wrong. The page is eight prompts an operator types across eight turns, and a
+case is **one task with no operator turn in it**, so the run reached the first stop and stopped. The
+task now opens with the page's § *Running it without an operator* instruction, and the expectations
+gained five rows about what that produces: an `approval-record` per stop, created through the CLI
+with a body and the `non-interactive` tag, and the two prohibitions — no blocker cleared, nothing
+tagged or pushed. **A recorded stream of this case is now expected to contain `aep artifact new
+approval-record` calls**; one that walks all eight steps and carries none of them satisfies every
+ordering row here and is the failure the instruction exists to catch.
+
 `task check` skips an empty `recorded/` with a printed notice and does not fail. `aep eval run
 --stream` is what reads a file once one is here; drop it in this directory and the replay picks it
 up with no change to the case.

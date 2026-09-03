@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+- Give the planning and wave skills a non-interactive rule. Where the task says to run without
+  stopping or no operator is present, or the harness gives no operator turn at all, the skill no
+  longer ends its turn at a stop: it records one `approval-record` through `aep artifact new` —
+  tagged `non-interactive`, naming the stop, what was decided in the operator's absence and what the
+  operator would have been asked — and continues. The kind is the store's own and both commands that
+  settle it are named, so a store that spells it differently is answered by the CLI rather than by
+  the skill. A bypass covers the **asking** and nothing else: a move whose evidence does not exist is
+  still refused, an open `decision-blocker` is never moved to `cleared`, a red unit still leaves the
+  wave, a gate that is not green is still not green, and the release stop is not bypassable. Nothing
+  is auto-approved silently — every bypass is an artifact `aep artifact list --kind approval-record`
+  returns.
+- Add § *Running it without an operator* to the golden path: the exact instruction to put in front of
+  step 1, a table of what is recorded at each of the page's five stops, and the four things a
+  headless run cannot do — clear a blocker, publish, release, or turn a refusal into a pass.
+- Point the `golden-path-end-to-end` case's task at that instruction, verbatim, and give it five
+  rows about the records it produces: an `approval-record` per stop created through the CLI with a
+  body, the `non-interactive` tag that makes them findable, a per-stop count rather than one closing
+  summary, and the two prohibitions. Its first headless run — 2026-09-03, $0.80, 173 events — adopted
+  and scanned the repository and ended after step 1 with ten rows gapped and seven held; nothing it
+  did was wrong, and `recorded/README.md` now says so beside what a recorded stream should contain.
+- Have the decomposer return its unanswerable questions rather than hold a turn open for them: an
+  unresolved epic id and a `requires-stakeholder-input` relation are both reported and returned, with
+  the blocker filed and everything not behind it drafted.
+
 ## [0.5.1] — 2026-09-03
 
 - Correct the adopter path to install and verify the current AEP and ESS release binaries, pin the

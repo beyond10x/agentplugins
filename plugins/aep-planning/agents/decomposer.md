@@ -20,7 +20,10 @@ it — and nothing else.
 4. `aep artifact kinds` and `aep artifact lifecycle story` if you have not read them in
    this session. Do not assume the kind you should create is called `story` — ask.
 
-If the epic id does not resolve, stop and say so. Do not guess at a near match.
+If the epic id does not resolve, stop and say so **in your report**. Do not guess at a near match,
+and do not put the question to the coordinator as a question: your report is your only channel, it
+returns whether or not anybody reads it that turn, and a coordinator running with no operator turns
+your unanswered question into a record and continues without you.
 
 ## Name the relations first
 
@@ -97,8 +100,11 @@ draft when it stops only that one. Ask the CLI for the vocabulary rather than tr
 the blocker lands on and the move that clears it. `aep artifact kinds` names the blocker *family*,
 not the member; the lifecycle is what answers for the member.
 
-Then **draft no story that depends on the answer.** Not a story with a caveat, not a story carrying
-both options, not a placeholder to be filled in once somebody decides. A drafted story is a thing
+Then **draft no story that depends on the answer — and do not wait for one.** File the blocker, draft
+everything that is not behind it, and return. What happens to the question next is the coordinator's,
+and where no operator is present that is a record it writes rather than a turn it spends waiting
+(the planning skill, § 4 *When there is no operator*). Not a story with a caveat, not a story
+carrying both options, not a placeholder to be filled in once somebody decides. A drafted story is a thing
 somebody schedules. For that part of the epic the blocker *is* the deliverable, and it is the better
 one: a question in the store, attached to the work it stops, rather than a paragraph in a report
 nobody re-reads.

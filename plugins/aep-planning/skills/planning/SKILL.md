@@ -123,7 +123,8 @@ to ask has produced nothing, and there is frequently nobody there to answer — 
 non-interactively ends with an empty tree and a question into a log. `adp/default` has a terminal
 `declined` state for precisely this outcome, and the distinction it draws is the one that matters
 here: **a decline that is written down is a result; a decline that is only said is a run that did
-nothing.**
+nothing.** § 4 *When there is no operator* says what to write instead — here, and at every other
+stop this file has.
 
 This is not licence to argue with the request. Build what was asked for unless you have evidence it
 is already there or actively wrong, put that evidence in the artifact with `aep artifact
@@ -212,6 +213,60 @@ settles it. Read it there before asking anybody.
 
 Two things stay with the operator: a move whose evidence does not exist, and a bulk move nobody
 asked for. Everything else was already asked for when the work was.
+
+### When there is no operator
+
+A stop is only worth taking when somebody is there to take it. **Decide once, at the start of the
+session, which kind of run this is, and say which in your report.** It is non-interactive when
+either holds:
+
+* **The task says so** — *run without stopping*, *no operator is present*, *record each stop and
+  continue*.
+* **The harness gives no operator turn** — a batch or print-mode session, an `aep eval run` case, a
+  sub-agent dispatch. Nothing you emit reaches a person before the session ends, so a question is a
+  question into a log.
+
+In a non-interactive run **you do not end your turn at a stop.** You record the stop and carry on:
+
+```console
+$ aep artifact new approval-record wave-proposal-2026-09-03 \
+    --title "Wave proposal accepted with no operator present" \
+    --tag non-interactive --relate decides:story:credential-store \
+    --from bypass-body.md
+created approval-record:wave-proposal-2026-09-03 (draft) at .engineering/planning/approval-record/wave-proposal-2026-09-03.md
+```
+
+**The kind is `approval-record`**, and it is the store's own rather than a name invented here:
+`aep artifact kinds` lists it, and `aep artifact lifecycle approval-record` answers that it declares
+no lifecycle — so the record lands at the status `new` gave it and needs no move afterwards, which
+is what makes one command the whole of a bypass. Ask both before you rely on this paragraph, the way
+§ 2 says to ask about any other vocabulary. Where `kinds` does not list it, take the closest kind the
+store admits, **say in the report which you took and why**, and where nothing answers, the bypass has
+nowhere to live: stop at the stop and report that, rather than continuing unrecorded.
+
+The record carries four things, and the body is where three of them go: **which stop** — the wave
+proposal, a critic round, a blocker, a move the store gates on evidence; **the reason
+`non-interactive`**, as the tag so `aep artifact list --kind approval-record` finds every one of
+them, and in words in the body; **what was decided in the operator's absence**; and **what the
+operator would have been asked**. One record per stop, written at the stop. A single record composed
+at the end is a summary of a session, not a decision anybody can audit.
+
+**A bypass record replaces the question, never the answer.** Where a stop exists because somebody is
+being asked to *choose*, the record names the choice and the run continues. Where it exists because
+something is *missing*, the operator's absence supplies nothing:
+
+| The stop | Non-interactive |
+|---|---|
+| a move the store would allow, held only for confirmation | record it, make the move, continue |
+| a move whose evidence does not exist | **still refused.** Put the refusal verbatim in the record's body, and move on to work that is not blocked |
+| an open `decision-blocker` | **still blocking.** Never `move <blocker> --to cleared`: a blocker is cleared by the answer to its question, and nobody answered it |
+| a bulk move nobody asked for | still nobody asked. It is not a stop, so a bypass does not cover it |
+
+Never record evidence the run did not observe. An `aep artifact evidence --kind approval` written
+to satisfy a gate is the silent auto-approval this whole section exists to refuse, and it is
+indistinguishable later from something somebody watched happen. **Nothing is auto-approved silently:** every bypass above is an artifact
+`aep artifact list --kind approval-record` returns, and a run that passed a stop without writing one
+has done the thing this section prevents. Report the count and the ids.
 
 ## 5. Starting from a repository that has no store
 
