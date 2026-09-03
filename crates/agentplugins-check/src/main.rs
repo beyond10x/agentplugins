@@ -40,7 +40,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/adversary.md",
         ],
     ),
-    ("ess-schema", &["skills/schema-validation/SKILL.md"]),
+    ("ess-schema", &["skills/ess-schema/SKILL.md"]),
     ("workspace-hygiene", &["skills/worktree/SKILL.md"]),
 ];
 

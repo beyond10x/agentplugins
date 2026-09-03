@@ -162,7 +162,7 @@ fn yaml<T: serde::de::DeserializeOwned>(path: &Path, label: &str) -> Result<T, S
 
 /// The name a `SKILL.md` or an agent file declares in its own frontmatter.
 ///
-/// Read rather than inferred from the directory: `plugins/ess-schema/skills/schema-validation/`
+/// Read rather than inferred from the directory: `plugins/ess-schema/skills/ess-schema/`
 /// declares `name: ess-schema`, so a resolver that trusted the directory would look for a skill that
 /// does not exist under a name nothing uses.
 fn declared_name(path: &Path) -> Result<String, String> {
@@ -763,7 +763,7 @@ mod tests {
     fn a_skill_is_resolved_by_the_name_its_document_declares() {
         let root = root();
         resolve_skill(&root, "ess-schema:ess-schema", "t")
-            .expect("the ESS skill declares `name: ess-schema` under `skills/schema-validation/`");
+            .expect("the ESS skill declares `name: ess-schema` under `skills/ess-schema/`");
         let error = resolve_skill(&root, "ess-schema:schema-validation", "t")
             .expect_err("the directory name is not what a harness lists");
         assert!(error.contains("declares"), "{error}");
