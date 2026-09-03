@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.2] — 2026-09-03
+
+- Require non-trivial cross-repository and release/deployment work to enter the owning AEP store
+  before implementation continues, and route such work through the planning specialist from the
+  Beyond10x front door.
+- Publish exact Codex CLI commands for a fresh release-pinned install and for replacing a stale
+  immutable marketplace pin, installing and enabling all five focused plugins.
+- Refresh the adopter binary guidance to ESS 0.9.2 and align every plugin manifest and shared skill
+  version with this release.
+
 ## [0.6.1] — 2026-09-03
 
 - The golden-path case's step 1 names the protocol source the page names,

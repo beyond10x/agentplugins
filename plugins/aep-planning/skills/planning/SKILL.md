@@ -3,9 +3,25 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.6.1** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.6.2** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
+
+## 0. When the record is required
+
+In a Beyond10x repository, use this skill before implementation when the work is non-trivial,
+crosses repository boundaries, or changes a release or deployment. A transient chat plan is useful
+while discovering facts, but it is not the governed record. Before the first implementation edit:
+
+1. run `aep artifact list` and `aep artifact kinds` in the repository that owns the outcome;
+2. create or select the artifact that owns the work and record its relation to the existing plan;
+3. record machine-readable scope before scheduling concurrent work; and
+4. keep evidence and lifecycle state current as the implementation and release progress.
+
+Read-only discovery may happen first so the artifact is evidence-based. If implementation is
+already in flight when the missing record is noticed, create or select it immediately and continue
+under it; do not discard correct work merely to make the timeline look cleaner. When no store is
+present, follow section 5 rather than inventing one.
 
 ## 1. The model
 

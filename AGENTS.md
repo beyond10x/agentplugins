@@ -28,6 +28,18 @@
 task check
 ```
 
+## Governed planning
+
+Use the repository's AEP store for any non-trivial implementation, cross-repository migration, or
+release/deployment change. Before editing implementation files, run `aep artifact list` and
+`aep artifact kinds`, create or select the artifact that owns the work, and keep its lifecycle,
+scope, evidence, and relations current through `aep artifact` commands. Never substitute a
+transient chat plan or direct edits under `.engineering/planning/` for that record.
+
+The `aep-planning` plugin is the canonical agent instruction surface for this workflow. When it is
+not loaded, stop before planning-store writes and install or enable the release-pinned plugin using
+the adopter instructions; do not improvise the store format from this file.
+
 The adopter-facing Docusaurus site lives under `website/` and is published at
 <https://beyond10x.github.io/agentplugins/>. A website change must also pass `task site-build`.
 The networked site build stays outside the offline Rust gate.
