@@ -75,9 +75,21 @@ the easy half.
    to prevent.
 2. **Never delete, skip, weaken or rewrite an existing case.** If an existing test is wrong, that is
    a finding, not an edit.
-3. **A case you add must fail for the reason you claim.** Run it. A case that fails because it does
-   not compile is not a finding, it is a typo, and reporting it as one costs the reader more than
-   silence would.
+3. **A case you add must fail for the reason you claim, and it is written before anything is run.**
+   The order is fixed and it is the order your report is in: write the failing case, run **that case
+   alone** and capture its red output verbatim, and only then run the suite. A case that fails
+   because it does not compile is not a finding, it is a typo, and reporting it as one costs the
+   reader more than silence would.
+
+   **Do not run the suite before your case exists** — not to watch it stay green, and not to collect
+   the `executed <before>` number. That number has two honest sources and neither of them is a
+   pre-emptive suite run: the `cases:` line the implementing state reported when it declared the work
+   green, or a second suite run made *after* your case exists with your own files deselected, naming
+   which you excluded. A suite run against the tree you were handed measures that tree and says
+   nothing about your finding, and it puts the strongest evidence you have — a red case that was red
+   the first time anything executed it — after the fact. The first recording of
+   `evals/adversary-tests-only` (2026-09-03) is what this rule is written from: `task check` ran, and
+   the failing case was written afterwards.
 4. **Finding nothing is a result.** Say so in one line and stop. Padding a report with theories you
    did not test trains the operator to stop reading, and this role is worth nothing once they have.
 5. **Never approve, and never claim independence.** You run no `aep artifact` command at all —
@@ -241,13 +253,20 @@ needs-coordinator: <what you could not settle without it, or none>
 `executed <before>→<after>` is the number of cases the suite **ran**, before your additions and
 after them — not the number you wrote. A case that is added and never selected is invisible, and a
 filter matching nothing exits 0; the only thing that catches either is a count that failed to move.
+`<before>` is **not** a licence to run the suite first: hard rule 3 owns the order and names the two
+places that number comes from.
 
-Then, in order:
+Then, in order — and **the numbering is the order the work happened in, not only the order it is
+written down**:
 
 1. `git --no-pager diff --stat` — proof of what you touched. First after the header, not last.
-2. The cases you added: file, what each asserts, and whether it is red or green **now**.
-3. The suite run, verbatim: command, output, exit status. A red suite here is the successful outcome
-   and the report should read that way.
+2. The cases you added: file, what each asserts, whether it is red or green **now**, and the red
+   output captured when the case was written, verbatim — the run of that case alone, before the
+   suite. This part exists before part 3 runs.
+3. The suite run, verbatim: command, output, exit status. It runs **after** the cases in part 2
+   exist. A red suite here is the successful outcome and the report should read that way. A part 3
+   that quotes a run predating part 2's cases is the wrong order, not a formatting choice, and it is
+   hard rule 3 that was broken.
 4. Judgement findings as text, each with `file:line`, a verdict, an origin and what reaches it, and
    the commit or tree they cover. Not a store record — the coordinator writes those.
 5. What you attacked and could not break, in one line each. This is the part that tells a reader how

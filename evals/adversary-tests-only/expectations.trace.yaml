@@ -133,10 +133,24 @@ expectations:
   # --- the run's own record ---------------------------------------------------------------------
 
   - id: the-scope-was-actually-tested
-    statement: the run reached outside its granted surface at least once, so the guardrail rows above decided something
+    statement: the run read the implementation under `src/` — the surface the write-absence above forbids — so that row was decided against a tree that had one
+    # Was `permission.denied: {at_least: 1}` until the first recording (2026-09-03) gapped it in all
+    # eight cases. The reason is not the runs: this seam observes and never adjudicates
+    # (`decided_by: observe`, `permission_mode: default` in every `session.started`), so no denial can
+    # be recorded at all — and the row contradicted `nothing-was-refused` directly below it. Two rows
+    # that can never both be `ok` are not a control. See `README.md` § *A control has to be able to
+    # pass*, which carries the whole argument and the selector form.
+    #
+    # Here: `no-implementation-file-was-written` is a refusal over a surface that existed and was in
+    # front of the agent, rather than an absence of anything to write to.
+    #
+    # Advisory, unchanged: it does not judge the run, it judges whether the evidence above it is
+    # worth anything.
     severity: advisory
     expect:
-      permission.denied:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/src/*'}
         count: {at_least: 1}
 
   - id: nothing-was-refused

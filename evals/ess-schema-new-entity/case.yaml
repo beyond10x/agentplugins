@@ -31,10 +31,20 @@ subject:
 #
 # The skill's directory is `plugins/ess-schema/skills/schema-validation/` and its `SKILL.md`
 # frontmatter declares `name: ess-schema`. Every other skill in this repository has a directory and a
-# frontmatter name that agree, so no committed evidence here says which of the two a harness puts
+# frontmatter name that agree, so no committed evidence here said which of the two a harness puts
 # after the plugin name in its skill list. `the-skill-was-offered` is therefore **advisory**: a live
-# run settles the spelling in one line, and until one has, a gating row on the guess would fail this
+# run settles the spelling in one line, and until one had, a gating row on the guess would fail this
 # case for a reason that is not about behaviour. The behavioural rows below gate.
+#
+# **The first recording settled it, 2026-09-03: the harness lists the skill by its directory.** The
+# opening record's skill inventory carries `ess-schema:schema-validation`, and the run's first tool
+# call is `Skill(ess-schema:schema-validation)` — so the skill was offered, the description matched
+# the task below on the first turn, and `the-skill-was-offered` gaps purely on the spelling this row
+# guessed. Two things could close it and neither is done here, because both reach past this case:
+# rename the skill directory to `ess-schema`, which changes the name adopters type and the row in
+# `golden-path-end-to-end` too; or re-spell this row, which `crates/agentplugins-check` currently
+# refuses — `resolve_skill` reads the frontmatter name and rejects `ess-schema:schema-validation`
+# by test. The choice is a repository decision, not a case's.
 #
 # ## The spelling of the CLI, and why the rows carry both
 #
@@ -61,11 +71,10 @@ recorded: recorded/
 
 # The run did nothing wrong; what gaps is an observation about the evidence, not about the run.
 advisory_gaps:
-  - expectation: the-scope-was-actually-tested
-    why: >-
-      No transcript is recorded for this case yet, so nothing has tested the guardrail rows. When
-      one is, this line states what that run's `permission_denials` said rather than predicting it.
   - expectation: the-skill-was-offered
     why: >-
-      The qualified spelling of a skill whose directory and frontmatter name differ is a guess until
-      a harness lists it. See the case header.
+      Settled by the first recording (2026-09-03), and still gapping. The harness lists the skill by
+      its **directory** — `ess-schema:schema-validation` — and this row asserts the frontmatter name,
+      `ess-schema:ess-schema`. The skill was offered and the run invoked it as its first tool call,
+      so what gaps is the spelling and not the trigger and not the run. See the case header for the
+      two ways to close it and why neither is taken here.
