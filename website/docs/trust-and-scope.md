@@ -11,9 +11,9 @@ Every published plugin is intentionally narrow:
 
 - Beyond10x routes work, links public resources, and creates portable plugins without copying the
   specialist workflows.
-- AEP Planning governs planning artifacts and lifecycle-aware planning work.
-- ADP coordinates accepted development work.
-- ESS Schema validates and projects executable system contracts.
+- AEP Plan governs planning artifacts and lifecycle-aware planning work.
+- AEP Drive coordinates accepted development work.
+- ESS Specify specifies, validates and projects executable system contracts.
 
 The repository gate checks that the two marketplace formats agree in their declared order, plugin
 and directory names match, required skills and agents exist, and no retired marketplace or

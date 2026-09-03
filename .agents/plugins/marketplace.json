@@ -17,10 +17,10 @@
       "category": "Productivity"
     },
     {
-      "name": "aep-planning",
+      "name": "aep-plan",
       "source": {
         "source": "local",
-        "path": "./plugins/aep-planning"
+        "path": "./plugins/aep-plan"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -29,10 +29,10 @@
       "category": "Productivity"
     },
     {
-      "name": "adp",
+      "name": "aep-drive",
       "source": {
         "source": "local",
-        "path": "./plugins/adp"
+        "path": "./plugins/aep-drive"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -41,10 +41,10 @@
       "category": "Productivity"
     },
     {
-      "name": "ess-schema",
+      "name": "ess-specify",
       "source": {
         "source": "local",
-        "path": "./plugins/ess-schema"
+        "path": "./plugins/ess-specify"
       },
       "policy": {
         "installation": "AVAILABLE",

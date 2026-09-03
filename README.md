@@ -5,9 +5,9 @@ Curated marketplace identity: `beyond10x`.
 The repository deliberately contains five focused plugins:
 
 - `beyond10x`: marketplace navigation, public resource discovery, and portable plugin creation.
-- `aep-planning`: governed planning, decomposition, plan review, and reverse engineering.
-- `adp`: wave coordination, story scoping, implementation, and adversarial review.
-- `ess-schema`: ESS validation and deterministic schema/OpenAPI projection guidance.
+- `aep-plan`: governed planning, decomposition, plan review, and reverse engineering.
+- `aep-drive`: wave coordination, story scoping, implementation, and adversarial review.
+- `ess-specify`: ESS specification, validation and deterministic schema/OpenAPI projection guidance.
 - `workspace-hygiene`: safe creation, leases, publication checks, and cleanup for Git worktrees.
 
 `beyond10x` is the front door, not a catch-all. It routes a task to the smallest specialist and
@@ -16,7 +16,7 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 ## Install
 
-`aep-planning` and `adp` drive the `aep` CLI; `ess-schema` drives the `ess` CLI. Install the
+`aep-plan` and `aep-drive` drive the `aep` CLI; `ess-specify` drives the `ess` CLI. Install the
 verified Linux or macOS archives for [AEP `0.44.0`](https://github.com/beyond10x/aep/releases/tag/0.44.0)
 and [ESS `0.9.2`](https://github.com/beyond10x/ess/releases/tag/0.9.2) first, then check them with
 `aep --version` and `ess --version`. The complete download and checksum commands are in
@@ -26,9 +26,9 @@ Paste this pinned block into a Claude Code session:
 
 ```text
 /plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.6.2
-/plugin install aep-planning@beyond10x
-/plugin install adp@beyond10x
-/plugin install ess-schema@beyond10x
+/plugin install aep-plan@beyond10x
+/plugin install aep-drive@beyond10x
+/plugin install ess-specify@beyond10x
 /reload-plugins
 ```
 
@@ -70,7 +70,7 @@ Live, which costs money:
 
 ```console
 $ METAHARNESS_LIVE=1 aep eval run --corpus evals --workflow adp/default \
-    --arm plugin --harness claude --plugin-dir plugins/aep-planning \
+    --arm plugin --harness claude --plugin-dir plugins/aep-plan \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>
 ```

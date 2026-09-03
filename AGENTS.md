@@ -2,7 +2,7 @@
 
 ## Serves
 
-- **O2 — decisions as data, with evidence.** Publishes the curated AEP, ADP and ESS instruction
+- **O2 — decisions as data, with evidence.** Publishes the curated AEP and ESS instruction
   surfaces used to plan, develop and validate governed work.
 - **O3 — any harness, observed and compared.** Keeps those instruction surfaces portable across
   supported agent harnesses.
@@ -36,7 +36,7 @@ release/deployment change. Before editing implementation files, run `aep artifac
 scope, evidence, and relations current through `aep artifact` commands. Never substitute a
 transient chat plan or direct edits under `.engineering/planning/` for that record.
 
-The `aep-planning` plugin is the canonical agent instruction surface for this workflow. When it is
+The `aep-plan` plugin is the canonical agent instruction surface for this workflow. When it is
 not loaded, stop before planning-store writes and install or enable the release-pinned plugin using
 the adopter instructions; do not improvise the store format from this file.
 

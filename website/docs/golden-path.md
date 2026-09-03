@@ -23,7 +23,7 @@ nobody has decided, and what the plan does with that instead of guessing.
 
 ## Prerequisites
 
-Install `aep-planning`, `adp` and `ess-schema` from the marketplace — see [Install](./install.md) —
+Install `aep-plan`, `aep-drive` and `ess-specify` from the marketplace — see [Install](./install.md) —
 and have the `aep` CLI on your PATH. Step 3 also uses the `ess` CLI.
 
 ```shell-session
@@ -339,7 +339,7 @@ story:commercial-client-record moved proposed -> active (revision 4)
 ```
 
 ```text
-Take story:commercial-client-record through the adp wave: scope it into units, implement the units,
+Take story:commercial-client-record through the aep-drive wave: scope it into units, implement the units,
 and have the adversary review the result against the story's acceptance and this repository's gate.
 ```
 

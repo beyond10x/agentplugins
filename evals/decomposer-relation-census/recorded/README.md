@@ -17,7 +17,7 @@ $ METAHARNESS_LIVE=1 aep eval run \
     --case evals/decomposer-relation-census \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/aep-planning \
+    --plugin-dir plugins/aep-plan \
     --cwd <a checkout holding `epic:commercial-clients` and nothing decomposed from it> \
     --budget-usd 5 \
     --observed-at <the date it was observed> \

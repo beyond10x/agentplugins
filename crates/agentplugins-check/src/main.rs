@@ -16,7 +16,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "aep-planning",
+        "aep-plan",
         &[
             "skills/planning/SKILL.md",
             "skills/planning/references/critic-rubric.md",
@@ -31,7 +31,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "adp",
+        "aep-drive",
         &[
             "skills/wave/SKILL.md",
             "skills/drive/SKILL.md",
@@ -40,7 +40,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/adversary.md",
         ],
     ),
-    ("ess-schema", &["skills/ess-schema/SKILL.md"]),
+    ("ess-specify", &["skills/specify/SKILL.md"]),
     ("workspace-hygiene", &["skills/worktree/SKILL.md"]),
 ];
 
@@ -135,7 +135,7 @@ fn frontmatter(text: &str) -> Option<&str> {
 /// and a YAML dependency for two `key:` prefixes would be a parser to keep in step with whichever
 /// one each harness uses.
 fn critic_pins(root: &Path) -> Result<(), String> {
-    let directory = root.join("plugins/aep-planning/agents");
+    let directory = root.join("plugins/aep-plan/agents");
     let mut entries = std::fs::read_dir(&directory)
         .map_err(|error| format!("reading {}: {error}", directory.display()))?
         .map(|entry| entry.map(|entry| entry.path()))
@@ -189,6 +189,261 @@ fn critic_pins(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// A plugin name this repository used to publish, and the spelling that replaced it.
+struct Retired {
+    /// What it was called.
+    old: &'static str,
+    /// What it is called now.
+    new: &'static str,
+    /// Characters that, following the name, mean it is not a plugin reference at all: `adp/1` is a
+    /// protocol id and `adp/default` a workflow id, both wire identifiers in `aep`'s formats that
+    /// belong to the profile rather than to the plugin, and neither is this repository's to rename.
+    ///
+    /// A `/` in *front* outweighs it, because `plugins/adp/skills/wave` is a path into the plugin
+    /// directory and is exactly the reference this sweep is looking for.
+    wire_next: &'static [char],
+}
+
+/// Every plugin name this repository has retired.
+///
+/// `AGENTS.md` § *Invariants* — *"Do not mention or depend on retired plugin references, former
+/// marketplace identities, or the historical source-repository name"* — was, until this table
+/// existed, an invariant a person upheld by remembering to run `rg`. The 0.6.2 rename found 173
+/// occurrences across nine kinds of file, and the one that survives such a sweep is not caught by
+/// the gate: it is caught by an adopter pasting an install line for a plugin the marketplace no
+/// longer offers.
+const RETIRED: &[Retired] = &[
+    Retired {
+        old: "aep-planning",
+        new: "aep-plan",
+        wire_next: &[],
+    },
+    Retired {
+        old: "ess-schema",
+        new: "ess-specify",
+        wire_next: &[],
+    },
+    Retired {
+        old: "adp",
+        new: "aep-drive",
+        wire_next: &['/'],
+    },
+];
+
+/// Directories never walked looking for a retired name, wherever they sit.
+const RETIRED_SKIP_DIRS: &[&str] = &[".git", "target", "node_modules"];
+
+/// Repository-relative prefixes a retired name is allowed to survive under.
+///
+/// A changelog records what the names *were* and a dated change record is what was written on the
+/// day; rewriting either is rewriting history rather than renaming a plugin. `.engineering/` is the
+/// planning store, whose only writer is the `aep` CLI. And a recorded transcript under
+/// `evals/*/recorded/` — with the manifest that dates it and the README that says how it was
+/// produced — is evidence of a run that happened under the old names: editing one would be
+/// falsifying an observation, not updating a reference.
+///
+/// The last entry is this file, which has to spell what it forbids in [`RETIRED`] above. It is not a
+/// loophole for a real reference: every plugin name in this file is a name [`plugin`] and
+/// [`marketplace`] resolve against the tree, or a path [`critic_pins`] opens, so a stale one here
+/// fails a check rather than escaping one.
+const RETIRED_ALLOWED: &[&str] = &[
+    "CHANGELOG.md",
+    "changes/",
+    ".engineering/",
+    "crates/agentplugins-check/src/main.rs",
+];
+
+/// Whether a byte can be part of the same word as a name, so `handpicked` does not read as `adp`.
+fn word_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || byte == b'_'
+}
+
+/// What a line says about itself when the old name on it is a quotation, not a reference.
+///
+/// One case exists and it is `evals/golden-path-end-to-end/expectations.trace.yaml`: an
+/// `env.agent_available` row states what the *recorded* harness listed, and that recording was made
+/// before the names changed. Renaming the row does not update a reference — it asserts something the
+/// transcript beside it disproves, which is how two gating rows went red and how the replay gate
+/// above came to exist. The marker is on the line and in the diff, so extending it is a decision
+/// somebody makes in the open rather than a file quietly falling out of the sweep.
+///
+/// **It exempts nothing outside [`quotable`].** A marker any file could carry is an opt-out from the
+/// sweep with no reviewer attached: a README, an install block or a manifest could excuse itself in
+/// one trailing comment. The claim it makes — *this spelling is what the transcript beside it
+/// contains* — is only true where a transcript is beside it, and that is one shape of file.
+const RECORDED_SPELLING: &str = "recorded-under-this-name";
+
+/// Whether a file is one whose rows may quote the spelling a recording used.
+///
+/// `evals/<case>/expectations.trace.yaml` and nothing else: the specification a recorded transcript
+/// is replayed against, in the directory that holds the transcript.
+fn quotable(relative: &str) -> bool {
+    matches!(
+        relative.split('/').collect::<Vec<_>>().as_slice(),
+        ["evals", _, "expectations.trace.yaml"]
+    )
+}
+
+/// The 1-based line numbers on which `text` names `retired` as something other than a wire id.
+///
+/// `quotable` says whether a line carrying [`RECORDED_SPELLING`] is exempt, which is a fact about
+/// the file rather than about the line — see that constant.
+fn retired_hits(text: &str, retired: &Retired, quotable: bool) -> Vec<usize> {
+    let mut lines = Vec::new();
+    for (number, line) in text.lines().enumerate() {
+        if quotable && line.contains(RECORDED_SPELLING) {
+            continue;
+        }
+        let bytes = line.as_bytes();
+        let mut from = 0;
+        while let Some(offset) = line[from..].find(retired.old) {
+            let start = from + offset;
+            let end = start + retired.old.len();
+            from = end;
+            if start > 0 && word_byte(bytes[start - 1]) {
+                continue;
+            }
+            let next = bytes.get(end).copied();
+            if next.is_some_and(word_byte) {
+                continue;
+            }
+            let inside_a_path = start > 0 && bytes[start - 1] == b'/';
+            if !inside_a_path
+                && next.is_some_and(|byte| retired.wire_next.contains(&char::from(byte)))
+            {
+                continue;
+            }
+            lines.push(number + 1);
+            break;
+        }
+    }
+    lines
+}
+
+/// Where a path segment spelling a retired plugin is a reference and not a coincidence.
+///
+/// The three trees whose directory layout *is* the plugin's identity: `plugins/<name>` is what
+/// `AGENTS.md` § *Invariants* means by *"plugin folder names and manifest names are identical"*,
+/// `website/docs/plugins/<name>.md` is the doc id an adopter links, and `evals/<case>` is the id a
+/// case carries. Elsewhere a segment is prose in a filename and the content sweep is the right
+/// reader for it.
+const RETIRED_PATH_ROOTS: &[&str] = &["plugins/", "website/docs/plugins/", "evals/"];
+
+/// Whether a repository-relative path is filed under a retired plugin name.
+///
+/// Files match on any segment — an incomplete `git mv` leaves the parent renamed and one file
+/// behind, and the file's own text need not spell anything. Directories match on their own last
+/// segment only, so one leftover tree is named once rather than once per level.
+///
+/// The final segment is compared with a single extension stripped, because
+/// `website/docs/plugins/<retired>.md` is the doc id and the `.md` is not part of it.
+fn retired_path(relative: &str, is_dir: bool, retired: &Retired) -> bool {
+    if !RETIRED_PATH_ROOTS
+        .iter()
+        .any(|root| relative.starts_with(root))
+    {
+        return false;
+    }
+    let segments: Vec<&str> = relative.split('/').collect();
+    let last = segments.len() - 1;
+    let bare = |index: usize| {
+        let segment = segments[index];
+        if index == last {
+            segment.rsplit_once('.').map_or(segment, |(stem, _)| stem)
+        } else {
+            segment
+        }
+    };
+    if is_dir {
+        return bare(last) == retired.old;
+    }
+    (0..segments.len()).any(|index| bare(index) == retired.old)
+}
+
+/// No file this repository authors still names a plugin it stopped publishing — in its text, or in
+/// where it sits.
+///
+/// Checked over the tree rather than over a list of known reference sites, because a list of sites
+/// is the same hand-maintained thing the invariant already was: the file that gets missed is by
+/// definition the one nobody thought to list.
+///
+/// **Both halves are needed, and the content half alone was not enough.** A rename that moves a
+/// directory and misses one file inside it leaves a path that names the retired plugin and a body
+/// that does not, and nothing else here reads it: [`marketplace`] checks the five entries it expects
+/// are present and in order, and [`plugin`] resolves `plugins/<name>` for each of those five, so a
+/// sixth directory beside them is read by neither.
+fn retired_names(root: &Path) -> Result<(), String> {
+    let mut found = Vec::new();
+    let mut stack = vec![root.to_path_buf()];
+    while let Some(directory) = stack.pop() {
+        let mut entries = std::fs::read_dir(&directory)
+            .map_err(|error| format!("reading {}: {error}", directory.display()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| format!("reading {}: {error}", directory.display()))?
+            .into_iter()
+            .map(|entry| entry.path())
+            .collect::<Vec<_>>();
+        entries.sort();
+        for path in entries {
+            let Ok(relative) = path.strip_prefix(root) else {
+                continue;
+            };
+            let relative = relative.to_string_lossy().replace('\\', "/");
+            let name = path
+                .file_name()
+                .and_then(std::ffi::OsStr::to_str)
+                .unwrap_or_default();
+            let is_dir = path.is_dir();
+            let recorded = relative.starts_with("evals/") && name == "recorded";
+            let allowed = RETIRED_ALLOWED
+                .iter()
+                .any(|allowed| format!("{relative}/").starts_with(allowed) || relative == *allowed);
+            if !allowed && !recorded {
+                for retired in RETIRED {
+                    if retired_path(&relative, is_dir, retired) {
+                        found.push(format!(
+                            "  {relative} is filed under `{}`, which is now `{}`",
+                            retired.old, retired.new
+                        ));
+                    }
+                }
+            }
+            if is_dir {
+                if !RETIRED_SKIP_DIRS.contains(&name) && !allowed && !recorded {
+                    stack.push(path);
+                }
+                continue;
+            }
+            if allowed || recorded {
+                continue;
+            }
+            let Ok(bytes) = std::fs::read(&path) else {
+                continue;
+            };
+            let text = String::from_utf8_lossy(&bytes);
+            let quotable = quotable(&relative);
+            for retired in RETIRED {
+                for line in retired_hits(&text, retired, quotable) {
+                    found.push(format!(
+                        "  {relative}:{line} names `{}`, which is now `{}`",
+                        retired.old, retired.new
+                    ));
+                }
+            }
+        }
+    }
+    if found.is_empty() {
+        return Ok(());
+    }
+    found.sort();
+    Err(format!(
+        "{} retired plugin name(s) remain, and `AGENTS.md` § Invariants forbids depending on \
+         one:\n{}",
+        found.len(),
+        found.join("\n")
+    ))
+}
+
 fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
@@ -196,6 +451,7 @@ fn check(root: &Path) -> Result<(), String> {
         plugin(root, name, required)?;
     }
     critic_pins(root)?;
+    retired_names(root)?;
     evals::evals(root)
 }
 
@@ -282,9 +538,9 @@ mod tests {
     fn a_deleted_critic_fails_the_check() {
         let required: &[&str] = PLUGINS
             .iter()
-            .find(|(name, _)| *name == "aep-planning")
+            .find(|(name, _)| *name == "aep-plan")
             .map(|(_, required)| *required)
-            .expect("aep-planning is one of the focused plugins");
+            .expect("aep-plan is one of the focused plugins");
         let critic = "agents/plan-critic-design.md";
         assert!(
             required.contains(&critic),
@@ -297,7 +553,7 @@ mod tests {
             .expect("checker is under repository root");
         let sandbox =
             std::env::temp_dir().join(format!("agentplugins-check-critic-{}", std::process::id()));
-        let plugin_root = sandbox.join("plugins").join("aep-planning");
+        let plugin_root = sandbox.join("plugins").join("aep-plan");
         let write = |target: &Path, bytes: &str| {
             std::fs::create_dir_all(target.parent().expect("every entry has a directory"))
                 .expect("the sandbox is writable");
@@ -305,7 +561,7 @@ mod tests {
         };
         for manifest in [".codex-plugin/plugin.json", ".claude-plugin/plugin.json"] {
             let committed =
-                std::fs::read_to_string(repository.join("plugins/aep-planning").join(manifest))
+                std::fs::read_to_string(repository.join("plugins/aep-plan").join(manifest))
                     .expect("the committed manifest is readable");
             write(&plugin_root.join(manifest), &committed);
         }
@@ -313,13 +569,10 @@ mod tests {
             write(&plugin_root.join(relative), "");
         }
 
-        let error = plugin(&sandbox, "aep-planning", required)
+        let error = plugin(&sandbox, "aep-plan", required)
             .expect_err("a plugin missing one of its critics must fail the check");
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
-        assert_eq!(
-            error,
-            format!("plugin `aep-planning` is missing `{critic}`")
-        );
+        assert_eq!(error, format!("plugin `aep-plan` is missing `{critic}`"));
     }
 
     /// A critic that declares no `model:`/`effort:` runs on whatever the calling session was on,
@@ -333,7 +586,7 @@ mod tests {
             std::process::id(),
             std::thread::current().id()
         ));
-        let agents = sandbox.join("plugins/aep-planning/agents");
+        let agents = sandbox.join("plugins/aep-plan/agents");
         let write = |name: &str, body: &str| {
             std::fs::create_dir_all(&agents).expect("the sandbox is writable");
             std::fs::write(agents.join(name), body).expect("the sandbox is writable");
@@ -379,6 +632,189 @@ mod tests {
             .and_then(Path::parent)
             .expect("checker is under repository root");
         critic_pins(root).expect("every committed plan critic declares `model:` and `effort:`");
+    }
+
+    /// The rename is only done when nothing still names the old plugins. Over the tree, not over a
+    /// list of reference sites: `aep-planning`, `adp` and `ess-schema` were named by both
+    /// marketplace manifests, ten plugin manifests, nine skill and agent bodies, eight eval cases,
+    /// eight expectation documents, five website pages, three website sources, this crate and two
+    /// READMEs, and the one that survives a hand sweep is the one no list had.
+    #[test]
+    fn no_authored_file_names_a_retired_plugin() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        retired_names(root).expect("nothing this repository authors names a retired plugin");
+    }
+
+    /// What the sweep counts as a reference. `adp` is three letters, so it has to be a whole word
+    /// and it has to not be the `adp/…` wire id — the profile the plugin drives keeps its
+    /// identifier in `aep`'s formats, and a rename that touched `workflow: adp/default` would have
+    /// invalidated every case document in the corpus.
+    #[test]
+    fn the_sweep_reads_a_reference_and_not_a_wire_id() {
+        let adp = &RETIRED[2];
+        assert_eq!(adp.old, "adp");
+
+        assert_eq!(
+            retired_hits("install the adp plugin\n", adp, false),
+            vec![1]
+        );
+        assert_eq!(retired_hits("plugins/adp/skills\n", adp, false), vec![1]);
+        assert!(
+            retired_hits("workflow: adp/default\n", adp, false).is_empty(),
+            "`adp/default` is a workflow id, not a plugin"
+        );
+        assert!(
+            retired_hits("the protocol adp/1\n", adp, false).is_empty(),
+            "`adp/1` is a protocol id, not a plugin"
+        );
+        assert!(
+            retired_hits("handpicked madpeople\n", adp, false).is_empty(),
+            "three letters inside a word are not a plugin name"
+        );
+
+        let planning = &RETIRED[0];
+        assert_eq!(planning.old, "aep-planning");
+        assert_eq!(
+            retired_hits("a\nplugins/aep-planning/x\n", planning, false),
+            vec![2]
+        );
+        assert!(retired_hits("plugins/aep-plan/x\n", planning, false).is_empty());
+    }
+
+    /// The marker excuses a line in a specification a transcript is replayed against, and nowhere
+    /// else. A marker any file could carry is an opt-out from the sweep with no reviewer attached.
+    #[test]
+    fn the_recorded_spelling_marker_is_confined_to_an_expectations_document() {
+        let planning = &RETIRED[0];
+        let row = format!("  agent: aep-planning:decomposer  # {RECORDED_SPELLING}\n");
+
+        assert!(
+            retired_hits(&row, planning, true).is_empty(),
+            "a quoted recording is evidence, not a stale reference"
+        );
+        assert_eq!(
+            retired_hits(&row, planning, false),
+            vec![1],
+            "the same comment in a README is an install line excusing itself"
+        );
+
+        assert!(quotable(
+            "evals/golden-path-end-to-end/expectations.trace.yaml"
+        ));
+        for elsewhere in [
+            "README.md",
+            "evals/README.md",
+            "evals/golden-path-end-to-end/case.yaml",
+            "evals/golden-path-end-to-end/recorded/expectations.trace.yaml",
+            "website/docs/install.md",
+            "expectations.trace.yaml",
+        ] {
+            assert!(!quotable(elsewhere), "{elsewhere}");
+        }
+    }
+
+    /// A retired name that reaches a file is a failing gate and not a warning, and the failure says
+    /// which file and which line — the whole point of moving this off `rg` and into the gate.
+    #[test]
+    fn a_retired_name_in_an_authored_file_fails_the_check() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-retired-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let write = |relative: &str, body: &str| {
+            let target = sandbox.join(relative);
+            std::fs::create_dir_all(target.parent().expect("every entry has a directory"))
+                .expect("the sandbox is writable");
+            std::fs::write(target, body).expect("the sandbox is writable");
+        };
+
+        write("README.md", "install `ess-schema` from the marketplace\n");
+        let error =
+            retired_names(&sandbox).expect_err("a retired name in an authored file must fail");
+        assert_eq!(
+            error,
+            "1 retired plugin name(s) remain, and `AGENTS.md` § Invariants forbids depending on \
+             one:\n  README.md:1 names `ess-schema`, which is now `ess-specify`"
+        );
+
+        // The three places the old names are the truth: what the changelog says the plugins were
+        // called, what a dated change record said on its day, and the transcript of a run that
+        // happened under them.
+        write("README.md", "install `ess-specify` from the marketplace\n");
+        write("CHANGELOG.md", "renamed `ess-schema` to `ess-specify`\n");
+        write("changes/2026-09-03-rename.yaml", "plugin: adp\n");
+        write(
+            "evals/a-case/recorded/run.events.jsonl",
+            "{\"skill\":\"adp:wave\"}\n",
+        );
+        write(
+            ".engineering/planning/story/x.md",
+            "the `aep-planning` plugin\n",
+        );
+        retired_names(&sandbox).expect("history, change records and transcripts keep their names");
+
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+    }
+
+    /// The name a file is *filed under* is a reference too, and the sweep never looks at one.
+    ///
+    /// [`retired_names`] reads bytes and never paths, so the leftover an incomplete `git mv` makes
+    /// — the parent moved, one file left behind under the old directory — survives it whenever
+    /// that file's own text does not happen to spell the name. Nothing else in this crate closes
+    /// it: [`marketplace`] checks that the five entries it expects are present and in order, and
+    /// [`plugin`] resolves `plugins/<name>` for each of those five, so neither reads a sixth
+    /// directory beside them. `AGENTS.md` § *Invariants* — *"Plugin folder names and manifest
+    /// names are identical"* and *"Do not mention or depend on retired plugin references"* — is
+    /// about the folder as much as about the prose.
+    ///
+    /// Measured on a copy of this worktree in a scratch directory, 2026-09-03: a
+    /// `plugins/<retired>/skills/wave/SKILL.md` whose body never spells the retired name, and a
+    /// `website/docs/plugins/<retired>.md` whose body never spells it either, both left
+    /// `cargo run --bin agentplugins-check` printing
+    /// `valid: marketplace beyond10x, 5 focused plugin(s)`.
+    ///
+    /// The retired spelling is assembled rather than written, so that the sibling sweep over the
+    /// tree counts the same number of lines with this test present as without it.
+    #[test]
+    fn a_path_named_for_a_retired_plugin_fails_the_check() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-retired-path-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let write = |relative: &str, body: &str| {
+            let target = sandbox.join(relative);
+            std::fs::create_dir_all(target.parent().expect("every entry has a directory"))
+                .expect("the sandbox is writable");
+            std::fs::write(target, body).expect("the sandbox is writable");
+        };
+        let retired = RETIRED[2].old;
+
+        // A leftover from a rename that moved the parent and missed one file. Its text names the
+        // new world; only where it sits still names the old one.
+        let plugin_file = format!("plugins/{retired}/skills/wave/SKILL.md");
+        let page = format!("website/docs/plugins/{retired}.md");
+        write(
+            &plugin_file,
+            "---\nname: wave\ndescription: run a wave\n---\n\nUse the renamed plugin.\n",
+        );
+        write(
+            &page,
+            "---\ntitle: AEP Drive\n---\n\n# The renamed plugin\n",
+        );
+
+        let error = retired_names(&sandbox);
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+        let error =
+            error.expect_err("a path filed under a retired plugin name must fail the check");
+        assert!(
+            error.contains(&plugin_file) && error.contains(&page),
+            "{error}"
+        );
     }
 
     #[test]

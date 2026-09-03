@@ -17,7 +17,7 @@ $ METAHARNESS_LIVE=1 aep eval run \
     --case evals/plan-critic-parallel-safety-verdict \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/aep-planning \
+    --plugin-dir plugins/aep-plan \
     --cwd <a checkout with a drafted `epic:commercial-clients` in its store> \
     --budget-usd 5 \
     --observed-at <the date it was observed> \

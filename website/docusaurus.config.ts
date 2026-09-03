@@ -36,7 +36,7 @@ const config: Config = {
   plugins: [docsSystemPlugin],
   themeConfig: {
     image: 'img/social-card.svg',
-    metadata: [{name: 'keywords', content: 'agent plugins, AEP, ADP, ESS, planning, schema validation'}],
+    metadata: [{name: 'keywords', content: 'agent plugins, AEP, ESS, planning, schema validation'}],
     colorMode: {defaultMode: 'dark', respectPrefersColorScheme: true},
     navbar: {
       title: 'Agent Plugins',
@@ -60,9 +60,9 @@ const config: Config = {
         ]},
         {title: 'Plugins', items: [
           {label: 'Beyond10x', to: '/docs/plugins/beyond10x'},
-          {label: 'AEP Planning', to: '/docs/plugins/aep-planning'},
-          {label: 'ADP', to: '/docs/plugins/adp'},
-          {label: 'ESS Schema', to: '/docs/plugins/ess-schema'},
+          {label: 'AEP Plan', to: '/docs/plugins/aep-plan'},
+          {label: 'AEP Drive', to: '/docs/plugins/aep-drive'},
+          {label: 'ESS Specify', to: '/docs/plugins/ess-specify'},
         ]},
         {title: 'Project', items: [
           {label: 'GitHub repository', href: 'https://github.com/beyond10x/agentplugins'},

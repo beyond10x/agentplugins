@@ -1,5 +1,70 @@
 # Changelog
 
+## [Unreleased]
+
+- Every product plugin now carries its product's name and the verb it performs. `aep-planning`
+  becomes `aep-plan`, `adp` becomes `aep-drive`, and `ess-schema` becomes `ess-specify` with its
+  skill directory and frontmatter name both `specify`. The other two plugins, `beyond10x` and
+  `workspace-hygiene`, keep their names, and so do the skill directories `planning`,
+  `story-migration`, `drive`, `wave`, `beyond10x`, `plugin-creator` and `worktree`.
+
+  | old | new |
+  |---|---|
+  | `aep-planning:planning` | `aep-plan:planning` |
+  | `aep-planning:story-migration` | `aep-plan:story-migration` |
+  | `aep-planning:decomposer` | `aep-plan:decomposer` |
+  | `aep-planning:plan-reviewer` | `aep-plan:plan-reviewer` |
+  | `aep-planning:reverse-engineer` | `aep-plan:reverse-engineer` |
+  | `aep-planning:plan-critic-acceptance` | `aep-plan:plan-critic-acceptance` |
+  | `aep-planning:plan-critic-design` | `aep-plan:plan-critic-design` |
+  | `aep-planning:plan-critic-scope` | `aep-plan:plan-critic-scope` |
+  | `aep-planning:plan-critic-parallel-safety` | `aep-plan:plan-critic-parallel-safety` |
+  | `adp:drive` | `aep-drive:drive` |
+  | `adp:wave` | `aep-drive:wave` |
+  | `adp:story-scoper` | `aep-drive:story-scoper` |
+  | `adp:implementor` | `aep-drive:implementor` |
+  | `adp:adversary` | `aep-drive:adversary` |
+  | `ess-schema:ess-schema` | `ess-specify:specify` |
+
+  Reinstall under the new names: the marketplace no longer offers the old ones. The workflow id
+  `adp/default` and the protocol id `adp/1` are unchanged — they name the AEP development profile,
+  which this rename does not reach.
+- `agentplugins-check` refuses a retired plugin name anywhere this repository authors — in a file's
+  text, and in where the file sits — rather than leaving `AGENTS.md` § *Invariants* to a person
+  remembering to grep. The path half is what an incomplete `git mv` leaves: a segment equal to a
+  retired name under `plugins/`, `website/docs/plugins/` or `evals/` is refused even when the file's
+  own text spells nothing.
+
+  The sweep exempts exactly seven things, each visible in a diff:
+
+  | exempt | why |
+  |---|---|
+  | `CHANGELOG.md` | records what the names were |
+  | `changes/` | dated change records, written on the day |
+  | `.engineering/` | the planning store, whose only writer is the `aep` CLI |
+  | `evals/*/recorded/` | a transcript, its manifest and the README that produced them are evidence of a run under the old names |
+  | `crates/agentplugins-check/src/main.rs` | has to spell what it forbids: the `RETIRED` table, the matcher's doc and its rule tests. Every plugin name in it is one `plugin`, `marketplace` or `critic_pins` resolves against the tree |
+  | `adp/…` | the wire ids `adp/1` and `adp/default`, unless a `/` in front makes it a path into the plugin directory |
+  | a line marked `# recorded-under-this-name` | **only** in `evals/*/expectations.trace.yaml`, where a transcript sits beside the row. The marker excuses nothing in a README, an install block or a manifest |
+
+  `.git/`, `target/` and `node_modules/` are not exemptions; they are not authored files and are
+  never walked.
+- A replay is judged by the report it writes and no longer by its exit status. Measured on
+  aep 0.44.0: `aep eval run --stream` prints *"not conformant: the run contradicted 2
+  expectation(s) … (exit 1)"* and exits **0**, so the gate reported *"1 recorded transcript(s)
+  replayed"* over a corpus that contradicted its own recording. On `protocol 0.50.0` the same
+  fail-open has a second word: a gating row nothing in the transcript can decide prints
+  *"undecided … (exit 3)"*, exits **0**, and is left at `verdict: "unknown"` — so reading only `gap`
+  would have closed one half. The gate now refuses any report whose document `verdict` is not `ok`,
+  which is `aep`'s own arithmetic over severity and `on_unknown:`, and refuses any report that does
+  not claim `trace-report/1` or states no verdict at all.
+- Five `env.*_available` rows in `golden-path-end-to-end` keep the plugin names of 2026-09-03,
+  because they state what the recorded harness listed and that recording predates the rename.
+  Renaming them was measured on that stream — 27 of 27 rows `ok` before, 22 of 27 after, two of them
+  gating — so each carries `recorded-under-this-name` and moves when the case is re-recorded.
+- The eval case `ess-schema-new-entity` is now `ess-specify-new-entity`, and the website's plugin
+  reference pages are `plugins/aep-plan`, `plugins/aep-drive` and `plugins/ess-specify`.
+
 ## [0.6.2] — 2026-09-03
 
 - Require non-trivial cross-repository and release/deployment work to enter the owning AEP store

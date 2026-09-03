@@ -6,13 +6,13 @@ title: Install
 # Install from the `beyond10x` marketplace
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
-identity is `beyond10x`. The installable names are `beyond10x`, `aep-planning`, `adp`,
-`ess-schema`, and `workspace-hygiene`.
+identity is `beyond10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`,
+`ess-specify`, and `workspace-hygiene`.
 
 ## Before you install: put `aep` and `ess` on your `PATH`
 
-`aep-planning` and `adp` are instruction surfaces for a program they do not ship. Both drive the
-`aep` CLI. `ess-schema` likewise drives the `ess` CLI. Install both before the plugins so the first
+`aep-plan` and `aep-drive` are instruction surfaces for a program they do not ship. Both drive the
+`aep` CLI. `ess-specify` likewise drives the `ess` CLI. Install both before the plugins so the first
 task does not stop at a missing command. Every AEP and ESS release publishes native archives for
 x86-64 and ARM64 Linux and macOS, plus a `SHA256SUMS` file. Windows archives are not published.
 
@@ -85,9 +85,9 @@ Copy the whole block into a Claude Code session:
 
 ```text
 /plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.6.2
-/plugin install aep-planning@beyond10x
-/plugin install adp@beyond10x
-/plugin install ess-schema@beyond10x
+/plugin install aep-plan@beyond10x
+/plugin install aep-drive@beyond10x
+/plugin install ess-specify@beyond10x
 /reload-plugins
 ```
 
@@ -107,9 +107,9 @@ For a fresh installation, run this release-pinned block:
 ```bash
 codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.6.2
 codex plugin add beyond10x@beyond10x
-codex plugin add aep-planning@beyond10x
-codex plugin add adp@beyond10x
-codex plugin add ess-schema@beyond10x
+codex plugin add aep-plan@beyond10x
+codex plugin add aep-drive@beyond10x
+codex plugin add ess-specify@beyond10x
 codex plugin add workspace-hygiene@beyond10x
 ```
 
@@ -119,9 +119,9 @@ block above:
 
 ```bash
 codex plugin remove beyond10x@beyond10x
-codex plugin remove aep-planning@beyond10x
-codex plugin remove adp@beyond10x
-codex plugin remove ess-schema@beyond10x
+codex plugin remove aep-plan@beyond10x
+codex plugin remove aep-drive@beyond10x
+codex plugin remove ess-specify@beyond10x
 codex plugin remove workspace-hygiene@beyond10x
 codex plugin marketplace remove beyond10x
 ```

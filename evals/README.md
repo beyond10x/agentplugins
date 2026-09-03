@@ -16,14 +16,14 @@ A case is four things and no others:
 
 | Case | Subject | The claim it holds the subject to |
 |---|---|---|
-| `plan-critic-acceptance-verdict` | `aep-planning:plan-critic-acceptance` | the verdict became an immutable `review-result` through `new --from`, and nothing moved |
-| `plan-critic-design-verdict` | `aep-planning:plan-critic-design` | the same, for the shape lane |
-| `plan-critic-scope-verdict` | `aep-planning:plan-critic-scope` | the same, for the coverage lane |
-| `plan-critic-parallel-safety-verdict` | `aep-planning:plan-critic-parallel-safety` | the same, for the concurrency lane |
-| `decomposer-relation-census` | `aep-planning:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
-| `ess-schema-new-entity` | `ess-schema:ess-schema` | the noun got a validated typed home before a story rested on it, and the unread relation stayed unread |
+| `plan-critic-acceptance-verdict` | `aep-plan:plan-critic-acceptance` | the verdict became an immutable `review-result` through `new --from`, and nothing moved |
+| `plan-critic-design-verdict` | `aep-plan:plan-critic-design` | the same, for the shape lane |
+| `plan-critic-scope-verdict` | `aep-plan:plan-critic-scope` | the same, for the coverage lane |
+| `plan-critic-parallel-safety-verdict` | `aep-plan:plan-critic-parallel-safety` | the same, for the concurrency lane |
+| `decomposer-relation-census` | `aep-plan:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
+| `ess-specify-new-entity` | `ess-specify:specify` | the noun got a validated typed home before a story rested on it, and the unread relation stayed unread |
 | `golden-path-end-to-end` | `website/docs/golden-path.md` | the eight published steps in the published order, with the CLIs as the stores' only writers |
-| `adversary-tests-only` | `adp:adversary` | tests were written, `src/` was not touched, and no `aep artifact` command ran |
+| `adversary-tests-only` | `aep-drive:adversary` | tests were written, `src/` was not touched, and no `aep artifact` command ran |
 
 ## `recorded/` is empty, and that is stated rather than implied
 
@@ -113,7 +113,7 @@ Live, which costs money and is refused without both `METAHARNESS_LIVE=1` and a c
 
 ```console
 $ METAHARNESS_LIVE=1 aep eval run --corpus evals --workflow adp/default \
-    --arm plugin --harness claude --plugin-dir plugins/aep-planning \
+    --arm plugin --harness claude --plugin-dir plugins/aep-plan \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>
 ```

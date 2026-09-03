@@ -9,7 +9,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Plugin reference',
-      items: ['plugins/beyond10x', 'plugins/aep-planning', 'plugins/adp', 'plugins/ess-schema', 'plugins/workspace-hygiene'],
+      items: ['plugins/beyond10x', 'plugins/aep-plan', 'plugins/aep-drive', 'plugins/ess-specify', 'plugins/workspace-hygiene'],
     },
     'trust-and-scope',
   ],

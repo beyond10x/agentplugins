@@ -10,16 +10,16 @@ verdict: held
 # `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
 # cases whose subject the pull request touched.
 subject:
-  agents: [aep-planning:plan-critic-acceptance]
+  agents: [aep-plan:plan-critic-acceptance]
   paths:
     # The rubric, not the whole planning skill: the rubric holds the verdict rule every row here
     # rests on, and scoping to the skill directory would put a paid run on this case every time an
     # unrelated section of `SKILL.md` moved.
-    - plugins/aep-planning/skills/planning/references/critic-rubric.md
+    - plugins/aep-plan/skills/planning/references/critic-rubric.md
 
 # What this case is about, in one line: **a critic argues and the caller records**, and the two
 # halves are one run. The critic's own charter says it records nothing
-# (`plugins/aep-planning/skills/planning/references/critic-rubric.md` § *You change nothing*:
+# (`plugins/aep-plan/skills/planning/references/critic-rubric.md` § *You change nothing*:
 # *"You do not record your own verdict. The caller writes the record"*), so a case scoped to the
 # subagent alone could not observe the thing that makes a verdict worth having — that it became an
 # immutable `review-result` in the store instead of a paragraph in a session nobody kept.
@@ -50,7 +50,7 @@ subject:
 # there is no session-wide form of the row either.
 
 task: |
-  Run the `aep-planning:plan-critic-acceptance` agent over the stories drafted under
+  Run the `aep-plan:plan-critic-acceptance` agent over the stories drafted under
   `epic:commercial-clients`, and judge whether every drafted acceptance statement names an observable outcome and the transition it turns on.
 
   Give the critic the story ids and the epic id, and nothing else.

@@ -2,7 +2,7 @@ format: trace-spec/1
 id: eval-case/adversary-tests-only
 title: The write verbs were offered, the tests were written, and the implementation was left alone
 
-# **No row here reads `plugins/adp/agents/adversary.md`.** Every row below is about what the run did.
+# **No row here reads `plugins/aep-drive/agents/adversary.md`.** Every row below is about what the run did.
 #
 # The write rows scope to a **set** of verbs — `[Write, Edit, NotebookEdit]` — and not to `Write`
 # alone, for the reason `aep/conformance/eval/README.md` bought with a live pilot: a run asked to
@@ -17,7 +17,7 @@ expectations:
     statement: the plugin loaded and offered the adversary, so a miss is not "it was not there"
     expect:
       env.agent_available:
-        agent: adp:adversary
+        agent: aep-drive:adversary
 
   - id: a-subagent-actually-ran
     statement: the attack went through a subagent rather than being improvised by the parent session

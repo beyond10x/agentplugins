@@ -17,7 +17,7 @@ $ METAHARNESS_LIVE=1 aep eval run \
     --case evals/adversary-tests-only \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/adp \
+    --plugin-dir plugins/aep-drive \
     --cwd <the implementor's worktree, suite green, with the unit brief in it> \
     --budget-usd 5 \
     --observed-at <the date it was observed> \
@@ -36,7 +36,7 @@ recorded beside it — a transcript with no provenance is a file, not evidence.
 
 A worktree in which one unit has been implemented and its suite is green, laid out with an
 implementation under `src/` and its tests under `tests/` — the two globs the rows scope to.
-The unit brief must name an assigned scratch directory (`plugins/adp/skills/wave/references/unit-brief.md`),
+The unit brief must name an assigned scratch directory (`plugins/aep-drive/skills/wave/references/unit-brief.md`),
 because `nothing-was-written-to-tmp` measures the rule that scratch is assigned rather than chosen.
 
 **The unit must have a defect to find.** Hard rule 4 says finding nothing is a result, so a

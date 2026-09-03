@@ -10,7 +10,7 @@ capabilities portable across Codex and Claude Code.
 
 It provides:
 
-- a `beyond10x` routing skill for selecting `aep-planning`, `adp`, `ess-schema`, or
+- a `beyond10x` routing skill for selecting `aep-plan`, `aep-drive`, `ess-specify`, or
   `workspace-hygiene`;
 - direct links to public product guides, command references, plugin references, and source;
 - a `plugin-creator` skill for creating or porting dual-harness plugins.
@@ -35,9 +35,9 @@ The full compatibility rules live with the plugin source and link to the current
 The front door does not copy specialist instructions. Install the plugin it selects when you need
 the governed workflow:
 
-- [`aep-planning`](./aep-planning.md) for plans and artifact stores;
-- [`adp`](./adp.md) for accepted development work;
-- [`ess-schema`](./ess-schema.md) for ESS validation and projections.
+- [`aep-plan`](./aep-plan.md) for plans and artifact stores;
+- [`aep-drive`](./aep-drive.md) for accepted development work;
+- [`ess-specify`](./ess-specify.md) for ESS specification, validation and projections.
 - [`workspace-hygiene`](./workspace-hygiene.md) for managed Git worktrees and safe cleanup.
 
 For the broader organization map, start at [Beyond10x getting started](https://beyond10x.github.io/getting-started/).

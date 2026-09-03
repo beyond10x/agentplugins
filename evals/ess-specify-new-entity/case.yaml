@@ -1,0 +1,67 @@
+format: eval-case/1
+id: ess-specify-new-entity
+title: A story introduced a noun and the noun got a typed home before anything was written around it
+workflow: adp/default
+states: [specify, decompose]
+arm: plugin
+verdict: held
+
+# Which repository files this case is a case about. `task check` refuses a case whose `agents:` or
+# `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
+# cases whose subject the pull request touched.
+subject:
+  # The ESS skill alone. The one `aep artifact new story` matcher below is the far side of an
+  # ordering row, not a claim about the planning skill.
+  skills: [ess-specify:specify]
+
+# The skill's § *Starting a domain from nothing* is the subject: *"A story or epic can introduce a
+# noun before any specification exists. That is still this skill's job: the domain is drafted first,
+# so the noun has a typed home before stories are written around it."* That sentence is an
+# **ordering**, which is the one class of claim a transcript decides well.
+#
+# The three things this case holds the run to, all of them the skill's own words:
+#
+# 1. the smallest document that validates is written — `system.yaml` and a domain file, nothing that
+#    is not required;
+# 2. `ess validate` is run over it **before** stories are written around the noun;
+# 3. a relation the tree does not settle is left as an `UNMAPPED:` marker, never invented — *"Imports
+#    never guess, and a domain an agent drafts is an import."*
+#
+# ## The skill's name, and how the ambiguity was closed
+#
+# The skill's directory is `plugins/ess-specify/skills/specify/` and its `SKILL.md` frontmatter
+# declares `name: specify`, so the two agree and the row below has one spelling to hold, not two.
+# They did not always: until 0.6.2 the directory and the frontmatter name disagreed, no committed
+# evidence said which of the two a harness puts after the plugin name in its skill list, and
+# `the-skill-was-offered` was **advisory** because a gating row on that guess would have failed this
+# case for a reason that is not about behaviour.
+#
+# **The 2026-09-03 golden-path recording settled it: the harness lists the skill by its directory**,
+# which is what made the directory and the name agreeing worth doing. The row stays advisory until a
+# recording under the current spelling exists here — this case has none, and an advisory row that
+# nobody has watched go `ok` is the honest severity for it. The behavioural rows below gate.
+#
+# ## The spelling of the CLI, and why the rows carry both
+#
+# `aep` in this repository's instructions, `protocol` in the binary's own usage lines, and an adopter
+# may have either on `PATH`. Every `aep` matcher below is a regex over both. `ess` has one spelling
+# and is matched as one.
+
+task: |
+  `story:warehouse-shipment-record` introduces a noun this repository has no typed home for: a
+  **shipment**, identified by a `shipment_id`, with a destination.
+
+  Give it one before any story is written around it. There is no ESS specification here yet, so
+  write the smallest `ess/1` document that validates — the header and one domain file, and nothing
+  that is not required — and run `ess validate` over it.
+
+  The epic also says a shipment has a **carrier**. Nothing in this tree, in any contract, and in no
+  artifact says what a carrier is. Do not type it.
+
+  Then report: what you wrote, the verbatim output of `ess validate` with its exit status, and every
+  relation you could not settle.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
+
+# The run did nothing wrong; what gaps is an observation about the evidence, not about the run.

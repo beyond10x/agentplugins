@@ -1,0 +1,18 @@
+{
+  "name": "aep-drive",
+  "version": "0.6.2",
+  "description": "Coordinate AEP development waves with scoped implementors and adversarial review.",
+  "author": {
+    "name": "Beyond10x"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AEP Drive",
+    "shortDescription": "Coordinate governed development waves.",
+    "longDescription": "Scope stories, coordinate isolated implementation units, and route each result through adversarial review under the Agentic Development Protocol profile.",
+    "developerName": "Beyond10x",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use aep-drive to scope and coordinate this implementation."
+  }
+}

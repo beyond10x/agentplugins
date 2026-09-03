@@ -39,9 +39,9 @@ $ METAHARNESS_LIVE=1 aep eval run \
     --case evals/golden-path-end-to-end \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/aep-planning \
-    --plugin beyond10x/agentplugins@adp@<this release> \
-    --plugin beyond10x/agentplugins@ess-schema@<this release> \
+    --plugin-dir plugins/aep-plan \
+    --plugin beyond10x/agentplugins@aep-drive@<this release> \
+    --plugin beyond10x/agentplugins@ess-specify@<this release> \
     --cwd <a fresh copy of the accounts service the page is written against> \
     --budget-usd 25 \
     --observed-at <the date it was observed> \
@@ -50,7 +50,7 @@ $ METAHARNESS_LIVE=1 aep eval run \
 ```
 
 `--budget-usd 25` and not the corpus's 5. The second headless run walked all eight steps in 118
-turns for $10.96 with only `aep-planning` loaded. The third was the first with `adp` actually
+turns for $10.96 with only `aep-plan` loaded. The third was the first with `aep-drive` actually
 loaded: it took the wave skill, spawned 12 sub-agents, and was still inside step 7 when the cap
 stopped it at $15.0014. Record it at 25 — the case costs more with its plugins than without them.
 The two `--plugin` pins must be installed at user scope at exactly that version
@@ -71,8 +71,8 @@ one module holding `create_account`, `read_account`, `update_account` and `delet
 a `TODO` at the deletion site, and **no `.engineering/` directory**. § 1 of the page is an
 adoption step, and it measures nothing against a tree that has already been adopted.
 
-This is the one case that needs three plugins installed — `aep-planning` for the planning steps,
-`ess-schema` for step 3, and `adp` for steps 7 and 8. `aep eval run --plugin-dir` takes one; the
+This is the one case that needs three plugins installed — `aep-plan` for the planning steps,
+`ess-specify` for step 3, and `aep-drive` for steps 7 and 8. `aep eval run --plugin-dir` takes one; the
 other two go as `--plugin` pins, above. Two things the second run (2026-09-03) showed the working
 tree also needs, both about the **child's** `PATH`, which metaharness constructs as
 `$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin` and does not inherit:

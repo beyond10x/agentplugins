@@ -14,9 +14,9 @@ directly when the work is already clear.
 | Plugin | Use it for | Includes |
 |---|---|---|
 | [`beyond10x`](./plugins/beyond10x.md) | Marketplace navigation and plugin authoring | router, public resource map, portable plugin creator |
-| [`aep-planning`](./plugins/aep-planning.md) | Governed plans and artifact stores | planning skill, decomposer, plan reviewer, reverse engineer |
-| [`adp`](./plugins/adp.md) | Governed development delivery | wave skill, story scoper, implementor, adversary |
-| [`ess-schema`](./plugins/ess-schema.md) | Executable system specifications | schema validation and deterministic projection guidance |
+| [`aep-plan`](./plugins/aep-plan.md) | Governed plans and artifact stores | planning skill, decomposer, plan reviewer, reverse engineer |
+| [`aep-drive`](./plugins/aep-drive.md) | Governed development delivery | wave skill, story scoper, implementor, adversary |
+| [`ess-specify`](./plugins/ess-specify.md) | Executable system specifications | specification, schema validation and deterministic projection guidance |
 | [`workspace-hygiene`](./plugins/workspace-hygiene.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
 The marketplace contains instructions, not credentials. A plugin does not acquire authority to

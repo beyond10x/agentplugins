@@ -12,7 +12,7 @@ verdict: held
 subject:
   # The agent alone. Every row below is about what the decomposer did, and scoping to the planning
   # skill as well would put a paid run on this case every time an unrelated section of it moved.
-  agents: [aep-planning:decomposer]
+  agents: [aep-plan:decomposer]
 
 # `aep/conformance/eval/decomposer-charter` already covers the decomposer's **charter** — it moved
 # nothing, it validated the store. This case covers the behaviour 0.4.0 added on top of it and that
@@ -45,7 +45,7 @@ subject:
 # regex over both — a widening of what can witness the claim, never of the claim.
 
 task: |
-  Decompose `epic:commercial-clients` with the `aep-planning:decomposer` agent.
+  Decompose `epic:commercial-clients` with the `aep-plan:decomposer` agent.
 
   Before you draft a single story, enumerate every domain relation the epic implies — the two
   entities in the direction the relation runs, cardinality, ownership, lifecycle coupling — and

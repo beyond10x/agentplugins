@@ -10,6 +10,22 @@ title: The eight steps happened in the order the page publishes, and the CLIs st
 # undecidable when either side never occurs, so a run that stopped at step 3 reports `unk` on the
 # later orderings rather than gapping them. That is the honest verdict — nobody found out — and the
 # rows that *do* gap on a short run are the ones about the steps it reached.
+#
+# ## Five rows carry the plugin names of 2026-09-03, and that is not an oversight
+#
+# All three product plugins were renamed in 0.6.2 — see `CHANGELOG.md` for the map — and every other
+# document in this corpus took the new spellings. The five `env.*_available` rows below did not,
+# because they are the only rows here that assert what a **recorded transcript contains** rather than
+# what an agent did: the harness inventory in
+# `recorded/claude-plugin-golden-path-end-to-end.events.jsonl` lists the plugins under the names they
+# carried on the day it ran, which is what the session was actually offered. Renaming them was
+# measured on that stream: 27 of 27 rows `ok` before, 22 of 27 after, with
+# `the-decomposer-was-offered` and `the-planning-skill-was-offered` contradicted outright. A row the
+# transcript beside it disproves is not a rename; it is a specification for a run nobody has had.
+#
+# They move when the case is re-recorded under the new names, which costs a live run at $25 and is
+# the operator's call, not this document's. Each carries `recorded-under-this-name` so that the
+# repository's retired-name sweep reads it as the quotation it is.
 
 expectations:
   # --- the surfaces the page names were offered -------------------------------------------------
@@ -18,13 +34,15 @@ expectations:
     statement: the plugin loaded and offered the decomposer, which step 4 dispatches
     expect:
       env.agent_available:
-        agent: aep-planning:decomposer
+        # The 2026-09-03 recording was made before the rename; see the note above.
+        agent: aep-planning:decomposer  # recorded-under-this-name
 
   - id: the-planning-skill-was-offered
     statement: the planning skill was among those the harness offered
     expect:
       env.skill_available:
-        skill: aep-planning:planning
+        # The 2026-09-03 recording was made before the rename; see the note above.
+        skill: aep-planning:planning  # recorded-under-this-name
 
   - id: the-wave-skill-was-offered
     statement: the wave skill was among those the harness offered, which step 7 runs
@@ -33,12 +51,15 @@ expectations:
     # `--plugin <repo>@<name>@<pin>` (aep 0.44.0), which metaharness places in the scratch config home
     # and, since 0.6.1, also names to the vendor with `--plugin-dir` — the registry placement alone
     # loaded nothing (metaharness probe Q19, answered by the 2026-09-03 recording). A run launched
-    # with only `--plugin-dir plugins/aep-planning` still gaps this row for a reason that is not about
-    # the plugin, which is why it stays advisory until the recorded stream shows it `ok`.
+    # with only `--plugin-dir plugins/aep-plan` still gaps this row for a reason that is not about
+    # the plugin, which is why it stays advisory until the recorded stream shows it `ok`. Since the
+    # rename the manifest's pins name no plugin this repository still ships, so the replay sends the
+    # pins alone and no `--plugin-dir` at all — an argument `aep`'s `ingest_recorded` discards.
     severity: advisory
     expect:
       env.skill_available:
-        skill: adp:wave
+        # The 2026-09-03 recording was made before the rename; see the note above.
+        skill: adp:wave  # recorded-under-this-name
 
   - id: the-ess-skill-was-offered
     statement: the ESS skill was among those the harness offered, which step 3 runs
@@ -46,7 +67,8 @@ expectations:
     severity: advisory
     expect:
       env.skill_available:
-        skill: ess-schema:ess-schema
+        # The 2026-09-03 recording was made before the rename; see the note above.
+        skill: ess-schema:ess-schema  # recorded-under-this-name
 
   - id: the-drive-skill-was-offered
     statement: the experimental drive skill was among those the harness offered, which step 8 runs
@@ -54,7 +76,8 @@ expectations:
     severity: advisory
     expect:
       env.skill_available:
-        skill: adp:drive
+        # The 2026-09-03 recording was made before the rename; see the note above.
+        skill: adp:drive  # recorded-under-this-name
 
   - id: the-work-was-fanned-out
     statement: the page's sub-agents ran as sub-agents
@@ -343,7 +366,7 @@ expectations:
     statement: the run stayed inside the per-case cap the corpus is run under
     # 25 and not the corpus's 5, in two moves. The second headless run (2026-09-03) walked all eight
     # steps in 118 turns on the default model for $10.96, which retired the $5 cap. The third
-    # (2026-09-03, out-3) was the first with `adp` actually loaded: it took the wave skill, spawned
+    # (2026-09-03, out-3) was the first with `aep-drive` actually loaded: it took the wave skill, spawned
     # 12 sub-agents, and was still inside step 7 when `--max-budget-usd` stopped it at $15.0014
     # (`session.ended` subtype `error_max_budget_usd`). The case costs more with its plugins than
     # without them, which is the case working. The runner passes the same number as `--budget-usd`,

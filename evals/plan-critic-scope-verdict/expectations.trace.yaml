@@ -2,7 +2,7 @@ format: trace-spec/1
 id: eval-case/plan-critic-scope-verdict
 title: The scope critic argued, the caller recorded the verdict, and nothing moved
 
-# **No row here reads `plugins/aep-planning/agents/plan-critic-scope.md`.** A check that greps an
+# **No row here reads `plugins/aep-plan/agents/plan-critic-scope.md`.** A check that greps an
 # agent's markdown asserts that a sentence is still written, which is the failure mode a behavioural
 # case exists to remove. Every row below is about what the run did.
 #
@@ -18,7 +18,7 @@ expectations:
     statement: the plugin loaded and offered the scope critic, so a miss is not "it was not there"
     expect:
       env.agent_available:
-        agent: aep-planning:plan-critic-scope
+        agent: aep-plan:plan-critic-scope
 
   - id: a-subagent-actually-ran
     statement: the critique went through a subagent rather than being improvised by the parent session

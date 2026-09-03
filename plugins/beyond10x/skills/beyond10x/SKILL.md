@@ -1,6 +1,6 @@
 ---
 name: beyond10x
-description: Navigate the Beyond10x engineering ecosystem and route work to the smallest matching plugin or public resource. Use when the user asks what Beyond10x provides, which plugin to install or invoke, where the AEP, ADP, ESS, Entity Runtime, or agent-plugin documentation lives, or when a request spans or is ambiguous between the Beyond10x plugins.
+description: Navigate the Beyond10x engineering ecosystem and route work to the smallest matching plugin or public resource. Use when the user asks what Beyond10x provides, which plugin to install or invoke, where the AEP, ESS, Entity Runtime, or agent-plugin documentation lives, or when a request spans or is ambiguous between the Beyond10x plugins.
 ---
 
 # Beyond10x guide
@@ -11,7 +11,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 
 1. Identify the user's immediate decision or outcome.
 2. For non-trivial implementation, cross-repository work, or release/deployment changes in a
-   Beyond10x repository, route through `aep-planning` first so the owning artifact, relations, and
+   Beyond10x repository, route through `aep-plan` first so the owning artifact, relations, and
    scope exist before implementation continues.
 3. Select one plugin from the routing table. Select several only when the task genuinely crosses
    their boundaries.
@@ -24,9 +24,9 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 |---|---|
 | Choose a plugin, understand the ecosystem, or find public documentation | `beyond10x` |
 | Create, update, review, or port an installable plugin | `plugin-creator` in this plugin |
-| Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep-planning` |
-| Scope and deliver accepted development work through a reviewed wave | `adp` |
-| Validate an ESS model or guide deterministic schema or OpenAPI projection | `ess-schema` |
+| Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep-plan` |
+| Scope and deliver accepted development work through a reviewed wave | `aep-drive` |
+| Specify an ESS model or guide deterministic schema or OpenAPI projection | `ess-specify` |
 | Create, inspect, finish, or safely clean Git worktrees | `workspace-hygiene` |
 
 ## Preserve boundaries
@@ -34,7 +34,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 - Do not treat this plugin as a substitute for the routed specialist.
 - Do not install another plugin, mutate a marketplace, or contact an external service unless the
   user asked for that action and the host grants it.
-- Do not infer that ADP work is ready merely because a planning request exists.
+- Do not infer that development work is ready merely because a planning request exists.
 - Do not turn schema guidance into authority to apply infrastructure.
 - State which plugin owns the next step whenever more than one could plausibly apply.
 

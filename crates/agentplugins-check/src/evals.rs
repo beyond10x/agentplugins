@@ -166,9 +166,9 @@ fn yaml<T: serde::de::DeserializeOwned>(path: &Path, label: &str) -> Result<T, S
 
 /// The name a `SKILL.md` or an agent file declares in its own frontmatter.
 ///
-/// Read rather than inferred from the directory: `plugins/ess-schema/skills/ess-schema/`
-/// declares `name: ess-schema`, so a resolver that trusted the directory would look for a skill that
-/// does not exist under a name nothing uses.
+/// Read rather than inferred from the directory: nothing requires a skill's directory to be spelt
+/// the way its frontmatter is, a harness lists what the document declares, and a resolver that
+/// trusted the directory would look for a skill that does not exist under a name nothing uses.
 fn declared_name(path: &Path) -> Result<String, String> {
     let text = std::fs::read_to_string(path)
         .map_err(|error| format!("reading {}: {error}", path.display()))?;
@@ -221,9 +221,10 @@ fn resolve_agent(root: &Path, reference: &str, case: &str) -> Result<(), String>
 
 /// Resolves a skill reference to the `SKILL.md` that declares it.
 ///
-/// By the declared name across every skill directory of the plugin, and not by directory: the two
-/// agree for four of this repository's five skills and not for the fifth, and a harness lists what
-/// the document declares.
+/// By the declared name across every skill directory of the plugin, and not by directory: a harness
+/// lists what the document declares, and nothing makes the two agree. One of this repository's
+/// skills carried a directory spelt differently from its frontmatter for four releases, and a
+/// resolver that trusted the directory was wrong about it for all four.
 fn resolve_skill(root: &Path, reference: &str, case: &str) -> Result<(), String> {
     let (plugin, name) = qualified(reference, "skill", case)?;
     let skills = root.join("plugins").join(plugin).join("skills");
@@ -566,6 +567,112 @@ fn treatment_args(case: &Case, pins: Vec<String>) -> Vec<String> {
     args
 }
 
+/// How the trace report a replay writes beside its stream is named.
+const REPORT_SUFFIX: &str = ".report.json";
+
+/// The format claim the report a replay writes carries.
+const REPORT_FORMAT: &str = "trace-report/1";
+
+/// The gating expectations a replay's own report says the run contradicted.
+///
+/// **The exit status of `aep eval run --stream` does not carry this.** Measured on 0.44.0,
+/// 2026-09-03: a replay of `golden-path-end-to-end` against a specification whose first two rows the
+/// transcript contradicts prints *"not conformant: the run contradicted 2 expectation(s) …
+/// (exit 1)"* — and exits **0**. So a gate that reads only the status, which this one did until
+/// 0.6.2, reports *"1 recorded transcript(s) replayed"* over a corpus that no longer describes its
+/// own recording. Nothing else in this repository would notice; the rename that found it found it by
+/// a person running the replay by hand.
+///
+/// Read from `trace-report/1` rather than from the printed sentence: the record is the document
+/// `aep` writes for a reader, and a gate that scraped prose would go quiet the first time the
+/// wording changed.
+///
+/// # The rule is the document's own verdict, not a row predicate this gate invents
+///
+/// A first version of this read *"a row that says `gap` and does not say `advisory`"*, on the belief
+/// that `on_unknown:` had already resolved an `unk` by the time a row's verdict was written. **It
+/// has not.** Measured on `protocol 0.50.0`, 2026-09-03: a replay against a specification holding
+/// one gating `order` row that the transcript cannot decide prints *"undecided: nothing was
+/// contradicted and 1 expectation(s) could not be judged from this transcript … (exit 3)"*, exits
+/// **0**, and leaves the row at `verdict: "unknown"`, `severity: "gate"` — the same fail-open, one
+/// word further along. A gate reading only `gap` calls that a replayed transcript.
+///
+/// So the rule is `verdict == "ok"` at the top of the document, which is `aep`'s own arithmetic over
+/// severity and `on_unknown:` rather than a second copy of it here. It is exactly *"every gating row
+/// held"*: the same probe reported `"ok"` for a document carrying one advisory gap and one advisory
+/// unknown and nothing else. The rows are then listed for the message, and a document that refuses
+/// itself while naming no row is refused too, so an unexplained verdict cannot pass as an empty one.
+///
+/// # And the format claim is checked, like every other document this module reads
+///
+/// The module header's own rule for somebody else's document is *"that the format claim is right"*.
+/// This one was exempt from it: a `trace-report` whose rows carried their outcome under another key
+/// read as a report with nothing contradicted, which relocates the fail-open rather than removing
+/// it. A report that does not claim `trace-report/1` is refused unread.
+fn contradicted(report: &Path) -> Result<Vec<String>, String> {
+    let text = std::fs::read_to_string(report).map_err(|error| {
+        format!(
+            "reading {}: {error}; a replay that left no report is not evidence that it held",
+            report.display()
+        )
+    })?;
+    let document: serde_json::Value = serde_json::from_str(&text)
+        .map_err(|error| format!("parsing {}: {error}", report.display()))?;
+
+    let format = document
+        .get("format")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| format!("{} states no `format`", report.display()))?;
+    if format != REPORT_FORMAT {
+        return Err(format!(
+            "{} claims `{format}` and not `{REPORT_FORMAT}`; this gate reads the fields \
+             `{REPORT_FORMAT}` defines, and reading them out of a document that says it is \
+             something else is how a report with nothing contradicted gets manufactured",
+            report.display()
+        ));
+    }
+
+    let verdict = document
+        .get("verdict")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| {
+            format!(
+                "{} states no `verdict`; a report that does not say whether the run held is not \
+                 evidence that it did",
+                report.display()
+            )
+        })?;
+    if verdict == "ok" {
+        return Ok(Vec::new());
+    }
+
+    let rows = document
+        .get("expectations")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| format!("{} carries no `expectations`", report.display()))?;
+    let named: Vec<String> = rows
+        .iter()
+        .filter(|row| {
+            row.get("verdict").and_then(serde_json::Value::as_str) != Some("ok")
+                && row.get("severity").and_then(serde_json::Value::as_str) != Some("advisory")
+        })
+        .map(|row| {
+            row.get("id")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("<a row with no id>")
+                .to_owned()
+        })
+        .collect();
+    if named.is_empty() {
+        return Err(format!(
+            "{} states `verdict: {verdict}` and names no gating row that explains it; an \
+             unexplained refusal is not a pass",
+            report.display()
+        ));
+    }
+    Ok(named)
+}
+
 /// Replays one recorded stream through `aep eval run --stream`, which spends nothing.
 fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), String> {
     let directory = stream
@@ -602,18 +709,31 @@ fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), S
         .env_remove("METAHARNESS_BIN")
         .output()
         .map_err(|error| format!("running {}: {error}", binary.display()))?;
-    if output.status.success() {
+    if !output.status.success() {
+        return Err(format!(
+            "replaying {} exited {}:\n{}{}",
+            stream.display(),
+            output
+                .status
+                .code()
+                .map_or_else(|| "on a signal".to_owned(), |code| code.to_string()),
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        ));
+    }
+    let contradicted = contradicted(&out.join(format!("{stem}{REPORT_SUFFIX}")))?;
+    if contradicted.is_empty() {
         return Ok(());
     }
     Err(format!(
-        "replaying {} exited {}:\n{}{}",
+        "replaying {} left {} gating expectation(s) unheld — {}. The transcript is the record of a \
+         run that happened; a gating row it contradicts, or that it cannot decide, is the corpus \
+         describing a run other than the one recorded. Re-record the case, or say in the document \
+         why the recorded run is what the row means.\n{}",
         stream.display(),
-        output
-            .status
-            .code()
-            .map_or_else(|| "on a signal".to_owned(), |code| code.to_string()),
-        String::from_utf8_lossy(&output.stdout),
-        String::from_utf8_lossy(&output.stderr)
+        contradicted.len(),
+        contradicted.join(", "),
+        String::from_utf8_lossy(&output.stdout)
     ))
 }
 
@@ -867,22 +987,25 @@ mod tests {
 
     #[test]
     fn the_treatment_a_replay_repeats_is_the_subject_minus_the_pins() {
-        // The golden path's own shape: three plugins in the subject, two of them pinned by the
-        // manifest, so the third is what arrived as `--plugin-dir`.
-        let case = case_about(&["aep-planning", "adp", "ess-schema"]);
+        // The golden path's shape: three plugins in the subject, two of them pinned by the
+        // manifest, so the third is what arrived as `--plugin-dir`. The committed golden-path
+        // manifest still pins the pre-0.6.2 spellings, because it is the record of a run that
+        // happened under them — so that replay takes the branch the third test covers, and this one
+        // is about the rule rather than about today's corpus.
+        let case = case_about(&["aep-plan", "aep-drive", "ess-specify"]);
         let pins = vec![
-            "beyond10x/agentplugins@adp@0.6.1".to_owned(),
-            "beyond10x/agentplugins@ess-schema@0.6.1".to_owned(),
+            "beyond10x/agentplugins@aep-drive@0.6.1".to_owned(),
+            "beyond10x/agentplugins@ess-specify@0.6.1".to_owned(),
         ];
         assert_eq!(
             treatment_args(&case, pins),
             vec![
                 "--plugin-dir",
-                "plugins/aep-planning",
+                "plugins/aep-plan",
                 "--plugin",
-                "beyond10x/agentplugins@adp@0.6.1",
+                "beyond10x/agentplugins@aep-drive@0.6.1",
                 "--plugin",
-                "beyond10x/agentplugins@ess-schema@0.6.1",
+                "beyond10x/agentplugins@ess-specify@0.6.1",
             ]
         );
     }
@@ -891,24 +1014,27 @@ mod tests {
     fn a_case_whose_manifest_pins_nothing_repeats_nothing() {
         // A single-plugin stream is unambiguous and `aep` reads the treatment out of it, so a
         // replay that added arguments would be inventing the experiment.
-        assert!(treatment_args(&case_about(&["adp"]), Vec::new()).is_empty());
+        assert!(treatment_args(&case_about(&["aep-drive"]), Vec::new()).is_empty());
     }
 
     #[test]
     fn an_ambiguous_remainder_sends_the_pins_rather_than_failing_the_gate() {
         // `--plugin-dir` reaches only the spawn a replay never performs. Refusing here would stop
         // a replay that would have succeeded, over an argument `aep` discards.
-        let two_left = case_about(&["aep-planning", "adp", "ess-schema", "extra"]);
-        let pins = vec!["beyond10x/agentplugins@adp@0.6.1".to_owned()];
+        let two_left = case_about(&["aep-plan", "aep-drive", "ess-specify", "extra"]);
+        let pins = vec!["beyond10x/agentplugins@aep-drive@0.6.1".to_owned()];
         let args = treatment_args(&two_left, pins.clone());
         assert!(!args.iter().any(|a| a == "--plugin-dir"), "{args:?}");
-        assert_eq!(args, vec!["--plugin", "beyond10x/agentplugins@adp@0.6.1"]);
+        assert_eq!(
+            args,
+            vec!["--plugin", "beyond10x/agentplugins@aep-drive@0.6.1"]
+        );
 
         // And when every subject plugin is pinned, the remainder is empty rather than wrong.
-        let all_pinned = case_about(&["adp"]);
+        let all_pinned = case_about(&["aep-drive"]);
         assert_eq!(
             treatment_args(&all_pinned, pins),
-            vec!["--plugin", "beyond10x/agentplugins@adp@0.6.1"]
+            vec!["--plugin", "beyond10x/agentplugins@aep-drive@0.6.1"]
         );
     }
 
@@ -917,15 +1043,180 @@ mod tests {
         evals(&root()).expect("the committed eval corpus validates");
     }
 
+    /// A replay is judged by the report it wrote, because the process status does not carry the
+    /// verdict — `aep eval run --stream` exits 0 on a run it has just called *not conformant*. A
+    /// gate reading the status alone calls a corpus green while its own recording contradicts it.
+    #[test]
+    fn a_replay_that_contradicts_a_gating_row_is_not_a_green_replay() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-report-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(&sandbox).expect("the sandbox is writable");
+        let report = sandbox.join(format!("run{REPORT_SUFFIX}"));
+        let write = |verdict: &str, rows: &str| {
+            std::fs::write(
+                &report,
+                format!(
+                    "{{\"format\":\"{REPORT_FORMAT}\",\"verdict\":\"{verdict}\",\
+                     \"expectations\":[{rows}]}}"
+                ),
+            )
+            .expect("the sandbox is writable");
+        };
+
+        // `aep`'s own arithmetic: a document whose only gaps are advisory is `verdict: ok`, which
+        // is measured rather than assumed — see [`contradicted`].
+        write(
+            "ok",
+            "{\"id\":\"a\",\"verdict\":\"ok\",\"severity\":\"gate\"},\
+             {\"id\":\"b\",\"verdict\":\"gap\",\"severity\":\"advisory\"}",
+        );
+        assert!(
+            contradicted(&report).expect("the report reads").is_empty(),
+            "an advisory gap is what `severity: advisory` declares it to be"
+        );
+
+        write(
+            "gap",
+            "{\"id\":\"a\",\"verdict\":\"ok\",\"severity\":\"gate\"},\
+             {\"id\":\"the-decomposer-was-offered\",\"verdict\":\"gap\",\"severity\":\"gate\"}",
+        );
+        assert_eq!(
+            contradicted(&report).expect("the report reads"),
+            vec!["the-decomposer-was-offered"]
+        );
+
+        // A document that refuses itself and names no gating row does not pass as an empty list.
+        write(
+            "gap",
+            "{\"id\":\"a\",\"verdict\":\"ok\",\"severity\":\"gate\"}",
+        );
+        let error = contradicted(&report).expect_err("an unexplained refusal is not a pass");
+        assert!(error.contains("unexplained refusal"), "{error}");
+
+        // A report that does not say whether the run held is refused rather than read for the
+        // fields it does carry.
+        std::fs::write(
+            &report,
+            format!("{{\"format\":\"{REPORT_FORMAT}\",\"expectations\":[]}}"),
+        )
+        .expect("the sandbox is writable");
+        let error = contradicted(&report).expect_err("a report with no verdict must be refused");
+        assert!(error.contains("states no `verdict`"), "{error}");
+
+        // A replay that wrote no report is not evidence that it held.
+        std::fs::remove_file(&report).expect("the sandbox is writable");
+        let error = contradicted(&report).expect_err("a missing report must be refused");
+        assert!(error.contains("not evidence"), "{error}");
+
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+    }
+
+    /// A replay `aep` itself calls **undecided** is not a green replay either, and this gate says
+    /// it is.
+    ///
+    /// [`contradicted`] counts a row only when its verdict is `gap`, on the stated ground that
+    /// *"an `unk` is `aep`'s to resolve through `on_unknown:`, which it has already done by the
+    /// time it writes a row's verdict"*. Measured on `protocol 0.50.0`, 2026-09-03, replaying the
+    /// committed golden-path transcript against a specification holding one **gating** `order` row
+    /// nothing in that stream decides:
+    ///
+    /// ```text
+    /// claude-plugin-golden-path-end-to-end — undecided: nothing was contradicted and 1
+    /// expectation(s) could not be judged from this transcript — somebody should look at the
+    /// format, not at the agent (exit 3)
+    /// ```
+    ///
+    /// The process exited **0** — the same fail-open this gate was added in 0.6.2 to close for
+    /// `gap`. The row is left at `verdict: "unknown"`, `severity: "gate"`; nothing resolved it. The
+    /// document below is that run's report, verbatim.
+    ///
+    /// The same run's document-level `verdict` is `"unknown"`, and a probe with one advisory gap
+    /// and one advisory unknown and nothing else reported `verdict: "ok"` — so `verdict == "ok"`
+    /// is exactly *"every gating row held"*, and reading it would close both halves at once.
+    #[test]
+    fn a_replay_aep_calls_undecided_is_not_a_green_replay() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-undecided-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(&sandbox).expect("the sandbox is writable");
+        let report = sandbox.join(format!("run{REPORT_SUFFIX}"));
+        std::fs::write(
+            &report,
+            r#"{"format":"trace-report/1","spec_id":"eval-case/golden-path-end-to-end",
+               "spec_title":"One gating ordering row that the transcript cannot decide",
+               "adapter":{"name":"metaharness/event-stream"},"redacted":true,
+               "advisory_overrides":[],
+               "summary":{"total":1,"ok":0,"gap":0,"unknown":1,"advisory_gap":0,
+                          "advisory_unknown":0},
+               "verdict":"unknown",
+               "expectations":[{"id":"a-gating-ordering-nothing-decides",
+                 "statement":"a command nobody ran preceded another command nobody ran",
+                 "kind":"order","severity":"gate",
+                 "outcome":{"outcome":"undecidable","reason":"never_occurred"},
+                 "verdict":"unknown"}]}"#,
+        )
+        .expect("the sandbox is writable");
+
+        let judged = contradicted(&report).expect("the report reads");
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+        assert_eq!(
+            judged,
+            vec!["a-gating-ordering-nothing-decides"],
+            "`aep` called this replay undecided and exited 0; a gate that reads only `gap` calls \
+             it a replayed transcript"
+        );
+    }
+
+    /// The one document this crate reads without checking the format claim it carries.
+    ///
+    /// Every other document here is refused when its `format:` is not the one this gate was
+    /// written against — that is the module's own stated rule, *"that the format claim is right"* —
+    /// and [`contradicted`] instead reaches straight for `expectations`, `verdict` and `severity`.
+    /// A `trace-report` whose rows carry their outcome anywhere else therefore reads as a report
+    /// with nothing contradicted, which is the fail-open this gate exists to remove rather than to
+    /// relocate. The row below is a gating `gap` written the way the same run's report already
+    /// spells it under `outcome.outcome`.
+    #[test]
+    fn a_report_whose_format_this_gate_does_not_know_is_not_read_as_green() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-report-format-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(&sandbox).expect("the sandbox is writable");
+        let report = sandbox.join(format!("run{REPORT_SUFFIX}"));
+        std::fs::write(
+            &report,
+            r#"{"format":"trace-report/2",
+               "expectations":[{"id":"the-decomposer-was-offered","severity":"gate",
+                 "outcome":{"outcome":"gap"}}]}"#,
+        )
+        .expect("the sandbox is writable");
+
+        let judged = contradicted(&report);
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+        let error = judged.expect_err(
+            "a report claiming a format this gate was not written against must be refused, not \
+             read for the fields it happens to share",
+        );
+        assert!(error.contains("trace-report/1"), "{error}");
+    }
+
     /// Every case names a surface this repository ships, and the resolver reads the frontmatter
-    /// rather than the directory — which is the whole reason `ess-schema:ess-schema` resolves at all.
+    /// rather than the directory — so a reference is refused when no document declares it, however
+    /// plausible the directory that would have carried it.
     #[test]
     fn a_skill_is_resolved_by_the_name_its_document_declares() {
         let root = root();
-        resolve_skill(&root, "ess-schema:ess-schema", "t")
-            .expect("the ESS skill declares `name: ess-schema` under `skills/ess-schema/`");
-        let error = resolve_skill(&root, "ess-schema:schema-validation", "t")
-            .expect_err("the directory name is not what a harness lists");
+        resolve_skill(&root, "ess-specify:specify", "t")
+            .expect("the ESS skill declares `name: specify` under `skills/specify/`");
+        let error = resolve_skill(&root, "ess-specify:schema-validation", "t")
+            .expect_err("a name no SKILL.md declares is not what a harness lists");
         assert!(error.contains("declares"), "{error}");
     }
 
@@ -933,7 +1224,7 @@ mod tests {
     /// go on passing its own document while judging nothing.
     #[test]
     fn a_case_naming_a_missing_agent_is_refused() {
-        let error = resolve_agent(&root(), "aep-planning:plan-critic-security", "t")
+        let error = resolve_agent(&root(), "aep-plan:plan-critic-security", "t")
             .expect_err("an agent this repository does not ship must be refused");
         assert!(error.contains("plan-critic-security"), "{error}");
     }
@@ -967,20 +1258,20 @@ mod tests {
         let root = root();
         let one = scope(
             &root,
-            &["plugins/aep-planning/agents/plan-critic-scope.md".to_owned()],
+            &["plugins/aep-plan/agents/plan-critic-scope.md".to_owned()],
         )
         .expect("the corpus scopes");
         assert_eq!(
             one,
             vec![(
                 "evals/plan-critic-scope-verdict".to_owned(),
-                "plugins/aep-planning".to_owned()
+                "plugins/aep-plan".to_owned()
             )]
         );
 
         let rubric = scope(
             &root,
-            &["plugins/aep-planning/skills/planning/references/critic-rubric.md".to_owned()],
+            &["plugins/aep-plan/skills/planning/references/critic-rubric.md".to_owned()],
         )
         .expect("the corpus scopes");
         // The four critic cases name the rubric directly, and the golden path names the planning
@@ -1006,7 +1297,7 @@ mod tests {
     fn a_reference_beside_a_skill_is_in_that_skills_scope() {
         let matched = scope(
             &root(),
-            &["plugins/adp/skills/wave/references/unit-brief.md".to_owned()],
+            &["plugins/aep-drive/skills/wave/references/unit-brief.md".to_owned()],
         )
         .expect("the corpus scopes");
         // The adversary's case, and the golden path — whose step 6 is the wave. Both are right.
@@ -1015,11 +1306,11 @@ mod tests {
             vec![
                 (
                     "evals/adversary-tests-only".to_owned(),
-                    "plugins/adp".to_owned()
+                    "plugins/aep-drive".to_owned()
                 ),
                 (
                     "evals/golden-path-end-to-end".to_owned(),
-                    "plugins/aep-planning".to_owned()
+                    "plugins/aep-plan".to_owned()
                 ),
             ]
         );

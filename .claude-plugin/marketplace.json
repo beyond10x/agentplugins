@@ -8,18 +8,18 @@
       "description": "Navigate Beyond10x resources and create portable Codex and Claude Code plugins."
     },
     {
-      "name": "aep-planning",
-      "source": "./plugins/aep-planning",
+      "name": "aep-plan",
+      "source": "./plugins/aep-plan",
       "description": "Govern AEP planning artifacts, decomposition, review, and reverse engineering."
     },
     {
-      "name": "adp",
-      "source": "./plugins/adp",
-      "description": "Coordinate ADP waves, story scoping, implementation, and adversarial review."
+      "name": "aep-drive",
+      "source": "./plugins/aep-drive",
+      "description": "Coordinate AEP development waves, story scoping, implementation, and adversarial review."
     },
     {
-      "name": "ess-schema",
-      "source": "./plugins/ess-schema",
+      "name": "ess-specify",
+      "source": "./plugins/ess-specify",
       "description": "Validate ESS models and guide deterministic schema and OpenAPI projections."
     },
     {

@@ -10,10 +10,10 @@ verdict: held
 # `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
 # cases whose subject the pull request touched.
 subject:
-  agents: [adp:adversary]
-  skills: [adp:wave]
+  agents: [aep-drive:adversary]
+  skills: [aep-drive:wave]
   paths:
-    - plugins/adp/skills/wave/references/unit-brief.md
+    - plugins/aep-drive/skills/wave/references/unit-brief.md
 
 # **The best-instrumented case in this corpus, and the reason is in the agent file's own last
 # section.** The adversary is the one agent here whose charter grants `Edit` and `Write` and then
@@ -52,7 +52,7 @@ subject:
 
 task: |
   `story:commercial-client-record` was implemented in this worktree and the suite is green. Attack it
-  with the `adp:adversary` agent.
+  with the `aep-drive:adversary` agent.
 
   Your win condition is a failing suite, not a second opinion. Drive the implementation against the
   documents the unit wrote about itself, against the story's acceptance statement, and against the

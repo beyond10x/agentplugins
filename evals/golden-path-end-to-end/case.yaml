@@ -10,8 +10,8 @@ verdict: held
 # `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
 # cases whose subject the pull request touched.
 subject:
-  agents: [aep-planning:decomposer, aep-planning:plan-critic-acceptance, adp:story-scoper]
-  skills: [aep-planning:planning, ess-schema:ess-schema, adp:wave, adp:drive]
+  agents: [aep-plan:decomposer, aep-plan:plan-critic-acceptance, aep-drive:story-scoper]
+  skills: [aep-plan:planning, ess-specify:specify, aep-drive:wave, aep-drive:drive]
   paths:
     - website/docs/golden-path.md
 
@@ -115,7 +115,7 @@ task: |
      revise the drafts that come back needing revision, stop after two rounds, and list what is still
      open.
 
-  7. Take `story:commercial-client-record` through the adp wave: scope it into units, implement the
+  7. Take `story:commercial-client-record` through the aep-drive wave: scope it into units, implement the
      units, and have the adversary review the result against the story's acceptance and this
      repository's gate. Walk the story's lifecycle deliberately, and say that you did.
 

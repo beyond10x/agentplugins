@@ -5,5 +5,5 @@
   <text x="90" y="160" fill="#d3a6ff" font-family="system-ui,sans-serif" font-size="30" font-weight="700" letter-spacing="7">BEYOND10X</text>
   <text x="90" y="300" fill="#fff" font-family="system-ui,sans-serif" font-size="86" font-weight="750">Agent Plugins</text>
   <text x="90" y="390" fill="#c8c1d4" font-family="system-ui,sans-serif" font-size="38">Focused guidance for governed engineering agents.</text>
-  <text x="90" y="515" fill="#f0b35c" font-family="ui-monospace,monospace" font-size="26">aep-planning · adp · ess-schema</text>
+  <text x="90" y="515" fill="#f0b35c" font-family="ui-monospace,monospace" font-size="26">aep-plan · aep-drive · ess-specify</text>
 </svg>
