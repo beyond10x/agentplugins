@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.6.1] — 2026-09-03
+
+- The golden-path case's step 1 names the protocol source the page names,
+  `git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45`, instead of "the
+  source the project pins". The second headless recording found no pin — the fixture has no
+  `.engineering/` by design — walked the filesystem for one and adopted with a relative path into
+  another checkout.
+- Two golden-path rows stop contradicting a correct run. `nothing-was-published` matches the write
+  forms of `git tag` only (a name, `-a`, `-s`, `-f`, `-m`); the bare listing `git tag` in a step-1
+  repository inspection took the row to `gap`. `nothing-was-promoted-before-the-blocker-was-filed`
+  spells out the rungs that schedule work — `--to proposed|active|implemented` — so archiving two
+  probe artifacts no longer reads as a promotion.
+- The golden-path cost row and the documented invocation say `15`, not the corpus's `5`: the second
+  recording walked all eight steps in 118 turns and stated $10.96 on the default model. The
+  invocation also carries the two `--plugin` pins the case needs, and `recorded/README.md` names the
+  two things the second recording showed the *child's* `PATH` must hold: the `aep` at `~/.local/bin`
+  is the one the run uses, and `ess` has to be there too.
+- `.github/workflows/eval.yml` installs the pinned `aep` into `$HOME/.local/bin` as well: the
+  session metaharness spawns runs on a constructed `PATH` that never held the `~/.cargo/bin` copy, so
+  every case task that ran `aep` in CI was running nothing.
+- The planning skill's guardrail 2 gains two corollaries from that recording: never create an
+  artifact to look at its template (a probe you archive is still a lifecycle move), and a body file
+  for `--from` goes under `$TMPDIR`, never a hard-coded `/tmp`.
+
 ## [0.6.0] — 2026-09-03
 
 - Rename the ESS skill's directory from `skills/schema-validation` to `skills/ess-schema`, its frontmatter name: the harness lists a skill by its directory and the eval rows and `agentplugins-check` resolve by the frontmatter name, so the first recording showed the skill offered and called on turn 1 while the row said it was not. The invocation is now `/ess-schema:ess-schema`.

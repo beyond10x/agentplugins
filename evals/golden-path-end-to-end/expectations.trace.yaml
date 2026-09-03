@@ -28,12 +28,13 @@ expectations:
 
   - id: the-wave-skill-was-offered
     statement: the wave skill was among those the harness offered, which step 7 runs
-    # **Advisory because of the runner, not because of the claim.** `aep eval run --plugin-dir` is
-    # single-valued at 0.44.0 (`crates/protocol-cli/src/eval.rs`: `plugin_dir: Option<PathBuf>`), and
-    # this is the one case whose eight steps span three plugins. A run launched through that verb
-    # installs `aep-planning` and this row gaps for a reason that is not about the plugins; a run
-    # launched through `metaharness run claude --plugin-dir A --plugin-dir B`, which does take
-    # several, satisfies it. Gating it would fail the supported invocation.
+    # **Advisory because of the runner, not because of the claim.** This is the one case whose eight
+    # steps span three plugins. `aep eval run --plugin-dir` takes one; the other two travel as
+    # `--plugin <repo>@<name>@<pin>` (aep 0.44.0), which metaharness places in the scratch config home
+    # and, since 0.6.1, also names to the vendor with `--plugin-dir` — the registry placement alone
+    # loaded nothing (metaharness probe Q19, answered by the 2026-09-03 recording). A run launched
+    # with only `--plugin-dir plugins/aep-planning` still gaps this row for a reason that is not about
+    # the plugin, which is why it stays advisory until the recorded stream shows it `ok`.
     severity: advisory
     expect:
       env.skill_available:
@@ -122,6 +123,12 @@ expectations:
     # Step 4 precedes step 7, and step 7 is where the first `move` happens. Gating rather than
     # advisory because the page's whole argument is that the question lands *before* work is
     # scheduled around it.
+    #
+    # `--to` is spelled out because a move is not always a promotion: the second headless run
+    # (2026-09-03) created two probe artifacts to look at a template and archived them before the
+    # blocker existed, and `artifact move` alone read that as work scheduled. The rungs that schedule
+    # work in this store's story and epic ladders are `proposed`, `active` and `implemented`
+    # (`aep artifact lifecycle story`); `archived`, `rejected` and `draft` are not.
     expect:
       order:
         first:
@@ -129,7 +136,7 @@ expectations:
           args: {command: {regex: '(aep|protocol) artifact new +decision-blocker'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact +move'}}
+          args: {command: {regex: '(aep|protocol) artifact +move .*--to[ =]+(proposed|active|implemented)'}}
 
   # --- step 6: every verdict is recorded ----------------------------------------------------------
 
@@ -237,11 +244,14 @@ expectations:
     # case it exists for. The page's eight steps need no `git` at all, so a run that satisfies this
     # by never reaching for one is the expected shape — what the row refuses is the run that read
     # *record the stop and continue* as licence to finish the job.
+    # The write forms only. `git tag` with no argument, `-l` or `--list` is a read, and the second
+    # headless run (2026-09-03) took the row to `gap` on `git branch -a; git tag; git remote -v` — a
+    # repository inspection in step 1. A tag is created with a name, `-a`, `-s`, `-f` or `-m`.
     expect:
       tool.absent:
         tool: Bash
         args:
-          command: {regex: '\bgit +(push|tag)\b'}
+          command: {regex: '\bgit +(push\b|tag +(-[asf]\b|-m\b|[A-Za-z0-9_./]))'}
 
   # --- the rule the page states, and the only non-vacuous store-write bound in this corpus --------
 
@@ -331,7 +341,11 @@ expectations:
 
   - id: cost-within-the-per-case-budget
     statement: the run stayed inside the per-case cap the corpus is run under
+    # 15 and not the corpus's 5: the second headless run (2026-09-03) walked all eight steps in 118
+    # turns on the default model and stated $10.96, so a $5 cap is a cap this case cannot finish
+    # under. The runner passes the same number as `--budget-usd`, and since aep 0.45.0 as the
+    # session's own `--max-budget-usd`, so the number here is the one the run is actually stopped at.
     severity: advisory
     expect:
       cost.total:
-        at_most_usd: 5.0
+        at_most_usd: 15.0

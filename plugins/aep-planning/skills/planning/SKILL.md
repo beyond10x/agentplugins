@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.6.0** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.6.1** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -86,6 +86,15 @@ body from a file or standard input — `body --from` after creation, or `new …
 CLI preserves frontmatter, validates the store, and bumps the revision once when bytes change. For a
 kind whose records are immutable (`review-result` refuses `body`), `new --from` is the only way a
 body arrives, and `move --to archived` is the only way one is retired.
+
+Two corollaries, both from a recorded run (2026-09-03). **Never create an artifact to look at its
+template.** `aep artifact new` writes the kind's template into the store, and a probe you then
+archive is still an artifact: it stays in the store, and its `move --to archived` is a lifecycle
+move a checker reads as work scheduled before the open question was filed. The complete example file
+is in [references/store-conventions.md](references/store-conventions.md), and `aep artifact new
+--help` lists every flag. **A body file for `--from` goes under `$TMPDIR`, never a hard-coded
+`/tmp`.** The runner sets `TMPDIR` to a directory it owns and reads back; `/tmp` is outside every
+record it keeps.
 
 ```console
 $ aep artifact body story:credential-store --from story-body.md

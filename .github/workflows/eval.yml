@@ -183,6 +183,12 @@ jobs:
           grep "  ${archive}$" SHA256SUMS | sha256sum --check -
           tar -xzf "$archive"
           install -m 0755 "aep-${AEP_VERSION}-${target}/aep" "$HOME/.cargo/bin/aep"
+          # The session metaharness spawns gets a constructed PATH — `$HOME/.local/bin:/usr/local/bin:
+          # /usr/bin:/bin`, never the runner's — so the `aep` a case's task runs is this copy, not the
+          # one above. Observed 2026-09-03: a stale `~/.local/bin/aep` made step 8 of the golden path
+          # stop at `unrecognized subcommand 'doctor'`; aep 0.45.0's `eval run` refuses a mismatch.
+          install -d "$HOME/.local/bin"
+          install -m 0755 "aep-${AEP_VERSION}-${target}/aep" "$HOME/.local/bin/aep"
           cargo install --locked --git https://github.com/beyond10x/metaharness --tag "$METAHARNESS_VERSION" metaharness
           aep --version
           metaharness --version

@@ -52,6 +52,15 @@ subject:
 # the failure the instruction is guarding against — an agent that decided eight things on an
 # operator's behalf and left no trace of any of them.
 #
+# ## Step 1 names the pin the page names
+#
+# The second headless run (2026-09-03, $10.96) read *"the protocol source the project pins"*, found no
+# `.engineering/` — the tree has none by design — and adopted with a relative path into a checkout it
+# found by walking the filesystem, recording an `approval-record` that the project pins nothing. The
+# page's own step 1 spells the source out, `git+…#8b4342a…`, so the task now carries it verbatim: a
+# case whose task differs from the page in the one place the page is precise measures a run nobody was
+# told how to start.
+#
 # ## Cost, and why this case is the expensive one
 #
 # Eight steps, an ESS model, a decomposer, three scopers, a critic panel, and an experimental driven
@@ -75,9 +84,10 @@ task: |
   decided in the operator's absence, and continue. Do not clear a blocker, do not publish and do not
   release.
 
-  1. Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source the
-     project pins and the profile `development.standard`, then run `aep reverse scan`. Report what
-     the scan found, and file nothing yet.
+  1. Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source
+     git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45 and the profile
+     development.standard, then run `aep reverse scan`. Report what the scan found, and file nothing
+     yet.
 
   2. File this as an epic in the planning store, and stop there — do not decompose it yet:
 

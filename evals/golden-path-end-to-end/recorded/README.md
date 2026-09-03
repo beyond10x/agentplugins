@@ -36,12 +36,19 @@ $ METAHARNESS_LIVE=1 aep eval run \
     --arm plugin \
     --harness claude \
     --plugin-dir plugins/aep-planning \
+    --plugin beyond10x/agentplugins@adp@<this release> \
+    --plugin beyond10x/agentplugins@ess-schema@<this release> \
     --cwd <a fresh copy of the accounts service the page is written against> \
-    --budget-usd 5 \
+    --budget-usd 15 \
     --observed-at <the date it was observed> \
     --redact \
     --out <a directory outside this repository>
 ```
+
+`--budget-usd 15` and not the corpus's 5: the second headless run walked all eight steps in 118
+turns and stated $10.96 on the default model. The two `--plugin` pins must be installed at user
+scope at exactly that version (`claude plugin list`); metaharness resolves them against the
+operator's own marketplace checkout and refuses a pin it cannot find.
 
 `--redact` is not optional for anything committed here: an un-redacted record quotes the transcript,
 and a report that quotes a transcript is not a thing to publish.
@@ -58,13 +65,15 @@ a `TODO` at the deletion site, and **no `.engineering/` directory**. § 1 of the
 adoption step, and it measures nothing against a tree that has already been adopted.
 
 This is the one case that needs three plugins installed — `aep-planning` for the planning steps,
-`ess-schema` for step 3, and `adp` for steps 7 and 8 — and **`aep eval run --plugin-dir` takes
-one** at 0.44.0
-(`crates/protocol-cli/src/eval.rs`: `plugin_dir: Option<PathBuf>`). `metaharness run claude` does
-take several. So a run launched through the command above installs `aep-planning` and reports
-`the-wave-skill-was-offered` and `the-ess-skill-was-offered` as gaps, which is why those rows are
-advisory and say so. A run that must satisfy them is launched through `metaharness` directly, and
-its stream is ingested here with `aep eval run --stream`.
+`ess-schema` for step 3, and `adp` for steps 7 and 8. `aep eval run --plugin-dir` takes one; the
+other two go as `--plugin` pins, above. Two things the second run (2026-09-03) showed the working
+tree also needs, both about the **child's** `PATH`, which metaharness constructs as
+`$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin` and does not inherit:
+
+- the `aep` at `~/.local/bin` is the one the run uses. A stale copy there (0.40.1 beside a 0.44.0 in
+  `~/.cargo/bin`) made step 8 stop at `aep doctor: unrecognized subcommand`. aep 0.45.0's
+  `eval run` refuses to spawn when that binary is not its own version.
+- `ess` has to be on that `PATH` too, or step 3 is drafted by hand and never validated.
 
 **It is also the expensive one.** Eight steps with a fan-out in two of them; a sweep's budget
 is mostly spent here. Record it last, when the seven cheaper cases have already shown the
