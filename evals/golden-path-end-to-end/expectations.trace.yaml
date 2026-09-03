@@ -13,7 +13,7 @@ title: The eight steps happened in the order the page publishes, and the CLIs st
 #
 # ## Five rows carry the plugin names of 2026-09-03, and that is not an oversight
 #
-# All three product plugins were renamed in 0.6.2 — see `CHANGELOG.md` for the map — and every other
+# All three product plugins were renamed in 0.7.0 — see `CHANGELOG.md` for the map — and every other
 # document in this corpus took the new spellings. The five `env.*_available` rows below did not,
 # because they are the only rows here that assert what a **recorded transcript contains** rather than
 # what an agent did: the harness inventory in

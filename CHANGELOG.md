@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.7.0] — 2026-09-04
 
 - Every product plugin now carries its product's name and the verb it performs. `aep-planning`
   becomes `aep-plan`, `adp` becomes `aep-drive`, and `ess-schema` becomes `ess-specify` with its

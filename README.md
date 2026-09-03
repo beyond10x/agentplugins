@@ -17,15 +17,15 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 ## Install
 
 `aep-plan` and `aep-drive` drive the `aep` CLI; `ess-specify` drives the `ess` CLI. Install the
-verified Linux or macOS archives for [AEP `0.44.0`](https://github.com/beyond10x/aep/releases/tag/0.44.0)
-and [ESS `0.9.2`](https://github.com/beyond10x/ess/releases/tag/0.9.2) first, then check them with
+verified Linux or macOS archives for [AEP `0.51.0`](https://github.com/beyond10x/aep/releases/tag/0.51.0)
+and [ESS `0.11.1`](https://github.com/beyond10x/ess/releases/tag/0.11.1) first, then check them with
 `aep --version` and `ess --version`. The complete download and checksum commands are in
 [`website/docs/install.md`](website/docs/install.md).
 
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.6.2
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.7.0
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x
