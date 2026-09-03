@@ -3,7 +3,7 @@ name: wave
 description: Run a wave — pick the next set of stories that can be implemented at once, propose it for approval, then dispatch one implementor per story into its own worktree, send each result to the adversary, and merge what goes green into one integration branch. Use when the operator asks to pick the next wave, to start a wave, to implement several stories in parallel, or to fan out work across sub-agents. Proposes first and stops; it never starts a wave nobody approved.
 ---
 
-**Skill version 0.5.0** — the version in `.claude-plugin/plugin.json`; the stage-1 proposal quotes it.
+**Skill version 0.5.1** — the version in `.claude-plugin/plugin.json`; the stage-1 proposal quotes it.
 
 # Running a wave
 

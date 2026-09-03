@@ -29,7 +29,7 @@ expectations:
   - id: the-wave-skill-was-offered
     statement: the wave skill was among those the harness offered, which step 7 runs
     # **Advisory because of the runner, not because of the claim.** `aep eval run --plugin-dir` is
-    # single-valued at 0.42.0 (`crates/protocol-cli/src/eval.rs`: `plugin_dir: Option<PathBuf>`), and
+    # single-valued at 0.44.0 (`crates/protocol-cli/src/eval.rs`: `plugin_dir: Option<PathBuf>`), and
     # this is the one case whose eight steps span three plugins. A run launched through that verb
     # installs `aep-planning` and this row gaps for a reason that is not about the plugins; a run
     # launched through `metaharness run claude --plugin-dir A --plugin-dir B`, which does take

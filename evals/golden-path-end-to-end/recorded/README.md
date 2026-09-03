@@ -39,14 +39,15 @@ one module holding `create_account`, `read_account`, `update_account` and `delet
 a `TODO` at the deletion site, and **no `.engineering/` directory**. § 1 of the page is an
 adoption step, and it measures nothing against a tree that has already been adopted.
 
-This is the one case that needs two plugins installed — `aep-planning` for steps 2 to 5 and `adp`
-for step 6 — and **`aep eval run --plugin-dir` takes one** at 0.42.0
+This is the one case that needs three plugins installed — `aep-planning` for the planning steps,
+`ess-schema` for step 3, and `adp` for steps 7 and 8 — and **`aep eval run --plugin-dir` takes
+one** at 0.44.0
 (`crates/protocol-cli/src/eval.rs`: `plugin_dir: Option<PathBuf>`). `metaharness run claude` does
 take several. So a run launched through the command above installs `aep-planning` and reports
-`the-wave-skill-was-offered` as a gap, which is why that row is advisory and says so. A run that
-must satisfy it is launched through `metaharness` directly, and its stream is ingested here with
-`aep eval run --stream`.
+`the-wave-skill-was-offered` and `the-ess-skill-was-offered` as gaps, which is why those rows are
+advisory and say so. A run that must satisfy them is launched through `metaharness` directly, and
+its stream is ingested here with `aep eval run --stream`.
 
-**It is also the expensive one.** Six steps with a fan-out in two of them; a sweep's budget
-is mostly spent here. Record it last, when the five cheaper cases have already shown the
+**It is also the expensive one.** Eight steps with a fan-out in two of them; a sweep's budget
+is mostly spent here. Record it last, when the seven cheaper cases have already shown the
 rows decide something.

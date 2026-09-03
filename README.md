@@ -25,7 +25,7 @@ and [ESS `0.5.1`](https://github.com/beyond10x/ess/releases/tag/0.5.1) first, th
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.5.0
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.5.1
 /plugin install aep-planning@beyond10x
 /plugin install adp@beyond10x
 /plugin install ess-schema@beyond10x

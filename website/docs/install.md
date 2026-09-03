@@ -84,14 +84,14 @@ at its first CLI command. Only the `beyond10x` front door needs neither binary.
 Copy the whole block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.5.0
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.5.1
 /plugin install aep-planning@beyond10x
 /plugin install adp@beyond10x
 /plugin install ess-schema@beyond10x
 /reload-plugins
 ```
 
-The first line registers the repository at the immutable `0.5.0` release; each install names its
+The first line registers the repository at the immutable `0.5.1` release; each install names its
 plugin in the `<plugin>@beyond10x` form. `/reload-plugins` activates them immediately. Add
 `/plugin install beyond10x@beyond10x` for the front door and
 `/plugin install workspace-hygiene@beyond10x` for managed worktrees. Claude Code reads
@@ -111,7 +111,7 @@ The `aep` and `ess` binary requirements above apply unchanged.
 
 ## Pinning
 
-The block above is already pinned to the bare `0.5.0` release tag. Upgrade by changing that tag
+The block above is already pinned to the bare `0.5.1` release tag. Upgrade by changing that tag
 deliberately, re-registering the marketplace source, and running `/reload-plugins`. The release gate
 validates both marketplace formats, every declared instruction file, the public documentation, and
 the version recorded by each plugin manifest.

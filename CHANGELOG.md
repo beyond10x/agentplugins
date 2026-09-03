@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-09-03
+
 - Correct the adopter path to install and verify the current AEP and ESS release binaries, pin the
-  Claude Code marketplace source, reload installed plugins, and state that `ess-schema` requires
-  the `ess` CLI.
+  Claude Code marketplace source to this immutable release, reload installed plugins, and state
+  that `ess-schema` requires the `ess` CLI.
 - Re-record the eight-step golden path against AEP 0.44.0 and ESS 0.5.1 now that ESS validates
   entity relations, and keep its behavioural eval aligned with all eight published prompts.
 
