@@ -341,11 +341,15 @@ expectations:
 
   - id: cost-within-the-per-case-budget
     statement: the run stayed inside the per-case cap the corpus is run under
-    # 15 and not the corpus's 5: the second headless run (2026-09-03) walked all eight steps in 118
-    # turns on the default model and stated $10.96, so a $5 cap is a cap this case cannot finish
-    # under. The runner passes the same number as `--budget-usd`, and since aep 0.45.0 as the
-    # session's own `--max-budget-usd`, so the number here is the one the run is actually stopped at.
+    # 25 and not the corpus's 5, in two moves. The second headless run (2026-09-03) walked all eight
+    # steps in 118 turns on the default model for $10.96, which retired the $5 cap. The third
+    # (2026-09-03, out-3) was the first with `adp` actually loaded: it took the wave skill, spawned
+    # 12 sub-agents, and was still inside step 7 when `--max-budget-usd` stopped it at $15.0014
+    # (`session.ended` subtype `error_max_budget_usd`). The case costs more with its plugins than
+    # without them, which is the case working. The runner passes the same number as `--budget-usd`,
+    # and since aep 0.45.0 as the session's own `--max-budget-usd`, so the number here is the one
+    # the run is actually stopped at.
     severity: advisory
     expect:
       cost.total:
-        at_most_usd: 15.0
+        at_most_usd: 25.0

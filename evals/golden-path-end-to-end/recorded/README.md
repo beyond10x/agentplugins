@@ -39,16 +39,19 @@ $ METAHARNESS_LIVE=1 aep eval run \
     --plugin beyond10x/agentplugins@adp@<this release> \
     --plugin beyond10x/agentplugins@ess-schema@<this release> \
     --cwd <a fresh copy of the accounts service the page is written against> \
-    --budget-usd 15 \
+    --budget-usd 25 \
     --observed-at <the date it was observed> \
     --redact \
     --out <a directory outside this repository>
 ```
 
-`--budget-usd 15` and not the corpus's 5: the second headless run walked all eight steps in 118
-turns and stated $10.96 on the default model. The two `--plugin` pins must be installed at user
-scope at exactly that version (`claude plugin list`); metaharness resolves them against the
-operator's own marketplace checkout and refuses a pin it cannot find.
+`--budget-usd 25` and not the corpus's 5. The second headless run walked all eight steps in 118
+turns for $10.96 with only `aep-planning` loaded. The third was the first with `adp` actually
+loaded: it took the wave skill, spawned 12 sub-agents, and was still inside step 7 when the cap
+stopped it at $15.0014. Record it at 25 — the case costs more with its plugins than without them.
+The two `--plugin` pins must be installed at user scope at exactly that version
+(`claude plugin list`); metaharness resolves them against the operator's own marketplace checkout
+and refuses a pin it cannot find.
 
 `--redact` is not optional for anything committed here: an un-redacted record quotes the transcript,
 and a report that quotes a transcript is not a thing to publish.
