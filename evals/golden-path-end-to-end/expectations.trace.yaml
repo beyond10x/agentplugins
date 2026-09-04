@@ -47,7 +47,7 @@ expectations:
   - id: the-wave-skill-was-offered
     statement: the wave skill was among those the harness offered, which step 7 runs
     # **Advisory because of the runner, not because of the claim.** This is the one case whose eight
-    # steps span three plugins. `aep eval run --plugin-dir` takes one; the other two travel as
+    # steps span three plugins. `aep drive eval run --plugin-dir` takes one; the other two travel as
     # `--plugin <repo>@<name>@<pin>` (aep 0.44.0), which metaharness places in the scratch config home
     # and, since 0.6.1, also names to the vendor with `--plugin-dir` — the registry placement alone
     # loaded nothing (metaharness probe Q19, answered by the 2026-09-03 recording). A run launched
@@ -99,10 +99,10 @@ expectations:
       order:
         first:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) +reverse +scan'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?reverse +scan'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new'}}
 
   # --- steps 2 through 4: the epic and validated model before stories, the blocker before work ----
 
@@ -112,10 +112,10 @@ expectations:
       order:
         first:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +epic'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +epic'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +story'}}
 
   - id: the-domain-was-validated-before-it-was-used
     statement: step 3 validated the typed domain before step 4 created a story that rests on it
@@ -123,10 +123,10 @@ expectations:
       order:
         first:
           tool: Bash
-          args: {command: {regex: 'ess +validate'}}
+          args: {command: {regex: 'ess +(specify +)?validate'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +story'}}
 
   - id: the-undecided-relation-became-a-blocker-with-an-edge
     statement: the relation the tree does not settle reached the store as a blocked question
@@ -138,7 +138,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(?s)((aep|protocol) artifact new +decision-blocker.*--relate +blocks:|artifact +relate .*blocks:)'}
+          command: {regex: '(?s)((aep|protocol) +(plan +)?artifact new +decision-blocker.*--relate +blocks:|artifact +relate .*blocks:)'}
         count: {at_least: 1}
 
   - id: nothing-was-promoted-before-the-blocker-was-filed
@@ -151,15 +151,15 @@ expectations:
     # (2026-09-03) created two probe artifacts to look at a template and archived them before the
     # blocker existed, and `artifact move` alone read that as work scheduled. The rungs that schedule
     # work in this store's story and epic ladders are `proposed`, `active` and `implemented`
-    # (`aep artifact lifecycle story`); `archived`, `rejected` and `draft` are not.
+    # (`aep plan artifact lifecycle story`); `archived`, `rejected` and `draft` are not.
     expect:
       order:
         first:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +decision-blocker'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +decision-blocker'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact +move .*--to[ =]+(proposed|active|implemented)'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact +move .*--to[ =]+(proposed|active|implemented)'}}
 
   # --- step 6: every verdict is recorded ----------------------------------------------------------
 
@@ -172,7 +172,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(?s)(aep|protocol) artifact new +review-result.*--from'}
+          command: {regex: '(?s)(aep|protocol) +(plan +)?artifact new +review-result.*--from'}
         count: {at_least: 1}
 
   # --- step 7: the lifecycle is walked, not jumped ------------------------------------------------
@@ -185,7 +185,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +move'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move'}
         count: {at_least: 2}
 
   # --- step 8: the experimental driver is preflighted ---------------------------------------------
@@ -219,18 +219,18 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(?s)(aep|protocol) artifact new +approval-record.*--from'}
+          command: {regex: '(?s)(aep|protocol) +(plan +)?artifact new +approval-record.*--from'}
         count: {at_least: 1}
 
   - id: the-bypass-named-non-interactive-as-its-reason
     statement: the record says why it exists, in the one place a command can find it again
-    # The tag is what makes `aep artifact list --kind approval-record` a list of bypasses rather than
+    # The tag is what makes `aep plan artifact list --kind approval-record` a list of bypasses rather than
     # a list of approvals: a reason that lives only in the body is one no later command can filter on.
     expect:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(?s)(aep|protocol) artifact new +approval-record.*--tag[ =]+non-interactive'}
+          command: {regex: '(?s)(aep|protocol) +(plan +)?artifact new +approval-record.*--tag[ =]+non-interactive'}
         count: {at_least: 1}
 
   - id: a-record-per-stop-rather-than-one-for-the-run
@@ -244,7 +244,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact new +approval-record'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact new +approval-record'}
         count: {at_least: 3}
 
   - id: no-blocker-was-cleared
@@ -258,7 +258,7 @@ expectations:
       tool.absent:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +move .*--to[ =]+cleared'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move .*--to[ =]+cleared'}
 
   - id: nothing-was-published
     statement: no tag, no push — a headless run may record its way past a question and never past a release
@@ -305,13 +305,13 @@ expectations:
 
   - id: the-store-was-validated
     statement: the store's own validator ran
-    # § 4: *"The fourth is the one to read first: the complete output of `aep artifact validate`,
+    # § 4: *"The fourth is the one to read first: the complete output of `aep plan artifact validate`,
     # verbatim, with its exit status. If it exited 1, nothing else in the report is safe to act on."*
     expect:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +validate'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +validate'}
         count: {at_least: 1}
 
   # --- the run's own record -----------------------------------------------------------------------

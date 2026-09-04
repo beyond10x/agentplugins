@@ -674,6 +674,12 @@ fn contradicted(report: &Path) -> Result<Vec<String>, String> {
 }
 
 /// Replays one recorded stream through `aep eval run --stream`, which spends nothing.
+///
+/// **The flat `eval run` here is deliberate and stays.** AEP 0.52.0 groups the verb as
+/// `aep drive eval run` and keeps `eval run` as a hidden alias with identical output, but this is a
+/// call and not a lesson: the binary it reaches is whichever `aep` is on the machine's `PATH`, and
+/// the published release the install page pins does not have the grouped spelling. `main.rs`'s
+/// `flat_spellings` sweep reads documents and not Rust for the same reason.
 fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), String> {
     let directory = stream
         .parent()

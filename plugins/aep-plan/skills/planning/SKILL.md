@@ -13,7 +13,7 @@ In a Beyond10x repository, use this skill before implementation when the work is
 crosses repository boundaries, or changes a release or deployment. A transient chat plan is useful
 while discovering facts, but it is not the governed record. Before the first implementation edit:
 
-1. run `aep artifact list` and `aep artifact kinds` in the repository that owns the outcome;
+1. run `aep plan artifact list` and `aep plan artifact kinds` in the repository that owns the outcome;
 2. create or select the artifact that owns the work and record its relation to the existing plan;
 3. record machine-readable scope before scheduling concurrent work; and
 4. keep evidence and lifecycle state current as the implementation and release progress.
@@ -38,45 +38,45 @@ or relations. Ask for them at the moment you need them:
 
 | Question | Command |
 |---|---|
-| What kinds can I create? | `aep artifact kinds` |
-| What edges exist between artifacts? | `aep artifact relations` |
-| What statuses does this kind have, and what moves where? | `aep artifact lifecycle <kind>` |
-| What is already in the store? | `aep artifact list [--kind k] [--status s] [--ref p:key] [--format json]` |
-| What, here, is this ticket? | `aep artifact list --ref jira:DEV-630` |
-| Which tracker keys does this repository mention that the plan does not? | `aep reverse tickets --provider jira` |
-| What does it look like as a board? | `aep artifact board [--kind k]` |
-| What is stopped, on what type of thing, and on which item? | `aep artifact blocked [--type t]` |
-| How is it wired together? | `aep artifact graph` |
-| What does this one artifact say, frontmatter and body? | `aep artifact show <id>` |
-| What has happened to it, oldest first? | `aep artifact history <id>` |
-| Why is it at this status — what did the store admit before each move? | `aep artifact explain <id>` |
-| What writes has one side of a hybrid plan taken that the other has not? | `aep artifact divergences` |
-| Is the whole store still consistent? | `aep artifact validate` |
+| What kinds can I create? | `aep plan artifact kinds` |
+| What edges exist between artifacts? | `aep plan artifact relations` |
+| What statuses does this kind have, and what moves where? | `aep plan artifact lifecycle <kind>` |
+| What is already in the store? | `aep plan artifact list [--kind k] [--status s] [--ref p:key] [--format json]` |
+| What, here, is this ticket? | `aep plan artifact list --ref jira:DEV-630` |
+| Which tracker keys does this repository mention that the plan does not? | `aep plan reverse tickets --provider jira` |
+| What does it look like as a board? | `aep plan artifact board [--kind k]` |
+| What is stopped, on what type of thing, and on which item? | `aep plan artifact blocked [--type t]` |
+| How is it wired together? | `aep plan artifact graph` |
+| What does this one artifact say, frontmatter and body? | `aep plan artifact show <id>` |
+| What has happened to it, oldest first? | `aep plan artifact history <id>` |
+| Why is it at this status — what did the store admit before each move? | `aep plan artifact explain <id>` |
+| What writes has one side of a hybrid plan taken that the other has not? | `aep plan artifact divergences` |
+| Is the whole store still consistent? | `aep plan artifact validate` |
 
-That is every `aep artifact` verb that answers a question. The six that are missing from it
+That is every `aep plan artifact` verb that answers a question. The six that are missing from it
 write — `new`, `move`, `relate`, `body`, `evidence`, `catch-up` — and guardrail 2 governs those.
-Run `aep artifact --help` when this table and the CLI disagree; the CLI is right.
+Run `aep plan artifact --help` when this table and the CLI disagree; the CLI is right.
 
 The reason is the reason this project exists. Lifecycle and relation documents are validated and
 versioned; a prose copy of them in a skill file is neither, and it goes stale the first time a kind
 gains a status. An agent that recites `draft → proposed → active` from memory will confidently
-propose an illegal move in a store that renamed one of them. Reading `aep artifact
+propose an illegal move in a store that renamed one of them. Reading `aep plan artifact
 lifecycle story` costs one command and cannot be wrong.
 
 When a store is present but you have not looked at it yet in this session, start with `aep
-artifact list` and `aep artifact kinds`. Two commands buy you the whole vocabulary.
+artifact list` and `aep plan artifact kinds`. Two commands buy you the whole vocabulary.
 
 ## 3. Seven guardrails
 
 These are inlined because they hold whatever the store's vocabulary is.
 
-**1. A status changes only through `aep artifact move`.** Never edit the `status:` field in
+**1. A status changes only through `aep plan artifact move`.** Never edit the `status:` field in
 frontmatter, and never write it into a file with `Edit` or a heredoc. The CLI validates the move
 against the kind's lifecycle; a hand-edited status is an unvalidated one, indistinguishable in the
 file from a legal one and wrong in exactly the cases that matter.
 
 ```console
-$ aep artifact move story:credential-store --to proposed
+$ aep plan artifact move story:credential-store --to proposed
 story:credential-store moved draft -> proposed (revision 2)
 ```
 
@@ -84,19 +84,19 @@ Some rungs cost evidence — their kind's lifecycle declares a `requires:` entry
 way to pay is to record the observation, before the move rather than at it:
 
 ```console
-$ aep artifact evidence story:credential-store --kind test_result \
+$ aep plan artifact evidence story:credential-store --kind test_result \
     --source "task check" --ref https://ci.example/run/8412 --at 2026-08-30T14:02:00Z
 ```
 
 `move` finds evidence recorded against the artifact without being told, so nothing is passed to it.
-The kind list is **closed**: `aep artifact evidence --help` documents the flag, and a kind
+The kind list is **closed**: `aep plan artifact evidence --help` documents the flag, and a kind
 outside the list is refused with the whole list printed — read it from that refusal rather than
 inventing a plausible name for what you observed. `--ref` and `--at` are optional and are what make
 the record checkable later. `move --evidence <kind>=<count>` is the asserted form, kept for a
 record that lives outside the store; it names no run and no artifact, and the store marks a move
 that rests on it as resting on an assertion.
 
-**2. Every store mutation uses `aep artifact`; never edit a store file directly.** Creation,
+**2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
 relations, status, and prose use `new`, `relate`, `move`, and `body` respectively. Supply the complete
 body from a file or standard input — `body --from` after creation, or `new … --from` at creation; the
 CLI preserves frontmatter, validates the store, and bumps the revision once when bytes change. For a
@@ -104,20 +104,20 @@ kind whose records are immutable (`review-result` refuses `body`), `new --from` 
 body arrives, and `move --to archived` is the only way one is retired.
 
 Two corollaries, both from a recorded run (2026-09-03). **Never create an artifact to look at its
-template.** `aep artifact new` writes the kind's template into the store, and a probe you then
+template.** `aep plan artifact new` writes the kind's template into the store, and a probe you then
 archive is still an artifact: it stays in the store, and its `move --to archived` is a lifecycle
 move a checker reads as work scheduled before the open question was filed. The complete example file
-is in [references/store-conventions.md](references/store-conventions.md), and `aep artifact new
+is in [references/store-conventions.md](references/store-conventions.md), and `aep plan artifact new
 --help` lists every flag. **A body file for `--from` goes under `$TMPDIR`, never a hard-coded
 `/tmp`.** The runner sets `TMPDIR` to a directory it owns and reads back; `/tmp` is outside every
 record it keeps.
 
 ```console
-$ aep artifact body story:credential-store --from story-body.md
+$ aep plan artifact body story:credential-store --from story-body.md
 story:credential-store body replaced (revision 2) at .engineering/planning/story/credential-store.md
 ```
 
-**3. After a batch of edits, run `aep artifact validate`, and relay its output verbatim.** It
+**3. After a batch of edits, run `aep plan artifact validate`, and relay its output verbatim.** It
 accumulates every problem rather than stopping at the first, and exits 1 if any remain. Do not
 summarise it into "validation failed" — the output names each artifact and each defect, which is the
 only part the operator can act on.
@@ -128,7 +128,7 @@ spelling, do not route around it by editing the file, and do not pick an interme
 "get there" without saying so.
 
 ```console
-$ aep artifact move story:credential-store --to implemented
+$ aep plan artifact move story:credential-store --to implemented
 story:credential-store is proposed; a story may move to: draft, rejected, active
 $ echo $?
 1
@@ -152,52 +152,52 @@ nothing.** § 4 *When there is no operator* says what to write instead — here,
 stop this file has.
 
 This is not licence to argue with the request. Build what was asked for unless you have evidence it
-is already there or actively wrong, put that evidence in the artifact with `aep artifact
+is already there or actively wrong, put that evidence in the artifact with `aep plan artifact
 body`, and leave the decision where § 4 leaves the ones that are the operator's — with the
 operator, who can now read what you found instead of answering a question.
 
-**6. Something parked is recorded, not described.** If `aep artifact kinds` lists no blocker
-kind, that is not the answer — ask `aep artifact lifecycle <type>-blocker` as well. Where that
+**6. Something parked is recorded, not described.** If `aep plan artifact kinds` lists no blocker
+kind, that is not the answer — ask `aep plan artifact lifecycle <type>-blocker` as well. Where that
 ladder answers, file the blocker as a `decision-blocker`, or as the `<type>-blocker` whose ladder
 answered, and say in your report that `kinds` does not list it. Where neither answers, the store
-cannot hold it as an artifact: record it in the blocked artifact's body through `aep artifact
+cannot hold it as an artifact: record it in the blocked artifact's body through `aep plan artifact
 body`, and say plainly that it is a paragraph rather than an artifact, so nobody expects
-`aep artifact blocked` to find it.
+`aep plan artifact blocked` to find it.
 
 A blocker artifact is typed by what would clear it and carries a `blocks` edge to the work it is
 stopping. Never leave the fact in a status field: an item parked for nine days on a credential and
 an item somebody is working on today are both `active`, and only the blocker tells them apart.
-Unblocking is `aep artifact move <blocker> --to cleared`, a move like any other, which is why
+Unblocking is `aep plan artifact move <blocker> --to cleared`, a move like any other, which is why
 the record survives it.
 
 ```console
-$ aep artifact lifecycle decision-blocker
+$ aep plan artifact lifecycle decision-blocker
 decision-blocker starts at open
   cleared -> nothing
   open -> cleared
 
-$ aep artifact new decision-blocker api-token-scope \
+$ aep plan artifact new decision-blocker api-token-scope \
     --title "Nobody has decided which account mints the CI token" \
     --withholds test_result --relate blocks:story:ci-evidence
 created decision-blocker:api-token-scope (open) at .engineering/planning/decision-blocker/api-token-scope.md
 ```
 
 `--withholds` is optional and names the evidence kind nobody can produce while this is open, so
-`aep artifact explain <blocked-id>` answers *why is there no record for the next move*. It only
+`aep plan artifact explain <blocked-id>` answers *why is there no record for the next move*. It only
 means something beside `blocks:`, and `validate` says so.
 
 **7. An epic or story that introduces a new noun models it first.** Where the artifact's outcome
 names an entity no `ess/1` document in the repository declares, do not decompose it and do not write
-stories around it. Draft the domain first — `aep reverse openapi --domain <name> --out <domain-doc>
+stories around it. Draft the domain first — `aep plan reverse openapi --domain <name> --out <domain-doc>
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
-`ess-specify:specify` skill — run `ess validate --path <specification>`, and cite the file by path in the
-artifact body through `aep artifact body`. A noun with no typed home is the relation nobody can
+`ess-specify:specify` skill — run `ess specify validate --path <specification>`, and cite the file by path in the
+artifact body through `aep plan artifact body`. A noun with no typed home is the relation nobody can
 check later.
 
 **A relation between two nouns is modelled the same way the nouns are: as a `relations:` entry on
 the entity, in the `ess/1` document.** Not as a sentence in a story body, and not as a field somebody
 will recognise as a foreign key later. The entry names the far entity, whether this side owns it or
-merely references it, and the cardinality; `ess validate` refuses an entry whose target does not
+merely references it, and the cardinality; `ess specify validate` refuses an entry whose target does not
 exist, whose linking field is missing or of the wrong type, and a second entity claiming to own the
 same one. That refusal is the whole value of writing it there: a relation in prose is checked by
 nobody.
@@ -216,12 +216,12 @@ second one.
 A move is a claim about the state of the world, and for most rungs the store already holds what
 settles it. Read it there before asking anybody.
 
-* New artifacts are created in the lifecycle's initial status — `aep artifact new` does this,
+* New artifacts are created in the lifecycle's initial status — `aep plan artifact new` does this,
   and it is the correct starting point. Do not immediately move them.
 * **Make the move when the store holds what the rung requires.** A rung whose lifecycle declares no
   `requires:` entry costs nothing to reach: on work you were asked to do, make the move and report
   it. A rung that costs evidence is settled by what has been recorded against the artifact — record
-  the evidence (guardrail 1), run `aep artifact move`, relay what it printed. Do not ask
+  the evidence (guardrail 1), run `aep plan artifact move`, relay what it printed. Do not ask
   permission for a move the store would allow: it buys one more question and no work, and whether
   the thing is implemented is a fact the store holds and the operator does not.
 * **Ask only when the evidence is missing, and name what is missing.** The refusal writes that
@@ -247,14 +247,14 @@ either holds:
 
 * **The task says so** — *run without stopping*, *no operator is present*, *record each stop and
   continue*.
-* **The harness gives no operator turn** — a batch or print-mode session, an `aep eval run` case, a
+* **The harness gives no operator turn** — a batch or print-mode session, an `aep drive eval run` case, a
   sub-agent dispatch. Nothing you emit reaches a person before the session ends, so a question is a
   question into a log.
 
 In a non-interactive run **you do not end your turn at a stop.** You record the stop and carry on:
 
 ```console
-$ aep artifact new approval-record wave-proposal-2026-09-03 \
+$ aep plan artifact new approval-record wave-proposal-2026-09-03 \
     --title "Wave proposal accepted with no operator present" \
     --tag non-interactive --relate decides:story:credential-store \
     --from bypass-body.md
@@ -262,7 +262,7 @@ created approval-record:wave-proposal-2026-09-03 (draft) at .engineering/plannin
 ```
 
 **The kind is `approval-record`**, and it is the store's own rather than a name invented here:
-`aep artifact kinds` lists it, and `aep artifact lifecycle approval-record` answers that it declares
+`aep plan artifact kinds` lists it, and `aep plan artifact lifecycle approval-record` answers that it declares
 no lifecycle — so the record lands at the status `new` gave it and needs no move afterwards, which
 is what makes one command the whole of a bypass. Ask both before you rely on this paragraph, the way
 § 2 says to ask about any other vocabulary. Where `kinds` does not list it, take the closest kind the
@@ -271,7 +271,7 @@ nowhere to live: stop at the stop and report that, rather than continuing unreco
 
 The record carries four things, and the body is where three of them go: **which stop** — the wave
 proposal, a critic round, a blocker, a move the store gates on evidence; **the reason
-`non-interactive`**, as the tag so `aep artifact list --kind approval-record` finds every one of
+`non-interactive`**, as the tag so `aep plan artifact list --kind approval-record` finds every one of
 them, and in words in the body; **what was decided in the operator's absence**; and **what the
 operator would have been asked**. One record per stop, written at the stop. A single record composed
 at the end is a summary of a session, not a decision anybody can audit.
@@ -287,10 +287,10 @@ something is *missing*, the operator's absence supplies nothing:
 | an open `decision-blocker` | **still blocking.** Never `move <blocker> --to cleared`: a blocker is cleared by the answer to its question, and nobody answered it |
 | a bulk move nobody asked for | still nobody asked. It is not a stop, so a bypass does not cover it |
 
-Never record evidence the run did not observe. An `aep artifact evidence --kind approval` written
+Never record evidence the run did not observe. An `aep plan artifact evidence --kind approval` written
 to satisfy a gate is the silent auto-approval this whole section exists to refuse, and it is
 indistinguishable later from something somebody watched happen. **Nothing is auto-approved silently:** every bypass above is an artifact
-`aep artifact list --kind approval-record` returns, and a run that passed a stop without writing one
+`aep plan artifact list --kind approval-record` returns, and a run that passed a stop without writing one
 has done the thing this section prevents. Report the count and the ids.
 
 ## 5. Starting from a repository that has no store
@@ -304,8 +304,8 @@ backlog rather than migrating it produces two plans and no record that one repla
 that has already happened once in this organisation.
 
 ```console
-$ aep reverse init --protocols <source> --profile <profile>
-$ aep reverse scan --format json
+$ aep plan reverse init --protocols <source> --profile <profile>
+$ aep plan reverse scan --format json
 ```
 
 `reverse init` writes `.engineering/project.yaml` and refuses the two things that quietly break
@@ -318,7 +318,7 @@ so two runs over one tree give identical bytes.
 Then, in a Git working tree:
 
 ```console
-$ aep reverse history --format json
+$ aep plan reverse history --format json
 ```
 
 The axis the scan has none of. It joins to the scan on `path:line` and dates every marked line and
@@ -346,33 +346,33 @@ module exists, is not in the bundle and must not be invented into one.
 An epic, two stories derived from it, one move, one validation.
 
 ```console
-$ aep artifact new epic passkey-login \
+$ aep plan artifact new epic passkey-login \
     --title "Passkey login" \
     --summary "Replace password sign-in with WebAuthn passkeys."
 created epic:passkey-login (draft) at .engineering/planning/epic/passkey-login.md
 
-$ aep artifact new story credential-store \
+$ aep plan artifact new story credential-store \
     --title "Store and retrieve passkey credentials" \
     --relate decomposes:epic:passkey-login
 created story:credential-store (draft) at .engineering/planning/story/credential-store.md
 
-$ aep artifact new story registration-ceremony \
+$ aep plan artifact new story registration-ceremony \
     --title "Register a passkey during sign-up" \
     --relate decomposes:epic:passkey-login
 created story:registration-ceremony (draft) at .engineering/planning/story/registration-ceremony.md
 ```
 
-Then write each story's complete body through `aep artifact body <id> --from <path|->` — or
+Then write each story's complete body through `aep plan artifact body <id> --from <path|->` — or
 hand it to `new … --from <path|->` in the first place — one acceptance statement per story, because
 guardrail 2 makes the CLI the store's sole writer.
 
 Then the one move the operator asked for, and the check:
 
 ```console
-$ aep artifact move story:credential-store --to proposed
+$ aep plan artifact move story:credential-store --to proposed
 story:credential-store moved draft -> proposed (revision 2)
 
-$ aep artifact validate
+$ aep plan artifact validate
 3 file(s) in .engineering/planning: 3 artifact(s)
 valid
 ```
@@ -389,8 +389,8 @@ argued with, and the findings nobody fixed, rather than a first draft with a hop
 **Skip the step when fewer than two artifacts sit under the one you decomposed, and say in the
 report that you skipped it and why.** Three of the four perspectives compare items with each other,
 so on a set of one they have nothing to do and produce agreeable noise. Count the edges rather than
-guessing: `aep artifact list --format json` prints every artifact with its relations, and
-`aep artifact graph` draws the same edges — count the ones pointing at the artifact you decomposed.
+guessing: `aep plan artifact list --format json` prints every artifact with its relations, and
+`aep plan artifact graph` draws the same edges — count the ones pointing at the artifact you decomposed.
 
 ### Dispatch the four at once
 
@@ -420,16 +420,16 @@ One record per critic per round, holding that critic's returned text. An approva
 is the round nobody can see later, and it is the half that makes the record evidence rather than a
 complaint log.
 
-The kind that holds a verdict is immutable — `aep artifact body` refuses it, because a record that
+The kind that holds a verdict is immutable — `aep plan artifact body` refuses it, because a record that
 can be edited after the fact is not evidence — so the body arrives at creation or never:
 
 ```console
-$ aep artifact lifecycle review-result
+$ aep plan artifact lifecycle review-result
 review-result starts at active
   active -> archived
   archived -> nothing
 
-$ aep artifact new review-result acceptance-round-1 \
+$ aep plan artifact new review-result acceptance-round-1 \
     --title "Acceptance critic, round 1" \
     --relate reviews:story:credential-store \
     --relate reviews:story:registration-ceremony \
@@ -440,10 +440,10 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
 * `--from` takes the critic's text **as it returned it**, written to a file first. Summarise it and
   you have recorded your reading of the review rather than the review. That includes the fenced
   ` ```findings ` block the rubric has each critic close with: it is the half a program reads, and a
-  record whose findings were flattened into prose is one `aep artifact findings` cannot compare
+  record whose findings were flattened into prose is one `aep plan artifact findings` cannot compare
   against the next round.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
-  `aep artifact relations` before you rely on it, the way you would any other vocabulary.
+  `aep plan artifact relations` before you rely on it, the way you would any other vocabulary.
 * Write them one at a time. Four critics return at once; the store takes one writer.
 * A later round is a **new** record, not an edit of the first. Two records that disagree are the
   history of a plan changing its mind, which is the thing worth having.
@@ -451,7 +451,7 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
 ### Revise, at most twice
 
 On `needs-revision`, revise the drafts — never the record. Each finding names the one artifact a
-revision would change; rewrite that artifact's body through `aep artifact body <id> --from <path|->`
+revision would change; rewrite that artifact's body through `aep plan artifact body <id> --from <path|->`
 with the complete body, or `--section <heading>` where one section changes, one artifact at a time.
 Then dispatch the same four again over the revised set.
 
@@ -469,7 +469,7 @@ model pin in [references/critic-rubric.md](references/critic-rubric.md) is waiti
 revision round, record one outcome per finding**, against the artifact the finding named:
 
 ```console
-$ aep artifact evidence story:credential-store --kind review_outcome \
+$ aep plan artifact evidence story:credential-store --kind review_outcome \
     --review review-result:acceptance-round-1 --outcome fixed
 ```
 
@@ -491,7 +491,7 @@ table's most misleading possible input.
 
 The verb takes the id of the artifact that was reviewed and the id of the record that reviewed it,
 so a finding is attributable to the round it came from without reading either body. Read
-`aep artifact evidence --help` for the flag spellings before you rely on the ones above; the kind
+`aep plan artifact evidence --help` for the flag spellings before you rely on the ones above; the kind
 list is closed and a refusal prints the whole of it (guardrail 1).
 
 **On a binary that predates the kind, the refusal prints the list and the outcome has nowhere to
@@ -501,7 +501,7 @@ readable and nobody records it as done. That is the one case where the outcome l
 
 A verdict is not a move. Whether an artifact advances is § 4's question and the store's; four agents
 approving its prose is not evidence anybody asked for. Finish the batch the way guardrail 3 says —
-`aep artifact validate`, output relayed verbatim.
+`aep plan artifact validate`, output relayed verbatim.
 
 ## 8. Scoping what is already there
 
@@ -512,7 +512,7 @@ decides what can be worked at once — and in most stores nothing holds it.
 The `story-scoper` agent answers it for one artifact: it reads the body, its edges, the symbols it
 names and the tree, and returns a `## Scope` section marking every line **cited** or **inferred**.
 It is read-only, so run one per story and run them at once; write what they return through
-`aep artifact body`, one at a time, because the journal is append-only and N writers race.
+`aep plan artifact body`, one at a time, because the journal is append-only and N writers race.
 
 Read the confidence line, not just the surface. A scope that mixes what was read with what was
 guessed is worse than none — it gets trusted exactly where it is weakest — which is why the section

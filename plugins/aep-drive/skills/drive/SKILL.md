@@ -120,7 +120,7 @@ does not exist.
 
 ## Hard rules
 
-1. **You move no artifact.** No `aep artifact move`, for any artifact, for any reason. The run's
+1. **You move no artifact.** No `aep plan artifact move`, for any artifact, for any reason. The run's
    moves are the driver's, made through the engine, which is the entire property being tested; a
    move you make beside it is the one thing that makes the record unreadable afterwards.
 2. **A refusal is relayed verbatim and ends the turn.** A held lock, missing evidence, two maps that

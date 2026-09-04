@@ -58,7 +58,7 @@ You sequence and dispatch. **You never decide that work is done.**
 | select candidates and propose them | decide a story is finished — the gate's exit code decides |
 | arrange worktrees and branches | evaluate a gate, or restate one's verdict as your own |
 | dispatch, route red and green, merge | let an implementor write to the planning store |
-| own **every** `aep artifact` call | share one build directory between two worktrees |
+| own **every** `aep plan artifact` call | share one build directory between two worktrees |
 | record the evidence and move the stories | report a process killed without having watched it die |
 | take the worktrees and their build directories down | remove a tree whose records nobody has read, or force one that is dirty |
 | merge the wave into the base branch when the gate is green | ask the operator to do a step this table gives you |
@@ -99,10 +99,10 @@ also the division that works: one agent, one surface; the shared files are yours
 ### Read the store before you propose anything
 
 ```console
-$ aep artifact list --kind story --status draft --format json
-$ aep artifact list --kind story --status proposed --format json
-$ aep artifact graph --format json
-$ aep artifact blocked
+$ aep plan artifact list --kind story --status draft --format json
+$ aep plan artifact list --kind story --status proposed --format json
+$ aep plan artifact graph --format json
+$ aep plan artifact blocked
 ```
 
 A candidate is **ready** when its status is `draft` or `proposed`, its `blocked_by` is empty, and
@@ -122,19 +122,19 @@ unless somebody establishes it.
 Fan out `story-scoper`, one agent per candidate, and run them at once. They are read-only by
 charter — which is what makes running many safe: the planning journal is append-only and one file,
 so N agents writing it would race. **They return `## Scope` sections; you write them**, one at a
-time, through `aep artifact body` with the complete body.
+time, through `aep plan artifact body` with the complete body.
 
 Each section says where the work lands and marks every line `cited` or `inferred`. Read the
 confidence line before you trust the surface: a wave whose disjointness rests on a `low` scope is a
 wave that finds out at merge time, with N agents' work already spent.
 
 **Write the scope twice: as the section, and as typed entries.** The section is for a person; the
-entries are what the store can compute a wave from. One `aep artifact scope` call per path, carrying
+entries are what the store can compute a wave from. One `aep plan artifact scope` call per path, carrying
 the same confidence mark the scoper returned:
 
 ```console
-$ aep artifact scope story:credential-store --add crates/aep-cli/src/planning.rs
-$ aep artifact scope story:credential-store --add crates/aep-domain/src/lib.rs --inferred
+$ aep plan artifact scope story:credential-store --add crates/aep-cli/src/planning.rs
+$ aep plan artifact scope story:credential-store --add crates/aep-domain/src/lib.rs --inferred
 ```
 
 The flag is the difference between a surface somebody read out of the body and one an agent
@@ -174,7 +174,7 @@ worse than that. Say in the proposal that N is one, and why the others were left
 disjoint sets, the pairs it had to exclude, and the stories it could not place:
 
 ```console
-$ aep artifact waves --kind story --status draft --format json
+$ aep plan artifact waves --kind story --status draft --format json
 ```
 
 Three lists come back — the waves, the collisions, and the unassessed — and **all three go into the
@@ -189,7 +189,7 @@ you assemble by hand around it.
 **The fallback is the old pairwise reading, and it is announced.** Where the installed binary
 answers `unrecognized subcommand`, the verb does not exist yet: read each candidate's body for the
 paths it cites, say for every pair in the proposed set whether they touch the same package, and
-**write in the proposal that the selection was made by reading pairs because `aep artifact waves`
+**write in the proposal that the selection was made by reading pairs because `aep plan artifact waves`
 was not available, with the version `aep --version` printed.** A proposal that does not say which
 path it took leaves the operator unable to tell a computed selection from a judged one, and those
 carry different weight.
@@ -209,8 +209,8 @@ this repository, that every non-draft story `serves` a declared objective. Find 
 assume:
 
 ```console
-$ aep artifact lifecycle story
-$ aep artifact validate
+$ aep plan artifact lifecycle story
+$ aep plan artifact validate
 ```
 
 Whatever the store requires, add it **as part of the proposal**, so the operator sees which
@@ -266,7 +266,7 @@ and the scopers you ran are how you did the work, not what the operator decides 
 
 The stage-1 stop assumes somebody is there to take it. Sometimes nobody is — the task says *run
 without stopping* or *no operator is present*, or the harness gives no operator turn at all: a batch
-or print-mode session, an `aep eval run` case, a dispatch. **A coordinator that ends its turn at the
+or print-mode session, an `aep drive eval run` case, a dispatch. **A coordinator that ends its turn at the
 stop in one of those has produced a page nobody will read and no wave.** Decide which kind of run
 this is before stage 1, the way `aep-plan`'s planning skill § 4 *When there is no operator* sets
 out, and say which in the report.
@@ -274,7 +274,7 @@ out, and say which in the report.
 **Record the stop and run it.** One `approval-record` through the CLI, before the first dispatch:
 
 ```console
-$ aep artifact new approval-record wave-proposal-2026-09-03 \
+$ aep plan artifact new approval-record wave-proposal-2026-09-03 \
     --title "Wave proposal accepted with no operator present" \
     --tag non-interactive --relate decides:story:credential-store \
     --from bypass-body.md
@@ -500,7 +500,7 @@ adversary thought and nothing about whether it mattered, which is the half that 
 whether attacking twice is worth what it costs:
 
 ```console
-$ aep artifact evidence story:credential-store --kind review_outcome \
+$ aep plan artifact evidence story:credential-store --kind review_outcome \
     --review review-result:adversary-unit-3-pass-1 --outcome fixed
 ```
 
@@ -547,7 +547,7 @@ found.** Both adversary passes were recorded as `review-result`s carrying a fenc
 so the comparison is a command rather than a reading of two reports:
 
 ```console
-$ aep artifact findings story:credential-store --format json
+$ aep plan artifact findings story:credential-store --format json
 ```
 
 It returns three lists between the two latest review-results — **carried**, **new** and
@@ -664,14 +664,14 @@ a defect is severe from how bad it would be if it happened.
    not only what it returned, and say which steps were skipped rather than folding them into a
    count of green ones.
 3. **Rewrite each unit's `## Scope` section from its implementor's confirmation table**, through
-   `aep artifact body`, with the corrections visible rather than deleted. The implementor
+   `aep plan artifact body`, with the corrections visible rather than deleted. The implementor
    checks every `inferred` line before building on it; one returned five rows and found two of them
    wrong, and both wrong lines are still in the store today. The next wave selects on overlap by
    reading that section, so a scope the wave learned and did not write back is a wave that taught
    the store nothing and left it misleading. It is two commands.
 4. Record the evidence the store requires for each story against the merge commit, then move each
-   one to its terminal status through `aep artifact move`.
-5. `aep artifact validate`, and relay its output **verbatim**.
+   one to its terminal status through `aep plan artifact move`.
+5. `aep plan artifact validate`, and relay its output **verbatim**.
 6. **Merge the integration branch into the base branch.** This is integration, not release, and it
    is yours — the same step as merging a unit, one level up. Do not stop here to ask; the gate
    already decided, and stopping strands finished work on a branch nobody asked you to leave it on.
@@ -770,7 +770,7 @@ killed agent that nobody noticed was gone.
 
 Cases with a decided answer, so that a coordinator meeting one does not have to invent one.
 
-**The verb and the prose disagree.** `aep artifact waves` puts two stories in one wave and your own
+**The verb and the prose disagree.** `aep plan artifact waves` puts two stories in one wave and your own
 reading of their bodies says they collide — or the reverse. **The verb wins, and the disagreement is
 reported in the proposal**, naming both stories, the surface your reading found, and which of the
 two conclusions each rests on.
@@ -782,7 +782,7 @@ unreproducible, which is the property the verb was added to get.
 
 **Reporting it is not optional, and it is the useful half.** A disagreement is one of exactly two
 things and both need a person: the scope entries are wrong — write the correction back through
-`aep artifact scope` and say you did — or your reading found a coupling the entries cannot express,
+`aep plan artifact scope` and say you did — or your reading found a coupling the entries cannot express,
 which is a finding about the story's `## Scope` section and belongs in the proposal. Silently
 following the verb loses both.
 

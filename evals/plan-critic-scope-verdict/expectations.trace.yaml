@@ -32,7 +32,7 @@ expectations:
 
   - id: the-verdict-is-a-review-result-created-from-a-body-file
     statement: the caller recorded the verdict as a `review-result` whose body arrived with the record
-    # `review-result` is immutable — `aep artifact new --help` says it *"refuses every edit after the
+    # `review-result` is immutable — `aep plan artifact new --help` says it *"refuses every edit after the
     # fact, which is what makes it evidence"* — so `--from` is not one way to write the body, it is
     # the only one. A row asserting `artifact new review-result` alone would pass on a record whose
     # body is still the kind's template.
@@ -40,7 +40,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(?s)(aep|protocol) artifact new +review-result.*--from'}
+          command: {regex: '(?s)(aep|protocol) +(plan +)?artifact new +review-result.*--from'}
         count: {at_least: 1}
 
   - id: the-critic-read-the-store-before-judging
@@ -48,12 +48,12 @@ expectations:
     # The positive control, over the same tool the absences are scoped to. It is also the
     # non-vacuity floor: a verdict over a set nobody opened is an empty `approve`.
     #
-    # Read: `aep artifact show <parent>` before any item, then `aep artifact graph` — the agent file makes the parent-first order the difference between a coverage check and a confirmation of one.
+    # Read: `aep plan artifact show <parent>` before any item, then `aep plan artifact graph` — the agent file makes the parent-first order the difference between a coverage check and a confirmation of one.
     expect:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact (show|graph)'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact (show|graph)'}
         count: {at_least: 1}
 
   # --- proposes, never performs ---------------------------------------------------------------
@@ -66,18 +66,18 @@ expectations:
       tool.absent:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +move'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move'}
 
   - id: no-judged-body-was-rewritten
     statement: the critic's verdict did not turn into an edit of the thing it judged
-    # One round was asked for. A panel loop revises drafts through `aep artifact body` on
+    # One round was asked for. A panel loop revises drafts through `aep plan artifact body` on
     # `needs-revision`, and that is correct behaviour in a panel case; it is not this case, whose
     # task says one round and no revision.
     expect:
       tool.absent:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +body'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +body'}
 
   # --- the run's own record -------------------------------------------------------------------
 

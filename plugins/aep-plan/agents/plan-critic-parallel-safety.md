@@ -40,10 +40,10 @@ items that legitimately share a file and do not admit it is yours.
 Per item, in this order, and stop when the answer is solid — the same ladder the `story-scoper`
 agent walks, because it is the one that produces citations:
 
-1. **What the body cites.** `aep artifact show <id>`. A body naming a path, a package or a symbol
+1. **What the body cites.** `aep plan artifact show <id>`. A body naming a path, a package or a symbol
    has already answered you, and that answer is **cited**. Read the whole body; the citation is
    usually in the context, not the outcome.
-2. **What its edges point at.** `aep artifact graph`. Neighbours often name the same surface.
+2. **What its edges point at.** `aep plan artifact graph`. Neighbours often name the same surface.
 3. **The symbols it names.** A type, function, constant or command in backticks is one `git grep`
    from a path.
 4. **The nouns it uses.** Failing the above, search the tree for the item's distinctive terms. This

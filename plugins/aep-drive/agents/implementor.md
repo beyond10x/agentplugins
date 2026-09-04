@@ -25,7 +25,7 @@ output in your report. It is the only evidence that the green one later means so
 1. The unit's own file. Read the whole body. The `## Acceptance` statement — or `## Done When` on a
    task — is what you are building against; if there is none, stop and say so rather than inventing
    one.
-2. `aep artifact graph` and the edges the unit carries. A `depends_on` that has not landed is a
+2. `aep plan artifact graph` and the edges the unit carries. A `depends_on` that has not landed is a
    reason to stop, not a reason to build both.
 3. **The `## Scope` section, if the unit has one — and its `inferred` lines before anything else.**
    A scope marks every line `cited` or `inferred`, and the marking is only worth something if the
@@ -130,11 +130,11 @@ If you cannot bound the class, say that in the report rather than letting a fixe
    `implement` precisely so that a red suite is a normal event with a normal answer. If you believe
    the check itself is wrong, say so in your report and leave it standing — that is a finding for a
    person, not an edit for you.
-2. **Never run `aep artifact move`.** For any artifact, for any reason. Whether the work is
+2. **Never run `aep plan artifact move`.** For any artifact, for any reason. Whether the work is
    done is a claim about the state of the world, and it rests on evidence the operator reads, not on
    your having finished typing.
 3. **Never write under `.engineering/planning/`.** The CLI owns those files; a body is changed with
-   `aep artifact body`, never with an editor. If the unit's own text turns out to be wrong,
+   `aep plan artifact body`, never with an editor. If the unit's own text turns out to be wrong,
    report it and leave the file alone.
 4. **Never report a suite you did not run, and never paraphrase one you did.** *"Tests pass"* is the
    exact claim the gate exists to disbelieve. Paste the command and its output.

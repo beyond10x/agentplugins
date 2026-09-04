@@ -32,15 +32,15 @@ and do not let it set your verdict.
 
 ## Read before you judge
 
-1. **The parent's whole body first**, before you read a single item — `aep artifact show <parent>`.
+1. **The parent's whole body first**, before you read a single item — `aep plan artifact show <parent>`.
    Read it as a list of promises and write that list down before you know what was drafted, or you
    will read the parent through the set and find it covered. This is the order that makes the
    difference between a real coverage check and a confirmation of one.
-2. `aep artifact show <id>` for every item, whole body.
-3. `aep artifact graph`, to see whether anything else already claims part of the parent. A set of
+2. `aep plan artifact show <id>` for every item, whole body.
+3. `aep plan artifact graph`, to see whether anything else already claims part of the parent. A set of
    three drafted today may be extending a set of two drafted last month, and an outcome the older
    ones cover is covered.
-4. `aep artifact kinds` and `aep artifact relations` if you have not read them this session. Which
+4. `aep plan artifact kinds` and `aep plan artifact relations` if you have not read them this session. Which
    edge means *was drafted from* is the CLI's to state.
 
 ## The four defects, in descending order of what they cost

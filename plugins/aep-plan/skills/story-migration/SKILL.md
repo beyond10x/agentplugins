@@ -28,8 +28,8 @@ the step this skill exists for; the rest is how to earn the right to write it.
 
 Two vocabularies matter and neither belongs in this file.
 
-**The store's**, which the CLI answers: `aep artifact kinds`, `aep artifact lifecycle <kind>`,
-`aep artifact relations`. A kind list written down here goes stale the first time a tree adds one,
+**The store's**, which the CLI answers: `aep plan artifact kinds`, `aep plan artifact lifecycle <kind>`,
+`aep plan artifact relations`. A kind list written down here goes stale the first time a tree adds one,
 and an agent reciting `draft → proposed → active` from memory will propose an illegal move in a
 store that renamed a rung. See the `planning` skill § 2 — it is the authority on this and is not
 restated here.
@@ -56,7 +56,7 @@ Report one row per location: path, file count, line count, the convention you de
 told you. Then stop.
 
 An empty finding is a real finding. A repository with nothing to migrate should adopt through
-`aep reverse init` and the `planning` skill § 5, not through this one.
+`aep plan reverse init` and the `planning` skill § 5, not through this one.
 
 ### Step 2 — classify
 
@@ -65,7 +65,7 @@ One row per source document, and a decision you can defend for each:
 | column | rule |
 |---|---|
 | source | the path |
-| kind | from `aep artifact kinds`; a plan is not automatically a `story` |
+| kind | from `aep plan artifact kinds`; a plan is not automatically a `story` |
 | slug | derived from the title, see § 4 |
 | status | the rung its own text evidences, and the quote that evidences it |
 | relations | edges to other sources, from `depends_on`, prose references, or a shared epic |
@@ -98,12 +98,12 @@ things if it is not held to a rule.
 One artifact at a time, body supplied at creation:
 
 ```console
-$ aep artifact new story dispatch-retry-backoff \
+$ aep plan artifact new story dispatch-retry-backoff \
     --title "Back off ACD v3 dispatch retries" --from body.md
 created story:dispatch-retry-backoff (draft) at .engineering/planning/story/dispatch-retry-backoff.md
 ```
 
-Then `aep artifact relate` for each edge, then `aep artifact move` for each artifact whose
+Then `aep plan artifact relate` for each edge, then `aep plan artifact move` for each artifact whose
 evidenced rung is above the initial one — **one move per rung, never a jump**, and each move's
 output relayed.
 
@@ -127,7 +127,7 @@ annotate the index once and say it is an index, rather than editing every bullet
 ### Step 6 — validate and report
 
 ```console
-$ aep artifact validate
+$ aep plan artifact validate
 ```
 
 Relay its output verbatim; it names each artifact and each defect, and that is the part anybody can
@@ -140,7 +140,7 @@ act on. Then report three lists, not one: what was migrated, what was **skipped 
 produce the plan as a document and stop. Do not reach for a flag that does not exist, and do not
 start writing to find out whether the classification was right.
 
-**Creation is refused, not overwritten.** `aep artifact new` refuses an id that already has a
+**Creation is refused, not overwritten.** `aep plan artifact new` refuses an id that already has a
 document, at two layers, and the refusal names the path. Treat it as the answer: either the
 artifact is already migrated, or the slug collides and needs a different one.
 
@@ -148,7 +148,7 @@ artifact is already migrated, or the slug collides and needs a different one.
 nothing: every `new` is rejected because the document is already there.
 
 ```console
-$ aep artifact new story dispatch-retry-backoff --title "…"
+$ aep plan artifact new story dispatch-retry-backoff --title "…"
 error: `story:dispatch-retry-backoff` already exists at story/dispatch-retry-backoff.md — creating
 over a document is how a plan item's body disappears, and there is no undo in a tool that has not
 committed anything
@@ -159,8 +159,8 @@ stops at the first failure will stop here; let it continue, and count what it cr
 run the migration twice and check that the artifact count is unchanged and `git status` shows no new
 file under `.engineering/planning/`.**
 
-**Status is never written directly.** `aep artifact new` has no `--status` flag; every artifact is
-created at its kind's initial rung and walks up through `aep artifact move`. Do not hand-edit
+**Status is never written directly.** `aep plan artifact new` has no `--status` flag; every artifact is
+created at its kind's initial rung and walks up through `aep plan artifact move`. Do not hand-edit
 `status:` in frontmatter — an unvalidated status is indistinguishable in the file from a legal one,
 which is what makes it expensive.
 
@@ -170,22 +170,22 @@ ampersand or a leading digit-free symbol will be refused.
 
 **A ticket id is a reference, not a sentence.** A legacy file naming `DEV-630` or a Zendesk number
 carries a join to a system that is still the real tracker. Record it with `--ref`, which puts it in
-frontmatter where `aep artifact list --ref jira:DEV-630` can find it:
+frontmatter where `aep plan artifact list --ref jira:DEV-630` can find it:
 
 ```console
-$ aep artifact new story dispatch-retry-backoff --title "…" --ref jira:DEV-630
-$ aep artifact set story:presence-sync-race --ref jira:DEV-425 --ref zendesk:8812
+$ aep plan artifact new story dispatch-retry-backoff --title "…" --ref jira:DEV-630
+$ aep plan artifact set story:presence-sync-race --ref jira:DEV-425 --ref zendesk:8812
 ```
 
 Write the link too, but write it **once**: `.engineering/project.yaml` takes a `providers:` map
-(`jira: https://acme.atlassian.net/browse/{key}`) and `aep artifact show` builds the URL from it. A
+(`jira: https://acme.atlassian.net/browse/{key}`) and `aep plan artifact show` builds the URL from it. A
 URL pasted into every artifact is the same fact copied N times, and after a tracker migration it is
 the copies that are wrong. Keep the human-readable line in the body as well when the source had one
 — the body is what a person reads — but the `refs:` entry is what a tool reads.
 
 **Dates come from git, never from the filesystem.** A fresh checkout resets mtime, and a migration
 run against one would date every artifact to the day it ran. AEP frontmatter carries no timestamp
-field on purpose, and `aep artifact set` writes only `--title`, `--summary`, `--owner`, tags and
+field on purpose, and `aep plan artifact set` writes only `--title`, `--summary`, `--owner`, tags and
 references — there is no door for an arbitrary key. So dates live in the body:
 
 ```markdown

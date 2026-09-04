@@ -63,13 +63,13 @@ valid: 8 eval case(s), 1 recorded transcript(s) replayed
 ```
 
 It validates every case, resolves every `subject:` to an agent or a skill that exists here, and
-replays whatever transcripts are recorded with `aep eval run --stream`, which spends nothing. An
+replays whatever transcripts are recorded with `aep drive eval run --stream`, which spends nothing. An
 empty `recorded/` and a machine with no `aep` on `PATH` are both printed notices, never a red gate.
 
 Live, which costs money:
 
 ```console
-$ METAHARNESS_LIVE=1 aep eval run --corpus evals --workflow adp/default \
+$ METAHARNESS_LIVE=1 aep drive eval run --corpus evals --workflow adp/default \
     --arm plugin --harness claude --plugin-dir plugins/aep-plan \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>
@@ -78,7 +78,7 @@ $ METAHARNESS_LIVE=1 aep eval run --corpus evals --workflow adp/default \
 Without `METAHARNESS_LIVE=1` the runner accepts the corpus and refuses to spawn, by name:
 
 ```console
-$ aep eval run --corpus evals --workflow adp/default --arm plugin --harness claude \
+$ aep drive eval run --corpus evals --workflow adp/default --arm plugin --harness claude \
     --out eval-out --observed-at 2026-09-03
 error: eval-out — 1 refusal(s):
   EVAL-RUN-002 a spawn costs money and `METAHARNESS_LIVE=1` is not in this environment. Set it

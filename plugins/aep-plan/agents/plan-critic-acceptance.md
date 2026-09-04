@@ -28,9 +28,9 @@ closing line as out of your lane, and do not let it set your verdict.
 
 ## Read before you judge
 
-1. `aep artifact show <id>` for every id you were given — the **whole** body, not the summary. The
+1. `aep plan artifact show <id>` for every id you were given — the **whole** body, not the summary. The
    acceptance is what you are here for and it is the last thing the drafter wrote.
-2. `aep artifact kinds` and `aep artifact lifecycle <kind>` if you have not read them this session.
+2. `aep plan artifact kinds` and `aep plan artifact lifecycle <kind>` if you have not read them this session.
    Do not assume what the drafted things are called or what a terminal status is named; ask.
 3. The tree, where an acceptance names a symbol, a path or a command. An acceptance you can check by
    running something is the strongest kind, and `git grep` tells you whether the thing it names

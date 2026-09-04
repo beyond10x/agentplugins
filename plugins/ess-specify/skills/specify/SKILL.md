@@ -17,7 +17,7 @@ Where an OpenAPI document already describes it, do not hand-write the domain. Dr
 contract, and read the decisions the draft says it could not take:
 
 ```console
-aep reverse openapi --domain <domain> <openapi-document> --out <file>
+aep plan reverse openapi --domain <domain> <openapi-document> --out <file>
 ```
 
 Otherwise write the smallest document that validates — two files, and nothing that is not required:
@@ -73,7 +73,7 @@ entities:
 Then check it before anything is written around it:
 
 ```console
-$ ess validate --path <specification>
+$ ess specify validate --path <specification>
 warehouse v1 — 2 file(s), valid
 ```
 
@@ -108,7 +108,7 @@ narrows that question without answering it. Where you cannot say which kind it i
 `UNMAPPED:` case below and not a coin toss.
 
 Grow it from there — types, commands, events, views, and a component that owns the domain — running
-`ess validate` after each addition rather than at the end.
+`ess specify validate` after each addition rather than at the end.
 
 **A draft is a proposal, never a silent completion.** Every relation you could not read from code,
 an OpenAPI document or an existing artifact is written with an `UNMAPPED:` marker beside the place
@@ -139,8 +139,8 @@ settle it.
 From the specification root, establish the current answer:
 
 ```console
-ess validate --path <specification>
-ess compile --path <specification> --format json
+ess specify validate --path <specification>
+ess specify compile --path <specification> --format json
 ```
 
 `validate` and `compile` accumulate diagnostics. Relay every refusal; do not stop at the first or
@@ -152,7 +152,7 @@ Use the projection command, never a handwritten parallel generator:
 
 ```console
 ess generate --path <specification> --kind schema --out <directory>
-ess project openapi --path <specification> --out <directory>
+ess generate project openapi --path <specification> --out <directory>
 ```
 
 The same typed IR must produce the same ordered files and bytes. Compare a regenerated temporary

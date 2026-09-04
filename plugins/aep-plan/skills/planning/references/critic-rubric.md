@@ -83,7 +83,7 @@ looked under and say what was not there; a missing thing has a location too.
 A prose line is for the operator; a fenced block is for a program. **Close your report with a
 ` ```findings ` block holding the same findings you just wrote as lines, and nothing that is not
 one of them.** The caller records your text verbatim as a `review-result`, so the block travels into
-the record and `aep artifact findings` can compare one round against the next by signature instead
+the record and `aep plan artifact findings` can compare one round against the next by signature instead
 of by re-reading two paragraphs.
 
 ```findings
@@ -109,7 +109,7 @@ The block is a YAML list, so on `approve` it is still there and it is `[]`. An a
 empty one are different facts, and only one of them says a critic ran.
 
 The field names above are what the record's reader parses. When it and this table disagree, the
-reader is right: `aep artifact findings --format json` prints what it read back, and one run of it
+reader is right: `aep plan artifact findings --format json` prints what it read back, and one run of it
 settles the question faster than an argument about a schema.
 
 ## What is not a finding

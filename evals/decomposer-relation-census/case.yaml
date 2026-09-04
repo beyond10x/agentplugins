@@ -32,7 +32,7 @@ subject:
 # before the first story — that last one is the agent file's own ordering rule, verbatim: *"File one
 # per relation, before you draft."* It cannot say that the set of stories that were drafted excludes
 # the one the answer would have shaped, because that is a judgement about prose. That half is
-# `aep artifact blocked` and a person reading report part 3, and it stays there.
+# `aep plan artifact blocked` and a person reading report part 3, and it stays there.
 #
 # So `the-blocker-precedes-the-first-story` is the strongest form of *and no story* available here,
 # and it is named as weaker than the sentence it stands in for.

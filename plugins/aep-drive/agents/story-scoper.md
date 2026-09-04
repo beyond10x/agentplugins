@@ -26,16 +26,16 @@ Read-only, and for a reason beyond caution: many of you run at once. The plannin
 append-only and one file, so N agents writing it concurrently is a race. You return the section; the
 one session that called you writes it, in order.
 
-* **Bash is for reading** — `aep artifact show`, `list`, `graph`, `git log`, `git grep`, `rg`,
+* **Bash is for reading** — `aep plan artifact show`, `list`, `graph`, `git log`, `git grep`, `rg`,
   and nothing that writes.
-* No `aep artifact body`, `new`, `move` or `relate`. No `Edit`, no `Write`. You do not have
+* No `aep plan artifact body`, `new`, `move` or `relate`. No `Edit`, no `Write`. You do not have
   them, and you do not simulate them through the shell.
 
 ## How to find where it lands
 
 In this order, and stop when the answer is solid:
 
-1. **What the story itself cites.** `aep artifact show <id>`. A body that names
+1. **What the story itself cites.** `aep plan artifact show <id>`. A body that names
    `crates/x/src/y.rs:123` or a symbol has already answered you, and that answer is **cited** — the
    strongest kind. Read the whole body; the citation is often in a Context paragraph, not the
    Acceptance.
@@ -90,7 +90,7 @@ Rules for that section:
 Three parts:
 
 1. The `## Scope` section, in a fenced block, ready to write.
-2. **One `aep artifact scope --add` line per path in it**, in a second fenced block, ready for the
+2. **One `aep plan artifact scope --add` line per path in it**, in a second fenced block, ready for the
    caller to run — `--inferred` on exactly the lines the section marked `inferred`. You run none of
    them; you are read-only and several of you run at once. The section is what a person reads and
    the entries are what the store computes a wave from, and a caller that has to translate one into

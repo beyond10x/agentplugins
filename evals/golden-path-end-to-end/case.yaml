@@ -36,7 +36,7 @@ subject:
 #
 # ## Why the task opens with an instruction the page does not number
 #
-# The first headless run of this case — one `aep eval run` session, 2026-09-03 — adopted the
+# The first headless run of this case — one live session, 2026-09-03 — adopted the
 # repository, scanned it, reported *step 1 — adopted, scanned* and ended, with ten rows gapped and
 # seven held. Nothing it did was wrong. The page is eight prompts an operator types across eight
 # turns, and a case is one task with no operator turn in it, so the run reached the first stop and
@@ -82,13 +82,13 @@ task: |
 
   Run this without stopping: no operator is present, so at every point you would pause for one — the
   wave proposal, a critic round, a blocker, a move the store gates on evidence — record one
-  `approval-record` through `aep artifact new`, tagged `non-interactive`, naming the stop and what you
+  `approval-record` through `aep plan artifact new`, tagged `non-interactive`, naming the stop and what you
   decided in the operator's absence, and continue. Do not clear a blocker, do not publish and do not
   release.
 
-  1. Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source
+  1. Adopt this repository for AEP planning. Run `aep plan reverse init` with the protocol source
      git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45 and the profile
-     development.standard, then run `aep reverse scan`. Report what the scan found, and file nothing
+     development.standard, then run `aep plan reverse scan`. Report what the scan found, and file nothing
      yet.
 
   2. File this as an epic in the planning store, and stop there — do not decompose it yet:

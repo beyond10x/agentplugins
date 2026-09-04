@@ -10,7 +10,7 @@ verdict: held
 # `skills:` name nothing that exists, and `.github/workflows/eval.yml` scopes a live run to the
 # cases whose subject the pull request touched.
 subject:
-  # The ESS skill alone. The one `aep artifact new story` matcher below is the far side of an
+  # The ESS skill alone. The one `aep plan artifact new story` matcher below is the far side of an
   # ordering row, not a claim about the planning skill.
   skills: [ess-specify:specify]
 
@@ -23,7 +23,7 @@ subject:
 #
 # 1. the smallest document that validates is written — `system.yaml` and a domain file, nothing that
 #    is not required;
-# 2. `ess validate` is run over it **before** stories are written around the noun;
+# 2. `ess specify validate` is run over it **before** stories are written around the noun;
 # 3. a relation the tree does not settle is left as an `UNMAPPED:` marker, never invented — *"Imports
 #    never guess, and a domain an agent drafts is an import."*
 #
@@ -53,12 +53,12 @@ task: |
 
   Give it one before any story is written around it. There is no ESS specification here yet, so
   write the smallest `ess/1` document that validates — the header and one domain file, and nothing
-  that is not required — and run `ess validate` over it.
+  that is not required — and run `ess specify validate` over it.
 
   The epic also says a shipment has a **carrier**. Nothing in this tree, in any contract, and in no
   artifact says what a carrier is. Do not type it.
 
-  Then report: what you wrote, the verbatim output of `ess validate` with its exit status, and every
+  Then report: what you wrote, the verbatim output of `ess specify validate` with its exit status, and every
   relation you could not settle.
 
 expectations: expectations.trace.yaml

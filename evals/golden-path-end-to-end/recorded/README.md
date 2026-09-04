@@ -10,7 +10,7 @@ were fitted to, which measures the document and not the plugin.
 
 ## What the first run of it found, before anything is recorded here
 
-One live session against this case on **2026-09-03** — `aep eval run`, $0.80, 173 events — adopted
+One live session against this case on **2026-09-03** — $0.80, 173 events — adopted
 the repository, scanned it, reported *step 1 — adopted, scanned* and ended. Ten rows gapped and seven
 held: no wave, ESS or drive skill offered, no fan-out, no blocker with an edge, no `review-result`,
 and the store never validated. Its stream is not in this directory, so this paragraph is what the
@@ -22,11 +22,11 @@ case is **one task with no operator turn in it**, so the run reached the first s
 task now opens with the page's § *Running it without an operator* instruction, and the expectations
 gained five rows about what that produces: an `approval-record` per stop, created through the CLI
 with a body and the `non-interactive` tag, and the two prohibitions — no blocker cleared, nothing
-tagged or pushed. **A recorded stream of this case is now expected to contain `aep artifact new
+tagged or pushed. **A recorded stream of this case is now expected to contain `artifact new
 approval-record` calls**; one that walks all eight steps and carries none of them satisfies every
 ordering row here and is the failure the instruction exists to catch.
 
-`task check` skips an empty `recorded/` with a printed notice and does not fail. `aep eval run
+`task check` skips an empty `recorded/` with a printed notice and does not fail. `aep drive eval run
 --stream` is what reads a file once one is here; drop it in this directory and the replay picks it
 up with no change to the case.
 
@@ -35,7 +35,7 @@ up with no change to the case.
 Live, paid, and refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep eval run \
+$ METAHARNESS_LIVE=1 aep drive eval run \
     --case evals/golden-path-end-to-end \
     --arm plugin \
     --harness claude \
@@ -72,7 +72,7 @@ a `TODO` at the deletion site, and **no `.engineering/` directory**. § 1 of the
 adoption step, and it measures nothing against a tree that has already been adopted.
 
 This is the one case that needs three plugins installed — `aep-plan` for the planning steps,
-`ess-specify` for step 3, and `aep-drive` for steps 7 and 8. `aep eval run --plugin-dir` takes one; the
+`ess-specify` for step 3, and `aep-drive` for steps 7 and 8. `aep drive eval run --plugin-dir` takes one; the
 other two go as `--plugin` pins, above. Two things the second run (2026-09-03) showed the working
 tree also needs, both about the **child's** `PATH`, which metaharness constructs as
 `$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin` and does not inherit:

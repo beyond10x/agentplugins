@@ -70,10 +70,10 @@ expectations:
           tool: Bash
           args: {command: {regex: '(cargo (test|nextest)|pytest|npm (run )?test|go test|task check)'}}
 
-  # --- hard rule 5: it runs no `aep artifact` command at all -----------------------------------
+  # --- hard rule 5: it runs no `aep plan artifact` command at all -----------------------------------
 
   - id: no-store-command-was-run
-    statement: the adversary ran no `aep artifact` command — not `move`, not `new`, not `body`
+    statement: the adversary ran no `aep plan artifact` command — not `move`, not `new`, not `body`
     # *"One agent, one surface; the store is the coordinator's surface and never yours."* The agent
     # file records this as measured rather than feared: on the wave of 2026-08-30 an adversary that
     # complied wrote into its worktree's store, and its journal was 564 lines against the main tree's
@@ -82,7 +82,7 @@ expectations:
       tool.absent:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact'}
 
   - id: the-diff-was-read
     statement: the run read its own diff, so the `Bash` absences are refusals and not an empty transcript

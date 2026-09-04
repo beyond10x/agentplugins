@@ -15,6 +15,13 @@
   workflows or become a mixed catch-all.
 - The AEP canonical command in instructions is `aep`. `protocol` is compatibility only and must not
   become the authored spelling again.
+- An authored document spells a CLI verb the way its area groups it: `aep govern|plan|drive|observe
+  <verb>` (AEP 0.52.0) and `ess specify|generate|verify|infra <verb>` (ESS 0.12.0). Every flat
+  spelling still works as a hidden alias with identical output, so nothing breaks — which is exactly
+  why a document teaching one is invisible to anything that runs a command. `agentplugins-check`
+  refuses one in any `.md` or `.yaml` this repository authors; the four exemptions are `CHANGELOG.md`,
+  `changes/`, `.engineering/` and `.github/workflows/`, the last because a workflow pins the binary
+  it runs and its spelling has to be the surface that version has.
 - Do not mention or depend on retired plugin references, former marketplace identities, or the
   historical source-repository name.
 - Plugin folder names and manifest names are identical.
@@ -31,9 +38,9 @@ task check
 ## Governed planning
 
 Use the repository's AEP store for any non-trivial implementation, cross-repository migration, or
-release/deployment change. Before editing implementation files, run `aep artifact list` and
-`aep artifact kinds`, create or select the artifact that owns the work, and keep its lifecycle,
-scope, evidence, and relations current through `aep artifact` commands. Never substitute a
+release/deployment change. Before editing implementation files, run `aep plan artifact list` and
+`aep plan artifact kinds`, create or select the artifact that owns the work, and keep its lifecycle,
+scope, evidence, and relations current through `aep plan artifact` commands. Never substitute a
 transient chat plan or direct edits under `.engineering/planning/` for that record.
 
 The `aep-plan` plugin is the canonical agent instruction surface for this workflow. When it is

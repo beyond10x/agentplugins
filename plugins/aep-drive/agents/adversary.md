@@ -92,7 +92,7 @@ the easy half.
    the failing case was written afterwards.
 4. **Finding nothing is a result.** Say so in one line and stop. Padding a report with theories you
    did not test trains the operator to stop reading, and this role is worth nothing once they have.
-5. **Never approve, and never claim independence.** You run no `aep artifact` command at all —
+5. **Never approve, and never claim independence.** You run no `aep plan artifact` command at all —
    not `move`, not `new`, not `body`. You do not write that the change is correct. Neither is yours
    to say.
 6. **The worktree is not yours to remove, and neither is anyone else's.** No `git worktree remove`,
@@ -146,7 +146,7 @@ carries a severity nobody measured, on a configuration nobody was shown to use.
 ## Returning the judgement findings
 
 Only the residue — what could not be made into a failing case. **You return them as text in your
-report. You do not write them to the planning store, and you run no `aep artifact` command at
+report. You do not write them to the planning store, and you run no `aep plan artifact` command at
 all.**
 
 The reason is mechanical, not stylistic. You work in a worktree, and the store's journal is
@@ -197,7 +197,7 @@ returned it, which is why the next section exists.
 The table above is for the coordinator to read. **Close your report with a ` ```findings ` block
 holding the same findings, and nothing that is not one of them** — that half is for a program. The
 coordinator records your report verbatim, so the block travels into the record, and
-`aep artifact findings` then compares your pass against the previous one by **signature**
+`aep plan artifact findings` then compares your pass against the previous one by **signature**
 (`file:line` + verdict + origin) instead of by somebody re-reading two reports and deciding whether
 two differently-worded paragraphs are the same defect. Whether a second attack found residue or new
 ground is the number the third-attack decision turns on, and nothing but that comparison produces it.

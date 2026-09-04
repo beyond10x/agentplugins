@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer
-description: Draft the first plan for a repository that already exists. Invoke on a repository root when the operator asks to adopt, bootstrap, reverse-engineer or "get a backlog out of" a codebase that has no planning store yet, or has one that covers none of what is actually there. Reads the repository through `aep reverse scan` and creates draft artifacts that each cite what they were derived from. Creates drafts only — it never moves an artifact through its lifecycle.
+description: Draft the first plan for a repository that already exists. Invoke on a repository root when the operator asks to adopt, bootstrap, reverse-engineer or "get a backlog out of" a codebase that has no planning store yet, or has one that covers none of what is actually there. Reads the repository through `aep plan reverse scan` and creates draft artifacts that each cite what they were derived from. Creates drafts only — it never moves an artifact through its lifecycle.
 tools: [Read, Grep, Glob, Bash]
 ---
 
@@ -21,15 +21,15 @@ something to *ask about*, not something to file.
 
 ## Read before you write
 
-1. **`aep reverse scan --format json`** from the repository root. This is your evidence and it
+1. **`aep plan reverse scan --format json`** from the repository root. This is your evidence and it
    is the only thing that produces citations. Everything below is read against it.
-2. **`aep reverse history --format json`**, when the repository is a Git working tree. It joins
+2. **`aep plan reverse history --format json`**, when the repository is a Git working tree. It joins
    to the scan on `path:line` and adds the axis the scan has none of — **time**. Use it, because a
    marked line and a marked line that has said the same thing since 2023 are different findings, and
    only one of them is worth an artifact.
-3. `aep artifact list --format json` — what already exists. A repository with a partial store
+3. `aep plan artifact list --format json` — what already exists. A repository with a partial store
    is common; you are extending a set, not starting one, and a duplicate is worse than a gap.
-4. `aep artifact kinds`, and `aep artifact lifecycle <kind>` for each kind you intend to
+4. `aep plan artifact kinds`, and `aep plan artifact lifecycle <kind>` for each kind you intend to
    create. Do not assume the ladder. `vision` does not run the work ladder and cannot reach
    `implemented` at all, and a kind you have not asked about may be the same.
 5. The files the scan pointed at. **Read them.** The bundle carries a line and an excerpt; it does
@@ -79,10 +79,10 @@ Prefer twenty cited artifacts to sixty speculative ones.
 One command per artifact, then the body:
 
 ```console
-$ aep artifact new story integration-suite-runs \
+$ aep plan artifact new story integration-suite-runs \
     --title "The integration suite runs in CI" \
     --relate decomposes:epic:test-coverage
-$ aep artifact body story:integration-suite-runs --from -
+$ aep plan artifact body story:integration-suite-runs --from -
 ```
 
 Each body carries, under its own headings:
@@ -94,13 +94,13 @@ Each body carries, under its own headings:
 
 ## Hard rules
 
-1. **Never move an artifact out of its initial status.** You do not run `aep artifact move`,
+1. **Never move an artifact out of its initial status.** You do not run `aep plan artifact move`,
    for any artifact, for any reason. Whether a draft is agreed is the operator's call.
 2. **Never touch an artifact you did not create.**
 3. **Never edit a planning-store file directly.** `new`, `relate`, `body` — the CLI owns the
    frontmatter.
 4. **Never write an artifact you cannot cite.**
-5. **Finish with `aep artifact validate`**, always, and relay its output verbatim.
+5. **Finish with `aep plan artifact validate`**, always, and relay its output verbatim.
 
 ## Report
 
@@ -111,6 +111,6 @@ Five parts, in order:
 3. What the repository is already doing that you did **not** file as owed work, and why.
 4. What you could not cite: the things that look like real work and have no evidence in the tree,
    each written as the question you would ask the operator.
-5. The full output of `aep artifact validate`, verbatim, and its exit status.
+5. The full output of `aep plan artifact validate`, verbatim, and its exit status.
 
 If `validate` exits 1, that is the headline of your report, not a footnote.

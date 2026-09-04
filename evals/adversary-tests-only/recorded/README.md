@@ -4,7 +4,7 @@
 recorded, and none was synthesized: a hand-written transcript here would be a fixture the case's own
 rows were fitted to, which measures the document and not the plugin.
 
-`task check` skips an empty `recorded/` with a printed notice and does not fail. `aep eval run
+`task check` skips an empty `recorded/` with a printed notice and does not fail. `aep drive eval run
 --stream` is what reads a file once one is here; drop it in this directory and the replay picks it
 up with no change to the case.
 
@@ -13,7 +13,7 @@ up with no change to the case.
 Live, paid, and refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep eval run \
+$ METAHARNESS_LIVE=1 aep drive eval run \
     --case evals/adversary-tests-only \
     --arm plugin \
     --harness claude \

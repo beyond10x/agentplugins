@@ -37,14 +37,14 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact new +decision-blocker'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact new +decision-blocker'}
         count: {at_least: 1}
 
   - id: the-blocker-carries-a-blocks-edge
     statement: the blocker is attached to the work it stops, so a command finds it and a reader does not have to
     # The edge is the point of the exercise: a question in a report is read once; a blocker with an
-    # edge is found by `aep artifact blocked`. Both spellings of writing it are in scope — the
-    # `--relate` at creation the agent file shows, and a later `aep artifact relate` — because the
+    # edge is found by `aep plan artifact blocked`. Both spellings of writing it are in scope — the
+    # `--relate` at creation the agent file shows, and a later `aep plan artifact relate` — because the
     # claim is that the edge exists, not which verb wrote it.
     expect:
       tool.called:
@@ -63,10 +63,10 @@ expectations:
       order:
         first:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +decision-blocker'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +decision-blocker'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +story'}}
 
   # --- the charter's hard rules, with their control -------------------------------------------
 
@@ -78,7 +78,7 @@ expectations:
       tool.absent:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +move'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move'}
 
   - id: artifacts-were-created-through-the-cli
     statement: the run created artifacts with the CLI, so the absence above is a refusal and not an empty transcript
@@ -88,12 +88,12 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact new'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact new'}
         count: {at_least: 1}
 
   - id: the-lifecycle-was-asked-for-rather-than-assumed
     statement: the run asked the CLI what the blocker family's member is called and where it starts
-    # The agent file is explicit that `aep artifact kinds` names the blocker *family*, not the
+    # The agent file is explicit that `aep plan artifact kinds` names the blocker *family*, not the
     # member, and that the lifecycle is what answers for the member. A decomposer that assumed
     # `open` and was right is indistinguishable from one that asked, except here.
     severity: advisory
@@ -101,7 +101,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact (lifecycle|kinds|relations)'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact (lifecycle|kinds|relations)'}
         count: {at_least: 1}
 
   - id: the-store-was-validated
@@ -111,7 +111,7 @@ expectations:
       tool.called:
         tool: Bash
         args:
-          command: {regex: '(aep|protocol) artifact +validate'}
+          command: {regex: '(aep|protocol) +(plan +)?artifact +validate'}
         count: {at_least: 1}
 
   # --- the run's own record -------------------------------------------------------------------

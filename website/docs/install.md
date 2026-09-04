@@ -28,11 +28,11 @@ case "$(uname -s):$(uname -m)" in
 esac
 ```
 
-Download AEP `0.51.0`, verify the selected archive against the release manifest, and install its
+Download AEP `0.52.0`, verify the selected archive against the release manifest, and install its
 canonical `aep` command:
 
 ```bash
-B10X_AEP_VERSION=0.51.0
+B10X_AEP_VERSION=0.52.0
 B10X_AEP_ARCHIVE="aep-${B10X_AEP_VERSION}-${B10X_TARGET}.tar.gz"
 B10X_AEP_RELEASE="https://github.com/beyond10x/aep/releases/download/${B10X_AEP_VERSION}"
 curl --fail --location --remote-name "${B10X_AEP_RELEASE}/${B10X_AEP_ARCHIVE}"
@@ -47,10 +47,10 @@ mkdir -p "$HOME/.local/bin"
 install -m 0755 "aep-${B10X_AEP_VERSION}-${B10X_TARGET}/aep" "$HOME/.local/bin/aep"
 ```
 
-Install ESS `0.11.1` the same way:
+Install ESS `0.13.1` the same way:
 
 ```bash
-B10X_ESS_VERSION=0.11.1
+B10X_ESS_VERSION=0.13.1
 B10X_ESS_ARCHIVE="ess-${B10X_ESS_VERSION}-${B10X_TARGET}.tar.gz"
 B10X_ESS_RELEASE="https://github.com/beyond10x/ess/releases/download/${B10X_ESS_VERSION}"
 curl --fail --location --remote-name "${B10X_ESS_RELEASE}/${B10X_ESS_ARCHIVE}"
@@ -75,7 +75,7 @@ aep --version
 ess --version
 ```
 
-The expected lines are `protocol 0.51.0` and `ess 0.11.1`. (`aep` retains `protocol` as its version
+The expected lines are `protocol 0.52.0` and `ess 0.13.1`. (`aep` retains `protocol` as its version
 label for compatibility.) `command not found` means the affected plugin will install and then stop
 at its first CLI command. Only the `beyond10x` front door needs neither binary.
 

@@ -39,7 +39,7 @@ expectations:
   - id: the-domain-file-was-written
     statement: the domain declaring the entity was written
     # The header's `domains:` list and the declaring source must agree in both directions — either
-    # half alone is a refusal, which the skill states and `ess validate` enforces. So a run that
+    # half alone is a refusal, which the skill states and `ess specify validate` enforces. So a run that
     # wrote only one of these two files cannot have exited 0 on the row below, and the two rows
     # together are the shape of *the smallest document that validates*.
     expect:
@@ -50,12 +50,12 @@ expectations:
         count: {at_least: 1}
 
   - id: the-specification-was-validated
-    statement: the specification was validated with `ess validate` after it was written
+    statement: the specification was validated with `ess specify validate` after it was written
     expect:
       tool.called:
         tool: Bash
         args:
-          command: {regex: 'ess +validate'}
+          command: {regex: 'ess +(specify +)?validate'}
         count: {at_least: 1}
 
   # --- the ordering the skill exists to produce ------------------------------------------------
@@ -72,17 +72,17 @@ expectations:
       order:
         first:
           tool: Bash
-          args: {command: {regex: 'ess +validate'}}
+          args: {command: {regex: 'ess +(specify +)?validate'}}
         before:
           tool: Bash
-          args: {command: {regex: '(aep|protocol) artifact new +story'}}
+          args: {command: {regex: '(aep|protocol) +(plan +)?artifact new +story'}}
 
   - id: no-projection-was-hand-written
     statement: no generated schema or OpenAPI file was written by hand
     # *"Use the projection command, never a handwritten parallel generator."* Non-vacuous: the run
     # holds `Write` and `Edit` and used them, which `the-domain-file-was-written` is the control for
     # over the same tool set. A projection that a run legitimately produced arrives through
-    # `ess generate` or `ess project`, which are `Bash` calls and not writes.
+    # `ess generate` or `ess generate project`, which are `Bash` calls and not writes.
     expect:
       tool.absent:
         tools: [Write, Edit, NotebookEdit]
@@ -96,7 +96,7 @@ expectations:
     # *"Every relation you could not read … is written with an `UNMAPPED:` marker beside the place it
     # would go, and named again in the report."* `text.matches` is the weakest kind in the vocabulary
     # and this row is the *named again in the report* half, so it is advisory. The marker in the file
-    # is the half that matters and no `trace-spec/1` kind reads a file's contents; `ess validate`
+    # is the half that matters and no `trace-spec/1` kind reads a file's contents; `ess specify validate`
     # exiting 0 with the carrier absent is what a reader checks, in the shell.
     severity: advisory
     expect:

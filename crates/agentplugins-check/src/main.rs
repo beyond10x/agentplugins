@@ -444,6 +444,250 @@ fn retired_names(root: &Path) -> Result<(), String> {
     ))
 }
 
+/// A command whose first level was regrouped into areas, and the verbs that moved.
+///
+/// AEP 0.52.0 and ESS 0.12.0 each replaced a flat list of first-level verbs with a small set of
+/// areas — the same areas their crate trees are divided into — and kept every flat spelling as a
+/// hidden alias with identical output. So nothing here is about a command that stopped working: it
+/// is about what a document *teaches*, and a document that teaches the compatibility surface
+/// teaches a reader a spelling neither `--help` nor either repository's own prose will confirm.
+struct Regrouped {
+    /// Every name the command is published under. `aep` and `protocol` are two names for one
+    /// binary (`AGENTS.md` § *Invariants*), and a command matcher in the eval corpus spells both.
+    tools: &'static [&'static str],
+    /// Each verb that used to be spelled at the first level, and the area it is spelled under now.
+    moved: &'static [(&'static str, &'static str)],
+}
+
+/// The two commands this repository's instructions drive, and where their first level went.
+///
+/// Read off the two command surfaces rather than off a release note: `aep`'s at
+/// `crates/edge/aep-cli/src/app.rs` in tag `0.52.0` (`GovernCommand`, `PlanCommand`, `DriveGroup`
+/// and `ObserveCommand`), and `ess`'s at `crates/edge/ess-cli/src/main.rs` in tag `0.12.0`
+/// (`SpecifyCommand`, `GenerateCommand`, `VerifyCommand` and `ImportCommand`).
+///
+/// Three spellings are deliberately absent, because none of them moved:
+///
+/// * `aep drive` and `aep doctor`. `drive run` was always spelled `drive run`; `doctor` belongs to
+///   no area.
+/// * `ess generate`. The area and the verb share a name, so `ess generate --path …` is what it
+///   always was — while `ess schema`, a sibling of that verb, is now `ess generate schema`.
+const REGROUPED: &[Regrouped] = &[
+    Regrouped {
+        tools: &["aep", "protocol"],
+        moved: &[
+            ("validate", "govern"),
+            ("resolve", "govern"),
+            ("inspect", "govern"),
+            ("evaluate", "govern"),
+            ("explain", "govern"),
+            ("describe", "govern"),
+            ("schema", "govern"),
+            ("workflow", "govern"),
+            ("artifact", "plan"),
+            ("serve", "plan"),
+            ("entity", "plan"),
+            ("audit", "plan"),
+            ("workspace", "plan"),
+            ("conformance", "plan"),
+            ("reverse", "plan"),
+            ("eval", "drive"),
+            ("trace", "observe"),
+            ("contract", "observe"),
+            ("property", "observe"),
+            ("specification", "observe"),
+            ("evidence", "observe"),
+        ],
+    },
+    Regrouped {
+        tools: &["ess"],
+        moved: &[
+            ("validate", "specify"),
+            ("compile", "specify"),
+            ("compose", "specify"),
+            ("inspect", "specify"),
+            ("graph", "specify"),
+            ("realization", "specify"),
+            ("runtime", "specify"),
+            ("synthesize", "generate"),
+            ("project", "generate"),
+            ("schema", "generate"),
+            ("build", "generate"),
+            ("component", "generate"),
+            ("release", "generate"),
+            ("stack", "generate"),
+            ("deployment", "generate"),
+            ("conform", "verify"),
+            ("diff", "verify"),
+            ("impact", "verify"),
+            ("import", "infra"),
+        ],
+    },
+];
+
+/// The extensions an authored document carries here: markdown prose, and the YAML the eval corpus
+/// is written in. Rust sources are not documents — see [`FLAT_ALLOWED`].
+const DOCUMENT_EXTENSIONS: &[&str] = &["md", "yaml", "yml"];
+
+/// Repository-relative prefixes where a flat spelling is not a lesson.
+///
+/// A changelog entry says what a command *was* called and a dated change record is what was written
+/// on the day; `.engineering/` is the planning store, whose only writer is the `aep` CLI.
+///
+/// `.github/workflows/` is the fourth and the only one that is not a record. It is a program, and
+/// it pins the binary it runs — `AEP_VERSION: '0.44.0'` in `eval.yml`, *"an eval whose runner moved
+/// between two runs measured two things"* — so its spelling has to be the surface that version
+/// actually has, which is the flat one. A workflow that typed the grouped spelling would not teach
+/// a reader anything; it would fail to parse an argument on the runner. The comments beside those
+/// calls are exempt with them, because a comment describing the call below it in another spelling
+/// is worse than either.
+const FLAT_ALLOWED: &[&str] = &[
+    "CHANGELOG.md",
+    "changes/",
+    ".engineering/",
+    ".github/workflows/",
+];
+
+/// A line with the regex spellings a command matcher is written in read back as the command a
+/// person would type.
+///
+/// `evals/*/expectations.trace.yaml` selects a call with a regex over both names of the binary and
+/// over runs of spaces — `'(aep|protocol) +artifact +new'` — so the flat spelling a row teaches is
+/// invisible to a reader looking for `aep artifact`. Three substitutions put it back: the
+/// alternation is one of the two names, and `\s+` and ` +` are a space. A row already widened to
+/// accept the grouped spelling reads `aep (plan )?artifact` after this and carries no flat
+/// spelling, which is the point — the widening is what makes the row match either.
+fn as_typed(line: &str) -> String {
+    line.replace("(aep|protocol)", "aep")
+        .replace("\\s+", " ")
+        .replace("\\s", " ")
+        .replace(" +", " ")
+}
+
+/// The 1-based line numbers on which `text` spells a first-level verb flat, each with the area it
+/// is spelled under now.
+///
+/// A hit is the command's name, a space, and a moved verb — nothing else. `aep plan artifact new`
+/// is clean because `plan` is not a verb that moved, `aep drive eval run` because `drive` is not
+/// either, and `ess generate project` because the word after `ess` is `generate`, which stayed. A
+/// name inside another word (`process`, `aep-cli`, `ess-specify`) is not the command.
+fn flat_hits(text: &str, group: &Regrouped) -> Vec<(usize, &'static str, &'static str)> {
+    let mut hits = Vec::new();
+    for (number, line) in text.lines().enumerate() {
+        let typed = as_typed(line);
+        let bytes = typed.as_bytes();
+        for tool in group.tools {
+            let mut from = 0;
+            while let Some(offset) = typed[from..].find(tool) {
+                let start = from + offset;
+                let end = start + tool.len();
+                from = end;
+                if start > 0 && (word_byte(bytes[start - 1]) || bytes[start - 1] == b'-') {
+                    continue;
+                }
+                let Some(rest) = typed[end..].strip_prefix(' ') else {
+                    continue;
+                };
+                let rest = rest.trim_start_matches(' ');
+                let width = rest
+                    .find(|character: char| !character.is_ascii_alphanumeric() && character != '-')
+                    .unwrap_or(rest.len());
+                let Some((verb, area)) =
+                    group.moved.iter().find(|(verb, _)| *verb == &rest[..width])
+                else {
+                    continue;
+                };
+                hits.push((number + 1, *verb, *area));
+            }
+        }
+    }
+    hits
+}
+
+/// Whether a repository-relative path is a recorded transcript or the manifest that dates it.
+///
+/// Everything under `evals/<case>/recorded/` except its `README.md`, which is not evidence of a run
+/// — it is the instructions for making one, and it is read by a person who then types them.
+fn transcript(relative: &str) -> bool {
+    matches!(
+        relative.split('/').collect::<Vec<_>>().as_slice(),
+        ["evals", _, "recorded", rest @ ..] if rest.last() != Some(&"README.md")
+    )
+}
+
+/// No authored document teaches a first-level verb the two CLIs no longer print.
+///
+/// Over the tree, for the reason the sibling sweep above is: a list of the documents that name a
+/// command is the hand-maintained thing that misses the one nobody thought to list. The 0.52.0 and
+/// 0.12.0 groupings reached twenty-two files here, and every flat spelling still works — so nothing
+/// fails, nothing warns, and a document teaching the old surface is invisible to every check that
+/// runs a command.
+fn flat_spellings(root: &Path) -> Result<(), String> {
+    let mut found = Vec::new();
+    let mut stack = vec![root.to_path_buf()];
+    while let Some(directory) = stack.pop() {
+        let mut entries = std::fs::read_dir(&directory)
+            .map_err(|error| format!("reading {}: {error}", directory.display()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| format!("reading {}: {error}", directory.display()))?
+            .into_iter()
+            .map(|entry| entry.path())
+            .collect::<Vec<_>>();
+        entries.sort();
+        for path in entries {
+            let Ok(relative) = path.strip_prefix(root) else {
+                continue;
+            };
+            let relative = relative.to_string_lossy().replace('\\', "/");
+            let name = path
+                .file_name()
+                .and_then(std::ffi::OsStr::to_str)
+                .unwrap_or_default();
+            let allowed = FLAT_ALLOWED
+                .iter()
+                .any(|allowed| format!("{relative}/").starts_with(allowed) || relative == *allowed);
+            if path.is_dir() {
+                if !RETIRED_SKIP_DIRS.contains(&name) && !allowed {
+                    stack.push(path);
+                }
+                continue;
+            }
+            if allowed || transcript(&relative) {
+                continue;
+            }
+            let extension = path
+                .extension()
+                .and_then(|extension| extension.to_str())
+                .unwrap_or_default();
+            if !DOCUMENT_EXTENSIONS.contains(&extension) {
+                continue;
+            }
+            let Ok(bytes) = std::fs::read(&path) else {
+                continue;
+            };
+            let text = String::from_utf8_lossy(&bytes);
+            for group in REGROUPED {
+                for (line, verb, area) in flat_hits(&text, group) {
+                    found.push(format!(
+                        "  {relative}:{line} teaches `{} {verb}`, which is now `{} {area} {verb}`",
+                        group.tools[0], group.tools[0]
+                    ));
+                }
+            }
+        }
+    }
+    if found.is_empty() {
+        return Ok(());
+    }
+    found.sort();
+    Err(format!(
+        "{} flat CLI spelling(s) remain in authored documents, and `AGENTS.md` § Invariants says \
+         the grouped spelling is the authored one:\n{}",
+        found.len(),
+        found.join("\n")
+    ))
+}
+
 fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
@@ -452,6 +696,7 @@ fn check(root: &Path) -> Result<(), String> {
     }
     critic_pins(root)?;
     retired_names(root)?;
+    flat_spellings(root)?;
     evals::evals(root)
 }
 
@@ -813,6 +1058,160 @@ mod tests {
             error.expect_err("a path filed under a retired plugin name must fail the check");
         assert!(
             error.contains(&plugin_file) && error.contains(&page),
+            "{error}"
+        );
+    }
+
+    /// The grouping is only migrated when no authored document still teaches the flat surface.
+    /// Over the tree, and not over a list of the documents that name a command: the flat spellings
+    /// reached skills, agent charters, references, the website, both READMEs and the eval corpus,
+    /// and every one of them still runs, so the one a hand sweep misses is caught by nothing.
+    #[test]
+    fn no_authored_document_teaches_a_flat_cli_spelling() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        flat_spellings(root).expect("every authored document uses the grouped spelling");
+    }
+
+    /// What the sweep counts as a flat spelling. The grouped forms have to read clean, or the
+    /// migration cannot land; the words that merely contain a command's name have to read clean,
+    /// or the sweep is noise; and the regex form a command matcher is written in has to read as
+    /// the command it selects, or the eval corpus keeps teaching what the skills stopped teaching.
+    #[test]
+    fn the_flat_sweep_reads_a_typed_command_and_not_a_word() {
+        let aep = &REGROUPED[0];
+        assert_eq!(aep.tools, &["aep", "protocol"]);
+        let ess = &REGROUPED[1];
+        assert_eq!(ess.tools, &["ess"]);
+
+        assert_eq!(
+            flat_hits("$ aep artifact new story x\n", aep),
+            vec![(1, "artifact", "plan")]
+        );
+        assert_eq!(
+            flat_hits("run `protocol reverse scan`\n", aep),
+            vec![(1, "reverse", "plan")]
+        );
+        assert_eq!(
+            flat_hits("a\n$ aep eval run --corpus evals\n", aep),
+            vec![(2, "eval", "drive")]
+        );
+        assert_eq!(
+            flat_hits("$ ess validate --path .\n", ess),
+            vec![(1, "validate", "specify")]
+        );
+        assert_eq!(
+            flat_hits("$ ess project openapi\n", ess),
+            vec![(1, "project", "generate")]
+        );
+
+        for grouped in [
+            "$ aep plan artifact new story x\n",
+            "$ aep drive eval run --corpus evals\n",
+            "$ aep drive run --workflow adp/default\n",
+            "$ aep doctor\n",
+            "$ protocol plan reverse scan\n",
+        ] {
+            assert!(flat_hits(grouped, aep).is_empty(), "{grouped}");
+        }
+        for grouped in [
+            "$ ess specify validate --path .\n",
+            "$ ess generate --path . --kind schema\n",
+            "$ ess generate project openapi\n",
+            "$ ess verify conform\n",
+        ] {
+            assert!(flat_hits(grouped, ess).is_empty(), "{grouped}");
+        }
+
+        // A command's name inside another word, inside a path, or inside a plugin id.
+        for elsewhere in [
+            "cargo build -p aep-cli\n",
+            "the plugin aep-drive\n",
+            "beyond10x/agentplugins@ess-specify@0.7.0\n",
+            "the process validates nothing\n",
+            "an aeproject\n",
+        ] {
+            assert!(flat_hits(elsewhere, aep).is_empty(), "{elsewhere}");
+            assert!(flat_hits(elsewhere, ess).is_empty(), "{elsewhere}");
+        }
+
+        // The shape a `trace-spec/1` command matcher is written in, before and after widening.
+        assert_eq!(
+            flat_hits(
+                "          command: {regex: '(aep|protocol) artifact +body'}\n",
+                aep
+            ),
+            vec![(1, "artifact", "plan")]
+        );
+        assert!(
+            flat_hits(
+                "          command: {regex: '(aep|protocol) +(plan +)?artifact +body'}\n",
+                aep
+            )
+            .is_empty(),
+            "a row widened to accept either spelling teaches neither"
+        );
+    }
+
+    /// A flat spelling that reaches an authored document is a failing gate naming the file, the
+    /// line and the grouped spelling — and the records that keep theirs keep them.
+    #[test]
+    fn a_flat_spelling_in_an_authored_document_fails_the_check() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-flat-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&sandbox);
+        let write = |relative: &str, body: &str| {
+            let target = sandbox.join(relative);
+            std::fs::create_dir_all(target.parent().expect("every entry has a directory"))
+                .expect("the sandbox is writable");
+            std::fs::write(target, body).expect("the sandbox is writable");
+        };
+
+        write(
+            "README.md",
+            "Run `aep artifact validate` before you stop.\n",
+        );
+        assert_eq!(
+            flat_spellings(&sandbox).expect_err("a flat spelling in an authored document fails"),
+            "1 flat CLI spelling(s) remain in authored documents, and `AGENTS.md` § Invariants \
+             says the grouped spelling is the authored one:\n  README.md:1 teaches `aep \
+             artifact`, which is now `aep plan artifact`"
+        );
+
+        // The four places the flat spelling is the record: what the changelog says the command
+        // was, what a dated change record said on its day, the planning store the CLI writes, and
+        // a transcript of a run made under it. And one place it is not: the README beside that
+        // transcript, which is instructions a person types.
+        write(
+            "README.md",
+            "Run `aep plan artifact validate` before you stop.\n",
+        );
+        write(
+            "CHANGELOG.md",
+            "`aep artifact` is now `aep plan artifact`\n",
+        );
+        write("changes/2026-09-04-grouping.yaml", "was: aep eval run\n");
+        write(".engineering/planning/story/x.md", "run `ess validate`\n");
+        write(
+            "evals/a-case/recorded/run.manifest.yaml",
+            "command: ess validate --path .\n",
+        );
+        flat_spellings(&sandbox).expect("history, change records and transcripts keep theirs");
+
+        write(
+            "evals/a-case/recorded/README.md",
+            "```console\n$ aep eval run --case evals/a-case\n```\n",
+        );
+        let error = flat_spellings(&sandbox)
+            .expect_err("the instructions beside a transcript are typed by a person");
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+        assert!(
+            error.contains("evals/a-case/recorded/README.md:2 teaches `aep eval`"),
             "{error}"
         );
     }

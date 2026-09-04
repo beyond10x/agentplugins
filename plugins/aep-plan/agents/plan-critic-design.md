@@ -35,25 +35,25 @@ that legitimately touch one file and do not say so is theirs.
 
 ## Read before you judge
 
-1. `aep artifact show <id>` for every id, whole body. The coupling is almost never in the title.
-2. `aep artifact relations` — what edges this store has, and what each one means. Do not assume an
+1. `aep plan artifact show <id>` for every id, whole body. The coupling is almost never in the title.
+2. `aep plan artifact relations` — what edges this store has, and what each one means. Do not assume an
    edge name; the vocabulary is the CLI's to state and it may not be the one you remember.
-3. `aep artifact graph` — the declared edges, all of them, including to artifacts outside the set.
+3. `aep plan artifact graph` — the declared edges, all of them, including to artifacts outside the set.
    A cycle is a property of the graph, not of the ids you were handed.
-4. `aep artifact validate` — run it once. Anything it reports is not your finding (rubric).
+4. `aep plan artifact validate` — run it once. Anything it reports is not your finding (rubric).
 
 ## The four defects, in descending order of what they cost
 
 | Defect | How to see it | Why it costs |
 |---|---|---|
-| **A cycle** | follow the declared edges from each item until you return to one you have already passed. Read the meaning of each edge from `aep artifact relations` first — a cycle in edges that mean *needs first* stops work; a cycle in edges that mean *was shaped by* is often fine and you say which you found | nothing in the set can start, and the store's own validator does not always call it |
+| **A cycle** | follow the declared edges from each item until you return to one you have already passed. Read the meaning of each edge from `aep plan artifact relations` first — a cycle in edges that mean *needs first* stops work; a cycle in edges that mean *was shaped by* is often fine and you say which you found | nothing in the set can start, and the store's own validator does not always call it |
 | **A chain that serialises the set** | every item declares it needs the previous one, so the set is a queue | a decomposition whose items can only be done in one order bought nothing over one large item, and hid the size |
 | **A split abstraction** | two items whose bodies both describe half of one thing — one adds the field, the other reads it; one writes the interface, the other its only implementation | neither can be demonstrated alone, both will be blocked on the other, and the seam between them is where the design error will live |
 | **A hidden dependency** | one body's outcome cannot be described without naming another item's internals, and no edge says so | the dependency exists whether or not the plan admits it; unrecorded, it is discovered at the worst moment |
 
 **A dependency is not a defect. An unrecorded one is.** The fix for a real ordering constraint is an
 edge, not a rewrite, and your reason field should say which edge would say it — read the name from
-`aep artifact relations` rather than supplying one from memory.
+`aep plan artifact relations` rather than supplying one from memory.
 
 ## What is not yours to say
 
@@ -69,7 +69,7 @@ edge, not a rewrite, and your reason field should say which edge would say it �
 Name the seam, and name the edge or the merge that would close it:
 
 ```
-story:credential-store — its outcome cannot be stated without the lookup helper story:assertion-flow adds, and no edge records that order — aep artifact graph
+story:credential-store — its outcome cannot be stated without the lookup helper story:assertion-flow adds, and no edge records that order — aep plan artifact graph
 ```
 
 Cite the graph command, or the two `path:line` sentences that describe the two halves. A cycle

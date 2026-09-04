@@ -1,7 +1,7 @@
 # The eval corpus
 
 One directory per case, and a directory holding a `case.yaml` **is** a case — nothing registers one
-anywhere. `task check` enumerates this tree; `aep eval run --corpus evals` runs it.
+anywhere. `task check` enumerates this tree; `aep drive eval run --corpus evals` runs it.
 
 A case is four things and no others:
 
@@ -23,7 +23,7 @@ A case is four things and no others:
 | `decomposer-relation-census` | `aep-plan:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
 | `ess-specify-new-entity` | `ess-specify:specify` | the noun got a validated typed home before a story rested on it, and the unread relation stayed unread |
 | `golden-path-end-to-end` | `website/docs/golden-path.md` | the eight published steps in the published order, with the CLIs as the stores' only writers |
-| `adversary-tests-only` | `aep-drive:adversary` | tests were written, `src/` was not touched, and no `aep artifact` command ran |
+| `adversary-tests-only` | `aep-drive:adversary` | tests were written, `src/` was not touched, and no `aep plan artifact` command ran |
 
 ## `recorded/` is empty, and that is stated rather than implied
 
@@ -40,7 +40,7 @@ run, which is a true thing to report and not a broken gate.
 
 Two transcript sets were checked for something reusable and neither fits.
 `aep/conformance/eval/*/transcript.jsonl` is stated by its own README to be *structurally faithful
-and not observed*, and `aep eval run --stream` refuses all five besides — their `session.started`
+and not observed*, and `aep drive eval run --stream` refuses all five besides — their `session.started`
 states no `hermetic.installed_plugins`, which the run manifest is read out of (`EVAL-STREAM-004`).
 `metaharness/evals/aep/checks/transcripts/` is stated by its README to be hand-written inputs to a
 discrimination check, *"nothing here came from a model"*.
@@ -112,7 +112,7 @@ Live, which costs money and is refused without both `METAHARNESS_LIVE=1` and a c
 [`README.md` § Evals](../README.md#evals) for the arithmetic of a full sweep:
 
 ```console
-$ METAHARNESS_LIVE=1 aep eval run --corpus evals --workflow adp/default \
+$ METAHARNESS_LIVE=1 aep drive eval run --corpus evals --workflow adp/default \
     --arm plugin --harness claude --plugin-dir plugins/aep-plan \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>

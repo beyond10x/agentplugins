@@ -31,7 +31,7 @@ subject:
 # ## What is asserted, and what is not
 #
 # **Asserted:** no write verb touched a path under `src/`; a write verb did touch a path under
-# `tests/`; no `aep artifact` command ran at all; the tree was not moved to the base and no worktree
+# `tests/`; no `aep plan artifact` command ran at all; the tree was not moved to the base and no worktree
 # was removed; nothing was written under `/tmp`.
 #
 # **Not asserted:** that the diff contains only test files. That is a claim about the git index, and

@@ -49,6 +49,12 @@ jobs:
       EVAL_BUDGET_USD: ${{ inputs.budget_usd || vars.EVAL_BUDGET_USD || '20' }}
       EVAL_CASE_USD: '5'
       # Pinned. An eval whose runner moved between two runs measured two things.
+      #
+      # Every `aep` call in this file is the flat spelling on purpose. AEP 0.52.0 grouped the first
+      # level into areas — `eval run` is `drive eval run` there, `artifact` is `plan artifact` —
+      # and this workflow runs the version pinned below, which has neither. A grouped spelling here
+      # would not teach a reader anything; it would fail to parse on the runner. Move both when the
+      # pin moves.
       AEP_VERSION: '0.44.0'
       METAHARNESS_VERSION: '0.4.2'
     steps:

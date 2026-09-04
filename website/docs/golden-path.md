@@ -43,16 +43,16 @@ The example service owns accounts and nothing else: a README, and one module hol
 directory yet.
 
 ```text
-Adopt this repository for AEP planning. Run `aep reverse init` with the protocol source
+Adopt this repository for AEP planning. Run `aep plan reverse init` with the protocol source
 git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45 and the profile
-development.standard, then run `aep reverse scan`. Report what the scan found, and file nothing yet.
+development.standard, then run `aep plan reverse scan`. Report what the scan found, and file nothing yet.
 ```
 
 Two commands and a report is the whole of this step. A scan is evidence, not a plan, and an agent
 that starts drafting artifacts out of one has skipped the part where you get to disagree with it.
 
 ```shell-session
-$ aep reverse init --protocols 'git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45' --profile development.standard
+$ aep plan reverse init --protocols 'git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45' --profile development.standard
 …/.engineering/project.yaml written
   protocol source resolves to …/aep/protocol-sources/cd43e0b7f3341c9d6329bc502188182e1b0f38df9eda89fd7546517a078e2573/snapshots/8b4342a41fdd914341d9a479627ed76240f88d45
   profile development.standard
@@ -63,7 +63,7 @@ source pinned to a branch rather than a commit — which is why the source above
 hash.
 
 ```shell-session
-$ aep reverse scan
+$ aep plan reverse scan
 aep.reverse-scan/1
 
 readme headings: 3
@@ -98,14 +98,14 @@ Cite what in this repository the epic rests on.
 ```
 
 ```shell-session
-$ aep artifact new epic commercial-clients --title "Commercial clients on an account" --summary "A commercial client that belongs to exactly one account, with create, read, update and delete." --from epic-body.md
+$ aep plan artifact new epic commercial-clients --title "Commercial clients on an account" --summary "A commercial client that belongs to exactly one account, with create, read, update and delete." --from epic-body.md
 created epic:commercial-clients (draft) at …/.engineering/planning/epic/commercial-clients.md
 ```
 
 The agent writes the body to a file and hands it to `--from`, because the CLI is the store's only
 writer: it owns the frontmatter, and it placed the epic at its kind's initial status without anybody
-typing one. Which statuses your store has is a question for the CLI, not for a page — `aep artifact
-kinds` and `aep artifact lifecycle epic` answer it, and they answer for *your* store.
+typing one. Which statuses your store has is a question for the CLI, not for a page — `aep plan artifact
+kinds` and `aep plan artifact lifecycle epic` answer it, and they answer for *your* store.
 
 ## 3. Model the new noun before decomposing it
 
@@ -175,12 +175,12 @@ entities:
 ```
 
 `via: account_id` sits on the **target** because the relation is `owns`: the child carries the field
-typed by the owner's identity. `ess validate` refuses a target that is not declared, a `via` that is
+typed by the owner's identity. `ess specify validate` refuses a target that is not declared, a `via` that is
 missing or of the wrong type, and a second entity claiming to own the same one — which is what makes
 this worth writing down rather than asserting in a story body.
 
 ```shell-session
-$ ess validate --path <specification>
+$ ess specify validate --path <specification>
 accounts v1 — 2 file(s), valid
 ```
 
@@ -210,7 +210,7 @@ The decomposer enumerates the relations before it drafts anything. For this epic
 | the account is the owning side of the pair | `inferable` | the same entry — `kind: owns` |
 | what deleting an account does to the clients it holds | `requires-stakeholder-input` | nothing — the `UNMAPPED:` marker beside that entry, and `README.md:13` and `src/accounts.py:30` |
 
-The first two citations point at a document `ess validate` accepted, not at a sentence in a story and
+The first two citations point at a document `ess specify validate` accepted, not at a sentence in a story and
 not at a foreign key in `src/`. A `path:line` into code is admissible for a relation only when the
 classification carries the word `inferred` — because a constraint in code says what this
 implementation currently does, and says nothing about whether anybody decided it.
@@ -218,11 +218,11 @@ implementation currently does, and says nothing about whether anybody decided it
 Two are settled, so three stories are drafted against them:
 
 ```shell-session
-$ aep artifact new story commercial-client-record --title "Create and read a commercial client on one account" --relate decomposes:epic:commercial-clients --from record-body.md
+$ aep plan artifact new story commercial-client-record --title "Create and read a commercial client on one account" --relate decomposes:epic:commercial-clients --from record-body.md
 created story:commercial-client-record (draft) at …/.engineering/planning/story/commercial-client-record.md
-$ aep artifact new story commercial-client-amendment --title "Update and delete a commercial client" --relate decomposes:epic:commercial-clients --from amendment-body.md
+$ aep plan artifact new story commercial-client-amendment --title "Update and delete a commercial client" --relate decomposes:epic:commercial-clients --from amendment-body.md
 created story:commercial-client-amendment (draft) at …/.engineering/planning/story/commercial-client-amendment.md
-$ aep artifact new story account-client-listing --title "List the commercial clients one account holds" --relate decomposes:epic:commercial-clients --from listing-body.md
+$ aep plan artifact new story account-client-listing --title "List the commercial clients one account holds" --relate decomposes:epic:commercial-clients --from listing-body.md
 created story:account-client-listing (draft) at …/.engineering/planning/story/account-client-listing.md
 ```
 
@@ -236,11 +236,11 @@ in a report nobody re-reads — or an `UNMAPPED:` comment that only somebody ope
 would find:
 
 ```shell-session
-$ aep artifact lifecycle decision-blocker
+$ aep plan artifact lifecycle decision-blocker
 decision-blocker starts at open
   cleared -> nothing
   open -> cleared
-$ aep artifact new decision-blocker account-deletion-cascade --title "Nobody has decided what happens to an account's commercial clients when the account is deleted" --withholds approval --relate blocks:epic:commercial-clients --from blocker-body.md
+$ aep plan artifact new decision-blocker account-deletion-cascade --title "Nobody has decided what happens to an account's commercial clients when the account is deleted" --withholds approval --relate blocks:epic:commercial-clients --from blocker-body.md
 created decision-blocker:account-deletion-cascade (open) at …/.engineering/planning/decision-blocker/account-deletion-cascade.md
 ```
 
@@ -249,18 +249,18 @@ with an edge is found by a command, and `--withholds` names the evidence nobody 
 stands:
 
 ```shell-session
-$ aep artifact blocked
+$ aep plan artifact blocked
 decision-blocker:account-deletion-cascade  decision  open, withholding approval  Nobody has decided what happens to an account's commercial clients when the account is deleted
   blocks epic:commercial-clients  draft  Commercial clients on an account
 ```
 
 The decomposer reports in four parts. The third lists what it deliberately did not cover, each with
 the question that blocked it — here, that blocker. **The fourth is the one to read first:** the
-complete output of `aep artifact validate`, verbatim, with its exit status. If it exited 1, nothing
+complete output of `aep plan artifact validate`, verbatim, with its exit status. If it exited 1, nothing
 else in the report is safe to act on. Here it did not:
 
 ```shell-session
-$ aep artifact validate
+$ aep plan artifact validate
 5 file(s) in …/.engineering/planning: 5 artifact(s)
 valid
 ```
@@ -281,7 +281,7 @@ store's journal is append-only and parallel writers race — and it goes through
 other change to a body:
 
 ```shell-session
-$ aep artifact body story:commercial-client-record --from record-body.md
+$ aep plan artifact body story:commercial-client-record --from record-body.md
 story:commercial-client-record body replaced (revision 2) at …/.engineering/planning/story/commercial-client-record.md
 ```
 
@@ -300,7 +300,7 @@ story's acceptance observable, and does it cover the state transitions), design 
 stories sharing a surface), scope (is the epic's outcome covered, and is anything drafted that sits
 outside it), parallel safety (name the pairs that touch one file). Each returns `approve` or
 `needs-revision` plus a list of *artifact — reason — citation* lines; a verdict with no citation is
-not a verdict. On `needs-revision` the drafts are revised through `aep artifact body` and the panel
+not a verdict. On `needs-revision` the drafts are revised through `aep plan artifact body` and the panel
 runs again, at most twice, and whatever is still open after that is listed rather than argued away.
 With fewer than two stories under the epic the step is skipped, and says so.
 
@@ -308,7 +308,7 @@ Every verdict is recorded as an artifact carrying a `reviews` edge to what it ju
 you end up with also carries the argument that produced it:
 
 ```shell-session
-$ aep artifact lifecycle review-result
+$ aep plan artifact lifecycle review-result
 review-result starts at active
   active -> archived
   archived -> nothing
@@ -322,7 +322,7 @@ edited. That is what makes it evidence rather than an opinion somebody kept upda
 A draft is not implementable, and the store says so rather than letting you pretend otherwise:
 
 ```shell-session
-$ aep artifact move story:commercial-client-record --to implemented
+$ aep plan artifact move story:commercial-client-record --to implemented
 story:commercial-client-record is draft; a story may move to: proposed, archived
 $ echo $?
 1
@@ -332,9 +332,9 @@ That refusal is the answer, not an obstacle: it names every status legal from wh
 stands. Walk it, deliberately, and say that you did:
 
 ```shell-session
-$ aep artifact move story:commercial-client-record --to proposed
+$ aep plan artifact move story:commercial-client-record --to proposed
 story:commercial-client-record moved draft -> proposed (revision 3)
-$ aep artifact move story:commercial-client-record --to active
+$ aep plan artifact move story:commercial-client-record --to active
 story:commercial-client-record moved proposed -> active (revision 4)
 ```
 
@@ -349,7 +349,7 @@ evidence recorded, and the repository's own invariants. None of it replaces your
 and none of it gives an implementor authority beyond its unit.
 
 When the run produces an observation that a later move needs — a test run, a review — record it with
-`aep artifact evidence` before the move, naming the source and where to look. `aep artifact move`
+`aep plan artifact evidence` before the move, naming the source and where to look. `aep plan artifact move`
 finds evidence recorded against the artifact without being told. If it still refuses, the refusal
 names what is missing, and that sentence is what to relay.
 
@@ -384,7 +384,7 @@ the model spend is real, so it asks you for a budget rather than choosing one.
 ## What you should have
 
 ```shell-session
-$ aep artifact list
+$ aep plan artifact list
 decision-blocker:account-deletion-cascade  decision-blocker  open    Nobody has decided what happens to an account's commercial clients when the account is deleted
 epic:commercial-clients                    epic              draft   Commercial clients on an account                                                                blocked: decision
 story:account-client-listing               story             draft   List the commercial clients one account holds
@@ -420,7 +420,7 @@ gaps and seven held, and nothing the run did was wrong; there was just nobody to
 ```text
 Run this without stopping: no operator is present, so at every point you would pause for one — the
 wave proposal, a critic round, a blocker, a move the store gates on evidence — record one
-`approval-record` through `aep artifact new`, tagged `non-interactive`, naming the stop and what you
+`approval-record` through `aep plan artifact new`, tagged `non-interactive`, naming the stop and what you
 decided in the operator's absence, and continue. Do not clear a blocker, do not publish and do not
 release.
 ```
@@ -430,17 +430,17 @@ The eight prompts then follow unchanged.
 ### What gets recorded at each stop
 
 One record per stop, written **at** the stop and through the CLI like every other change to the
-store — `aep artifact kinds` lists `approval-record`, and `aep artifact lifecycle approval-record`
+store — `aep plan artifact kinds` lists `approval-record`, and `aep plan artifact lifecycle approval-record`
 answers that it declares no lifecycle, so creating it is the whole of the bypass. Afterwards,
-`aep artifact list --kind approval-record` is the list of every place the run decided something you
+`aep plan artifact list --kind approval-record` is the list of every place the run decided something you
 would have decided.
 
 | Where the page waits | What the run records | What it does next |
 |---|---|---|
 | **step 4** — the decomposer files `decision-blocker:account-deletion-cascade` and drafts no story behind it | the blocker id, and the story it did not draft | drafts the two stories that do not depend on the answer |
-| **step 6** — a critic round comes back `needs-revision` | one record per round, holding the verdict nobody was there to read | revises through `aep artifact body`, runs the second round, stops at two, lists what is still open |
+| **step 6** — a critic round comes back `needs-revision` | one record per round, holding the verdict nobody was there to read | revises through `aep plan artifact body`, runs the second round, stops at two, lists what is still open |
 | **step 7** — the wave proposal | the units, the commits an approval would have authorised, the pre-flight numbers | writes the wave page anyway, then dispatches |
-| **step 7** — `aep artifact move` refuses for want of evidence | the refusal, verbatim | records the evidence if the run actually observed it; otherwise leaves the story where it stands and goes on with what is not blocked |
+| **step 7** — `aep plan artifact move` refuses for want of evidence | the refusal, verbatim | records the evidence if the run actually observed it; otherwise leaves the story where it stands and goes on with what is not blocked |
 | **step 8** — the driven run's budget | the budget the instruction named | launches. Where the instruction named none, it records that and prints the command rather than choosing a number to spend |
 
 ### What a headless run cannot do
@@ -450,7 +450,7 @@ does not supply:
 
 | | Why |
 |---|---|
-| **clear a blocker** | `aep artifact move decision-blocker:account-deletion-cascade --to cleared` *is* the answer to the question, and the question is the thing nobody was there to answer. The blocker stands and the epic stays blocked — which is the correct end state, not a gap |
+| **clear a blocker** | `aep plan artifact move decision-blocker:account-deletion-cascade --to cleared` *is* the answer to the question, and the question is the thing nobody was there to answer. The blocker stands and the epic stays blocked — which is the correct end state, not a gap |
 | **publish** | a push, a tag and a version bump are the repository's release procedure, and none of them is a step of this plan |
 | **release** | the wave's second stop, and the one that is not bypassable. Nothing mechanical enforces a release procedure, so a run nobody is watching is the case that stop exists for. The run closes at the merge and leaves the release |
 | **turn a refusal into a pass** | a move whose evidence does not exist is still refused and a red gate is still red. A bypass record is not an exit status, and evidence is never recorded for an observation the run did not make |

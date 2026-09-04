@@ -47,7 +47,7 @@ replaces this list wholesale. This repository's, as the worked example:
 * each worktree builds into its own `target/` **inside the worktree** — never set
   `CARGO_TARGET_DIR`, never point two trees at one build directory
 * `cargo fmt -p <crate>`, never `cargo fmt --all`
-* never write under `.engineering/planning/`, and no `aep artifact` write verb — reads
+* never write under `.engineering/planning/`, and no `aep plan artifact` write verb — reads
   (`show`, `list`, `--help`) are fine
 * the gate is **package-scoped** here; the full gate runs once, later, on the integration branch
 * no `git worktree` command, and no `git commit`, `git add`, `git stash` or branch command —

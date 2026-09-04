@@ -1,5 +1,60 @@
 # Changelog
 
+## [Unreleased]
+
+- Every authored document teaches the **grouped** CLI spelling. AEP 0.52.0 replaced a flat first
+  level of twenty-three verbs with four areas plus `doctor`, and ESS 0.12.0 replaced twenty with
+  four;
+  both keep every flat spelling as a hidden alias with identical stdout, stderr and exit status, so
+  **nothing here was broken and nothing is fixed** — what changes is what a skill, a charter, a
+  reference, a page and an eval case teach a reader to type.
+
+  | was | is |
+  |---|---|
+  | `aep validate resolve inspect evaluate explain describe schema workflow` | `aep govern <verb>` |
+  | `aep artifact serve entity audit workspace conformance reverse` | `aep plan <verb>` |
+  | `aep eval {matrix,run}` | `aep drive eval {matrix,run}` |
+  | `aep trace contract property specification evidence` | `aep observe <verb>` |
+  | `ess validate compile compose inspect graph realization runtime` | `ess specify <verb>` |
+  | `ess synthesize project schema build release stack deployment` | `ess generate <verb>` |
+  | `ess conform diff impact` | `ess verify <verb>` |
+  | `ess import` | `ess infra import` |
+
+  `aep drive run|status|resume|transition`, `aep doctor` and `ess generate --path …` are what they
+  were: those verbs did not move. The `protocol` spelling follows `aep`'s, since they are two names
+  for one binary.
+
+- The eval corpus's command matchers **accept either spelling** rather than moving to the grouped
+  one. `'(aep|protocol) artifact +move'` is now `'(aep|protocol) +(plan +)?artifact +move'`: the
+  committed transcript of `golden-path-end-to-end` was recorded under the flat spelling and a row
+  that stopped matching it would be a specification describing a run other than the one recorded,
+  while a row that only matched the flat spelling would report `never_occurred` against the next
+  recording made by an agent reading the migrated skills. Widening witnesses a claim; it does not
+  widen one. The same holds for the `tool.absent` row in `adversary-tests-only`, where accepting
+  both spellings is what keeps *"no `artifact` command ran"* from being satisfiable by typing the
+  other one.
+
+- `agentplugins-check` refuses a flat spelling in any `.md`, `.yaml` or `.yml` this repository
+  authors, rather than leaving `AGENTS.md` § *Invariants* to a person remembering to grep. Sweeping
+  the tree found 360 of them across 47 files, five of which were in a file no hand list had — the
+  paid eval workflow.
+
+  The sweep exempts four prefixes, each visible in a diff:
+
+  | exempt | why |
+  |---|---|
+  | `CHANGELOG.md` | what a command *was* called |
+  | `changes/` | a dated record, written on the day |
+  | `.engineering/` | the planning store, whose only writer is the `aep` CLI |
+  | `.github/workflows/` | a program, not a lesson: `eval.yml` pins `AEP_VERSION: '0.44.0'`, so its spelling has to be the surface that version has |
+
+  Rust sources are not swept for the same reason as the last row: `evals.rs` spawns
+  `aep eval run --stream` against whichever binary is on `PATH`, and that call is a call.
+
+- The install page pins **AEP 0.52.0** and **ESS 0.13.1**, the latest published release of each, and
+  the versions whose `--version` lines it quotes. The grouped spelling the pages now teach exists in
+  AEP from 0.52.0 and in ESS from 0.12.0; the previous pins (0.51.0 and 0.11.1) have neither.
+
 ## [0.7.0] — 2026-09-04
 
 - Every product plugin now carries its product's name and the verb it performs. `aep-planning`
