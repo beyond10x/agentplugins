@@ -53,8 +53,9 @@ or relations. Ask for them at the moment you need them:
 | What writes has one side of a hybrid plan taken that the other has not? | `aep plan artifact divergences` |
 | Is the whole store still consistent? | `aep plan artifact validate` |
 
-That is every `aep plan artifact` verb that answers a question. The six that are missing from it
-write — `new`, `move`, `relate`, `body`, `evidence`, `catch-up` — and guardrail 2 governs those.
+That is every `aep plan artifact` verb that answers a question. The seven that are missing from it
+write — `new`, `move`, `relate`, `unrelate`, `body`, `evidence`, `catch-up` — and guardrail 2 governs
+those.
 Run `aep plan artifact --help` when this table and the CLI disagree; the CLI is right.
 
 The reason is the reason this project exists. Lifecycle and relation documents are validated and
@@ -97,7 +98,12 @@ record that lives outside the store; it names no run and no artifact, and the st
 that rests on it as resting on an assertion.
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
-relations, status, and prose use `new`, `relate`, `move`, and `body` respectively. Supply the complete
+relations, status, and prose use `new`, `relate`/`unrelate`, `move`, and `body` respectively. **A
+wrong edge is taken back in the words that made it** — `unrelate <id> <relation> <target>`, or the
+colon form `unrelate <id> <relation>:<target>` — so a backwards `blocks` is a command, not a
+paragraph apologising for one. Before AEP 0.53.0 there was no such verb and sessions wrote the
+correction into the artifact's body instead; if `unrelate` is refused as an unknown verb, the
+installed CLI predates it and the honest report says so. Supply the complete
 body from a file or standard input — `body --from` after creation, or `new … --from` at creation; the
 CLI preserves frontmatter, validates the store, and bumps the revision once when bytes change. For a
 kind whose records are immutable (`review-result` refuses `body`), `new --from` is the only way a

@@ -41,8 +41,8 @@ written twice, so they cannot be allowed to disagree:
 | the file lives under the directory named by its `kind` | `aep plan artifact list --kind` reads the directory, and a misfiled artifact is invisible to it |
 
 Renaming therefore is not a `mv`. Moving a file by hand breaks every relation that names its old id
-and leaves `validate` to find the wreckage. Create the new artifact, re-point the relations, and
-archive the old one through its lifecycle.
+and leaves `validate` to find the wreckage. Create the new artifact, re-point the relations — `relate`
+on the new id and `unrelate` on the old one — and archive the old one through its lifecycle.
 
 ## Mutation ownership
 
@@ -53,6 +53,7 @@ No planning-store file is edited directly. One command surface owns every change
 | create an artifact, with its body when you have it | `aep plan artifact new … [--from <path|->]` |
 | replace its complete markdown body | `aep plan artifact body <id> --from <path|->` |
 | add a relation | `aep plan artifact relate` |
+| take one back, when it was wrong or pointed the wrong way | `aep plan artifact unrelate` (AEP 0.53.0) |
 | move lifecycle status, including lifting a blocker | `aep plan artifact move` |
 
 This makes the store a single-writer system: every mutation loads and validates it before writing,

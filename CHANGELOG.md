@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+- **The planning skill says how to take an edge back.** AEP 0.53.0 adds
+  `aep plan artifact unrelate <id> <relation> <target>`, and the skill now names it in the write-verb
+  list, in guardrail 2, in the mutation-ownership table and in the renaming paragraph. Until this
+  landed the skill described a store where a relation could be added and never removed, so a session
+  that made a backwards `blocks` edge had nowhere to put the correction but the artifact's body —
+  which is what a recorded run did on 2026-09-04. A refusal naming `unrelate` as an unknown verb now
+  means the installed CLI predates 0.53.0, and the skill says so.
+
 - Every authored document teaches the **grouped** CLI spelling. AEP 0.52.0 replaced a flat first
   level of twenty-three verbs with four areas plus `doctor`, and ESS 0.12.0 replaced twenty with
   four;
