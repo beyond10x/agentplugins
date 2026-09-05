@@ -58,8 +58,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          notes_file="${RUNNER_TEMP}/release-notes.md"
+          git for-each-ref --format='%(contents)' "refs/tags/${GITHUB_REF_NAME}" > "$notes_file"
           if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release edit "${GITHUB_REF_NAME}" --verify-tag --title "Agent Plugins ${GITHUB_REF_NAME}" --notes-from-tag
+            gh release edit "${GITHUB_REF_NAME}" --verify-tag --draft=false --title "Agent Plugins ${GITHUB_REF_NAME}" --notes-file "$notes_file"
           else
-            gh release create "${GITHUB_REF_NAME}" --verify-tag --title "Agent Plugins ${GITHUB_REF_NAME}" --notes-from-tag
+            gh release create "${GITHUB_REF_NAME}" --verify-tag --title "Agent Plugins ${GITHUB_REF_NAME}" --notes-file "$notes_file"
           fi
