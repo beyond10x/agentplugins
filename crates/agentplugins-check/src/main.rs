@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
 mod evals;
+mod readiness;
 
 const PLUGINS: &[(&str, &[&str])] = &[
     (

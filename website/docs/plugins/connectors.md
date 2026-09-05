@@ -15,27 +15,26 @@ plugin installation.
 
 ## Install in either host
 
-This plugin is new on `main`; the `0.7.0` marketplace release does not contain it. For a fresh
-marketplace registration, use the current branch:
+Release `0.8.0` includes this plugin. For a fresh marketplace registration, use the release pin:
 
 ```bash
-claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#main
+claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.0
 claude plugin install connectors@beyond10x
 ```
 
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref main
+codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.8.0
 codex plugin add connectors@beyond10x
 ```
 
 An existing `beyond10x` registration pinned to `0.7.0` must be repointed before it can offer this
-plugin; refreshing an immutable tag does not add newer content. Preserve the other installed
-plugins when changing that registration. For development, both marketplace-add commands also
-accept the absolute path to a current local checkout containing both marketplace files. `main`
-moves; use an exact commit ref when a reproducible pre-release installation is required.
+plugin; refreshing an immutable tag does not add newer content. Follow the
+[upgrade instructions](../install.md) and preserve the other installed plugins when changing
+that registration. For development, both marketplace-add commands also accept the absolute path
+to a current local checkout containing both marketplace files.
 
 Reload Claude Code's plugins with `/reload-plugins`, or start a new Codex thread. In Claude Code,
-invoke `/connectors:connectors`; in Codex select the `connectors` skill or invoke `$connectors`.
+invoke `/connectors:connectors`; in Codex select the `connectors` skill or invoke `$connectors:connectors`.
 Both manifests load the same `skills/connectors/SKILL.md` bytes. These layouts follow the
 [OpenAI plugin packaging contract](https://developers.openai.com/plugins/build/plugins) and
 [Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference).

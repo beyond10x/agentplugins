@@ -110,6 +110,9 @@ struct Case {
     expectations: String,
     /// Where a recorded transcript goes, relative to the case directory.
     recorded: String,
+    /// Optional repository-owned semantic assertions beyond AEP's trace vocabulary.
+    #[serde(default)]
+    command_contract: Option<String>,
     /// Expectations that are expected to gap, each with the observation that explains it.
     #[serde(default)]
     advisory_gaps: Vec<serde_yaml::Value>,
@@ -429,6 +432,15 @@ fn case(root: &Path, directory: &Path) -> Result<Vec<PathBuf>, String> {
     let _ = &document.advisory_gaps;
 
     subject(root, &document, name)?;
+    if document
+        .command_contract
+        .as_deref()
+        .is_some_and(|contract| contract != "connectors-readiness")
+    {
+        return Err(format!(
+            "case `{name}` declares an unknown command_contract"
+        ));
+    }
     spec(&directory.join(&document.expectations))?;
 
     // Where a transcript goes, and whatever is already there.
@@ -695,6 +707,7 @@ fn replay(binary: &Path, root: &Path, stream: &Path, out: &Path) -> Result<(), S
         .expect("a stream has a directory")
         .join(format!("{stem}{MANIFEST_SUFFIX}"));
     let arm: Case = yaml(&directory.join("case.yaml"), "a case")?;
+    check_commands(&arm, stream)?;
 
     let output = Command::new(binary)
         .arg("eval")
@@ -936,6 +949,9 @@ pub(crate) fn cli(root: &Path, arguments: &[String]) -> Option<std::process::Exi
         .as_slice()
     {
         ["evals"] => evals(root),
+        ["evals", "check-stream", case, stream] => {
+            check_stream(root, Path::new(case), Path::new(stream))
+        }
         ["evals", "scope", changed @ ..] => {
             let changed: Vec<String> = changed.iter().map(|path| (*path).to_owned()).collect();
             scope(root, &changed).map(|matched| {
@@ -953,6 +969,40 @@ pub(crate) fn cli(root: &Path, arguments: &[String]) -> Option<std::process::Exi
             std::process::ExitCode::from(1)
         }
     })
+}
+
+fn check_commands(case: &Case, stream: &Path) -> Result<(), String> {
+    match case.command_contract.as_deref() {
+        None => Ok(()),
+        Some("connectors-readiness") => crate::readiness::check(stream),
+        Some(other) => Err(format!("unknown command_contract `{other}`")),
+    }
+}
+
+/// Check the repository's extra command contract and the AEP report from a live run.
+fn check_stream(root: &Path, directory: &Path, stream: &Path) -> Result<(), String> {
+    let directory = root.join(directory);
+    case(root, &directory)?;
+    let document: Case = yaml(&directory.join("case.yaml"), "a case")?;
+    check_commands(&document, stream)?;
+    let name = stream
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or("invalid stream name")?;
+    let stem = name
+        .strip_suffix(STREAM_SUFFIX)
+        .ok_or("expected an .events.jsonl stream")?;
+    let report = stream.with_file_name(format!("{stem}{REPORT_SUFFIX}"));
+    let failures = contradicted(&report)?;
+    if !failures.is_empty() {
+        return Err(format!(
+            "{}: unheld expectations: {}",
+            report.display(),
+            failures.join(", ")
+        ));
+    }
+    println!("valid: {} command and trace contracts", document.id);
+    Ok(())
 }
 
 #[cfg(test)]
@@ -986,9 +1036,27 @@ mod tests {
             task: String::new(),
             expectations: String::new(),
             recorded: String::new(),
+            command_contract: None,
             advisory_gaps: Vec::new(),
             violated: Vec::new(),
         }
+    }
+
+    #[test]
+    fn readiness_contract_is_required_even_when_the_trace_report_passes() {
+        let directory =
+            std::env::temp_dir().join(format!("readiness-contract-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let stream = directory.join("synthetic.events.jsonl");
+        let report = directory.join(format!("synthetic{REPORT_SUFFIX}"));
+        std::fs::write(&report, r#"{"format":"trace-report/1","verdict":"ok"}"#).unwrap();
+        std::fs::write(&stream, "").unwrap();
+        let error =
+            check_stream(&root(), Path::new("evals/connectors-readiness"), &stream).unwrap_err();
+        assert!(error.contains("doctor-ran"), "{error}");
+        std::fs::write(&stream, r#"{"format":"metaharness.event/1","event":"tool.requested","name":"exec_command","input":{"cmd":"connectors inspect doctor && connectors serve local --help"}}"#).unwrap();
+        check_stream(&root(), Path::new("evals/connectors-readiness"), &stream).unwrap();
+        std::fs::remove_dir_all(&directory).unwrap();
     }
 
     #[test]

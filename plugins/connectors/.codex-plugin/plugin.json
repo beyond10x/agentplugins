@@ -1,6 +1,6 @@
 {
   "name": "connectors",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Set up, inspect, and invoke governed integrations through the connectors CLI.",
   "author": { "name": "Beyond10x" },
   "license": "Apache-2.0",

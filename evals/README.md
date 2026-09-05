@@ -12,7 +12,7 @@ A case is four things and no others:
 | the expectations | `expectations.trace.yaml` | a `trace-spec/1` document: what the run must have looked like |
 | the transcript | `recorded/` | a recorded run, replayed through the checker for nothing |
 
-## The eight cases
+## The nine cases
 
 | Case | Subject | The claim it holds the subject to |
 |---|---|---|
@@ -24,6 +24,30 @@ A case is four things and no others:
 | `ess-specify-new-entity` | `ess-specify:specify` | the noun got a validated typed home before a story rested on it, and the unread relation stayed unread |
 | `golden-path-end-to-end` | `website/docs/golden-path.md` | the eight published steps in the published order, with the CLIs as the stores' only writers |
 | `adversary-tests-only` | `aep-drive:adversary` | tests were written, `src/` was not touched, and no `aep plan artifact` command ran |
+| `connectors-readiness` | `connectors:connectors` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
+
+### Connector command checks
+
+`connectors-readiness` declares `command_contract: connectors-readiness`. Its session predicates
+remain in `expectations.trace.yaml`; command predicates run in the repository's Rust checker.
+AEP's trace format cannot union `Bash`/`command` with `exec_command`/`cmd`, and a word regex cannot
+decide whether `--help` belongs to the same command as a mutation. The checker reads both host
+shapes and parses shell syntax without executing transcript text.
+
+The normal replay and live CI paths run both checks. After a manual `aep drive eval run`, check
+each emitted stream and its adjacent trace report with:
+
+```bash
+cargo run --quiet --locked --bin agentplugins-check -- \
+  evals check-stream evals/connectors-readiness /path/to/run.events.jsonl
+```
+
+Running only `aep drive eval run` evaluates the common trace predicates, not the extra command
+contract. Native Claude stream-json and Codex rollout call shapes are also understood by the
+command checker. This bounded diagnostic case requires direct commands with literal arguments;
+dynamic shell expansion, shell wrappers, and code-mode calls need a decoded trace and are refused.
+Tests under `readiness.rs` use synthetic records to exercise the checker, not to claim a live
+plugin run. The plugin's operating instructions do not impose this eval-only restriction.
 
 ## `recorded/` is empty, and that is stated rather than implied
 

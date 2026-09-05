@@ -17,8 +17,8 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 ## Install
 
-The new `connectors` plugin is available from `main` and local checkouts; it is not part of the
-`0.7.0` release below. See the [Connectors installation guide](website/docs/plugins/connectors.md)
+The `connectors` plugin is included in release `0.8.0` for both hosts.
+See the [Connectors installation guide](website/docs/plugins/connectors.md)
 for both hosts. Install the standalone `connectors` CLI first.
 
 `aep-plan` and `aep-drive` drive the `aep` CLI; `ess-specify` drives the `ess` CLI. Install the
@@ -30,7 +30,7 @@ and [ESS `0.11.1`](https://github.com/beyond10x/ess/releases/tag/0.11.1) first, 
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.7.0
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.0
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x
@@ -38,7 +38,8 @@ Paste this pinned block into a Claude Code session:
 ```
 
 Add `/plugin install beyond10x@beyond10x` for the front door and
-`/plugin install workspace-hygiene@beyond10x` for managed worktrees. Codex offers the same plugins
+`/plugin install workspace-hygiene@beyond10x` for managed worktrees, or
+`/plugin install connectors@beyond10x` for integrations. Codex offers the same plugins
 from the same repository, following `.agents/plugins/marketplace.json`; its exact non-interactive
 CLI bootstrap and upgrade commands are in [`website/docs/install.md`](website/docs/install.md).
 

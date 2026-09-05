@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-09-05
+
+- Fix Connector readiness evaluation for Claude `Bash`/`command` and Codex
+  `exec_command`/`cmd` traces. A shared Rust command checker runs alongside AEP's session checks
+  in replay and live CI; parsed help commands no longer count as mutations. Regression cases
+  reject real mutations, missing doctor evidence, and mutations chained after help.
+- Publish the connectors plugin in the release-pinned installation guides for both hosts.
+- Repair YAML quoting in the ESS skill description so every released plugin validates.
+
 - Add the focused `connectors` plugin to both marketplaces, with one shared skill for the
   Connectors 0.6.0 CLI, secret-safe onboarding, readiness diagnostics, and governed operation
   invocation. Include host installation guidance and a readiness eval case.

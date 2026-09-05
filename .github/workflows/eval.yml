@@ -216,6 +216,7 @@ jobs:
           while IFS=$'\t' read -r case plugin; do
             [[ -n "$case" ]] || continue
             echo "::group::$case"
+            case_out="$RUNNER_TEMP/eval-out/${case#evals/}"
             aep eval run \
               --case "$case" \
               --arm plugin \
@@ -226,7 +227,10 @@ jobs:
               --assume-usd-per-run "$EVAL_CASE_USD" \
               --observed-at "$observed" \
               --redact \
-              --out "$RUNNER_TEMP/eval-out"
+              --out "$case_out"
+            for stream in "$case_out"/*.events.jsonl; do
+              cargo run --quiet --locked --bin agentplugins-check -- evals check-stream "$case" "$stream"
+            done
             echo "::endgroup::"
           done < selected.tsv
 
@@ -244,7 +248,7 @@ jobs:
             echo
             echo "\`aep\` $AEP_VERSION · \`metaharness\` $METAHARNESS_VERSION · cap \$$EVAL_BUDGET_USD · ${{ steps.scope.outputs.count }} case(s)"
             echo
-            if aep eval matrix "$RUNNER_TEMP/eval-out" --format text > matrix.txt 2> matrix.err; then
+            if aep eval matrix "$RUNNER_TEMP/eval-out"/* --format text > matrix.txt 2> matrix.err; then
               echo '```'
               cat matrix.txt
               echo '```'
