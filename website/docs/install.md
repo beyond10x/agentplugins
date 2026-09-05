@@ -7,7 +7,9 @@ title: Install
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
 identity is `beyond10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`,
-`ess-specify`, and `workspace-hygiene`.
+`ess-specify`, `workspace-hygiene`, and `connectors` on `main`. The pinned `0.7.0` release below
+contains the first five; install the new [Connectors plugin](plugins/connectors.md) from a current
+checkout or `main` until a release includes it.
 
 ## Before you install: put `aep` and `ess` on your `PATH`
 
@@ -101,7 +103,7 @@ commands and supported marketplace sources.
 
 ## Codex
 
-Codex offers the same five plugins from the same repository under the same `beyond10x` identity.
+Codex offers the same plugins from the same repository under the same `beyond10x` identity.
 For a fresh installation, run this release-pinned block:
 
 ```bash

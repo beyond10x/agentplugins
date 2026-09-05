@@ -28,6 +28,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Scope and deliver accepted development work through a reviewed wave | `aep-drive` |
 | Specify an ESS model or guide deterministic schema or OpenAPI projection | `ess-specify` |
 | Create, inspect, finish, or safely clean Git worktrees | `workspace-hygiene` |
+| Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors` |
 
 ## Preserve boundaries
 

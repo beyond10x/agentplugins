@@ -26,6 +26,11 @@
       "name": "workspace-hygiene",
       "source": "./plugins/workspace-hygiene",
       "description": "Manage isolated Git worktrees with explicit ownership and safe cleanup proof."
+    },
+    {
+      "name": "connectors",
+      "source": "./plugins/connectors",
+      "description": "Set up, inspect, and invoke governed integrations through the connectors CLI."
     }
   ]
 }

@@ -2,19 +2,24 @@
 
 Curated marketplace identity: `beyond10x`.
 
-The repository deliberately contains five focused plugins:
+The repository deliberately contains six focused plugins:
 
 - `beyond10x`: marketplace navigation, public resource discovery, and portable plugin creation.
 - `aep-plan`: governed planning, decomposition, plan review, and reverse engineering.
 - `aep-drive`: wave coordination, story scoping, implementation, and adversarial review.
 - `ess-specify`: ESS specification, validation and deterministic schema/OpenAPI projection guidance.
 - `workspace-hygiene`: safe creation, leases, publication checks, and cleanup for Git worktrees.
+- `connectors`: provider setup, connection diagnostics, and governed CLI operation invocation.
 
 `beyond10x` is the front door, not a catch-all. It routes a task to the smallest specialist and
 keeps plugin-creation workflows portable by making shared skills the canonical implementation for
 Codex and Claude Code. It does not copy or replace the specialists' instructions.
 
 ## Install
+
+The new `connectors` plugin is available from `main` and local checkouts; it is not part of the
+`0.7.0` release below. See the [Connectors installation guide](website/docs/plugins/connectors.md)
+for both hosts. Install the standalone `connectors` CLI first.
 
 `aep-plan` and `aep-drive` drive the `aep` CLI; `ess-specify` drives the `ess` CLI. Install the
 verified Linux or macOS archives for [AEP `0.51.0`](https://github.com/beyond10x/aep/releases/tag/0.51.0)
@@ -59,7 +64,7 @@ Free, offline, and part of `task check`:
 
 ```console
 $ task evals
-valid: 8 eval case(s), 1 recorded transcript(s) replayed
+valid: 9 eval case(s), 1 recorded transcript(s) replayed
 ```
 
 It validates every case, resolves every `subject:` to an agent or a skill that exists here, and
@@ -89,9 +94,9 @@ error: eval-out — 1 refusal(s):
 
 | | |
 |---|---|
-| cases in the corpus | **8** |
+| cases in the corpus | **9** |
 | per-case cap | **$5** — `story:plugin-eval-cases`, the operator's default |
-| one full run, one arm, one harness | **$40** |
+| one full run, one arm, one harness | **$45** |
 | `EVAL_BUDGET_USD` default | **$20** — `story:eval-ci-gates`, the operator's default |
 
 **So a full sweep does not fit its own default budget, and that is the intended behaviour rather
@@ -102,7 +107,7 @@ pull request touching one agent or one skill actually selects. Running the whole
 deliberate act: raise the repository variable, or dispatch one case at a time.
 
 The cap is a **cap, not an estimate** — no recorded run has priced this corpus yet, so nothing here
-claims a full sweep will cost $40 rather than refusing above it. `--assume-usd-per-run` is what the
+claims a full sweep will cost $45 rather than refusing above it. `--assume-usd-per-run` is what the
 runner charges a run whose stream states no cost, and it is set to the per-case cap so the runner's
 own pre-spawn check is made against the budgeted number and not against its optimistic default.
 

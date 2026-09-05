@@ -1,0 +1,31 @@
+format: trace-spec/1
+id: eval-case/connectors-readiness
+title: Readiness uses the shipped CLI and preserves the diagnostic scope
+expectations:
+  - id: skill-offered
+    statement: the host offered the shared connectors skill
+    severity: advisory
+    expect:
+      env.skill_available:
+        skill: connectors:connectors
+  - id: doctor-ran
+    statement: the diagnostic command actually ran
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'connectors .*inspect doctor'}
+        count: {at_least: 1}
+  - id: diagnosis-did-not-mutate
+    statement: diagnosis did not start a service, configure access, or invoke an operation
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'connectors .*\b(serve|setup|invoke)\b'}
+  - id: completed
+    statement: the session completed without a harness error
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed

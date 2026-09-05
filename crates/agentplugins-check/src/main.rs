@@ -42,6 +42,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
     ),
     ("ess-specify", &["skills/specify/SKILL.md"]),
     ("workspace-hygiene", &["skills/worktree/SKILL.md"]),
+    ("connectors", &["skills/connectors/SKILL.md"]),
 ];
 
 fn json(path: &Path) -> Result<serde_json::Value, String> {

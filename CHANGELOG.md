@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Add the focused `connectors` plugin to both marketplaces, with one shared skill for the
+  Connectors 0.6.0 CLI, secret-safe onboarding, readiness diagnostics, and governed operation
+  invocation. Include host installation guidance and a readiness eval case.
+
 - **The planning skill says how to take an edge back.** AEP 0.53.0 adds
   `aep plan artifact unrelate <id> <relation> <target>`, and the skill now names it in the write-verb
   list, in guardrail 2, in the mutation-ownership table and in the renaming paragraph. Until this
