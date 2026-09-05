@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: task:connectors-eval-release
 kind: task
-status: active
+status: implemented
 title: Fix portable readiness evaluation and release the connectors plugin
 relations:
 - derived_from: task:connectors-plugin
-revision: 3
+revision: 4
 ---
 ## Outcome
 Fix both reviewed readiness-eval defects: Codex exec_command/cmd calls must satisfy doctor evidence, and CLI help must not be counted as a mutation. Cut an AgentPlugins release containing the portable connectors plugin and these fixes, update both user-global installations, and safely clean this session's managed worktrees.
