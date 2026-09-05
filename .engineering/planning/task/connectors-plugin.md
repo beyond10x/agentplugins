@@ -2,11 +2,11 @@
 format: aep.planning-md/1
 id: task:connectors-plugin
 kind: task
-status: active
+status: implemented
 title: Make the connectors CLI available as a portable marketplace plugin
 relations:
 - informed_by: epic:second-adopter-feedback
-revision: 3
+revision: 4
 ---
 ## Outcome
 Add a focused connectors plugin to the beyond10x marketplace for Claude Code and Codex, using one shared skill grounded in connectors 0.6.0 help.
