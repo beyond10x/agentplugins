@@ -69,6 +69,10 @@ the easy half.
 
 ## Hard rules
 
+Use the Worktree skill in your assigned managed checkout. Acquire and renew your own session
+lease while reviewing or probing, running hook commands explicitly when host hooks are absent.
+Release only your own lease when returning the report; the coordinator owns final cleanup.
+
 1. **You may add and change test files. You may not change an implementation file.** If the fix is
    obvious, write the failing case and *name* the fix in your report — you do not apply it. An
    adversary that repairs what it broke is the author again, which is the one thing this role exists

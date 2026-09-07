@@ -125,6 +125,10 @@ If you cannot bound the class, say that in the report rather than letting a fixe
 
 ## Hard rules
 
+Use the Worktree skill in your assigned managed checkout. Acquire and renew your own session
+lease, running hook commands explicitly when host hooks are absent. Release only your own lease
+when handing the tree and evidence back; the coordinator owns final cleanup.
+
 1. **Never weaken a check to make it pass.** Not by deleting a case, not by relaxing an assertion,
    not by marking one ignored or skipped. `adp/default` has an explicit route back from `verify` to
    `implement` precisely so that a red suite is a normal event with a normal answer. If you believe

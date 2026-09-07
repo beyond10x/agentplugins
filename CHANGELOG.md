@@ -11,6 +11,9 @@
   exact operation protocols, daemon-free bounded calls, pagination, restriction metadata,
   rate-limit handling and CLI/daemon upgrade checks.
 - Refresh current marketplace installation pins to 0.8.1 and Worktree installation to 0.4.0.
+- Route wave creation and retirement through the Worktree skill and CLI; give coordinators,
+  implementors and adversaries explicit lease duties, preserve evidence before cleanup and
+  restrict branch deletion to the exact wave record.
 
 ## [0.8.0] — 2026-09-05
 

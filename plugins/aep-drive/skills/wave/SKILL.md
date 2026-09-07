@@ -378,6 +378,13 @@ It costs seconds.
 One integration branch for the wave; one branch and one worktree per unit, each forked from the
 integration branch.
 
+Invoke the `workspace-hygiene:worktree` skill and create every checkout with `worktree create`,
+including the coordinator's integration checkout. Record each managed id, owning session,
+story/task id and published branch alongside the paths below. Acquire a coordinator lease before
+using a tree and renew it while agents or checks run. Each implementor and adversary maintains
+its own session lease in the assigned tree and releases only that lease when handing back.
+Run the hook commands explicitly when the host does not run them; loading a skill installs no hooks.
+
 **Each worktree builds into its own build directory.** Never point two at one. A shared build
 directory serves one tree's binaries to another and lets one tree's code generation rewrite
 another's committed output — a failure that reads as a mysterious test failure and costs several
@@ -701,22 +708,28 @@ The order is not interchangeable:
    Anything a reader would want goes into the closing commit, the wave page or a story *before* the
    tree goes. A worktree removed with its records unread takes the whole account of what happened
    with it.
-2. **`git worktree remove <path>`, one per unit.** It takes the checkout and leaves the branch.
-3. **Remove each unit's build directory and scratch root by name**, from the triple you wrote in
+2. **Publish the wanted commits before retiring their checkouts.** A merged local branch alone
+   does not supply current remote recovery proof. Reuse publication authorization already given;
+   if publication is not authorized, retain the tree and record that blocker and its next owner.
+3. **Remove each unit's disposable build output and scratch by exact path**, from the triple you wrote in
    the wave page when you made them. This is the step that gets missed, because it is the one `git`
-   knows nothing about: neither survives in `git worktree list`, and both survive `worktree remove`
-   untouched. One wave here left a **16 GB** build directory standing on a disk already at 93%,
+   knows nothing about. First confirm the agents and their child processes have stopped and the
+   evidence from step 1 is preserved; retain anything whose reproducibility or ownership is unclear.
+   One wave here left a **16 GB** build directory standing on a disk already at 93%,
    every worktree it belonged to long since removed, and nothing found it until somebody went
    looking for free space. Scratch is the same failure one size down — 579 MB, 95 MB, 17 MB in
    another wave, in three directories nobody had a list of.
-4. **Delete every unit branch that is merged**, which after a green close is all of them. Use the
-   branch prefixes [references/branch-and-merge.md](references/branch-and-merge.md) names for this
-   repository, not a prefix from another one:
+4. **Release your own lease, then finish and review managed cleanup.** Confirm each returned
+   agent released its own lease; never clear another session's lease. Run `worktree finish <path>`,
+   then `worktree gc --repo <primary> --dry-run --id <managed-id>`. Apply only the exact ids from
+   that review with `worktree gc --repo <primary> --apply --id <managed-id>`. Follow the Worktree
+   skill's reconciliation procedure for interrupted lifecycle state. Include the integration
+   checkout after its wanted commits have been published.
+5. **Delete only merged unit branches named in this wave's record.** For each exact branch:
 
    ```console
-   $ for b in $(git branch --list 'impl/*' --format='%(refname:short)'); do
-   >   git merge-base --is-ancestor "$b" main && git branch -d "$b" || echo "NOT MERGED: $b"
-   > done
+   $ git merge-base --is-ancestor <unit-branch> <base-branch>
+   $ git branch -d <unit-branch>
    ```
 
    `git branch -d` refuses a branch that is not merged, which is the safety here — do not reach for
@@ -728,14 +741,14 @@ The order is not interchangeable:
    A branch that is **not** merged is a unit that left the wave or a tree whose work never landed.
    Keep it, and name it in the closing report.
 
-5. **`git worktree prune`, then `git worktree list` and `git branch --list 'impl/*'` — read both.**
-   Report what they say, not that you ran the removal. A removal you did not confirm is the same
-   class of claim as a process you did not watch die.
+6. **Verify the managed cleanup results and the exact paths.** Read `worktree repo list --repo
+   <primary>` and the retained ids' `worktree inspect` reports. Report verified cleanup or an
+   explicit handoff with id, path, work-item references, published commit, retained evidence,
+   blockers, next owner and next action. Never infer story completion from storage or Git state.
 
-**Never force a removal.** `git worktree remove` refuses a tree with uncommitted changes, and
-`--force` answers that by discarding them — an agent's unpushed work, or a run's only record. A
-dirty worktree at cleanup time is a **finding for the operator**: name the path and what is in it,
-leave it standing, and let the next wave's pre-flight refuse on it.
+**Never force a removal or bypass the manager with raw Git removal or pruning.** A refusal
+preserves uncommitted work, ignored evidence, live sessions or incomplete recovery proof. Name
+the retained path and concrete blocker in the closing report.
 
 **A unit that left the wave keeps its tree** until the operator says otherwise. It holds the only
 copy of what was tried, which is the reason the third failure was recorded rather than hidden.
