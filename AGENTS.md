@@ -57,8 +57,9 @@ carries credential, token-minting or bot-authenticated git wrappers.
 ## Releases
 
 Bare annotated tags are releases. Before tagging, `CHANGELOG.md`, the workspace version, and every
-plugin manifest version must agree. The release workflow reruns `task check`, builds the public
-site, verifies that agreement, and only then publishes the GitHub release.
+plugin manifest version must agree. The release workflow reruns `task check`, verifies that
+agreement, and only then publishes the GitHub release. Public-site validation and Atlas
+publication run independently and do not delay source-release completion.
 
 <!-- b10x-docs-operations:start -->
 ## Public documentation operations
@@ -79,3 +80,24 @@ cargo run --manifest-path "$atlas_checkout/Cargo.toml" --locked -q -- \
 
 Keep internal plans, stories, ADRs, decisions, worklogs, security material, and research out of the public allowlist unless a repository authority explicitly declares them public.
 <!-- b10x-docs-operations:end -->
+
+<!-- b10x-release-operations:start -->
+## Release completion
+
+An ordinary release completes after this repository's exact tag, required source checks,
+published release and required artifacts are verified. A pushed tag with unfinished checks or
+uploads is queued; report it as released only after those requirements succeed.
+
+Atlas reconciliation and public documentation publication run asynchronously. Do not wait for
+Atlas or Website, update Website source locks or bootstrap snapshots, promote consumer pins,
+release shared docs tooling, or redeploy documentation façades as part of an ordinary source
+release. Report documentation as pending unless its publication was actually verified. A background
+documentation failure does not invalidate a successful source release.
+
+Keep this repository's provenance, correctness, security, compatibility and artifact verification
+requirements. Shared rendering, routing or delivery-control changes still require their relevant
+integration gates. A release request does not authorize deployment or downstream releases.
+Repositories without a release unit retain their existing publication policy. This completion
+boundary supersedes older instructions that attach synchronous documentation ceremony to each
+source release.
+<!-- b10x-release-operations:end -->
