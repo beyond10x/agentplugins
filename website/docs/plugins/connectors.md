@@ -9,21 +9,29 @@ guides provider setup, connection diagnostics, and the search → describe → i
 admitted integrations. It ships no binary, credentials, daemon, hooks, or automatic MCP connection.
 
 Install the standalone CLI from [Connectors releases](https://github.com/beyond10x/connectors/releases)
-and verify `connectors --version`. The skill targets the grouped commands in `0.6.0` and reads the
+and verify `connectors --version`. The skill targets the grouped commands in `0.7.1` and reads the
 installed binary's help before selecting options. Service setup and credentials are separate from
 plugin installation.
 
+Operation, connection and event commands default to local even when a hosted login is saved.
+Choose `--target hosted` explicitly for a hosted workflow and keep that target throughout
+search, describe and invoke. The operation contract defaults to v3 without automatic fallback.
+Bounded reads can run locally without a daemon; ongoing sessions and events still need one.
+When upgrading, verify the operations your application uses and replace the CLI and local daemon
+together. The skill also covers pagination, restriction metadata and explicit handling of
+rate-limit responses.
+
 ## Install in either host
 
-Release `0.8.0` includes this plugin. For a fresh marketplace registration, use the release pin:
+Release `0.8.1` includes this plugin. For a fresh marketplace registration, use the release pin:
 
 ```bash
-claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.0
+claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.1
 claude plugin install connectors@beyond10x
 ```
 
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.8.0
+codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.8.1
 codex plugin add connectors@beyond10x
 ```
 

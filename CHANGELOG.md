@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.8.1] — 2026-09-07
+
+- Regenerate Workspace Hygiene from Worktree 0.4.0: native storage inspection, explicit lease
+  maintenance when hooks are absent, own-lease release before finish, bounded disposable
+  storage, retained evidence and verified cleanup or an owned handoff.
+- Upgrade Connectors guidance to the released 0.7.1 surface: explicit local/hosted targets,
+  exact operation protocols, daemon-free bounded calls, pagination, restriction metadata,
+  rate-limit handling and CLI/daemon upgrade checks.
+- Refresh current marketplace installation pins to 0.8.1 and Worktree installation to 0.4.0.
+
 ## [0.8.0] — 2026-09-05
 
 - Fix Connector readiness evaluation for Claude `Bash`/`command` and Codex

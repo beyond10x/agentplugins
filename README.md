@@ -17,7 +17,7 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 ## Install
 
-The `connectors` plugin is included in release `0.8.0` for both hosts.
+The `connectors` plugin is included in release `0.8.1` for both hosts.
 See the [Connectors installation guide](website/docs/plugins/connectors.md)
 for both hosts. Install the standalone `connectors` CLI first.
 
@@ -30,7 +30,7 @@ and [ESS `0.11.1`](https://github.com/beyond10x/ess/releases/tag/0.11.1) first, 
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.0
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.1
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x

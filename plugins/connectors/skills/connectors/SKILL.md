@@ -12,13 +12,15 @@ not install the binary, start a service, supply credentials, or grant access.
 ## Establish the target
 
 1. Run `connectors --version` and `connectors --help`. These instructions target the grouped
-   command surface shipped in 0.6.0. Consult `<command> --help` before using an unfamiliar option.
+   command surface in 0.7.1. Consult `<command> --help` before using an unfamiliar option.
    If the binary is missing, report it and use the official
    [Connectors releases](https://github.com/beyond10x/connectors/releases) and
    [source](https://github.com/beyond10x/connectors) for installation. Do not invent download URLs.
 2. Reuse the user's deployment configuration and state root. For a local deployment, run
    `connectors --output json inspect doctor`, adding `--config` and `--state-root` when supplied.
-   Preserve that same target on subsequent commands. Do not dump configuration or credential files.
+   Select `--target local` or `--target hosted` explicitly for operation, connection and event
+   commands, and preserve the target throughout a workflow. Local is the default even with a
+   saved hosted login. Do not dump configuration or credential files.
 3. Ask only for a target or input the available context cannot establish. A missing daemon,
    credential, or grant is a diagnostic result; identify the next concrete setup step.
 
@@ -35,30 +37,47 @@ not install the binary, start a service, supply credentials, or grant access.
   authorization covering that expansion; an invocation refusal does not supply it.
 - `connectors serve local` runs a personal service. Start it only when the task calls for one,
   after inspecting its help, and report any process you leave running.
+  Bounded local search, describe and individual permitted calls can run without a daemon;
+  ongoing sessions, events and connection activation still require the service.
 - For hosted access, inspect `connectors session --help` and use the configured hosted session.
   `connectors serve mcp` is the hosted stdio bridge. Inspect its help when that integration is
   requested; this plugin does not register an MCP server automatically. Hosted administration
-  belongs under `connectors admin`; do not assume local operation flags select a hosted endpoint.
+  belongs under `connectors admin`. Use `--target hosted` for ordinary hosted operations.
+
+## Upgrade an existing installation
+
+Check the installed version against an actual official release and its compatibility notes.
+Before replacing a source-built installation, compare every operation the application uses with
+the candidate's input and output contracts; a successful account probe alone is insufficient.
+Upgrade the CLI and local daemon together when an upgrade is requested, preserving configuration
+and credential state. The released 0.7.1 CLI has no `inspect upgrade` command; do not invent one
+or promise automated compatibility assessment. Recheck help when a later release adds commands.
 
 ## Discover, describe, invoke
 
-For local operations, use this sequence with the same configuration and state root throughout:
+Use this sequence with the same deployment, configuration and state root throughout. These examples
+select local; substitute `--target hosted` for a hosted workflow:
 
 ```bash
-connectors --output json operation search --query '<user intent>' --limit 10
-connectors --output json operation describe --operation '<operation from search>'
+connectors --output json operation --target local search --query '<user intent>' --limit 10
+connectors --output json operation --target local describe --operation '<operation from search>'
 ```
 
 Search returns currently callable operations and their admitted Connections. An empty result is
-not permission to guess an operation or fall back to an ungoverned provider API. Select a returned
+not permission to guess an operation or silently switch to a provider API. Report the capability
+gap before considering another integration client under the session's instructions. Select a returned
 operation and Connection matching the user's target. Describe it immediately before invocation;
 use the returned input schema and fresh opaque `description_ref` without inventing or reusing a
 reference from a previous session. Prepare only catalog-declared caller inputs.
 
+The operation contract defaults to v3. Select `--protocol-version v2` only for an explicitly
+required compatible contract, consistently across search, describe and invoke. There is no
+automatic protocol negotiation or fallback.
+
 When the user's request authorizes the described effects, invoke using the returned references:
 
 ```bash
-connectors --output json operation invoke \
+connectors --output json operation --target local invoke \
   --operation '<operation from search>' \
   --connection '<admitted connection from search>' \
   --description-ref '<fresh reference from describe>' \
@@ -75,6 +94,11 @@ documented `--approval-evidence-ref` option. Never fabricate evidence, a grant, 
 snapshot, or a description lease. On a stale description, describe again and reassess the schema
 and effects. Do not blindly retry a mutation after an ambiguous timeout; establish its outcome or
 report the uncertainty before another attempt.
+
+For bounded collection, follow the description's pagination contract, preserve the time window
+and filters, and continue until its documented end condition. An empty or partial page alone
+does not prove completeness. Preserve returned restriction metadata. Rate-limit advice does not
+authorize an automatic retry; report it and reassess before repeating an action.
 
 ## Report the result
 
