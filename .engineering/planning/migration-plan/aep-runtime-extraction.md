@@ -2,15 +2,18 @@
 format: aep.planning-md/1
 id: migration-plan:aep-runtime-extraction
 kind: migration-plan
-status: active
+status: implemented
 title: Move concrete AEP execution above the foundation
-revision: 2
+revision: 4
 ---
 ## Decision
-The operator approved extraction on 2026-09-09: model-backed runs move to `metaharness aep drive`; migrate eval and Agentplugins callers now; preserve compatible paused runs. AEP retains neutral governor, run machinery, command/operator driving and offline evidence ingestion. No foundation runtime dependency on installed Metaharness or Harness.
+The operator approved the runtime extraction and caller migration on 2026-09-09 (Atlas ADR 0047).
 
-## Implementation
-Make AEP CLI importable, share neutral run-host services, move concrete executor, frame/event translation, native hooks and live evaluation into Metaharness. Pin all AEP dependencies to one published commit. Keep existing authorization, spend, frozen wire and resume integrity rules. Record Atlas ADR 0047 and actual catalog direction, then complete fresh foundation composition and final planning validation.
+## Repository scope
+Change the governed drive entry, wave/evaluation guidance, planning example and public documentation to invoke `metaharness aep drive`. Require the selected AEP planning executable and preserve the saved budget and plugin configuration on resume. Keep plugin versions unchanged.
 
-## Acceptance
-Foundation gates pass without tooling executables. Offline adapter tests retain denial, frame, budget, plugin and legacy-resume behavior. Callers invoke the real replacement command. Exact-hash composition receipt and final ER planning evidence exist before completion. Retire only reviewed recoverable worktrees; preserve unrelated changes. No tags, deployment, paid run or connectors_v2 enrollment.
+## Repository acceptance
+`task check`, `task site-build`, the three changed skills' validators and `claude plugin validate` for aep-plan and aep-drive pass. These are source and manifest checks; they do not claim a new installed-host run or paid evaluation.
+
+## Coordination
+Integrate after the AEP neutral host and Metaharness adapter. Atlas's migration-plan:aep-runtime-extraction and task:foundation-composition-evidence own the final dependency reconciliation, foundation composition receipt and ER planning evidence. This record's implemented status describes the caller source implementation; the coordinated migration remains active in Atlas until its final evidence is recorded.
