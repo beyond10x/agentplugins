@@ -253,7 +253,7 @@ either holds:
 
 * **The task says so** — *run without stopping*, *no operator is present*, *record each stop and
   continue*.
-* **The harness gives no operator turn** — a batch or print-mode session, an `aep drive eval run` case, a
+* **The harness gives no operator turn** — a batch or print-mode session, a `metaharness aep drive eval run` case, a
   sub-agent dispatch. Nothing you emit reaches a person before the session ends, so a question is a
   question into a log.
 

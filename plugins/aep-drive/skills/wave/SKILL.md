@@ -266,7 +266,7 @@ and the scopers you ran are how you did the work, not what the operator decides 
 
 The stage-1 stop assumes somebody is there to take it. Sometimes nobody is — the task says *run
 without stopping* or *no operator is present*, or the harness gives no operator turn at all: a batch
-or print-mode session, an `aep drive eval run` case, a dispatch. **A coordinator that ends its turn at the
+or print-mode session, a `metaharness aep drive eval run` case, a dispatch. **A coordinator that ends its turn at the
 stop in one of those has produced a page nobody will read and no wave.** Decide which kind of run
 this is before stage 1, the way `aep-plan`'s planning skill § 4 *When there is no operator* sets
 out, and say which in the report.
