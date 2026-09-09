@@ -75,7 +75,7 @@ empty `recorded/` and a machine with no `aep` on `PATH` are both printed notices
 Live, which costs money:
 
 ```console
-$ METAHARNESS_LIVE=1 aep drive eval run --corpus evals --workflow adp/default \
+$ METAHARNESS_LIVE=1 metaharness aep drive eval run --corpus evals --workflow adp/default \
     --arm plugin --harness claude --plugin-dir plugins/aep-plan \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>

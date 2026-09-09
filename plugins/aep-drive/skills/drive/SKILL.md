@@ -1,6 +1,6 @@
 ---
 name: drive
-description: Start one governed `aep drive` run over a single story from an ordinary session — check the checkout with `aep doctor`, launch the driver against the project's step map, print the run id and how to follow it. Use when the operator says to drive a story, asks for a driven or governed run, asks to run a story under the engine rather than implement it interactively, or asks why a wave's rules are instructions here and enforced there. It starts a run and reports; it moves no artifact itself, and the driver's refusals are relayed unedited.
+description: Start one governed `metaharness aep drive` run over a single story from an ordinary session — check the checkout with `aep doctor`, launch the driver against the project's step map, print the run id and how to follow it. Use when the operator says to drive a story, asks for a driven or governed run, asks to run a story under the engine rather than implement it interactively, or asks why a wave's rules are instructions here and enforced there. It starts a run and reports; it moves no artifact itself, and the driver's refusals are relayed unedited.
 ---
 
 # `/drive <story-id>`
@@ -48,7 +48,7 @@ is given and guesses none.
 
 ## 2. Point the driver at the story
 
-`aep drive run` walks a **task document**, not a story id — the story is the contract and the task
+`metaharness aep drive run` walks a **task document**, not a story id — the story is the contract and the task
 document is what a run needs to resolve a plan against it. It names the story in `derived_from:`,
 along with the protocol, the profile, and the facts nothing can observe about the change.
 
@@ -65,7 +65,8 @@ select the one that fits; where two fit, it **refuses and names both**, and that
 operator to answer. Do not pick one to get the run started.
 
 ```console
-$ aep drive run --project . --map <the map the project declares> \
+$ metaharness aep drive run --project . --map <the map the project declares> \
+    --aep-binary <the AEP executable built from the runner's pinned source> \
     --plugin-dir <the plugin directory the run loads> \
     --pause-on-approval --budget-usd <what the operator said> --assume-usd-per-run <what the operator said>
 ```
@@ -97,7 +98,7 @@ one fallback:
 | | |
 |---|---|
 | **the nested launch is accepted** | report the run id and follow it. Say in the report that the launch was nested, so a later comparison knows which path produced the numbers |
-| **it is refused or unsupported** | do not work around it, do not switch harness, and do not retry with different flags. **Print the exact command for the operator to paste into a terminal** — the full `aep drive run` line above, with the real paths, the real budget and the working directory to run it from — and stop |
+| **it is refused or unsupported** | do not work around it, do not switch harness, and do not retry with different flags. **Print the exact command for the operator to paste into a terminal** — the full `metaharness aep drive run` line above, with the real paths, the real budget and the working directory to run it from — and stop |
 
 Both paths end in a report; neither ends in a second attempt. A refusal here is a fact about this
 machine's harness nesting, and the operator can act on it in one paste.
@@ -105,11 +106,12 @@ machine's harness nesting, and the operator can act on it in one paste.
 ## 4. Print the run id and how to follow it
 
 ```console
-$ aep drive status
+$ metaharness aep drive status
 ```
 
-`status` reports what the store's last run is doing and who holds the lock. `resume` continues one
-that stopped.
+`status` reports what the store's last run is doing and who holds the lock. `metaharness aep drive resume <run>` continues a compatible paused run, retaining its budget and plugin inputs. A version or integrity refusal is binding.
+
+The AEP planning executable and the Metaharness runner are distinct tools. Pass the source-matched AEP executable with `--aep-binary`; do not substitute the Metaharness binary for planning commands. AEP still provides planning, command-only driving and offline evidence ingestion.
 
 **There is no `aep drive watch` yet.** It is a proposed verb — `aep` `story:drive-watch-is-a-verb`,
 draft — so until it exists, print the script the `aep` repository documents instead:
@@ -140,6 +142,6 @@ does not exist.
 2. `aep doctor`'s output, or the failing lines and nothing else if it exited 1.
 3. The run id, the map that was selected, the budget passed, and which launch path was taken —
    nested, or printed for a terminal.
-4. Where the run is now: `aep drive status`, verbatim, and the `scripts/drive-watch` line for
+4. Where the run is now: `metaharness aep drive status`, verbatim, and the `scripts/drive-watch` line for
    following it.
 5. Any refusal, verbatim.

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Governed model runs and live evaluation use `metaharness aep drive`. The drive skill
+  supplies the separate AEP planning executable and preserves compatible resume, budget
+  and plugin-input requirements.
 ## [0.8.1] — 2026-09-07
 
 - Regenerate Workspace Hygiene from Worktree 0.4.0: native storage inspection, explicit lease
