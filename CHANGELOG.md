@@ -2,10 +2,18 @@
 
 ## [Unreleased]
 
-### Fixed
+## [0.9.1] — 2026-09-10
 
+- Pin ESS `0.22.1` instead of `0.20.0`. ESS `0.22.0` had no archives because its own release gate
+  was red at the tag; `0.22.1` is the release cut with that gate green and its `Release` run
+  publishing the four archives and `SHA256SUMS`. The install page, the README and the expected
+  `ess --version` line follow.
+- The ESS skill's example is re-validated on ESS `0.22.1` — the same line, `warehouse v1 — 2
+  file(s), valid`, exit 0 — and its `--path` paragraph no longer has to distinguish the pinned
+  release from `ess-inputs.yaml`, which the pinned release reads.
 - Align the golden path's model-driving command with Metaharness and label its older recorded
   CLI output separately from current installation requirements.
+- Unlike `0.9.0`, this release ran `task check` and `task site-build` on the tagged tree.
 
 ## [0.9.0] — 2026-09-10
 

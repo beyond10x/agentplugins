@@ -78,7 +78,7 @@ $ ess specify validate --path <specification>
 warehouse v1 — 2 file(s), valid
 ```
 
-That is the verbatim output of ESS `0.20.0`, exit status 0, over both files as printed—including the
+That is the verbatim output of ESS `0.22.1`, exit status 0, over both files as printed—including the
 `relations:` block and its second entity. It is a validated starting point, not an illustrative
 shape. Change the names and semantics to match the repository you actually read, then validate the
 changed specification again.
@@ -111,11 +111,10 @@ narrows that question without answering it. Where you cannot say which kind it i
 Grow it from there — types, commands, events, views, and a component that owns the domain — running
 `ess specify validate` after each addition rather than at the end.
 
-`--path` takes one ESS file or a directory. From ESS 0.21.0 a directory is read through its
-`ess-inputs.yaml` when one exists — an exact file list, which is what lets authored inputs sit in
-nested directories beside generated files — and otherwise through the `system.yaml` layout above,
-which that CLI calls legacy and still accepts. ESS 0.20.0, the release the install page pins, reads
-the `system.yaml` layout only.
+`--path` takes one ESS file or a directory. A directory is read through its `ess-inputs.yaml` when
+one exists — an exact file list, which is what lets authored inputs sit in nested directories beside
+generated files (ESS 0.21.0) — and otherwise through the `system.yaml` layout above, which the CLI
+calls legacy and still accepts.
 
 **A draft is a proposal, never a silent completion.** Every relation you could not read from code,
 an OpenAPI document or an existing artifact is written with an `UNMAPPED:` marker beside the place

@@ -7,7 +7,7 @@ title: Install
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
 identity is `beyond10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`,
-`ess-specify`, `workspace-hygiene`, and `connectors`. All six are included in the pinned `0.9.0`
+`ess-specify`, `workspace-hygiene`, and `connectors`. All six are included in the pinned `0.9.1`
 release below. The [Connectors guide](plugins/connectors.md) covers its separate CLI prerequisite.
 
 ## Before you install: put `aep` and `ess` on your `PATH`
@@ -48,10 +48,10 @@ mkdir -p "$HOME/.local/bin"
 install -m 0755 "aep-${B10X_AEP_VERSION}-${B10X_TARGET}/aep" "$HOME/.local/bin/aep"
 ```
 
-Install ESS `0.20.0` the same way:
+Install ESS `0.22.1` the same way:
 
 ```bash
-B10X_ESS_VERSION=0.20.0
+B10X_ESS_VERSION=0.22.1
 B10X_ESS_ARCHIVE="ess-${B10X_ESS_VERSION}-${B10X_TARGET}.tar.gz"
 B10X_ESS_RELEASE="https://github.com/beyond10x/ess/releases/download/${B10X_ESS_VERSION}"
 curl --fail --location --remote-name "${B10X_ESS_RELEASE}/${B10X_ESS_ARCHIVE}"
@@ -76,7 +76,7 @@ aep --version
 ess --version
 ```
 
-The expected lines are `protocol 0.55.0` and `ess 0.20.0`. (`aep` retains `protocol` as its version
+The expected lines are `protocol 0.55.0` and `ess 0.22.1`. (`aep` retains `protocol` as its version
 label for compatibility.) `command not found` means the affected plugin will install and then stop
 at its first CLI command. Only the `beyond10x` front door needs neither binary.
 
@@ -99,14 +99,14 @@ The wave skill, the planning skill and every other plugin need no Metaharness.
 Copy the whole block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.0
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.1
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x
 /reload-plugins
 ```
 
-The first line registers the repository at the immutable `0.9.0` release; each install names its
+The first line registers the repository at the immutable `0.9.1` release; each install names its
 plugin in the `<plugin>@beyond10x` form. `/reload-plugins` activates them immediately. Add
 `/plugin install beyond10x@beyond10x` for the front door and
 `/plugin install workspace-hygiene@beyond10x` for managed worktrees, or
@@ -121,7 +121,7 @@ Codex offers the same plugins from the same repository under the same `beyond10x
 For a fresh installation, run this release-pinned block:
 
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.9.0
+codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.9.1
 codex plugin add beyond10x@beyond10x
 codex plugin add aep-plan@beyond10x
 codex plugin add aep-drive@beyond10x
@@ -154,7 +154,7 @@ The `aep` and `ess` binary requirements above apply unchanged.
 
 ## Pinning
 
-The blocks above are already pinned to the bare `0.9.0` release tag. Upgrade by changing that tag
+The blocks above are already pinned to the bare `0.9.1` release tag. Upgrade by changing that tag
 deliberately, re-registering the marketplace source, and running `/reload-plugins`. The release gate
 validates both marketplace formats, every declared instruction file, the public documentation, and
 the version recorded by each plugin manifest.
