@@ -17,20 +17,21 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 ## Install
 
-The `connectors` plugin is included in release `0.8.1` for both hosts.
+The `connectors` plugin is included in release `0.9.0` for both hosts.
 See the [Connectors installation guide](website/docs/plugins/connectors.md)
 for both hosts. Install the standalone `connectors` CLI first.
 
 `aep-plan` and `aep-drive` drive the `aep` CLI; `ess-specify` drives the `ess` CLI. Install the
-verified Linux or macOS archives for [AEP `0.51.0`](https://github.com/beyond10x/aep/releases/tag/0.51.0)
-and [ESS `0.11.1`](https://github.com/beyond10x/ess/releases/tag/0.11.1) first, then check them with
+verified Linux or macOS archives for [AEP `0.55.0`](https://github.com/beyond10x/aep/releases/tag/0.55.0)
+and [ESS `0.20.0`](https://github.com/beyond10x/ess/releases/tag/0.20.0) first, then check them with
 `aep --version` and `ess --version`. The complete download and checksum commands are in
-[`website/docs/install.md`](website/docs/install.md).
+[`website/docs/install.md`](website/docs/install.md), which also names the Metaharness build that
+`aep-drive`'s `drive` skill needs for `metaharness aep drive`.
 
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.8.1
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.0
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x

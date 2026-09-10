@@ -55,6 +55,9 @@ No planning-store file is edited directly. One command surface owns every change
 | add a relation | `aep plan artifact relate` |
 | take one back, when it was wrong or pointed the wrong way | `aep plan artifact unrelate` (AEP 0.53.0) |
 | move lifecycle status, including lifting a blocker | `aep plan artifact move` |
+| change a title, summary, owner, tag, reference or model digest | `aep plan artifact set` |
+| record which surfaces a story lands on, read (`cited`) or worked out (`--inferred`) | `aep plan artifact scope <id> --add <path>` |
+| record an observation a later move rests on, by kind or from a conformance report | `aep plan artifact evidence` |
 
 This makes the store a single-writer system: every mutation loads and validates it before writing,
 and every changed document receives the same revision semantics.
@@ -74,6 +77,8 @@ Everything above the `---` is structured. Ownership is what decides whether you 
 | `summary` | descriptive | one or two sentences; optional |
 | `format` | machine | optional; defaults to `aep.planning-md/1` when absent — a file may omit it |
 | `withholds` | machine | optional; set by `aep plan artifact new --withholds <evidence-kind>`. The evidence kind this artifact is stopping anybody from producing, and only meaningful beside a `blocks:` relation — `validate` reports it otherwise |
+| `scope` | machine | story only; written by `aep plan artifact scope`, each entry a `path` and a `confidence` of `cited` or `inferred`. `aep plan artifact waves` reads nothing else |
+| `model_digest` | machine | `executable-system-specification` only; written by `aep plan artifact set --model-digest`, refused by name on any other kind (AEP 0.50.0) |
 
 "Machine" means the CLI validates it against a document you do not control from the file. A
 hand-written `status` is not a faster move — it is an unvalidated one, and it looks identical to a

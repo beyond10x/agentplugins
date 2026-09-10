@@ -63,9 +63,9 @@ Derived <date> by `story-scoper`. Every line is **cited** (read from the story o
 **inferred** (a reading that could be wrong).
 
 - **Primary surface:** `crates/aep-cli` — cited
-- **Files:** `crates/aep-cli/src/planning.rs:2142` — cited
+- **Files:** `crates/edge/aep-cli/src/planning.rs:2142` — cited
 - **Symbols:** `ArtifactStatus::ALL` — cited
-- **Also likely:** `crates/aep-domain/src/artifact.rs` — inferred, where the enum is declared
+- **Also likely:** `crates/govern/aep-domain/src/artifact.rs` — inferred, where the enum is declared
 - **Documents:** none
 - **Confidence:** high — the story names the defect site
 - **Would collide with:** any unit touching `aep-cli`'s planning surface

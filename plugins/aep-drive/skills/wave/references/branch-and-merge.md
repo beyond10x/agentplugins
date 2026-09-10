@@ -162,7 +162,7 @@ coordinator's only memory of what it made. Teardown removes all three.
 
 **The build directory belongs inside the worktree.** In this repository that is not a preference:
 `cargo xtask` bakes the repository root in at build time, and
-`crates/aep-cli/tests/store_selection.rs` asserts `CARGO_TARGET_TMPDIR` lies under the
+`crates/edge/aep-cli/tests/store_selection.rs` asserts `CARGO_TARGET_TMPDIR` lies under the
 repository root, so eleven tests fail whenever the target is elsewhere (`AGENTS.md` § *Gate*, "Two
 worktrees must not share a `CARGO_TARGET_DIR`"). Each worktree builds into its own `target/`;
 `CARGO_TARGET_DIR` is not set, and never points two trees at one directory. This row read "usually

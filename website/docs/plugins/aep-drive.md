@@ -28,3 +28,6 @@ Driven runs are not finished work on the `aep` side. The walk has not yet reache
 `aep`'s `story:governed-dogfood-run` records two attempts that stopped before the review step — so
 the `drive` skill says so before it launches anything, prints the run id and how to follow it, and
 moves no artifact itself.
+
+The `drive` entry needs a Metaharness build that carries `metaharness aep drive`: AEP 0.55.0 refuses
+a model-backed map itself and names that command. [Install](../install.md) names the build to use.

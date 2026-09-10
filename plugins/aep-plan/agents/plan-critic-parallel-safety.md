@@ -74,7 +74,7 @@ surface is a weaker claim, and the drafter is entitled to see which kind they ar
 Name the pair, the surface, and whether it is cited or inferred:
 
 ```
-story:credential-store — both this and story:assertion-flow land on `crates/aep-cli/src/planning.rs` (cited, both bodies) and neither says so — .engineering/planning/story/credential-store.md:12
+story:credential-store — both this and story:assertion-flow land on `crates/edge/aep-cli/src/planning.rs` (cited, both bodies) and neither says so — .engineering/planning/story/credential-store.md:12
 ```
 
 The artifact field names the **one** item whose body has to say something; the other is cited inside

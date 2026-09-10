@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.8.1** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.9.0** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -51,12 +51,15 @@ or relations. Ask for them at the moment you need them:
 | What has happened to it, oldest first? | `aep plan artifact history <id>` |
 | Why is it at this status — what did the store admit before each move? | `aep plan artifact explain <id>` |
 | What writes has one side of a hybrid plan taken that the other has not? | `aep plan artifact divergences` |
+| Which stories may be implemented at once, from their typed `scope` and `depends_on`? | `aep plan artifact waves [--kind k] [--status s] [--format json]` |
+| What did the latest review of an artifact find that the one before did not? | `aep plan artifact findings <id> [--from <review> --to <review>]` |
+| Per reviewer, what did their findings change and what did their verdicts cost? | `aep plan artifact review-value [--since <YYYY-MM-DD>]` |
 | Is the whole store still consistent? | `aep plan artifact validate` |
 
-That is every `aep plan artifact` verb that answers a question. The seven that are missing from it
-write — `new`, `move`, `relate`, `unrelate`, `body`, `evidence`, `catch-up` — and guardrail 2 governs
-those.
-Run `aep plan artifact --help` when this table and the CLI disagree; the CLI is right.
+That is every `aep plan artifact` verb that answers a question at AEP 0.55.0. The nine that are
+missing from it write — `new`, `move`, `relate`, `unrelate`, `body`, `set`, `scope`, `evidence`,
+`catch-up` — and guardrail 2 governs those. Run `aep plan artifact --help` when this table and the
+CLI disagree; the CLI is right.
 
 The reason is the reason this project exists. Lifecycle and relation documents are validated and
 versioned; a prose copy of them in a skill file is neither, and it goes stale the first time a kind
@@ -64,8 +67,8 @@ gains a status. An agent that recites `draft → proposed → active` from memor
 propose an illegal move in a store that renamed one of them. Reading `aep plan artifact
 lifecycle story` costs one command and cannot be wrong.
 
-When a store is present but you have not looked at it yet in this session, start with `aep
-artifact list` and `aep plan artifact kinds`. Two commands buy you the whole vocabulary.
+When a store is present but you have not looked at it yet in this session, start with
+`aep plan artifact list` and `aep plan artifact kinds`. Two commands buy you the whole vocabulary.
 
 ## 3. Seven guardrails
 
@@ -96,6 +99,16 @@ inventing a plausible name for what you observed. `--ref` and `--at` are optiona
 the record checkable later. `move --evidence <kind>=<count>` is the asserted form, kept for a
 record that lives outside the store; it names no run and no artifact, and the store marks a move
 that rests on it as resting on an assertion.
+
+An ESS conformance report is recorded from the file rather than typed: `aep plan artifact evidence
+<id> --from <report>` reads the kind, the source and the instant out of an
+`ess-conformance-report/1` — the instant is the report's own `completed_at` — and refuses a report
+of no scenarios or with no `spec_digest` (AEP 0.43.0). A report/2, which ESS 0.20.0 writes on
+`--report-format 2`, is accepted only beside `--suite <the exact suite JSON it ran>` (AEP 0.55.0).
+That record is what moves an `executable-system-specification` to `conforming` — its ladder is
+`draft → validated → conforming` (AEP 0.50.0) — and `aep plan artifact set <id> --model-digest
+<hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The
+`ess-specify:specify` skill says how the report is produced.
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
 relations, status, and prose use `new`, `relate`/`unrelate`, `move`, and `body` respectively. **A
@@ -193,7 +206,7 @@ created decision-blocker:api-token-scope (open) at .engineering/planning/decisio
 means something beside `blocks:`, and `validate` says so.
 
 **7. An epic or story that introduces a new noun models it first.** Where the artifact's outcome
-names an entity no `ess/1` document in the repository declares, do not decompose it and do not write
+names an entity no ESS document in the repository declares (`ess/1`, or `ess/2` from ESS 0.20.0), do not decompose it and do not write
 stories around it. Draft the domain first — `aep plan reverse openapi --domain <name> --out <domain-doc>
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
 `ess-specify:specify` skill — run `ess specify validate --path <specification>`, and cite the file by path in the
@@ -201,7 +214,7 @@ artifact body through `aep plan artifact body`. A noun with no typed home is the
 check later.
 
 **A relation between two nouns is modelled the same way the nouns are: as a `relations:` entry on
-the entity, in the `ess/1` document.** Not as a sentence in a story body, and not as a field somebody
+the entity, in the ESS document.** Not as a sentence in a story body, and not as a field somebody
 will recognise as a foreign key later. The entry names the far entity, whether this side owns it or
 merely references it, and the cardinality; `ess specify validate` refuses an entry whose target does not
 exist, whose linking field is missing or of the wrong type, and a second entity claiming to own the

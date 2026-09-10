@@ -154,7 +154,7 @@ when handing the tree and evidence back; the coordinator owns final cleanup.
    tree builds into its own `target/`. Two trees sharing one target hand each other their binaries:
    `cargo xtask` bakes the repository root in at build time, so a `schema` run in one tree rewrote
    the generated schemas in another; a `task check` ran a test that did not exist in the tree it ran
-   in; and `crates/aep-cli/tests/store_selection.rs` asserts the target lies under the
+   in; and `crates/edge/aep-cli/tests/store_selection.rs` asserts the target lies under the
    repository root and fails eleven tests when it does not (`AGENTS.md:493-502`). It cost about
    three gate runs per agent to learn. If the disk is short, that is a tree the coordinator removes,
    not a variable you set.

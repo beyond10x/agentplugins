@@ -1,7 +1,7 @@
 ---
 name: specify
 description: >-
-  Validate Executable System Specifications and guide deterministic JSON Schema or OpenAPI projections through the `ess` command. Use when a repository contains an ESS `system.yaml`, generated schema or OpenAPI artifacts, an `ess-*` format, when a story or epic introduces an entity — a noun the plan needs a typed home for, whether or not a specification exists yet, including a repository with no `system.yaml` anywhere, where the domain is drafted from nothing — or when the user asks about specification validation, compilation, schema generation, projection drift, adapter coverage, or unsupported semantics. An entity introduction names the noun and something typed about it: an identifier, a field, or a relation to another noun. A story that mentions a noun in passing, an acceptance line, a status change or a plan's prose is not one.
+  Validate Executable System Specifications and guide deterministic JSON Schema or OpenAPI projections through the `ess` command. Use when a repository contains an ESS `system.yaml` or `ess-inputs.yaml`, generated schema or OpenAPI artifacts, an `ess-*` format, when a story or epic introduces an entity — a noun the plan needs a typed home for, whether or not a specification exists yet, including a repository with no `system.yaml` anywhere, where the domain is drafted from nothing — or when the user asks about specification validation, compilation, schema generation, projection drift, adapter coverage, or unsupported semantics. An entity introduction names the noun and something typed about it: an identifier, a field, or a relation to another noun. A story that mentions a noun in passing, an acceptance line, a status change or a plan's prose is not one.
 ---
 
 # ESS schema validation and projection
@@ -78,7 +78,7 @@ $ ess specify validate --path <specification>
 warehouse v1 — 2 file(s), valid
 ```
 
-That is the verbatim output of ESS `0.5.1`, exit status 0, over both files as printed—including the
+That is the verbatim output of ESS `0.20.0`, exit status 0, over both files as printed—including the
 `relations:` block and its second entity. It is a validated starting point, not an illustrative
 shape. Change the names and semantics to match the repository you actually read, then validate the
 changed specification again.
@@ -110,6 +110,12 @@ narrows that question without answering it. Where you cannot say which kind it i
 
 Grow it from there — types, commands, events, views, and a component that owns the domain — running
 `ess specify validate` after each addition rather than at the end.
+
+`--path` takes one ESS file or a directory. From ESS 0.21.0 a directory is read through its
+`ess-inputs.yaml` when one exists — an exact file list, which is what lets authored inputs sit in
+nested directories beside generated files — and otherwise through the `system.yaml` layout above,
+which that CLI calls legacy and still accepts. ESS 0.20.0, the release the install page pins, reads
+the `system.yaml` layout only.
 
 **A draft is a proposal, never a silent completion.** Every relation you could not read from code,
 an OpenAPI document or an existing artifact is written with an `UNMAPPED:` marker beside the place
@@ -159,6 +165,27 @@ ess generate project openapi --path <specification> --out <directory>
 The same typed IR must produce the same ordered files and bytes. Compare a regenerated temporary
 tree with the committed tree before replacing anything. A stale committed file is drift; a file no
 projection owns is not authority.
+
+## Conformance is a record, not a claim
+
+In the planning store an `executable-system-specification` is `conforming` because a suite ran and
+its report says so, never because somebody moved it there (AEP 0.50.0). The report is what crosses
+from ESS to AEP:
+
+```console
+ess verify conform synthesize --path <specification> --out <suite.json>
+ess verify conform run --path <specification> --target <reference> --report-out <report.json>
+aep plan artifact evidence <specification-artifact> --from <report.json>
+```
+
+`synthesize` writes the suite the specification obliges — nothing for a domain with no commands or
+outcomes, so the two-entity draft above yields `0 scenario(s)` and no report worth recording.
+`run` holds a built-in reference implementation to it; `--target` lists the ones this binary
+carries. `evidence --from` reads the kind, the source and the instant out of the report and refuses
+a report of no scenarios or with no `spec_digest`. A report/2 (`--report-format 2`, ESS 0.20.0) is
+recorded only beside `--suite <the exact suite JSON it ran>` (AEP 0.55.0). Then
+`aep plan artifact set <artifact> --model-digest <hex>` ties the record to the model the suite ran
+against, and `aep plan artifact move <artifact> --to conforming` is decided by the store.
 
 ## Adapter contract
 

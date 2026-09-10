@@ -20,7 +20,7 @@ forward (`workflows/development/default.yaml`).
 you honest, and it is worth understanding rather than obeying:
 
 * `independent: true` is checked structurally — a record whose producer is an agent does not satisfy
-  it, however confidently it is worded (`crates/aep-domain/src/requirement.rs`). Nothing signs a
+  it, however confidently it is worded (`crates/govern/aep-domain/src/requirement.rs`). Nothing signs a
   record; gap-register **D-3** is the proposal for that, and it is not accepted.
 * So your *opinion* counts for nothing, by design. What counts is the **failing test case you
   wrote**: the test runner produces that record, and the test runner is a verifier. Your case is
@@ -207,7 +207,7 @@ two differently-worded paragraphs are the same defect. Whether a second attack f
 ground is the number the third-attack decision turns on, and nothing but that comparison produces it.
 
 ```findings
-- file: crates/aep-domain/src/requirement.rs
+- file: crates/govern/aep-domain/src/requirement.rs
   line: 214
   category: contract-drift
   severity: blocker

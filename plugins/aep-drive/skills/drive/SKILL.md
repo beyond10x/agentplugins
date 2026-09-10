@@ -48,6 +48,13 @@ is given and guesses none.
 
 ## 2. Point the driver at the story
 
+**`metaharness aep drive run --help` has to answer before anything else.** AEP 0.55.0 hands every
+model-backed map to Metaharness and refuses it itself, naming this command. Metaharness
+`0.7.0` includes the verb; earlier tags through `0.6.5` predate it.
+`unrecognized subcommand 'aep'` means the installed
+Metaharness is older than the AEP that sent you here: say so, point at the install page's
+Metaharness block, and stop.
+
 `metaharness aep drive run` walks a **task document**, not a story id — the story is the contract and the task
 document is what a run needs to resolve a plan against it. It names the story in `derived_from:`,
 along with the protocol, the profile, and the facts nothing can observe about the change.
@@ -65,7 +72,7 @@ select the one that fits; where two fit, it **refuses and names both**, and that
 operator to answer. Do not pick one to get the run started.
 
 ```console
-$ metaharness aep drive run --project . --map <the map the project declares> \
+$ METAHARNESS_LIVE=1 metaharness aep drive run --project . --map <the map the project declares> \
     --aep-binary <the AEP executable built from the runner's pinned source> \
     --plugin-dir <the plugin directory the run loads> \
     --pause-on-approval --budget-usd <what the operator said> --assume-usd-per-run <what the operator said>
@@ -75,6 +82,10 @@ $ metaharness aep drive run --project . --map <the map the project declares> \
 are not yours to invent.** The cap is checked before every session spawn, because one applied
 afterwards is a receipt rather than a bound. Ask the operator for both numbers and pass what they
 said; a run launched on a guessed budget is a run whose ceiling nobody agreed to.
+
+**`METAHARNESS_LIVE=1` is the opt-in, and it goes on the command.** Without it a map with an `llm`
+step is refused before a run id is allocated — *a model session can cost money; opt in explicitly* —
+and that refusal is the answer, not a flag to find a way around.
 
 `--pause-on-approval` runs to the first thing a person owes and exits 0 having persisted. It is the
 right default here: the stop is the point of the exercise.

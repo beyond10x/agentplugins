@@ -2,9 +2,27 @@
 
 ## [Unreleased]
 
-- Governed model runs and live evaluation use `metaharness aep drive`. The drive skill
-  supplies the separate AEP planning executable and preserves compatible resume, budget
-  and plugin-input requirements.
+## [0.9.0] — 2026-09-10
+
+- Align installation guidance on AEP `0.55.0` and ESS `0.20.0`, both with published native
+  archives. Keep ESS `0.22.0` out of the download instructions while its archives are unavailable.
+- Use Metaharness `0.7.0` for governed model runs through `metaharness aep drive`. Supply the
+  separate planning executable with `--aep-binary`, preserve plugin and budget inputs, and
+  require the explicit `METAHARNESS_LIVE=1` opt-in.
+- Bring the planning skill's command inventory up to AEP `0.55.0`, including `waves`, `findings`,
+  `review-value`, `set` and `scope`. Explain conformance report ingestion through
+  `evidence --from`, report/2 suite binding, model digests and specification lifecycle states.
+- Document ESS conformance synthesis, execution and evidence ingestion. Distinguish the pinned
+  ESS `0.20.0` system-file layout from `ess-inputs.yaml`, introduced in `0.21.0`.
+- Update example crate paths for AEP's area-based layout and keep both plugin manifests and
+  current installation pins aligned at `0.9.0`.
+- Publish source through standalone bot tooling without an Atlas checkout or organization
+  admission requirement. Repository correctness and release checks remain repository-owned.
+
+Historical walkthrough and paid-evaluation pins remain attached to their original recordings.
+This source release was cut without running gates, tests, live evaluations or binary packaging,
+at the operator's request. Earlier preparation evidence remains in the planning record.
+
 ## [0.8.1] — 2026-09-07
 
 - Regenerate Workspace Hygiene from Worktree 0.4.0: native storage inspection, explicit lease
