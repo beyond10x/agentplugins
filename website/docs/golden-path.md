@@ -15,7 +15,9 @@ front of step 1, and without it the run ends at the first stop.
 Every console block below is the output of actually running the command shown above it. None of it
 is written by hand; the only edit is that the recording machine's absolute paths are shortened to
 `…`. What the agents *say* is described in prose instead of quoted, because yours will not say it
-the same way. The commands were refreshed against AEP `0.44.0` and ESS `0.5.1`.
+the same way. The recorded outputs below use AEP `0.44.0` and ESS `0.5.1`; they remain dated
+evidence of that run. Use [Install](./install.md) for current release requirements. Model-backed
+driving now uses `metaharness aep drive`, as described in step 8.
 
 The worked feature is deliberately small: a **commercial client** record that belongs to exactly one
 **account**, with create, read, update and delete. The interesting part is the one thing about it
@@ -365,7 +367,7 @@ Drive story:commercial-client-record. Run aep doctor first and stop if anything 
 the run will cost before you launch it, and print the run id and how to follow it.
 ```
 
-The `drive` skill checks the checkout, points `aep drive run` at the task document that names the
+The `drive` skill checks the checkout, points `metaharness aep drive run` at the task document that names the
 story, launches it against the project's step map, and prints the run id. It moves no artifact
 itself — the moves are the driver's, which is the whole property being tested — and it relays a
 refusal (a held lock, missing evidence, two step maps that both fit) verbatim and stops.

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Align the golden path's model-driving command with Metaharness and label its older recorded
+  CLI output separately from current installation requirements.
+
 ## [0.9.0] — 2026-09-10
 
 - Align installation guidance on AEP `0.55.0` and ESS `0.20.0`, both with published native
