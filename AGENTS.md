@@ -51,8 +51,8 @@ The adopter-facing Docusaurus site lives under `website/` and is published at
 <https://beyond10x.github.io/agentplugins/>. A website change must also pass `task site-build`.
 The networked site build stays outside the offline Rust gate.
 
-Commit and push through the organization bot tooling owned by private Atlas. This repository never
-carries credential, token-minting or bot-authenticated git wrappers.
+Commit and push through standalone `b10x-gates bot` with protected local credentials. This
+repository never carries credential, token-minting or bot-authenticated git wrappers.
 
 ## Releases
 
@@ -60,6 +60,17 @@ Bare annotated tags are releases. Before tagging, `CHANGELOG.md`, the workspace 
 plugin manifest version must agree. The release workflow reruns `task check`, verifies that
 agreement, and only then publishes the GitHub release. Public-site validation and Atlas
 publication run independently and do not delay source-release completion.
+
+## Source publication
+
+This repository owns its correctness checks, required reviews and release artifacts. Ordinary
+commits, pushes and releases require no Atlas checkout, current Atlas main or organization-wide
+dependency admission. Use standalone `b10x-gates bot --repo . -- <git-command>` with protected local
+credentials and the existing `b10x-bot[bot]` identity. Preserve repository and worktree hooks.
+
+Atlas documentation validation belongs to documentation operations; it is not a prerequisite for
+source publication. Documentation failures affect documentation delivery. Organization privacy
+rules still apply; historical brand exemptions do not authorize new public associations.
 
 <!-- b10x-docs-operations:start -->
 ## Public documentation operations
