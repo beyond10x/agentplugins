@@ -15,8 +15,8 @@ commands in `0.7.x` and reads the installed binary's help before selecting optio
 `beyond10x/connectors`' default branch and its *Latest* release are the connectors_v2 lineage
 (`v0.8.0` and up), which is a different CLI — `setup`, `adapters`, `connections`, `operations`,
 `describe`, `invoke`, `serve` — per Atlas ADR 0051 on the `beyond10x/connectors` lineage
-(2026-09-15); this skill drives the v1 CLI, `0.7.x`, so the generic releases page and its *Latest*
-entry are not the CLI these instructions teach. Service setup and credentials are separate
+(accepted 2026-09-15); this skill drives the v1 CLI, `0.7.x`, so the generic releases page and
+its *Latest* entry are not the CLI these instructions teach. Service setup and credentials are separate
 from plugin installation.
 
 Operation, connection and event commands default to local even when a hosted login is saved.

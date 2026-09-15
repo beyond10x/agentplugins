@@ -48,6 +48,11 @@ Add `/plugin install beyond10x@beyond10x` for the front door and
 from the same repository, following `.agents/plugins/marketplace.json`; its exact non-interactive
 CLI bootstrap and upgrade commands are in [`website/docs/install.md`](website/docs/install.md).
 
+The `connectors` skill in the pinned `0.9.1` release still links `beyond10x/connectors`' generic
+releases page, whose *Latest* is the connectors_v2 CLI that skill does not drive; `main` links the
+v1 line's [`v0.7.2` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.2) instead,
+and that correction ships in the next tag.
+
 Codex marketplace metadata lives at `.agents/plugins/marketplace.json`; Claude plugin marketplace
 metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own manifest and only the
 skills or agents in its stated scope.

@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+- The `connectors` skill and `website/docs/plugins/connectors.md` link the last v1 release,
+  `v0.7.2`, state the `0.7.x` surface these instructions drive, and say that
+  `beyond10x/connectors`' default branch and *Latest* release are the connectors_v2 lineage per
+  atlas ADR 0051 (accepted 2026-09-15). The released `0.9.1` skill still links the repository's
+  generic releases page, whose *Latest* is the v2 CLI this skill does not drive.
+- Eval coverage is counted from the `evals/*/case.yaml` `subject:` fields — 7 of 10 agents and 5
+  of 9 skills — in `README.md` and `evals/README.md`, and the seven uncovered ids are named as
+  `story:plugin-eval-cases`'s remaining scope.
+- `README.md` and the install page name the Metaharness↔AEP pin as read from
+  `crates/metaharness-aep/Cargo.toml` rather than assumed to match the `aep` on `PATH`.
+- The `inspect` upgrade check arrived at Connectors `v0.7.2`; the earlier "0.7.1 has none" claim
+  is corrected.
+
 ## [0.9.1] — 2026-09-10
 
 - Pin ESS `0.22.1` instead of `0.20.0`. ESS `0.22.0` had no archives because its own release gate

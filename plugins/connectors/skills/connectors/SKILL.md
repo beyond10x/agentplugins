@@ -20,8 +20,8 @@ not install the binary, start a service, supply credentials, or grant access.
    `beyond10x/connectors`' default branch and its *Latest* release are the connectors_v2 lineage
    (`v0.8.0` and up), which is a different CLI — `setup`, `adapters`, `connections`, `operations`,
    `describe`, `invoke`, `serve` — per Atlas ADR 0051 on the `beyond10x/connectors` lineage
-   (2026-09-15); this skill drives the v1 CLI, `0.7.x`. So the repository's generic releases page
-   and its *Latest* entry are not this CLI.
+   (accepted 2026-09-15); this skill drives the v1 CLI, `0.7.x`. So the repository's generic
+   releases page and its *Latest* entry are not this CLI.
 2. Reuse the user's deployment configuration and state root. For a local deployment, run
    `connectors --output json inspect doctor`, adding `--config` and `--state-root` when supplied.
    Select `--target local` or `--target hosted` explicitly for operation, connection and event
