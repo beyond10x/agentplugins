@@ -92,6 +92,12 @@ cargo install --locked --git https://github.com/beyond10x/metaharness \
 metaharness aep drive run --help
 ```
 
+Metaharness does not call the `aep` binary installed above — it links AEP as a library at whatever
+`beyond10x/aep` git revision `crates/metaharness-aep/Cargo.toml` pins in the Metaharness tag you
+install (at `0.7.0` that revision is `a23176ae`, which `git describe --tags` in the AEP repository
+reports as `0.54.0-33-ga23176ae`, i.e. behind the `0.55.0` you put on `PATH`), so read that manifest
+for the Metaharness↔AEP pair rather than assuming the two versions match.
+
 The wave skill, the planning skill and every other plugin need no Metaharness.
 
 ## Claude Code

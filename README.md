@@ -26,7 +26,11 @@ verified Linux or macOS archives for [AEP `0.55.0`](https://github.com/beyond10x
 and [ESS `0.22.1`](https://github.com/beyond10x/ess/releases/tag/0.22.1) first, then check them with
 `aep --version` and `ess --version`. The complete download and checksum commands are in
 [`website/docs/install.md`](website/docs/install.md), which also names the Metaharness build that
-`aep-drive`'s `drive` skill needs for `metaharness aep drive`.
+`aep-drive`'s `drive` skill needs for `metaharness aep drive`. That build links its own copy of AEP
+rather than the binary you install here: `metaharness`'s `crates/metaharness-aep/Cargo.toml` pins
+the `aep-*` crates to a `beyond10x/aep` git revision — at Metaharness `0.7.0` that is `a23176ae`,
+which `git describe --tags` reports as `0.54.0-33-ga23176ae` — so read that manifest for the
+Metaharness↔AEP pair instead of assuming it matches the `0.55.0` on your `PATH`.
 
 Paste this pinned block into a Claude Code session:
 
@@ -58,9 +62,16 @@ the private organization tooling outside this tree.
 
 ## Evals
 
-Every agent and user-facing skill has an eval case beside it under [`evals/`](evals/): one
-`eval-case/1` per subject, judged by a `trace-spec/1` document, run by the `aep` CLI. A change that
-breaks a charter turns a row red instead of being noticed by a reader.
+Nine cases under [`evals/`](evals/) — one `eval-case/1` each, judged by a `trace-spec/1` document,
+run by the `aep` CLI — name 7 of this repository's 10 agents and 5 of its 9 skills in their
+`subject:` fields. Covered: the agents `aep-drive:adversary`, `aep-drive:story-scoper`,
+`aep-plan:decomposer`, `aep-plan:plan-critic-acceptance`, `aep-plan:plan-critic-design`,
+`aep-plan:plan-critic-parallel-safety` and `aep-plan:plan-critic-scope`, and the skills
+`aep-drive:drive`, `aep-drive:wave`, `aep-plan:planning`, `connectors:connectors` and
+`ess-specify:specify`. Not covered: the agents `aep-drive:implementor`, `aep-plan:plan-reviewer`
+and `aep-plan:reverse-engineer`, and the skills `aep-plan:story-migration`, `beyond10x:beyond10x`,
+`beyond10x:plugin-creator` and `workspace-hygiene:worktree`. A change that breaks a covered charter
+turns a row red instead of being noticed by a reader; a change to an uncovered one does not.
 
 Free, offline, and part of `task check`:
 

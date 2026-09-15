@@ -14,8 +14,12 @@ not install the binary, start a service, supply credentials, or grant access.
 1. Run `connectors --version` and `connectors --help`. These instructions target the grouped
    command surface in 0.7.1. Consult `<command> --help` before using an unfamiliar option.
    If the binary is missing, report it and use the official
-   [Connectors releases](https://github.com/beyond10x/connectors/releases) and
+   [Connectors `v0.7.1` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.1) and
    [source](https://github.com/beyond10x/connectors) for installation. Do not invent download URLs.
+   These instructions drive the v1 lineage — the `0.7.x` command line tagged `v0.7.1` — and not the
+   connectors v2 rewrite that carries the same repository's later tags (`v0.8.0` and up) under a
+   different surface (`setup`, `adapters`, `connections`, `operations`, `describe`, `invoke`,
+   `serve`), so the repository's generic releases page and its *Latest* entry are not this CLI.
 2. Reuse the user's deployment configuration and state root. For a local deployment, run
    `connectors --output json inspect doctor`, adding `--config` and `--state-root` when supplied.
    Select `--target local` or `--target hosted` explicitly for operation, connection and event

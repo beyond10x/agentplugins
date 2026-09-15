@@ -8,10 +8,14 @@ The `connectors` plugin provides one shared `connectors` skill for Claude Code a
 guides provider setup, connection diagnostics, and the search → describe → invoke sequence for
 admitted integrations. It ships no binary, credentials, daemon, hooks, or automatic MCP connection.
 
-Install the standalone CLI from [Connectors releases](https://github.com/beyond10x/connectors/releases)
+Install the standalone CLI from the
+[Connectors `v0.7.1` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.1)
 and verify `connectors --version`. The skill targets the grouped commands in `0.7.1` and reads the
-installed binary's help before selecting options. Service setup and credentials are separate from
-plugin installation.
+installed binary's help before selecting options. The skill drives the v1 lineage — the `0.7.x`
+command line tagged `v0.7.1` — and not the connectors v2 rewrite that carries the same repository's
+later tags (`v0.8.0` and up) under a different surface, so the generic releases page and its
+*Latest* entry are not the CLI these instructions teach. Service setup and credentials are separate
+from plugin installation.
 
 Operation, connection and event commands default to local even when a hosted login is saved.
 Choose `--target hosted` explicitly for a hosted workflow and keep that target throughout
