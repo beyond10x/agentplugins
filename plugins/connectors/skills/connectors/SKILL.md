@@ -12,14 +12,16 @@ not install the binary, start a service, supply credentials, or grant access.
 ## Establish the target
 
 1. Run `connectors --version` and `connectors --help`. These instructions target the grouped
-   command surface in 0.7.1. Consult `<command> --help` before using an unfamiliar option.
+   command surface in 0.7.x. Consult `<command> --help` before using an unfamiliar option.
    If the binary is missing, report it and use the official
-   [Connectors `v0.7.1` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.1) and
-   [source](https://github.com/beyond10x/connectors) for installation. Do not invent download URLs.
-   These instructions drive the v1 lineage — the `0.7.x` command line tagged `v0.7.1` — and not the
-   connectors v2 rewrite that carries the same repository's later tags (`v0.8.0` and up) under a
-   different surface (`setup`, `adapters`, `connections`, `operations`, `describe`, `invoke`,
-   `serve`), so the repository's generic releases page and its *Latest* entry are not this CLI.
+   [Connectors `v0.7.2` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.2) —
+   the last release of the v1 line — and [source](https://github.com/beyond10x/connectors) for
+   installation. Do not invent download URLs.
+   `beyond10x/connectors`' default branch and its *Latest* release are the connectors_v2 lineage
+   (`v0.8.0` and up), which is a different CLI — `setup`, `adapters`, `connections`, `operations`,
+   `describe`, `invoke`, `serve` — per Atlas ADR 0051 on the `beyond10x/connectors` lineage
+   (2026-09-15); this skill drives the v1 CLI, `0.7.x`. So the repository's generic releases page
+   and its *Latest* entry are not this CLI.
 2. Reuse the user's deployment configuration and state root. For a local deployment, run
    `connectors --output json inspect doctor`, adding `--config` and `--state-root` when supplied.
    Select `--target local` or `--target hosted` explicitly for operation, connection and event
@@ -54,8 +56,11 @@ Check the installed version against an actual official release and its compatibi
 Before replacing a source-built installation, compare every operation the application uses with
 the candidate's input and output contracts; a successful account probe alone is insufficient.
 Upgrade the CLI and local daemon together when an upgrade is requested, preserving configuration
-and credential state. The released 0.7.1 CLI has no `inspect upgrade` command; do not invent one
-or promise automated compatibility assessment. Recheck help when a later release adds commands.
+and credential state. `connectors inspect upgrade` arrived in the v1 line at `v0.7.2` and only
+reports installed facts — version, catalog schema and digest, credential-file formats, hosted
+session-metadata version — without checking remote releases or changing files; it is not an
+upgrade command. Do not invent one or promise automated compatibility assessment. Recheck help
+when a later release adds commands.
 
 ## Discover, describe, invoke
 

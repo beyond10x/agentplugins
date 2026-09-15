@@ -64,7 +64,9 @@ the private organization tooling outside this tree.
 
 Nine cases under [`evals/`](evals/) — one `eval-case/1` each, judged by a `trace-spec/1` document,
 run by the `aep` CLI — name 7 of this repository's 10 agents and 5 of its 9 skills in their
-`subject:` fields. Covered: the agents `aep-drive:adversary`, `aep-drive:story-scoper`,
+`subject:` fields. Those `subject:` fields are the source of truth for eval coverage: every
+coverage number here and in [`evals/README.md`](evals/README.md) is counted from
+`evals/*/case.yaml`, never from a prose table. Covered: the agents `aep-drive:adversary`, `aep-drive:story-scoper`,
 `aep-plan:decomposer`, `aep-plan:plan-critic-acceptance`, `aep-plan:plan-critic-design`,
 `aep-plan:plan-critic-parallel-safety` and `aep-plan:plan-critic-scope`, and the skills
 `aep-drive:drive`, `aep-drive:wave`, `aep-plan:planning`, `connectors:connectors` and
