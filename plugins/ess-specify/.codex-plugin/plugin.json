@@ -1,6 +1,6 @@
 {
   "name": "ess-specify",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Validate ESS schemas and guide deterministic projections without guessing semantics.",
   "author": {
     "name": "Beyond10x"

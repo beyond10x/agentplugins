@@ -7,7 +7,7 @@ title: Install
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
 identity is `beyond10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`,
-`ess-specify`, `workspace-hygiene`, and `connectors`. All six are included in the pinned `0.9.1`
+`ess-specify`, `workspace-hygiene`, and `connectors`. All six are included in the pinned `0.9.2`
 release below. The [Connectors guide](plugins/connectors.md) covers its separate CLI prerequisite.
 
 ## Before you install: put `aep` and `ess` on your `PATH`
@@ -105,14 +105,14 @@ The wave skill, the planning skill and every other plugin need no Metaharness.
 Copy the whole block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.1
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.2
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x
 /reload-plugins
 ```
 
-The first line registers the repository at the immutable `0.9.1` release; each install names its
+The first line registers the repository at the immutable `0.9.2` release; each install names its
 plugin in the `<plugin>@beyond10x` form. `/reload-plugins` activates them immediately. Add
 `/plugin install beyond10x@beyond10x` for the front door and
 `/plugin install workspace-hygiene@beyond10x` for managed worktrees, or
@@ -127,7 +127,7 @@ Codex offers the same plugins from the same repository under the same `beyond10x
 For a fresh installation, run this release-pinned block:
 
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.9.1
+codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.9.2
 codex plugin add beyond10x@beyond10x
 codex plugin add aep-plan@beyond10x
 codex plugin add aep-drive@beyond10x
@@ -160,7 +160,7 @@ The `aep` and `ess` binary requirements above apply unchanged.
 
 ## Pinning
 
-The blocks above are already pinned to the bare `0.9.1` release tag. Upgrade by changing that tag
+The blocks above are already pinned to the bare `0.9.2` release tag. Upgrade by changing that tag
 deliberately, re-registering the marketplace source, and running `/reload-plugins`. The release gate
 validates both marketplace formats, every declared instruction file, the public documentation, and
 the version recorded by each plugin manifest.

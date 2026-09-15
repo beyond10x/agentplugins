@@ -17,7 +17,7 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 ## Install
 
-The `connectors` plugin is included in release `0.9.1` for both hosts.
+The `connectors` plugin is included in release `0.9.2` for both hosts.
 See the [Connectors installation guide](website/docs/plugins/connectors.md)
 for both hosts. Install the standalone `connectors` CLI first.
 
@@ -35,7 +35,7 @@ Metaharness↔AEP pair instead of assuming it matches the `0.55.0` on your `PATH
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.1
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.2
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x
@@ -47,11 +47,6 @@ Add `/plugin install beyond10x@beyond10x` for the front door and
 `/plugin install connectors@beyond10x` for integrations. Codex offers the same plugins
 from the same repository, following `.agents/plugins/marketplace.json`; its exact non-interactive
 CLI bootstrap and upgrade commands are in [`website/docs/install.md`](website/docs/install.md).
-
-The `connectors` skill in the pinned `0.9.1` release still links `beyond10x/connectors`' generic
-releases page, whose *Latest* is the connectors_v2 CLI that skill does not drive; `main` links the
-v1 line's [`v0.7.2` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.2) instead,
-and that correction ships in the next tag.
 
 Codex marketplace metadata lives at `.agents/plugins/marketplace.json`; Claude plugin marketplace
 metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own manifest and only the

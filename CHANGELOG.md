@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.9.2] — 2026-09-15
 
 - The `connectors` skill and `website/docs/plugins/connectors.md` link the last v1 release,
   `v0.7.2`, state the `0.7.x` surface these instructions drive, and say that
