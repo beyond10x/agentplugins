@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased]
+
+- New skill `ess-specify:coverage`. It covers the half of ESS work `specify` does not: raising and
+  auditing a conformance suite's coverage against a real implementation, and judging whether a
+  passing suite is testing anything. Drafted from one measured engagement in which a suite with 156
+  passing scenarios was not exercising the mapping those scenarios existed to check — changing the
+  implementation so an upstream state folded onto the wrong internal state moved no verdict at all.
+  The skill leads with that: break the behaviour and watch a named scenario go red, before trusting
+  any count.
+- It carries four things the same engagement paid for. Skips are ranked from the target's own
+  refusal reasons and never by construct — a construct ranking was wrong about every cause, naming
+  an enum table as the largest block where measurement found zero enum skips and one unrelated
+  cause at 60%. A double's payload is grounded in what the producer emits rather than what the
+  consumer's parser accepts, because a parser ignores unknown keys and a two-key fake proves
+  nothing. A counts ratchet floors `answered` rather than `passed`, so a flapping scenario cannot
+  fail a gate while nothing has regressed. And `-race` is named as the reproducer for a CI-only
+  timing failure where a container CPU limit is not, because the detector slows every operation
+  uniformly while a CPU limit still allows a full-speed burst.
+- `ess-specify`'s manifests, the `README.md` boundary line and the eval-coverage counts follow: 10
+  skills rather than 9, with `ess-specify:coverage` listed among the uncovered ones.
+
+
 ## [0.9.2] — 2026-09-15
 
 - The `connectors` skill and `website/docs/plugins/connectors.md` link the last v1 release,

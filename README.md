@@ -7,7 +7,8 @@ The repository deliberately contains six focused plugins:
 - `beyond10x`: marketplace navigation, public resource discovery, and portable plugin creation.
 - `aep-plan`: governed planning, decomposition, plan review, and reverse engineering.
 - `aep-drive`: wave coordination, story scoping, implementation, and adversarial review.
-- `ess-specify`: ESS specification, validation and deterministic schema/OpenAPI projection guidance.
+- `ess-specify`: ESS specification, validation and deterministic schema/OpenAPI projection
+  guidance, and conformance-suite coverage against a real implementation.
 - `workspace-hygiene`: safe creation, leases, publication checks, and cleanup for Git worktrees.
 - `connectors`: provider setup, connection diagnostics, and governed CLI operation invocation.
 
@@ -63,7 +64,7 @@ the private organization tooling outside this tree.
 ## Evals
 
 Nine cases under [`evals/`](evals/) — one `eval-case/1` each, judged by a `trace-spec/1` document,
-run by the `aep` CLI — name 7 of this repository's 10 agents and 5 of its 9 skills in their
+run by the `aep` CLI — name 7 of this repository's 10 agents and 5 of its 10 skills in their
 `subject:` fields. Those `subject:` fields are the source of truth for eval coverage: every
 coverage number here and in [`evals/README.md`](evals/README.md) is counted from
 `evals/*/case.yaml`, never from a prose table. Covered: the agents `aep-drive:adversary`, `aep-drive:story-scoper`,
@@ -72,7 +73,7 @@ coverage number here and in [`evals/README.md`](evals/README.md) is counted from
 `aep-drive:drive`, `aep-drive:wave`, `aep-plan:planning`, `connectors:connectors` and
 `ess-specify:specify`. Not covered: the agents `aep-drive:implementor`, `aep-plan:plan-reviewer`
 and `aep-plan:reverse-engineer`, and the skills `aep-plan:story-migration`, `beyond10x:beyond10x`,
-`beyond10x:plugin-creator` and `workspace-hygiene:worktree`. A change that breaks a covered charter
+`beyond10x:plugin-creator`, `ess-specify:coverage` and `workspace-hygiene:worktree`. A change that breaks a covered charter
 turns a row red instead of being noticed by a reader; a change to an uncovered one does not.
 
 Free, offline, and part of `task check`:

@@ -1,18 +1,18 @@
 {
   "name": "ess-specify",
   "version": "0.9.2",
-  "description": "Validate ESS schemas and guide deterministic projections without guessing semantics.",
+  "description": "Validate ESS schemas, guide deterministic projections, and audit conformance coverage without guessing semantics.",
   "author": {
     "name": "Beyond10x"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "ESS Specify",
-    "shortDescription": "Validate and project typed ESS contracts.",
-    "longDescription": "Validate Executable System Specifications, inspect compiled IR, and guide deterministic JSON Schema and OpenAPI projections with explicit coverage gaps and refusals.",
+    "shortDescription": "Validate, project and conformance-test typed ESS contracts.",
+    "longDescription": "Validate Executable System Specifications, inspect compiled IR, guide deterministic JSON Schema and OpenAPI projections with explicit coverage gaps and refusals, and raise or audit a conformance suite against a real implementation.",
     "developerName": "Beyond10x",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "Use ess-specify to validate and project this system contract."
+    "defaultPrompt": "Use ess-specify to validate, project or conformance-test this system contract."
   }
 }

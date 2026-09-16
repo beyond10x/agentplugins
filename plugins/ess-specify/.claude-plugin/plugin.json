@@ -1,10 +1,10 @@
 {
   "name": "ess-specify",
   "displayName": "ESS Specify",
-  "description": "Validate ESS models and guide deterministic schema and OpenAPI projections.",
+  "description": "Validate ESS models, guide deterministic schema and OpenAPI projections, and raise or audit conformance-suite coverage against a real implementation.",
   "version": "0.9.2",
   "author": { "name": "Beyond10x" },
   "license": "Apache-2.0",
   "repository": "https://github.com/beyond10x/agentplugins",
-  "keywords": ["ess", "specify", "schema", "openapi", "projection"]
+  "keywords": ["ess", "specify", "schema", "openapi", "projection", "conformance", "coverage"]
 }
