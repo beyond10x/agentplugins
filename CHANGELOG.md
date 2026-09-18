@@ -1,6 +1,41 @@
 # Changelog
 
-## [Unreleased]
+## [0.10.0] — 2026-09-18
+
+- `ess-specify:specify` asks what the binary speaks before writing a `format:` line, and asserts no
+  release number anywhere — the two things it used to pin are what went stale. The authored format
+  has four majors and they are not interchangeable; the skill now names what each adds and says to
+  declare the highest the local `ess` accepts. An adopter following the old instructions specified a
+  46k-line service entirely at `ess/1` and produced a thirteen-item list of things "ESS cannot say",
+  of which three were already solved and a fourth was solved on re-baselining. Declaring an older
+  major than you need is the quiet failure: the document still validates, and nothing tells you the
+  branch you wanted shipped two majors ago.
+- The same skill gains the predicate grammar, which it never described. `kind == WebCrawl or kind ==
+  ZendeskHc` parses as **one fact path**, and its `undeclared reference` refusal reads as proof that
+  disjunction does not exist — the same adopter recorded a real invariant as unstatable on that
+  basis. Compounds are structured (`all`/`any`/`not`, `any_of`, `defined`), and the worked example is
+  an implication, because that is the shape most field rules take.
+- It gains authored scenarios, which never appeared: the flag that selects them, and the reason they
+  are needed — synthesis arranges a subject by replaying commands and reads no entity relations, so
+  a created child gets a fabricated owner and no owner arranged. A quarter of that adopter's suite
+  reported no information until an authored scenario established the row directly.
+- `run`'s built-in targets are no longer described as "a built-in reference implementation". One of
+  them says in its own source that it executes no part of the model; pointed at an adopter's
+  specification it returned every scenario unsupported, which prints like a result and is the
+  absence of one. A real target is a crate written against the conformance target trait.
+- New rule: a refusal is real when a handler performs it. Auditing one specification against its
+  service found a refusal nothing performs, two idempotent operations modelled as conflicts, and an
+  entity that was a request extractor rather than a stored row. `aep plan reverse openapi` is
+  described by what it yields — types, and on a fifty-operation contract zero entities with an
+  `UNMAPPED:` marker per decision it could not take — so identity and lifecycle are read from the
+  implementation, where the state machines are usually already enums.
+- `## Adapter contract` and `## Format changes` are gone. Both addressed someone working on ESS —
+  importers, projectors, minting a major — rather than someone using it to specify their own system.
+- `ess-specify:coverage` gains the skip block that is neither a missing construct nor an undriven
+  plane: a precondition the model cannot state, whose honest answer is unsupported naming the
+  precondition, and whose cheapest real coverage is an authored setup. It also names the runner that
+  refuses a newer-vocabulary suite until the suite is admitted, which is where a coverage run fails
+  first.
 
 - New skill `ess-specify:coverage`. It covers the half of ESS work `specify` does not: raising and
   auditing a conformance suite's coverage against a real implementation, and judging whether a

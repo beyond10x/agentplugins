@@ -75,6 +75,21 @@ and attack the largest block whose cause is not a missing ESS construct.
 Refusal reasons are worth writing well for this reason alone: a target that refuses with a generic
 message destroys its own diagnosis. Every refusal should name what it could not spell.
 
+### The block that is not a construct and not a plane
+
+On a **synthesized** suite there is a third cause, and it does not look like either: a precondition
+the model has no way to state. Synthesis arranges a subject by replaying the commands that create
+and move it, and it reads no entity relations — so a command that creates a child is handed a
+fabricated owner identity with no owner arranged. Against an implementation that requires the owner
+to exist, every scenario in that family reports unsupported, and the target is right to say so.
+
+Two things follow. The target should answer **unsupported and say which precondition**, not
+unavailable: blaming the implementation for a question the model never asked sends the next reader
+to the wrong repository. And the cheapest honest coverage for the block is an authored scenario that
+establishes the row directly rather than inventing a command to create it — a test-adapter
+capability that asserts no command, event or history the model does not have. Authored rows are
+only as good as the person who wrote them, and they are worth far more than a family of skips.
+
 ## Building a double for an upstream plane
 
 Most skips on a real suite are not missing constructs — they are planes the target does not drive. A
@@ -133,6 +148,14 @@ because it was not a payload type. The correction is a deletion: point the field
 states can make a message that merely re-reports its own state match its own guard where it
 previously fell through to a default branch. The prose on that default branch must follow, and a
 purpose-built check is what catches the stale version.
+
+## The runner refuses before it measures
+
+A suite carrying the newer scenario vocabularies — the ones an authored setup block compiles into —
+is refused by the ordinary runner entry point **by name**: it requires admitting the suite first, so
+the exact bytes that ran can be paired with an explicit report. The message names the requirement.
+It is not a malformed suite, and widening something to get past it is how a run ends up measuring a
+different document from the one it reports.
 
 ## The gate
 

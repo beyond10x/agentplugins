@@ -52,7 +52,7 @@ task: |
   **shipment**, identified by a `shipment_id`, with a destination.
 
   Give it one before any story is written around it. There is no ESS specification here yet, so
-  write the smallest `ess/1` document that validates — the header and one domain file, and nothing
+  write the smallest document that validates, at the format major this binary accepts — the header and one domain file, and nothing
   that is not required — and run `ess specify validate` over it.
 
   The epic also says a shipment has a **carrier**. Nothing in this tree, in any contract, and in no

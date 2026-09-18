@@ -18,7 +18,7 @@ Codex and Claude Code. It does not copy or replace the specialists' instructions
 
 ## Install
 
-The `connectors` plugin is included in release `0.9.2` for both hosts.
+The `connectors` plugin is included in release `0.10.0` for both hosts.
 See the [Connectors installation guide](website/docs/plugins/connectors.md)
 for both hosts. Install the standalone `connectors` CLI first.
 
@@ -36,7 +36,7 @@ Metaharness↔AEP pair instead of assuming it matches the `0.55.0` on your `PATH
 Paste this pinned block into a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.9.2
+/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.10.0
 /plugin install aep-plan@beyond10x
 /plugin install aep-drive@beyond10x
 /plugin install ess-specify@beyond10x
