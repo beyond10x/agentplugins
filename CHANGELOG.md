@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.10.0] — 2026-09-23
 
 - **Breaking:** `ess-specify` is retired from this marketplace. ESS now ships its own plugin, `ess`,
   from the `beyond10x/ess` repository at the same version as the `ess` binary, and the binary prints
@@ -12,6 +12,8 @@
 - The eval case `ess-specify-new-entity` is removed; the corpus has eight cases, and
   `golden-path-end-to-end` no longer names an ESS skill in its subject. Its step 3 still drafts and
   validates an ESS domain.
+- Workspace, every plugin manifest, the three version-stamped skills and every install pin move to
+  `0.10.0`.
 
 ## [0.9.3] — 2026-09-18
 
