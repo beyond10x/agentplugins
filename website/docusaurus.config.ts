@@ -62,7 +62,6 @@ const config: Config = {
           {label: 'Beyond10x', to: '/docs/plugins/beyond10x'},
           {label: 'AEP Plan', to: '/docs/plugins/aep-plan'},
           {label: 'AEP Drive', to: '/docs/plugins/aep-drive'},
-          {label: 'ESS Specify', to: '/docs/plugins/ess-specify'},
         ]},
         {title: 'Project', items: [
           {label: 'GitHub repository', href: 'https://github.com/beyond10x/agentplugins'},

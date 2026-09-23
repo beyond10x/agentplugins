@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+- **Breaking:** `ess-specify` is retired from this marketplace. ESS now ships its own plugin, `ess`,
+  from the `beyond10x/ess` repository at the same version as the `ess` binary, and the binary prints
+  the same skills through `ess skill`. The copy here released on its own cadence and had drifted:
+  `0.9.2` told adopters to install ESS `0.22.1` while ESS was at `0.29.0`. Replace
+  `ess-specify@beyond10x` with `ess@ess` after adding the ESS repository as a marketplace.
+- The `beyond10x` front door and the `aep-plan` planning skill route spec-driven work to `ess:specify`
+  (or `ess skill specify`). `ess-specify` joins the retired names `agentplugins-check` refuses.
+- The eval case `ess-specify-new-entity` is removed; the corpus has eight cases, and
+  `golden-path-end-to-end` no longer names an ESS skill in its subject. Its step 3 still drafts and
+  validates an ESS domain.
+
 ## [0.9.3] — 2026-09-18
 
 - New skill `ess-specify:coverage`. It covers the half of ESS work `specify` does not: raising and

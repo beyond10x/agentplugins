@@ -108,7 +108,7 @@ of no scenarios or with no `spec_digest` (AEP 0.43.0). A report/2, which ESS 0.2
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
 `draft → validated → conforming` (AEP 0.50.0) — and `aep plan artifact set <id> --model-digest
 <hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The
-`ess-specify:specify` skill says how the report is produced.
+`ess:specify` skill says how the report is produced — the `ess` plugin from the `beyond10x/ess` marketplace, or `ess skill specify` from the binary.
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
 relations, status, and prose use `new`, `relate`/`unrelate`, `move`, and `body` respectively. **A
@@ -209,7 +209,7 @@ means something beside `blocks:`, and `validate` says so.
 names an entity no ESS document in the repository declares (`ess/1`, or `ess/2` from ESS 0.20.0), do not decompose it and do not write
 stories around it. Draft the domain first — `aep plan reverse openapi --domain <name> --out <domain-doc>
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
-`ess-specify:specify` skill — run `ess specify validate --path <specification>`, and cite the file by path in the
+`ess:specify` skill (`ess skill specify` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
 artifact body through `aep plan artifact body`. A noun with no typed home is the relation nobody can
 check later.
 

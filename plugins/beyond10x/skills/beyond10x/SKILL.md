@@ -26,7 +26,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Create, update, review, or port an installable plugin | `plugin-creator` in this plugin |
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep-plan` |
 | Scope and deliver accepted development work through a reviewed wave | `aep-drive` |
-| Specify an ESS model or guide deterministic schema or OpenAPI projection | `ess-specify` |
+| Specify, retrofit or conformance-test an ESS model | the `ess` plugin from the `beyond10x/ess` marketplace (`ess skill` prints the same skills) |
 | Create, inspect, finish, or safely clean Git worktrees | `workspace-hygiene` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors` |
 

@@ -1066,10 +1066,10 @@ mod tests {
         // manifest still pins the pre-0.6.2 spellings, because it is the record of a run that
         // happened under them — so that replay takes the branch the third test covers, and this one
         // is about the rule rather than about today's corpus.
-        let case = case_about(&["aep-plan", "aep-drive", "ess-specify"]);
+        let case = case_about(&["aep-plan", "aep-drive", "workspace-hygiene"]);
         let pins = vec![
             "beyond10x/agentplugins@aep-drive@0.6.1".to_owned(),
-            "beyond10x/agentplugins@ess-specify@0.6.1".to_owned(),
+            "beyond10x/agentplugins@workspace-hygiene@0.6.1".to_owned(),
         ];
         assert_eq!(
             treatment_args(&case, pins),
@@ -1079,7 +1079,7 @@ mod tests {
                 "--plugin",
                 "beyond10x/agentplugins@aep-drive@0.6.1",
                 "--plugin",
-                "beyond10x/agentplugins@ess-specify@0.6.1",
+                "beyond10x/agentplugins@workspace-hygiene@0.6.1",
             ]
         );
     }
@@ -1095,7 +1095,7 @@ mod tests {
     fn an_ambiguous_remainder_sends_the_pins_rather_than_failing_the_gate() {
         // `--plugin-dir` reaches only the spawn a replay never performs. Refusing here would stop
         // a replay that would have succeeded, over an argument `aep` discards.
-        let two_left = case_about(&["aep-plan", "aep-drive", "ess-specify", "extra"]);
+        let two_left = case_about(&["aep-plan", "aep-drive", "workspace-hygiene", "extra"]);
         let pins = vec!["beyond10x/agentplugins@aep-drive@0.6.1".to_owned()];
         let args = treatment_args(&two_left, pins.clone());
         assert!(!args.iter().any(|a| a == "--plugin-dir"), "{args:?}");
@@ -1287,9 +1287,9 @@ mod tests {
     #[test]
     fn a_skill_is_resolved_by_the_name_its_document_declares() {
         let root = root();
-        resolve_skill(&root, "ess-specify:specify", "t")
-            .expect("the ESS skill declares `name: specify` under `skills/specify/`");
-        let error = resolve_skill(&root, "ess-specify:schema-validation", "t")
+        resolve_skill(&root, "workspace-hygiene:worktree", "t")
+            .expect("the worktree skill declares `name: worktree` under `skills/worktree/`");
+        let error = resolve_skill(&root, "workspace-hygiene:schema-validation", "t")
             .expect_err("a name no SKILL.md declares is not what a harness lists");
         assert!(error.contains("declares"), "{error}");
     }
