@@ -8,7 +8,6 @@ const plugins = [
   ['Beyond10x', 'Route work, find public resources, and create portable plugins.', '/docs/plugins/beyond10x'],
   ['AEP Plan', 'Plan, decompose, review, and reverse-engineer governed work.', '/docs/plugins/aep-plan'],
   ['AEP Drive', 'Scope stories and coordinate implementation waves with adversarial review.', '/docs/plugins/aep-drive'],
-  ['ESS Specify', 'Specify typed systems and guide deterministic schema projections.', '/docs/plugins/ess-specify'],
   ['Workspace Hygiene', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/workspace-hygiene'],
 ];
 

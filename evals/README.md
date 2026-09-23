@@ -12,12 +12,12 @@ A case is four things and no others:
 | the expectations | `expectations.trace.yaml` | a `trace-spec/1` document: what the run must have looked like |
 | the transcript | `recorded/` | a recorded run, replayed through the checker for nothing |
 
-## The nine cases
+## The eight cases
 
 Every cell in the middle column is that case's `subject:` in full, read from its `case.yaml`, and
 those fields — not this table and not any prose elsewhere — are the source of truth for what the
-corpus covers: counted from them the nine cases name **7 of this repository's 10 agents** and
-**5 of its 10 skills**.
+corpus covers: counted from them the eight cases name **7 of this repository's 10 agents** and
+**4 of its 8 skills**.
 
 | Case | `subject:` agents and skills | The claim it holds the subject to |
 |---|---|---|
@@ -26,14 +26,13 @@ corpus covers: counted from them the nine cases name **7 of this repository's 10
 | `plan-critic-scope-verdict` | `aep-plan:plan-critic-scope` | the same, for the coverage lane |
 | `plan-critic-parallel-safety-verdict` | `aep-plan:plan-critic-parallel-safety` | the same, for the concurrency lane |
 | `decomposer-relation-census` | `aep-plan:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
-| `ess-specify-new-entity` | `ess-specify:specify` | the noun got a validated typed home before a story rested on it, and the unread relation stayed unread |
-| `golden-path-end-to-end` | `aep-plan:decomposer`, `aep-plan:plan-critic-acceptance`, `aep-drive:story-scoper`, `aep-plan:planning`, `ess-specify:specify`, `aep-drive:wave`, `aep-drive:drive` (and the path `website/docs/golden-path.md`) | the eight published steps in the published order, with the CLIs as the stores' only writers |
+| `golden-path-end-to-end` | `aep-plan:decomposer`, `aep-plan:plan-critic-acceptance`, `aep-drive:story-scoper`, `aep-plan:planning`, `aep-drive:wave`, `aep-drive:drive` (and the path `website/docs/golden-path.md`) | the eight published steps in the published order, with the CLIs as the stores' only writers |
 | `adversary-tests-only` | `aep-drive:adversary`, `aep-drive:wave` | tests were written, `src/` was not touched, and no `aep plan artifact` command ran |
 | `connectors-readiness` | `connectors:connectors` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
 
 No case names the agents `aep-drive:implementor`, `aep-plan:plan-reviewer` or
 `aep-plan:reverse-engineer`, nor the skills `aep-plan:story-migration`, `beyond10x:beyond10x`,
-`beyond10x:plugin-creator`, `ess-specify:coverage` or `workspace-hygiene:worktree`; those eight are
+`beyond10x:plugin-creator` or `workspace-hygiene:worktree`; those seven are
 the remaining scope of
 `story:plugin-eval-cases` in `.engineering/planning`, and a change to one of them turns no row red.
 

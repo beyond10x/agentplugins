@@ -11,7 +11,7 @@ verdict: held
 # cases whose subject the pull request touched.
 subject:
   agents: [aep-plan:decomposer, aep-plan:plan-critic-acceptance, aep-drive:story-scoper]
-  skills: [aep-plan:planning, ess-specify:specify, aep-drive:wave, aep-drive:drive]
+  skills: [aep-plan:planning, aep-drive:wave, aep-drive:drive]
   paths:
     - website/docs/golden-path.md
 

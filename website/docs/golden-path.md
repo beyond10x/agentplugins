@@ -25,7 +25,8 @@ nobody has decided, and what the plan does with that instead of guessing.
 
 ## Prerequisites
 
-Install `aep-plan`, `aep-drive` and `ess-specify` from the marketplace — see [Install](./install.md) —
+Install `aep-plan` and `aep-drive` from the marketplace — see [Install](./install.md) — and the
+`ess` plugin from the [ESS repository](https://github.com/beyond10x/ess#point-your-agent-here),
 and have the `aep` CLI on your PATH. Step 3 also uses the `ess` CLI.
 
 ```shell-session

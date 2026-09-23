@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.9.3** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.10.0** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -108,7 +108,7 @@ of no scenarios or with no `spec_digest` (AEP 0.43.0). A report/2, which ESS 0.2
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
 `draft → validated → conforming` (AEP 0.50.0) — and `aep plan artifact set <id> --model-digest
 <hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The
-`ess-specify:specify` skill says how the report is produced.
+`ess:specify` skill says how the report is produced — the `ess` plugin from the `beyond10x/ess` marketplace, or `ess skill specify` from the binary.
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
 relations, status, and prose use `new`, `relate`/`unrelate`, `move`, and `body` respectively. **A
@@ -209,7 +209,7 @@ means something beside `blocks:`, and `validate` says so.
 names an entity no ESS document in the repository declares (`ess/1`, or `ess/2` from ESS 0.20.0), do not decompose it and do not write
 stories around it. Draft the domain first — `aep plan reverse openapi --domain <name> --out <domain-doc>
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
-`ess-specify:specify` skill — run `ess specify validate --path <specification>`, and cite the file by path in the
+`ess:specify` skill (`ess skill specify` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
 artifact body through `aep plan artifact body`. A noun with no typed home is the relation nobody can
 check later.
 

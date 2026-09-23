@@ -16,8 +16,11 @@ directly when the work is already clear.
 | [`beyond10x`](./plugins/beyond10x.md) | Marketplace navigation and plugin authoring | router, public resource map, portable plugin creator |
 | [`aep-plan`](./plugins/aep-plan.md) | Governed plans and artifact stores | planning skill, decomposer, plan reviewer, reverse engineer |
 | [`aep-drive`](./plugins/aep-drive.md) | Governed development delivery | wave skill, story scoper, implementor, adversary |
-| [`ess-specify`](./plugins/ess-specify.md) | Executable system specifications | specification, schema validation and deterministic projection guidance |
 | [`workspace-hygiene`](./plugins/workspace-hygiene.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
+
+Executable System Specifications have their own plugin, `ess`, served by the
+[ESS repository](https://github.com/beyond10x/ess#point-your-agent-here) at the version of the
+`ess` binary it describes.
 
 The marketplace contains instructions, not credentials. A plugin does not acquire authority to
 write a repository, contact a service, or bypass an approval boundary merely because it is

@@ -10,7 +10,7 @@ Use the narrowest link that answers the request.
 | [Beyond10x plugin](https://beyond10x.github.io/agentplugins/docs/plugins/beyond10x) | This router and the portable plugin-creation workflow |
 | [AEP Plan plugin](https://beyond10x.github.io/agentplugins/docs/plugins/aep-plan) | Governed planning skill and specialist planning agents |
 | [AEP Drive plugin](https://beyond10x.github.io/agentplugins/docs/plugins/aep-drive) | Development-wave roles and coordination |
-| [ESS Specify plugin](https://beyond10x.github.io/agentplugins/docs/plugins/ess-specify) | ESS specification, validation and deterministic projection guidance |
+| [ESS agent plugin](https://github.com/beyond10x/ess#point-your-agent-here) | ESS specification, retrofit, validation, projection and conformance guidance, released with the `ess` binary |
 | [Workspace Hygiene plugin](https://beyond10x.github.io/agentplugins/docs/plugins/workspace-hygiene) | Managed Git worktree lifecycle and cleanup guidance |
 | [AEP](https://beyond10x.github.io/aep/) | Protocol concepts, commands, and adopter documentation |
 | [AEP Service](https://beyond10x.github.io/aep-service/) | Hosted AEP service boundary and operations |

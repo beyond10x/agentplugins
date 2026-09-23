@@ -41,7 +41,6 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/adversary.md",
         ],
     ),
-    ("ess-specify", &["skills/specify/SKILL.md"]),
     ("workspace-hygiene", &["skills/worktree/SKILL.md"]),
     ("connectors", &["skills/connectors/SKILL.md"]),
 ];
@@ -222,13 +221,19 @@ const RETIRED: &[Retired] = &[
     },
     Retired {
         old: "ess-schema",
-        new: "ess-specify",
+        new: "ess@ess (beyond10x/ess marketplace)",
         wire_next: &[],
     },
     Retired {
         old: "adp",
         new: "aep-drive",
         wire_next: &['/'],
+    },
+    // ESS ships its own plugin, at the binary's version, from the ESS repository.
+    Retired {
+        old: "ess-specify",
+        new: "ess@ess (beyond10x/ess marketplace)",
+        wire_next: &[],
     },
 ];
 
@@ -416,7 +421,9 @@ fn retired_names(root: &Path) -> Result<(), String> {
                 }
                 continue;
             }
-            if allowed || recorded {
+            // In a linked worktree `.git` is a file whose `gitdir:` line names the checkout's
+            // location, which nothing in this repository authors.
+            if allowed || recorded || RETIRED_SKIP_DIRS.contains(&name) {
                 continue;
             }
             let Ok(bytes) = std::fs::read(&path) else {
@@ -985,13 +992,13 @@ mod tests {
         assert_eq!(
             error,
             "1 retired plugin name(s) remain, and `AGENTS.md` § Invariants forbids depending on \
-             one:\n  README.md:1 names `ess-schema`, which is now `ess-specify`"
+             one:\n  README.md:1 names `ess-schema`, which is now `ess@ess (beyond10x/ess marketplace)`"
         );
 
         // The three places the old names are the truth: what the changelog says the plugins were
         // called, what a dated change record said on its day, and the transcript of a run that
         // happened under them.
-        write("README.md", "install `ess-specify` from the marketplace\n");
+        write("README.md", "install `aep-plan` from the marketplace\n");
         write("CHANGELOG.md", "renamed `ess-schema` to `ess-specify`\n");
         write("changes/2026-09-03-rename.yaml", "plugin: adp\n");
         write(

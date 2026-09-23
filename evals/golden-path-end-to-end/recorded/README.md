@@ -41,7 +41,7 @@ $ METAHARNESS_LIVE=1 aep drive eval run \
     --harness claude \
     --plugin-dir plugins/aep-plan \
     --plugin beyond10x/agentplugins@aep-drive@<this release> \
-    --plugin beyond10x/agentplugins@ess-specify@<this release> \
+    --plugin beyond10x/ess@ess@<the ESS release> \
     --cwd <a fresh copy of the accounts service the page is written against> \
     --budget-usd 25 \
     --observed-at <the date it was observed> \
@@ -72,7 +72,7 @@ a `TODO` at the deletion site, and **no `.engineering/` directory**. § 1 of the
 adoption step, and it measures nothing against a tree that has already been adopted.
 
 This is the one case that needs three plugins installed — `aep-plan` for the planning steps,
-`ess-specify` for step 3, and `aep-drive` for steps 7 and 8. `aep drive eval run --plugin-dir` takes one; the
+`ess` from the `beyond10x/ess` marketplace for step 3, and `aep-drive` for steps 7 and 8. `aep drive eval run --plugin-dir` takes one; the
 other two go as `--plugin` pins, above. Two things the second run (2026-09-03) showed the working
 tree also needs, both about the **child's** `PATH`, which metaharness constructs as
 `$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin` and does not inherit:
