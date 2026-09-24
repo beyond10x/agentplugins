@@ -1,6 +1,11 @@
 {
-  "name": "beyond10x",
-  "owner": { "name": "beyond10x" },
+  "name": "b10x",
+  "owner": {
+    "name": "beyond10x"
+  },
+  "metadata": {
+    "description": "Beyond10x agent plugins: the plugins this repository carries, and product plugins pinned at their own releases."
+  },
   "plugins": [
     {
       "name": "beyond10x",
@@ -18,14 +23,20 @@
       "description": "Coordinate AEP development waves, story scoping, implementation, and adversarial review."
     },
     {
-      "name": "workspace-hygiene",
-      "source": "./plugins/workspace-hygiene",
-      "description": "Manage isolated Git worktrees with explicit ownership and safe cleanup proof."
-    },
-    {
       "name": "connectors",
       "source": "./plugins/connectors",
       "description": "Set up, inspect, and invoke governed integrations through the connectors CLI."
+    },
+    {
+      "name": "worktree",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/beyond10x/worktree.git",
+        "path": "plugins/worktree",
+        "ref": "0.6.0",
+        "sha": "3d4954b7f0cde907a5b8a27a6c3d095368d4a1cf"
+      },
+      "description": "Manage isolated Git worktrees with explicit ownership and safe cleanup proof, released with the worktree binary."
     }
   ]
 }

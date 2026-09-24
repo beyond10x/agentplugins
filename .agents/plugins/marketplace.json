@@ -1,5 +1,5 @@
 {
-  "name": "beyond10x",
+  "name": "b10x",
   "interface": {
     "displayName": "Beyond10x"
   },
@@ -41,21 +41,15 @@
       "category": "Productivity"
     },
     {
-      "name": "workspace-hygiene",
+      "name": "connectors",
       "source": {
         "source": "local",
-        "path": "./plugins/workspace-hygiene"
+        "path": "./plugins/connectors"
       },
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       },
-      "category": "Productivity"
-    },
-    {
-      "name": "connectors",
-      "source": { "source": "local", "path": "./plugins/connectors" },
-      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
       "category": "Productivity"
     }
   ]

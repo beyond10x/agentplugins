@@ -8,7 +8,7 @@ const plugins = [
   ['Beyond10x', 'Route work, find public resources, and create portable plugins.', '/docs/plugins/beyond10x'],
   ['AEP Plan', 'Plan, decompose, review, and reverse-engineer governed work.', '/docs/plugins/aep-plan'],
   ['AEP Drive', 'Scope stories and coordinate implementation waves with adversarial review.', '/docs/plugins/aep-drive'],
-  ['Workspace Hygiene', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/workspace-hygiene'],
+  ['Worktree', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/worktree'],
 ];
 
 export default function Home(): ReactNode {
@@ -16,7 +16,7 @@ export default function Home(): ReactNode {
     <Layout title="Focused engineering guidance" description="The curated beyond10x agent plugin marketplace.">
       <main>
         <header className={styles.hero}>
-          <p className={styles.eyebrow}>Curated marketplace · beyond10x</p>
+          <p className={styles.eyebrow}>Curated marketplace · b10x</p>
           <Heading as="h1">Give each agent only the engineering guidance it needs.</Heading>
           <p className={styles.lead}>
             A lightweight front door routes work to four focused specialists and helps create

@@ -2,12 +2,12 @@
 sidebar_position: 1
 slug: /
 title: Agent Plugins
-description: The curated beyond10x marketplace for focused engineering-agent guidance.
+description: The curated b10x marketplace for focused engineering-agent guidance.
 ---
 
 # Focused guidance, explicit scope
 
-The `beyond10x` marketplace publishes a front door and four specialist plugins. Install the front
+The `b10x` marketplace publishes a front door and four specialist plugins. Install the front
 door when you want routing, ecosystem resources, or portable plugin creation. Install a specialist
 directly when the work is already clear.
 
@@ -16,7 +16,7 @@ directly when the work is already clear.
 | [`beyond10x`](./plugins/beyond10x.md) | Marketplace navigation and plugin authoring | router, public resource map, portable plugin creator |
 | [`aep-plan`](./plugins/aep-plan.md) | Governed plans and artifact stores | planning skill, decomposer, plan reviewer, reverse engineer |
 | [`aep-drive`](./plugins/aep-drive.md) | Governed development delivery | wave skill, story scoper, implementor, adversary |
-| [`workspace-hygiene`](./plugins/workspace-hygiene.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
+| [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
 Executable System Specifications have their own plugin, `ess`, served by the
 [ESS repository](https://github.com/beyond10x/ess#point-your-agent-here) at the version of the

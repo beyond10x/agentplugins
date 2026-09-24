@@ -5,6 +5,10 @@ use std::process::{Command, ExitCode};
 
 mod evals;
 mod readiness;
+mod remote;
+
+/// The marketplace identity in every marketplace format.
+const MARKETPLACE: &str = "b10x";
 
 const PLUGINS: &[(&str, &[&str])] = &[
     (
@@ -41,7 +45,6 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/adversary.md",
         ],
     ),
-    ("workspace-hygiene", &["skills/worktree/SKILL.md"]),
     ("connectors", &["skills/connectors/SKILL.md"]),
 ];
 
@@ -51,25 +54,37 @@ fn json(path: &Path) -> Result<serde_json::Value, String> {
     serde_json::from_str(&text).map_err(|error| format!("parsing {}: {error}", path.display()))
 }
 
-fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
+/// `remote` is whether this marketplace format also lists [`remote::REMOTE`] after the plugins it
+/// carries; only the Claude Code format can point into another repository.
+fn marketplace(root: &Path, relative: &str, remote: bool) -> Result<(), String> {
     let document = json(&root.join(relative))?;
-    if document.get("name").and_then(serde_json::Value::as_str) != Some("beyond10x") {
+    if document.get("name").and_then(serde_json::Value::as_str) != Some(MARKETPLACE) {
         return Err(format!(
-            "{relative} does not declare marketplace `beyond10x`"
+            "{relative} does not declare marketplace `{MARKETPLACE}`"
         ));
     }
     let entries = document
         .get("plugins")
         .and_then(serde_json::Value::as_array)
         .ok_or_else(|| format!("{relative} has no plugins array"))?;
-    if entries.len() != PLUGINS.len() {
+    let expected = PLUGINS
+        .iter()
+        .map(|(name, _)| *name)
+        .chain(
+            remote::REMOTE
+                .iter()
+                .filter(|_| remote)
+                .map(|remote| remote.name),
+        )
+        .collect::<Vec<_>>();
+    if entries.len() != expected.len() {
         return Err(format!(
-            "{relative} contains {} plugins; expected {} focused plugins",
+            "{relative} contains {} plugins; expected {}",
             entries.len(),
-            PLUGINS.len()
+            expected.len()
         ));
     }
-    for (index, (plugin, _)) in PLUGINS.iter().enumerate() {
+    for (index, plugin) in expected.iter().enumerate() {
         let actual = entries[index]
             .get("name")
             .and_then(serde_json::Value::as_str);
@@ -233,6 +248,12 @@ const RETIRED: &[Retired] = &[
     Retired {
         old: "ess-specify",
         new: "ess@ess (beyond10x/ess marketplace)",
+        wire_next: &[],
+    },
+    // Worktree ships its own plugin from its repository; this marketplace pins it by tag.
+    Retired {
+        old: "workspace-hygiene",
+        new: "worktree@b10x",
         wire_next: &[],
     },
 ];
@@ -698,8 +719,9 @@ fn flat_spellings(root: &Path) -> Result<(), String> {
 }
 
 fn check(root: &Path) -> Result<(), String> {
-    marketplace(root, ".agents/plugins/marketplace.json")?;
-    marketplace(root, ".claude-plugin/marketplace.json")?;
+    marketplace(root, ".agents/plugins/marketplace.json", false)?;
+    marketplace(root, ".claude-plugin/marketplace.json", true)?;
+    remote::shape(root)?;
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
     }
@@ -748,11 +770,12 @@ fn main() -> ExitCode {
     }
     let result = match arguments.as_slice() {
         [] => check(&root),
+        [remote] if remote == "remote" => check(&root).and_then(|()| remote::verify(&root)),
         [release, verify, version] if release == "release" && verify == "verify" => {
             check(&root).and_then(|()| verify_release(&root, version))
         }
         _ => Err(
-            "usage: agentplugins-check [release verify <version> | evals | evals scope <path>...]"
+            "usage: agentplugins-check [remote | release verify <version> | evals | evals scope <path>...]"
                 .to_owned(),
         ),
     };
@@ -760,8 +783,9 @@ fn main() -> ExitCode {
     match result {
         Ok(()) => {
             println!(
-                "valid: marketplace beyond10x, {} focused plugin(s)",
-                PLUGINS.len()
+                "valid: marketplace {MARKETPLACE}, {} focused plugin(s), {} remote plugin(s)",
+                PLUGINS.len(),
+                remote::REMOTE.len()
             );
             ExitCode::SUCCESS
         }

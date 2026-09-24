@@ -3,7 +3,7 @@ name: wave
 description: Run a wave — pick the next set of stories that can be implemented at once, propose it for approval, then dispatch one implementor per story into its own worktree, send each result to the adversary, and merge what goes green into one integration branch. Use when the operator asks to pick the next wave, to start a wave, to implement several stories in parallel, or to fan out work across sub-agents. Proposes first and stops; it never starts a wave nobody approved.
 ---
 
-**Skill version 0.10.0** — the version in `.claude-plugin/plugin.json`; the stage-1 proposal quotes it.
+**Skill version 0.11.0** — the version in `.claude-plugin/plugin.json`; the stage-1 proposal quotes it.
 
 # Running a wave
 
@@ -378,7 +378,7 @@ It costs seconds.
 One integration branch for the wave; one branch and one worktree per unit, each forked from the
 integration branch.
 
-Invoke the `workspace-hygiene:worktree` skill and create every checkout with `worktree create`,
+Invoke the `worktree:worktree` skill and create every checkout with `worktree create`,
 including the coordinator's integration checkout. Record each managed id, owning session,
 story/task id and published branch alongside the paths below. Acquire a coordinator lease before
 using a tree and renew it while agents or checks run. Each implementor and adversary maintains
