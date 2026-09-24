@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.14.2] — 2026-09-24
+
+From trial 2, in which fresh agents given only a sentence and this repository's link onboarded
+(10 tool calls), wrote a valid todo specification in a new session that loaded the plugins
+(9 calls, no ESS clone), and upgraded a seeded `ess` 0.29.0 after the session-start line named it.
+
+- `SETUP.md` creates `~/.cache` before `mktemp` in it; a fresh home has none.
+- `b10x:init`'s plan example uses placeholders for the products and method it asked about, instead
+  of values an agent can paste unchanged.
+- A product's `init` skips the install step when its CLI already answers, rather than asking the
+  install-method question again right after `b10x:init`.
+- `ess:specifying`'s syntax example is a lending library, not a todo service: an agent asked for a
+  todo spec copied the example's domain. It now also shows a lifecycle with no final state
+  (`terminal: []`), which the trial agent had to guess; `ess specify validate` accepts it.
+- `b10x upgrade` updates only what is installed: it no longer proposes new plugins, and a host with
+  nothing from Beyond10x on it is left alone with a note naming `b10x init --host …`. The upgrade
+  skills plan with `--host` for the host they run in.
+- Plan output lists the marketplace refresh that `apply` runs, under "Also runs".
+
 ## [0.14.1] — 2026-09-24
 
 - Publishes what 0.14.0 could not: the 0.14.0 release workflow's smoke test still looked for the

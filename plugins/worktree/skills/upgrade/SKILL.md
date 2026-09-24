@@ -6,10 +6,10 @@ description: Check whether the worktree plugin and the `worktree` CLI are curren
 # Upgrade worktree
 
 ```bash
-b10x upgrade worktree --out ~/.local/state/b10x/plan.json
+b10x upgrade worktree --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-It compares the installed `worktree` plugin with what the marketplace serves and the `worktree` on `PATH`
+Use `--host codex` in Codex. It compares the installed `worktree` plugin with what the marketplace serves and the `worktree` on `PATH`
 with the newest release, and prints each difference with the action that fixes it. Nothing is
 changed yet.
 

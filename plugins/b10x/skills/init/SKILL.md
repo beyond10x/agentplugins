@@ -47,8 +47,11 @@ Plan for the host you run in (`--host claude` in Claude Code, `--host codex` in 
 
 ```bash
 mkdir -p ~/.local/state/b10x
-b10x init aep,ess --method cargo --host claude --out ~/.local/state/b10x/plan.json
+b10x init <products> --method <cargo|prebuilt> --host claude --out ~/.local/state/b10x/plan.json
 ```
+
+`<products>` is the answer to step 2, comma separated (`ess`, or `aep,worktree`); `--method` is the
+answer to step 3.
 
 It prints a summary and writes the plan to the file. List every change it names in one numbered
 list, one line each, and call out: CLIs it installs or replaces (which version, where), earlier

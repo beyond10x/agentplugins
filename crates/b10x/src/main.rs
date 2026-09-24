@@ -202,6 +202,7 @@ fn main() -> ExitCode {
                         host.list(),
                         true,
                         method.map(MethodArg::method),
+                        false,
                     ),
                     json,
                     out.as_deref(),
@@ -217,7 +218,13 @@ fn main() -> ExitCode {
         } => {
             let selection = (!products.is_empty()).then(|| clean(products));
             emit(
-                make_plan(selection, host.list(), true, method.map(MethodArg::method)),
+                make_plan(
+                    selection,
+                    host.list(),
+                    true,
+                    method.map(MethodArg::method),
+                    true,
+                ),
                 json,
                 out.as_deref(),
             )
@@ -278,6 +285,7 @@ fn make_plan(
     hosts: Vec<Host>,
     only: bool,
     method: Option<catalog::Method>,
+    upgrade: bool,
 ) -> Result<Plan, String> {
     let overridden = marketplace_override();
     let mut embedded = Catalog::embedded();
@@ -319,6 +327,7 @@ fn make_plan(
         home: &home,
         only,
         method,
+        upgrade,
     };
     Ok(plan::plan(&context, &inventory))
 }
@@ -336,6 +345,7 @@ fn setup_plan(
             host.list(),
             false,
             method.map(MethodArg::method),
+            false,
         ),
         json,
         out,
@@ -419,6 +429,13 @@ fn print_plan(plan: &Plan) {
             println!("  {:>2}. {}", index + 1, action.describe());
         }
     }
+    let refreshes: Vec<&plan::Action> = plan.actions.iter().filter(|a| !a.changes()).collect();
+    if !refreshes.is_empty() {
+        println!("\nAlso runs (refreshes the marketplace snapshot; changes no version):");
+        for action in refreshes {
+            println!("   - {}", action.describe());
+        }
+    }
     if !plan.next.is_empty() {
         println!("\nNext:");
         for line in &plan.next {
@@ -475,7 +492,13 @@ fn setup_apply(path: &PathBuf, yes: bool) -> Result<ExitCode, String> {
         .filter(|offer| offer.selected)
         .map(|offer| offer.id.clone())
         .collect();
-    let after = make_plan(Some(selection), plan.hosts.clone(), plan.only, plan.method)?;
+    let after = make_plan(
+        Some(selection),
+        plan.hosts.clone(),
+        plan.only,
+        plan.method,
+        plan.upgrade,
+    )?;
     println!("\nAfter:");
     print_plan(&after);
     if after.converged() {
