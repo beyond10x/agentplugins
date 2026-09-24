@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "agentplugins-check"
-version = "0.11.0"
+version = "0.12.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -75,7 +75,7 @@ dependencies = [
 
 [[package]]
 name = "b10x"
-version = "0.11.0"
+version = "0.12.0"
 dependencies = [
  "clap",
  "serde",

@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.12.0] — 2026-09-24
 
 - **One-sentence onboarding.** Tell an agent to follow
   `https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md`: it installs the new
