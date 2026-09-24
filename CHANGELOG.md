@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.11.0] — 2026-09-24
 
 - **Breaking:** the marketplace identity is `b10x` in both formats. Installs name plugins as
   `<plugin>@b10x`. A registration made from an earlier release is named `beyond10x`: remove its

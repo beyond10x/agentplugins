@@ -29,15 +29,15 @@ rate-limit responses.
 
 ## Install in either host
 
-Release `0.10.0` includes this plugin. For a fresh marketplace registration, use the release pin:
+Release `0.11.0` includes this plugin. For a fresh marketplace registration, use the release pin:
 
 ```bash
-claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.10.0
+claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.11.0
 claude plugin install connectors@b10x
 ```
 
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.10.0
+codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.11.0
 codex plugin add connectors@b10x
 ```
 
