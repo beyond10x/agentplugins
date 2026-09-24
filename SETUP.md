@@ -18,6 +18,7 @@ says so. Change nothing the user did not confirm.
 
      ```bash
      base=https://github.com/beyond10x/agentplugins/releases/latest/download
+     mkdir -p "$HOME/.cache"
      work=$(mktemp -d "$HOME/.cache/b10x-setup.XXXXXX")
      curl -fsSL -o "$work/b10x-<target>.tar.gz" "$base/b10x-<target>.tar.gz"
      curl -fsSL -o "$work/SHA256SUMS" "$base/SHA256SUMS"

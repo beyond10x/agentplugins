@@ -1,6 +1,6 @@
 {
   "name": "aep",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "description": "Plan governed work in the AEP artifact store and deliver it in reviewed waves.",
   "author": {
     "name": "Beyond10x"

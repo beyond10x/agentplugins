@@ -7,7 +7,7 @@ description: Start with AEP in this project — make sure the `aep` CLI is avail
 
 ## 1. Have the CLI
 
-Run `aep --version`. If it is missing or `b10x` says it is behind, install it with `b10x`:
+Run `aep --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`aep:upgrade` handles newer releases). If it is missing, install it with `b10x`:
 
 ```bash
 b10x init aep --out ~/.local/state/b10x/plan.json

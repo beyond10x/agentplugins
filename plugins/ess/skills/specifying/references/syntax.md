@@ -1,18 +1,18 @@
 # ESS syntax by example
 
-A small todo service in three files, with every section a specification usually needs. It validates
-as written (`ess specify validate --path <directory>` → `todo v1 — 3 file(s), valid`). Copy the shape,
-not the domain.
+A small lending library in three files, with every section a specification usually needs. It
+validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
+Copy the shape, not the domain: name your own entities, commands and events after your system.
 
 ## `system.yaml`
 
 ```yaml
 format: ess/1
-system: todo
+system: library
 version: v1
 
 domains:
-  - todo.list
+  - library.lending
 ```
 
 ## `components.yaml`
@@ -21,243 +21,279 @@ Who runs the domain, which commands it accepts, which events it publishes, how i
 
 ```yaml
 components:
-  - component: todo-service
-    summary: Holds every todo list and its tasks.
+  - component: lending-service
+    summary: Holds every branch and the copies it lends.
     owns:
       domains:
-        - todo.list
+        - library.lending
     accepts:
       commands:
-        - todo.list.CreateList
-        - todo.list.AddTask
-        - todo.list.CompleteTask
+        - library.lending.OpenBranch
+        - library.lending.AddCopy
+        - library.lending.LendCopy
+        - library.lending.ReturnCopy
     publishes:
       events:
-        - todo.list.ListCreated
-        - todo.list.TaskAdded
-        - todo.list.TaskCompleted
+        - library.lending.BranchOpened
+        - library.lending.CopyAdded
+        - library.lending.CopyLent
+        - library.lending.CopyReturned
     reached_by: network
 ```
 
-## `domains/list.yaml`
+## `domains/lending.yaml`
 
 ```yaml
-domain: todo.list
+domain: library.lending
 
-summary: Lists of tasks that a person adds and completes.
+summary: Branches that own copies of books and lend them out.
 
 naming:
-  wire: lists
-  display: Todo lists
+  wire: lending
+  display: Lending
 
 # Types: `newtype` over a primitive, `enum`, `struct` (with `fields`, optional `invariants`),
 # `union` (tagged: `tag:` plus `variants:` name → type). Primitives include Uuid, String, Integer,
 # Decimal, Boolean, Bytes, Timestamp, Duration; wrappers Optional<T>, List<T>, Map<K, V>.
 types:
-  - name: todo.list.ListId
+  - name: library.lending.BranchId
     kind: newtype
     of: Uuid
 
-  - name: todo.list.TaskId
+  - name: library.lending.CopyId
     kind: newtype
     of: Uuid
 
-  - name: todo.list.Title
+  - name: library.lending.Title
     kind: newtype
     of: String
 
-  - name: todo.list.Priority
+  - name: library.lending.Format
     kind: enum
-    variants: [Low, Normal, High]
+    variants: [Hardcover, Paperback, Audio]
 
 # Entities: an identity, fields, relations to other entities, and a lifecycle whose transitions
 # commands move. `owns` means the target cannot outlive this entity; `references` means it can.
 entities:
-  - name: todo.list.TodoList
+  - name: library.lending.Branch
     identity:
-      name: list_id
-      type: todo.list.ListId
+      name: branch_id
+      type: library.lending.BranchId
     fields:
-      - name: title
-        type: todo.list.Title
+      - name: name
+        type: String
     relations:
-      - name: tasks
+      - name: copies
         kind: owns
-        target: todo.list.Task
+        target: library.lending.Copy
         cardinality: many
-        via: list_id
-    lifecycle:
-      initial: Active
-      states: [Active]
-      terminal: [Active]
-
-  - name: todo.list.Task
-    identity:
-      name: task_id
-      type: todo.list.TaskId
-    fields:
-      - name: list_id
-        type: todo.list.ListId
-      - name: title
-        type: todo.list.Title
-      - name: priority
-        type: todo.list.Priority
-      - name: estimate_minutes
-        type: Integer
-    invariants:
-      - estimate_minutes > 0
+        via: branch_id
     lifecycle:
       initial: Open
-      states: [Open, Done]
-      terminal: [Done]
+      states: [Open]
+      terminal: [Open]
+
+  # A lifecycle may have no final state: a copy goes out and comes back for as long as it exists,
+  # so `terminal` is empty.
+  - name: library.lending.Copy
+    identity:
+      name: copy_id
+      type: library.lending.CopyId
+    fields:
+      - name: branch_id
+        type: library.lending.BranchId
+      - name: title
+        type: library.lending.Title
+      - name: format
+        type: library.lending.Format
+      - name: pages
+        type: Integer
+    invariants:
+      - pages > 0
+    lifecycle:
+      initial: Available
+      states: [Available, OnLoan]
+      terminal: []
       transitions:
-        - name: complete
-          from: [Open]
-          to: Done
+        - name: lend
+          from: [Available]
+          to: OnLoan
+        - name: return
+          from: [OnLoan]
+          to: Available
 
 # Actors: who may invoke which commands.
 actors:
-  - name: todo.list.Owner
+  - name: library.lending.Librarian
     may:
-      - todo.list.CreateList
-      - todo.list.AddTask
-      - todo.list.CompleteTask
+      - library.lending.OpenBranch
+      - library.lending.AddCopy
+      - library.lending.LendCopy
+      - library.lending.ReturnCopy
     naming:
-      display: List owner
+      display: Librarian
 
 # Errors a command outcome can return.
 errors:
-  - name: todo.list.InvalidEstimate
-    summary: The estimate is not a positive number of minutes.
+  - name: library.lending.InvalidPageCount
+    summary: The page count is not a positive number.
     fields:
       - name: submitted
         type: Integer
 
-  - name: todo.list.TaskStateConflict
-    summary: The task is not in a state this command acts from, so nothing moved.
+  - name: library.lending.CopyStateConflict
+    summary: The copy is not in a state this command acts from, so nothing moved.
     fields:
       - name: state
-        type: todo.list.Task.State
+        type: library.lending.Copy.State
 
 # Commands: input, then outcomes. An outcome `creates` an entity or `moves` one through a
 # transition, `emits` events with a `payload` built from `input.<field>`, or returns an `error`.
 commands:
-  - name: todo.list.CreateList
+  - name: library.lending.OpenBranch
     naming:
-      wire: create-list
-      display: Create a list
+      wire: open-branch
+      display: Open a branch
     input:
-      - name: title
-        type: todo.list.Title
+      - name: name
+        type: String
     outcomes:
-      - name: created
-        creates: todo.list.TodoList
-        instance: list_id
+      - name: opened
+        creates: library.lending.Branch
+        instance: branch_id
         emits:
-          - todo.list.ListCreated
+          - library.lending.BranchOpened
         payload:
-          todo.list.ListCreated:
-            title: input.title
-        summary: The list exists and is empty.
+          library.lending.BranchOpened:
+            name: input.name
+        summary: The branch exists and holds no copies.
 
   # Two outcomes of one command: all but one need a `when` over the command's input, or the result
   # is not determined by the input and `validate` refuses it as `conflicting_declaration`.
-  - name: todo.list.AddTask
+  - name: library.lending.AddCopy
     naming:
-      wire: add-task
-      display: Add a task
+      wire: add-copy
+      display: Add a copy
     input:
-      - name: list_id
-        type: todo.list.ListId
+      - name: branch_id
+        type: library.lending.BranchId
       - name: title
-        type: todo.list.Title
-      - name: priority
-        type: todo.list.Priority
-      - name: estimate_minutes
+        type: library.lending.Title
+      - name: format
+        type: library.lending.Format
+      - name: pages
         type: Integer
     outcomes:
       - name: added
-        when: estimate_minutes > 0
-        creates: todo.list.Task
-        instance: task_id
+        when: pages > 0
+        creates: library.lending.Copy
+        instance: copy_id
         emits:
-          - todo.list.TaskAdded
+          - library.lending.CopyAdded
         payload:
-          todo.list.TaskAdded:
-            list_id: input.list_id
+          library.lending.CopyAdded:
+            branch_id: input.branch_id
             title: input.title
-        summary: The task is on the list and Open.
+        summary: The copy is on the shelf and Available.
 
       - name: refused
-        error: todo.list.InvalidEstimate
-        summary: The estimate was not positive, and nothing was added.
+        error: library.lending.InvalidPageCount
+        summary: The page count was not positive, and nothing was added.
 
   # A command that moves an entity: `wrong_state: true` answers from every state the transition does
   # not start from, so the `from:` list lives in one place.
-  - name: todo.list.CompleteTask
+  - name: library.lending.LendCopy
     naming:
-      wire: complete-task
-      display: Complete a task
+      wire: lend-copy
+      display: Lend a copy
     input:
-      - name: task_id
-        type: todo.list.TaskId
+      - name: copy_id
+        type: library.lending.CopyId
     outcomes:
-      - name: completed
-        moves: todo.list.Task.complete
-        instance: task_id
+      - name: lent
+        moves: library.lending.Copy.lend
+        instance: copy_id
         emits:
-          - todo.list.TaskCompleted
+          - library.lending.CopyLent
         payload:
-          todo.list.TaskCompleted:
-            task_id: input.task_id
-        summary: The task is Done.
+          library.lending.CopyLent:
+            copy_id: input.copy_id
+        summary: The copy is out on loan.
 
       - name: wrong-state
         wrong_state: true
-        error: todo.list.TaskStateConflict
-        summary: The task is not Open, so nothing was completed.
+        error: library.lending.CopyStateConflict
+        summary: The copy is not Available, so nothing was lent.
+
+  - name: library.lending.ReturnCopy
+    naming:
+      wire: return-copy
+      display: Return a copy
+    input:
+      - name: copy_id
+        type: library.lending.CopyId
+    outcomes:
+      - name: returned
+        moves: library.lending.Copy.return
+        instance: copy_id
+        emits:
+          - library.lending.CopyReturned
+        payload:
+          library.lending.CopyReturned:
+            copy_id: input.copy_id
+        summary: The copy is back on the shelf.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.CopyStateConflict
+        summary: The copy is not on loan, so nothing was returned.
 
 events:
-  - name: todo.list.ListCreated
+  - name: library.lending.BranchOpened
     fields:
-      - name: list_id
-        type: todo.list.ListId
-      - name: title
-        type: todo.list.Title
+      - name: branch_id
+        type: library.lending.BranchId
+      - name: name
+        type: String
 
-  - name: todo.list.TaskAdded
+  - name: library.lending.CopyAdded
     fields:
-      - name: task_id
-        type: todo.list.TaskId
-      - name: list_id
-        type: todo.list.ListId
+      - name: copy_id
+        type: library.lending.CopyId
+      - name: branch_id
+        type: library.lending.BranchId
       - name: title
-        type: todo.list.Title
+        type: library.lending.Title
 
-  - name: todo.list.TaskCompleted
+  - name: library.lending.CopyLent
     fields:
-      - name: task_id
-        type: todo.list.TaskId
+      - name: copy_id
+        type: library.lending.CopyId
+
+  - name: library.lending.CopyReturned
+    fields:
+      - name: copy_id
+        type: library.lending.CopyId
 
 # Views: read models over an entity. `read_your_writes` or `eventual`; an optional `filter`.
 views:
-  - name: todo.list.OpenTasks
-    source: todo.list.Task
+  - name: library.lending.AvailableCopies
+    source: library.lending.Copy
     consistency: read_your_writes
-    filter: state == Open
+    filter: state == Available
     fields:
-      - name: task_id
-        type: todo.list.TaskId
+      - name: copy_id
+        type: library.lending.CopyId
       - name: title
-        type: todo.list.Title
+        type: library.lending.Title
     naming:
-      wire: open-tasks
-      display: Open tasks
+      wire: available
+      display: Available copies
 ```
 
 ## What `when` can and cannot say
 
-A `when` reads only the command's own input. A condition on another entity — "the list must exist",
-"the customer is active" — is not an input guard. Express it as a transition of that entity (a command
-that `moves` it, answered by `wrong_state` from states it does not start from), or leave an
+A `when` reads only the command's own input. A condition on another entity — "the branch must be
+open", "the customer is active" — is not an input guard. Express it as a transition of that entity (a
+command that `moves` it, answered by `wrong_state` from states it does not start from), or leave an
 `UNMAPPED:` marker naming the rule and report it; never invent an outcome the compiler cannot decide.

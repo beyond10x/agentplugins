@@ -6,10 +6,10 @@ description: Check whether the AEP plugin and the `aep` CLI are current, and upg
 # Upgrade AEP
 
 ```bash
-b10x upgrade aep --out ~/.local/state/b10x/plan.json
+b10x upgrade aep --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-It compares the installed `aep` plugin with what the marketplace serves and the `aep` on `PATH`
+Use `--host codex` in Codex. It compares the installed `aep` plugin with what the marketplace serves and the `aep` on `PATH`
 with the newest release, and prints each difference with the action that fixes it. Nothing is
 changed yet.
 

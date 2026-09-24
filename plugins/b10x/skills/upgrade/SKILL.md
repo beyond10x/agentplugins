@@ -6,10 +6,10 @@ description: Check every installed Beyond10x plugin and CLI against what is newe
 # Upgrade Beyond10x
 
 ```bash
-b10x upgrade --out ~/.local/state/b10x/plan.json
+b10x upgrade --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-It checks each installed product — plugin against the marketplace, CLI on `PATH` against the newest
+Use `--host codex` in Codex. It checks each installed product — plugin against the marketplace, CLI on `PATH` against the newest
 release — plus earlier installs under retired names, and prints each difference with the action that
 fixes it. Nothing is changed yet. One product only: `b10x upgrade ess`.
 

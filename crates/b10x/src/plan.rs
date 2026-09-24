@@ -192,6 +192,9 @@ pub struct Plan {
     /// The install method asked for, if any.
     #[serde(default)]
     pub method: Option<Method>,
+    /// Planned as an upgrade: only what is installed is updated.
+    #[serde(default)]
+    pub upgrade: bool,
 }
 
 impl Plan {
@@ -253,10 +256,14 @@ pub struct Context<'a> {
     pub only: bool,
     /// How to install binaries; `None` picks cargo when it is on `PATH`, else prebuilt.
     pub method: Option<Method>,
+    /// Update only what is installed: no new plugins, and a host with nothing Beyond10x on it is
+    /// left alone (`upgrade`).
+    pub upgrade: bool,
 }
 
 /// Make the plan.
 #[must_use]
+#[allow(clippy::too_many_lines)]
 pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
     let catalog = context.catalog;
     let present = present(catalog, inventory);
@@ -288,6 +295,25 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
             Host::Claude => inventory.claude.as_ref(),
             Host::Codex => inventory.codex.as_ref(),
         };
+        let untouched = state.is_some_and(|state| {
+            !state.plugins.iter().any(|plugin| {
+                plugin.marketplace == catalog.marketplace.name
+                    || catalog.retired_marketplace(&plugin.marketplace)
+                    || catalog.retired_plugins.contains_key(&plugin.name)
+            })
+        });
+        if context.upgrade && untouched {
+            findings.push(Finding {
+                level: Level::Note,
+                host: Some(*host),
+                subject: host.program().to_owned(),
+                detail: format!(
+                    "nothing from Beyond10x is installed here; `b10x init <products> --host {}` adds it",
+                    host.program()
+                ),
+            });
+            continue;
+        }
         match state {
             Some(state) => plan_host(
                 context,
@@ -345,6 +371,7 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
         next,
         only: context.only,
         method: context.method,
+        upgrade: context.upgrade,
     }
 }
 
@@ -455,6 +482,13 @@ fn plan_host(
         let id = format!("{plugin}@{name}");
         let target = context.resolved.plugins.get(*plugin);
         match user.get(plugin) {
+            None if context.upgrade && !catalog.base.iter().any(|base| base == plugin) => {
+                findings.push(finding(
+                    Level::Note,
+                    &id,
+                    "not installed; `b10x init` adds it".to_owned(),
+                ));
+            }
             None => {
                 findings.push(finding(
                     Level::Change,
@@ -990,6 +1024,7 @@ mod tests {
             home: Path::new("/opt/b10x-home"),
             only: false,
             method: None,
+            upgrade: false,
         };
         plan(&context, inventory)
     }
@@ -1237,6 +1272,7 @@ mod tests {
             home: Path::new("/opt/b10x-home"),
             only: true,
             method,
+            upgrade: false,
         };
         plan(&context, inventory)
     }
@@ -1309,6 +1345,59 @@ mod tests {
             matches!(metaharness, Some(Action::InstallBinary { method: Method::Cargo, .. })),
             "no archive for metaharness: asking for prebuilt falls back to cargo, which the catalog has"
         );
+    }
+
+    #[test]
+    fn upgrade_updates_what_exists_and_leaves_an_empty_host_alone() {
+        let mut claude = HostState::default();
+        claude.marketplaces.push(Market {
+            name: "b10x".to_owned(),
+            source: "beyond10x/agentplugins".to_owned(),
+            reference: None,
+            location: None,
+        });
+        for name in ["b10x", "ess"] {
+            claude.plugins.push(Installed {
+                name: name.to_owned(),
+                marketplace: "b10x".to_owned(),
+                version: Some("0.12.0".to_owned()),
+                scope: "user".to_owned(),
+                project: None,
+                enabled: true,
+            });
+        }
+        let inventory = Inventory {
+            claude: Some(claude),
+            codex: Some(HostState::default()),
+            ..Inventory::default()
+        };
+        let catalog = Catalog::embedded();
+        let resolved = resolved();
+        let context = Context {
+            catalog: &catalog,
+            resolved: &resolved,
+            selection: None,
+            hosts: vec![Host::Claude, Host::Codex],
+            home: Path::new("/opt/b10x-home"),
+            only: true,
+            method: None,
+            upgrade: true,
+        };
+        let plan = plan(&context, &inventory);
+        let commands = commands(&plan);
+        assert!(
+            !commands.iter().any(|c| c.starts_with("codex")),
+            "{commands:#?}"
+        );
+        assert!(commands.contains(&"claude plugin update ess@b10x --scope user".to_owned()));
+        assert!(
+            !commands.iter().any(|c| c.contains("install aep")),
+            "{commands:#?}"
+        );
+        assert!(plan
+            .findings
+            .iter()
+            .any(|f| f.host == Some(Host::Codex) && f.detail.contains("b10x init")));
     }
 
     #[test]

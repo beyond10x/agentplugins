@@ -6,10 +6,10 @@ description: Check whether the Connectors plugin and the `connectors` CLI are cu
 # Upgrade Connectors
 
 ```bash
-b10x upgrade connectors --out ~/.local/state/b10x/plan.json
+b10x upgrade connectors --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-It compares the installed `connectors` plugin with what the marketplace serves and the `connectors` on `PATH`
+Use `--host codex` in Codex. It compares the installed `connectors` plugin with what the marketplace serves and the `connectors` on `PATH`
 with the newest release, and prints each difference with the action that fixes it. Nothing is
 changed yet.
 

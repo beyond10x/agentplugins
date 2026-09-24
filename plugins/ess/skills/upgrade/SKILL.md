@@ -6,10 +6,10 @@ description: Check whether the ESS plugin and the `ess` CLI are current, and upg
 # Upgrade ESS
 
 ```bash
-b10x upgrade ess --out ~/.local/state/b10x/plan.json
+b10x upgrade ess --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-It compares the installed `ess` plugin with what the marketplace serves and the `ess` on `PATH` with
+Use `--host codex` in Codex. It compares the installed `ess` plugin with what the marketplace serves and the `ess` on `PATH` with
 the newest ESS release, and prints each difference with the action that fixes it. Nothing is
 changed yet.
 

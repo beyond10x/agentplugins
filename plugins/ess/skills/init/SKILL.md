@@ -11,7 +11,7 @@ suites. The `ess` CLI is the authority; these skills tell you how to drive it.
 
 ## 1. Have the CLI
 
-Run `ess --version`. If it is missing or `b10x` says it is behind, install it with `b10x`:
+Run `ess --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`ess:upgrade` handles newer releases). If it is missing, install it with `b10x`:
 
 ```bash
 b10x init ess --out ~/.local/state/b10x/plan.json
