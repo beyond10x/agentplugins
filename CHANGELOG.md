@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.12.0] — 2026-09-24
+
+- **One-sentence onboarding.** Tell an agent to follow
+  `https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md`: it installs the new
+  `b10x` binary, which reads both hosts (`claude`/`codex plugin list --json`, marketplace lists,
+  `~/.codex/config.toml`), every catalog binary on `PATH` and the plugin entries in known projects'
+  settings, and prints findings and exact actions (`b10x setup plan`). The agent asks which products
+  to have and confirms the list; `b10x setup apply` snapshots every file it changes, runs the actions,
+  and re-plans to show the result converged; `b10x setup undo` restores the snapshot.
+- Setup migrates earlier installs: retired plugin ids and marketplaces (`beyond10x`, `ess`,
+  `worktree`) on both hosts and at user, project and local scope, orphan `enabledPlugins` entries
+  whose marketplace is gone, and a `b10x` registration pinned to a ref. It installs `ess` and
+  `worktree` binaries at the version of the plugin that describes them and `aep` at its newest
+  release, from checksummed release archives or `cargo install --git --tag`, into the directory of
+  the copy that runs, and names shadowed copies later on `PATH`.
+- **Breaking:** the front-door plugin `beyond10x` is now `b10x`: skills `b10x:setup` (new),
+  `b10x:guide` (was `beyond10x:beyond10x`) and `b10x:plugin-creator`, plus a SessionStart hook that
+  runs `b10x check` and prints one line per plugin/binary drift or legacy install.
+- **This repository names no version of what it points at.** `ess` and `worktree` are `git-subdir`
+  entries with repository and path only, in both marketplace files; 0.11.0's tag+commit pin on
+  `worktree` is gone. `catalog.json` is version-free. `agentplugins-check` refuses a remote entry
+  with `ref`, `sha` or `version` and a catalog that disagrees with the marketplaces;
+  `agentplugins-check remote` now refuses a product whose default branch serves a plugin version it
+  never released.
+- `ess@b10x` is back in the catalog, pointing at the ESS repository; `ess@ess` installs are migrated.
+- Correction: 0.11.0 said Codex could not install from another repository. Codex marketplaces accept
+  `git-subdir` entries (verified with `worktree` at 0.6.0); both hosts now install `worktree@b10x`
+  and `ess@b10x`.
+- Release archives `b10x-<target>.tar.gz` for four targets, `SHA256SUMS` and `SETUP.md` are published
+  with each release; the names carry no version so `releases/latest/download/…` is stable.
+
 ## [0.11.0] — 2026-09-24
 
 - **Breaking:** the marketplace identity is `b10x` in both formats. Installs name plugins as

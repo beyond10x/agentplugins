@@ -1,6 +1,6 @@
 ---
-name: beyond10x
-description: Navigate the Beyond10x engineering ecosystem and route work to the smallest matching plugin or public resource. Use when the user asks what Beyond10x provides, which plugin to install or invoke, where the AEP, ESS, Entity Runtime, or agent-plugin documentation lives, or when a request spans or is ambiguous between the Beyond10x plugins.
+name: guide
+description: Navigate the Beyond10x engineering ecosystem and route work to the smallest matching plugin or public resource. Use when the user asks what Beyond10x provides, which plugin fits a task, where the AEP, ESS, Entity Runtime, or agent-plugin documentation lives, or when a request spans or is ambiguous between the Beyond10x plugins.
 ---
 
 # Beyond10x guide
@@ -22,11 +22,12 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 
 | Request | Route |
 |---|---|
-| Choose a plugin, understand the ecosystem, or find public documentation | `beyond10x` |
+| Install, upgrade or repair the Beyond10x plugins and their binaries | `setup` in this plugin |
+| Choose a plugin, understand the ecosystem, or find public documentation | `guide` in this plugin |
 | Create, update, review, or port an installable plugin | `plugin-creator` in this plugin |
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep-plan` |
 | Scope and deliver accepted development work through a reviewed wave | `aep-drive` |
-| Specify, retrofit or conformance-test an ESS model | the `ess` plugin from the `beyond10x/ess` marketplace (`ess skill` prints the same skills) |
+| Specify, retrofit or conformance-test an ESS model | `ess` (from the `b10x` marketplace, released with the `ess` binary; `ess skill` prints the same skills) |
 | Create, inspect, finish, or safely clean Git worktrees | `worktree` (from the `b10x` marketplace, released with the `worktree` binary) |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors` |
 

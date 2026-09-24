@@ -1,0 +1,77 @@
+{
+  "installed": [
+    {
+      "pluginId": "beyond10x@beyond10x",
+      "name": "beyond10x",
+      "marketplaceName": "beyond10x",
+      "version": "0.10.0",
+      "installed": true,
+      "enabled": true,
+      "source": {
+        "source": "local",
+        "path": "/opt/b10x-home/.codex/.tmp/marketplaces/beyond10x/plugins/beyond10x"
+      },
+      "marketplaceSource": {
+        "sourceType": "git",
+        "source": "https://github.com/beyond10x/agentplugins.git"
+      },
+      "installPolicy": "AVAILABLE",
+      "authPolicy": "ON_INSTALL"
+    },
+    {
+      "pluginId": "aep-plan@beyond10x",
+      "name": "aep-plan",
+      "marketplaceName": "beyond10x",
+      "version": "0.10.0",
+      "installed": true,
+      "enabled": true,
+      "source": {
+        "source": "local",
+        "path": "/opt/b10x-home/.codex/.tmp/marketplaces/beyond10x/plugins/aep-plan"
+      },
+      "marketplaceSource": {
+        "sourceType": "git",
+        "source": "https://github.com/beyond10x/agentplugins.git"
+      },
+      "installPolicy": "AVAILABLE",
+      "authPolicy": "ON_INSTALL"
+    },
+    {
+      "pluginId": "aep-drive@beyond10x",
+      "name": "aep-drive",
+      "marketplaceName": "beyond10x",
+      "version": "0.10.0",
+      "installed": true,
+      "enabled": true,
+      "source": {
+        "source": "local",
+        "path": "/opt/b10x-home/.codex/.tmp/marketplaces/beyond10x/plugins/aep-drive"
+      },
+      "marketplaceSource": {
+        "sourceType": "git",
+        "source": "https://github.com/beyond10x/agentplugins.git"
+      },
+      "installPolicy": "AVAILABLE",
+      "authPolicy": "ON_INSTALL"
+    },
+    {
+      "pluginId": "workspace-hygiene@beyond10x",
+      "name": "workspace-hygiene",
+      "marketplaceName": "beyond10x",
+      "version": "0.10.0",
+      "installed": true,
+      "enabled": true,
+      "source": {
+        "source": "local",
+        "path": "/opt/b10x-home/.codex/.tmp/marketplaces/beyond10x/plugins/workspace-hygiene"
+      },
+      "marketplaceSource": {
+        "sourceType": "git",
+        "source": "https://github.com/beyond10x/agentplugins.git"
+      },
+      "installPolicy": "AVAILABLE",
+      "authPolicy": "ON_INSTALL"
+    }
+  ],
+  "available": []
+}

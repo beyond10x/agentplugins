@@ -1,0 +1,68 @@
+{
+  "format": "b10x.catalog/1",
+  "marketplace": {
+    "name": "b10x",
+    "repository": "beyond10x/agentplugins"
+  },
+  "base": ["b10x"],
+  "products": [
+    {
+      "id": "aep",
+      "summary": "Plan governed work in an artifact store and deliver it in reviewed waves.",
+      "plugins": ["aep-plan", "aep-drive"],
+      "binaries": [
+        {
+          "name": "aep",
+          "bind": { "kind": "latest" },
+          "install": { "kind": "release-archive", "repository": "beyond10x/aep" }
+        },
+        {
+          "name": "metaharness",
+          "optional": true,
+          "bind": { "kind": "latest" },
+          "install": { "kind": "cargo", "repository": "beyond10x/metaharness", "package": "metaharness-cli" }
+        }
+      ]
+    },
+    {
+      "id": "ess",
+      "summary": "Write, retrofit, validate and conformance-test Executable System Specifications.",
+      "plugins": ["ess"],
+      "binaries": [
+        {
+          "name": "ess",
+          "bind": { "kind": "plugin", "plugin": "ess" },
+          "install": { "kind": "release-archive", "repository": "beyond10x/ess" }
+        }
+      ]
+    },
+    {
+      "id": "worktree",
+      "summary": "Create, lease, finish and safely clean isolated Git worktrees.",
+      "plugins": ["worktree"],
+      "binaries": [
+        {
+          "name": "worktree",
+          "bind": { "kind": "plugin", "plugin": "worktree" },
+          "install": { "kind": "cargo", "repository": "beyond10x/worktree", "package": "b10x-worktree-cli" }
+        }
+      ]
+    },
+    {
+      "id": "connectors",
+      "optional": true,
+      "summary": "Set up providers and invoke governed integrations through the connectors CLI.",
+      "plugins": ["connectors"],
+      "binaries": []
+    }
+  ],
+  "retired_plugins": {
+    "aep-planning": "aep-plan",
+    "adp": "aep-drive",
+    "beyond10x": "b10x",
+    "ess-schema": "ess",
+    "ess-specify": "ess",
+    "workspace-hygiene": "worktree"
+  },
+  "retired_marketplaces": ["beyond10x", "ess", "worktree"]
+}

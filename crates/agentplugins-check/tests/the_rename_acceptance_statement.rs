@@ -64,6 +64,8 @@ const EXEMPT_FILES: &[&str] = &[
     "CHANGELOG.md",
     // Where the sweep's own `RETIRED` table lives; see the header.
     "crates/agentplugins-check/src/main.rs",
+    // The migration map `b10x setup` reads: it must spell every retired name to find old installs.
+    "catalog.json",
 ];
 
 /// Exempt in full, by repository-relative prefix.
@@ -72,6 +74,8 @@ const EXEMPT_PREFIXES: &[&str] = &[
     "changes/",
     // The planning store, whose only writer is the `aep` CLI.
     ".engineering/",
+    // The setup binary and its recorded host output: it replaces installs made under the old names.
+    "crates/b10x/",
 ];
 
 /// The marker a row carries when its spelling is what the transcript beside it contains.

@@ -1,16 +1,16 @@
 //! Plugins this marketplace lists but does not carry.
 //!
-//! A product that ships its own plugin keeps the plugin beside the binary it describes, at the
-//! binary's version, so the two cannot drift. This marketplace only points at it: a `git-subdir`
-//! entry naming the product repository, the plugin directory, a release tag and that tag's full
-//! commit. Pointing at a tag is what lets the catalog go stale instead, so the two halves below
-//! check it from both sides:
+//! A product that ships its own plugin keeps it beside the binary it describes, at the binary's
+//! version. This marketplace points at it with a `git-subdir` entry naming the product repository
+//! and the plugin directory — and nothing else. It names no ref, commit or version, so nothing here
+//! has to change when the product releases: the host installs whatever the product's default branch
+//! serves, and `b10x setup` matches the binary to that plugin's version.
 //!
-//! - [`shape`] runs in the offline gate and refuses an entry that is not a pinned `git-subdir` at
-//!   the declared repository and path.
+//! - [`shape`] runs in the offline gate and refuses an entry that is not an unpinned `git-subdir`
+//!   at the declared repository and path, in either marketplace file.
 //! - [`verify`] runs with network access (`agentplugins-check remote`, on every pull request, `main`
-//!   push and a daily schedule) and refuses a `sha` that is not the tag's commit, a manifest at that
-//!   commit whose version is not the tag, and a tag that is not the repository's newest release.
+//!   push and a daily schedule) and refuses a default branch whose plugin manifests name another
+//!   plugin, disagree on the version, or declare a version the repository never released.
 
 use std::path::Path;
 use std::process::Command;
@@ -21,33 +21,40 @@ pub struct Remote {
     pub name: &'static str,
     /// The only repository the entry may point at.
     pub url: &'static str,
+    /// `owner/repo`.
+    pub repository: &'static str,
     /// The plugin directory inside that repository.
     pub path: &'static str,
 }
 
 /// Every plugin this marketplace lists from another repository, in marketplace order after the
 /// plugins it carries.
-pub const REMOTE: &[Remote] = &[Remote {
-    name: "worktree",
-    url: "https://github.com/beyond10x/worktree.git",
-    path: "plugins/worktree",
-}];
+pub const REMOTE: &[Remote] = &[
+    Remote {
+        name: "worktree",
+        url: "https://github.com/beyond10x/worktree.git",
+        repository: "beyond10x/worktree",
+        path: "plugins/worktree",
+    },
+    Remote {
+        name: "ess",
+        url: "https://github.com/beyond10x/ess.git",
+        repository: "beyond10x/ess",
+        path: "plugins/ess",
+    },
+];
 
-/// The Claude Code marketplace file; Codex reads no remote entries.
-const CLAUDE_MARKETPLACE: &str = ".claude-plugin/marketplace.json";
+/// Both marketplace files; each lists every remote plugin.
+const MARKETPLACES: &[&str] = &[
+    ".claude-plugin/marketplace.json",
+    ".agents/plugins/marketplace.json",
+];
 
-/// A pinned entry as the marketplace declares it.
-pub struct Pin {
-    /// Which remote plugin.
-    pub remote: &'static Remote,
-    /// Release tag.
-    pub tag: String,
-    /// The tag's full commit.
-    pub sha: String,
-}
+/// Keys that would pin an entry to one release and make this repository track the product's.
+const PINS: &[&str] = &["ref", "sha", "version"];
 
 fn bare_version(tag: &str) -> Option<(u64, u64, u64)> {
-    let mut parts = tag.split('.');
+    let mut parts = tag.trim_start_matches('v').split('.');
     let version = (
         parts.next()?.parse().ok()?,
         parts.next()?.parse().ok()?,
@@ -56,188 +63,124 @@ fn bare_version(tag: &str) -> Option<(u64, u64, u64)> {
     parts.next().is_none().then_some(version)
 }
 
-fn full_sha(sha: &str) -> bool {
-    sha.len() == 40
-        && sha
-            .bytes()
-            .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
-}
-
-/// Read and check every remote entry's shape, without the network.
-pub fn shape(root: &Path) -> Result<Vec<Pin>, String> {
-    let document = super::json(&root.join(CLAUDE_MARKETPLACE))?;
-    let entries = document
-        .get("plugins")
-        .and_then(serde_json::Value::as_array)
-        .ok_or_else(|| format!("{CLAUDE_MARKETPLACE} has no plugins array"))?;
-    let mut pins = Vec::new();
-    for remote in REMOTE {
-        let entry = entries
-            .iter()
-            .find(|entry| {
-                entry.get("name").and_then(serde_json::Value::as_str) == Some(remote.name)
-            })
-            .ok_or_else(|| format!("{CLAUDE_MARKETPLACE} does not list `{}`", remote.name))?;
-        let source = entry
-            .get("source")
-            .ok_or_else(|| format!("`{}` has no source", remote.name))?;
-        let field = |key: &str| source.get(key).and_then(serde_json::Value::as_str);
-        if field("source") != Some("git-subdir") {
-            return Err(format!("`{}` source is not `git-subdir`", remote.name));
-        }
-        if field("url") != Some(remote.url) || field("path") != Some(remote.path) {
-            return Err(format!(
-                "`{}` must point at {} path {}",
-                remote.name, remote.url, remote.path
-            ));
-        }
-        let tag = field("ref").unwrap_or_default();
-        if bare_version(tag).is_none() {
-            return Err(format!(
-                "`{}` ref `{tag}` is not a bare release tag",
-                remote.name
-            ));
-        }
-        let sha = field("sha").unwrap_or_default();
-        if !full_sha(sha) {
-            return Err(format!(
-                "`{}` sha `{sha}` is not a full commit",
-                remote.name
-            ));
-        }
-        if entry.get("version").is_some() {
-            return Err(format!(
-                "`{}` declares a version; the manifest at the pinned commit owns it",
-                remote.name
-            ));
-        }
-        pins.push(Pin {
-            remote,
-            tag: tag.to_owned(),
-            sha: sha.to_owned(),
-        });
-    }
-    Ok(pins)
-}
-
-fn git(arguments: &[&str], directory: Option<&Path>) -> Result<String, String> {
-    let mut command = Command::new("git");
-    command.args(arguments);
-    if let Some(directory) = directory {
-        command.current_dir(directory);
-    }
-    let output = command
-        .output()
-        .map_err(|error| format!("running git {}: {error}", arguments.join(" ")))?;
-    if !output.status.success() {
-        return Err(format!(
-            "git {} failed: {}",
-            arguments.join(" "),
-            String::from_utf8_lossy(&output.stderr).trim()
-        ));
-    }
-    String::from_utf8(output.stdout).map_err(|error| format!("git output: {error}"))
-}
-
-/// The commit each release tag of `url` points at, peeled through annotated tags.
-fn tags(url: &str) -> Result<Vec<(String, String)>, String> {
-    let listing = git(&["ls-remote", "--tags", url], None)?;
-    let mut direct = std::collections::BTreeMap::new();
-    let mut peeled = std::collections::BTreeMap::new();
-    for line in listing.lines() {
-        let Some((sha, reference)) = line.split_once('\t') else {
-            continue;
-        };
-        let Some(name) = reference.strip_prefix("refs/tags/") else {
-            continue;
-        };
-        match name.strip_suffix("^{}") {
-            Some(name) => peeled.insert(name.to_owned(), sha.to_owned()),
-            None => direct.insert(name.to_owned(), sha.to_owned()),
-        };
-    }
-    Ok(direct
-        .into_iter()
-        .filter(|(name, _)| bare_version(name).is_some())
-        .map(|(name, sha)| {
-            let commit = peeled.remove(&name).unwrap_or(sha);
-            (name, commit)
-        })
-        .collect())
-}
-
-/// Check every pin against its repository. Needs the network and `git`.
-pub fn verify(root: &Path) -> Result<(), String> {
-    for pin in shape(root)? {
-        let name = pin.remote.name;
-        let releases = tags(pin.remote.url)?;
-        let commit = releases
-            .iter()
-            .find(|(tag, _)| *tag == pin.tag)
-            .map(|(_, commit)| commit)
-            .ok_or_else(|| format!("`{name}`: {} has no tag `{}`", pin.remote.url, pin.tag))?;
-        if *commit != pin.sha {
-            return Err(format!(
-                "`{name}`: sha {} is not tag `{}` ({commit})",
-                pin.sha, pin.tag
-            ));
-        }
-        let newest = releases
-            .iter()
-            .filter_map(|(tag, _)| bare_version(tag).map(|version| (version, tag)))
-            .max()
-            .map(|(_, tag)| tag.clone())
-            .unwrap_or_default();
-        if newest != pin.tag {
-            return Err(format!(
-                "`{name}` pins `{}`; {} has released `{newest}`",
-                pin.tag, pin.remote.url
-            ));
-        }
-
-        let scratch = std::env::temp_dir().join(format!(
-            "agentplugins-check-{name}-{}-{}",
-            std::process::id(),
-            &pin.sha[..12]
-        ));
-        let _ = std::fs::remove_dir_all(&scratch);
-        std::fs::create_dir_all(&scratch)
-            .map_err(|error| format!("creating {}: {error}", scratch.display()))?;
-        let result = (|| {
-            git(&["init", "--quiet", "--bare"], Some(&scratch))?;
-            git(
-                &["fetch", "--quiet", "--depth", "1", pin.remote.url, &pin.sha],
-                Some(&scratch),
-            )?;
-            for manifest in [".claude-plugin/plugin.json", ".codex-plugin/plugin.json"] {
-                let text = git(
-                    &[
-                        "show",
-                        &format!("{}:{}/{manifest}", pin.sha, pin.remote.path),
-                    ],
-                    Some(&scratch),
-                )?;
-                let document: serde_json::Value = serde_json::from_str(&text)
-                    .map_err(|error| format!("`{name}` {manifest}: {error}"))?;
-                if document.get("name").and_then(serde_json::Value::as_str) != Some(name) {
-                    return Err(format!("`{name}` {manifest} carries another plugin name"));
-                }
-                let version = document.get("version").and_then(serde_json::Value::as_str);
-                if version != Some(pin.tag.as_str()) {
+/// Check every remote entry's shape in both marketplace files, without the network.
+pub fn shape(root: &Path) -> Result<(), String> {
+    for relative in MARKETPLACES {
+        let document = super::json(&root.join(relative))?;
+        let entries = document
+            .get("plugins")
+            .and_then(serde_json::Value::as_array)
+            .ok_or_else(|| format!("{relative} has no plugins array"))?;
+        for remote in REMOTE {
+            let entry = entries
+                .iter()
+                .find(|entry| {
+                    entry.get("name").and_then(serde_json::Value::as_str) == Some(remote.name)
+                })
+                .ok_or_else(|| format!("{relative} does not list `{}`", remote.name))?;
+            let source = entry
+                .get("source")
+                .ok_or_else(|| format!("{relative}: `{}` has no source", remote.name))?;
+            let field = |key: &str| source.get(key).and_then(serde_json::Value::as_str);
+            if field("source") != Some("git-subdir") {
+                return Err(format!(
+                    "{relative}: `{}` source is not `git-subdir`",
+                    remote.name
+                ));
+            }
+            let path = field("path").map(|path| path.trim_start_matches("./"));
+            if field("url") != Some(remote.url) || path != Some(remote.path) {
+                return Err(format!(
+                    "{relative}: `{}` must point at {} path {}",
+                    remote.name, remote.url, remote.path
+                ));
+            }
+            for pin in PINS {
+                if source.get(pin).is_some() || entry.get(pin).is_some() {
                     return Err(format!(
-                        "`{name}` {manifest} at {} declares version {version:?}, not `{}`",
-                        pin.sha, pin.tag
+                        "{relative}: `{}` declares `{pin}`; remote entries follow the product's default branch and name no version",
+                        remote.name
                     ));
                 }
             }
-            Ok(())
-        })();
-        let _ = std::fs::remove_dir_all(&scratch);
-        result?;
-        println!(
-            "remote `{name}`: {} at {} is the newest release",
-            pin.tag, pin.sha
-        );
+        }
+    }
+    Ok(())
+}
+
+fn curl(url: &str) -> Result<String, String> {
+    let output = Command::new("curl")
+        .args(["-fsSL", "--retry", "2", "--max-time", "60", url])
+        .output()
+        .map_err(|error| format!("running curl: {error}"))?;
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+    } else {
+        Err(format!(
+            "curl {url} failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ))
+    }
+}
+
+fn release_tags(url: &str) -> Result<Vec<String>, String> {
+    let output = Command::new("git")
+        .args(["ls-remote", "--tags", "--refs", url])
+        .output()
+        .map_err(|error| format!("running git ls-remote: {error}"))?;
+    if !output.status.success() {
+        return Err(format!(
+            "git ls-remote {url} failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .filter_map(|line| line.split_once("refs/tags/").map(|(_, tag)| tag.to_owned()))
+        .filter(|tag| bare_version(tag).is_some())
+        .collect())
+}
+
+/// Check every remote plugin on its repository's default branch. Needs the network, `curl` and `git`.
+pub fn verify(root: &Path) -> Result<(), String> {
+    shape(root)?;
+    for remote in REMOTE {
+        let name = remote.name;
+        let mut versions = Vec::new();
+        for manifest in [".claude-plugin/plugin.json", ".codex-plugin/plugin.json"] {
+            let url = format!(
+                "https://raw.githubusercontent.com/{}/HEAD/{}/{manifest}",
+                remote.repository, remote.path
+            );
+            let document: serde_json::Value = serde_json::from_str(&curl(&url)?)
+                .map_err(|error| format!("`{name}` {manifest}: {error}"))?;
+            if document.get("name").and_then(serde_json::Value::as_str) != Some(name) {
+                return Err(format!("`{name}` {manifest} carries another plugin name"));
+            }
+            let version = document
+                .get("version")
+                .and_then(serde_json::Value::as_str)
+                .ok_or_else(|| format!("`{name}` {manifest} declares no version"))?
+                .to_owned();
+            versions.push(version);
+        }
+        if versions[0] != versions[1] {
+            return Err(format!(
+                "`{name}`: the Claude manifest says {} and the Codex manifest {}",
+                versions[0], versions[1]
+            ));
+        }
+        let version = &versions[0];
+        let released = release_tags(remote.url)?
+            .iter()
+            .any(|tag| bare_version(tag) == bare_version(version));
+        if !released {
+            return Err(format!(
+                "`{name}`: {}'s default branch serves plugin version {version}, which it never released",
+                remote.repository
+            ));
+        }
+        println!("remote `{name}`: default branch serves released version {version}");
     }
     Ok(())
 }
@@ -246,77 +189,50 @@ pub fn verify(root: &Path) -> Result<(), String> {
 mod tests {
     use super::*;
 
-    #[test]
-    fn release_tags_are_bare_semver() {
-        assert_eq!(bare_version("0.6.0"), Some((0, 6, 0)));
-        assert_eq!(bare_version("v0.6.0"), None);
-        assert_eq!(bare_version("0.6"), None);
-        assert_eq!(bare_version("0.6.0.1"), None);
-    }
+    struct Scratch(std::path::PathBuf);
 
-    #[test]
-    fn a_sha_is_forty_lowercase_hex() {
-        assert!(full_sha(&"a".repeat(40)));
-        assert!(!full_sha(&"A".repeat(40)));
-        assert!(!full_sha(&"a".repeat(39)));
-    }
-
-    fn marketplace_with(source: &serde_json::Value) -> tempdir::Scratch {
-        let scratch = tempdir::Scratch::new();
-        let path = scratch.0.join(".claude-plugin");
-        std::fs::create_dir_all(&path).unwrap();
-        let document = serde_json::json!({
-            "name": "b10x",
-            "plugins": [{"name": "worktree", "source": source}],
-        });
-        std::fs::write(path.join("marketplace.json"), document.to_string()).unwrap();
-        scratch
-    }
-
-    mod tempdir {
-        pub struct Scratch(pub std::path::PathBuf);
-        impl Scratch {
-            pub fn new() -> Self {
-                use std::sync::atomic::{AtomicUsize, Ordering};
-                static NEXT: AtomicUsize = AtomicUsize::new(0);
-                let path = std::env::temp_dir().join(format!(
-                    "agentplugins-check-remote-test-{}-{}",
-                    std::process::id(),
-                    NEXT.fetch_add(1, Ordering::SeqCst)
-                ));
-                std::fs::create_dir_all(&path).unwrap();
-                Self(path)
+    impl Scratch {
+        fn with(claude: &serde_json::Value, codex: &serde_json::Value) -> Self {
+            use std::sync::atomic::{AtomicUsize, Ordering};
+            static NEXT: AtomicUsize = AtomicUsize::new(0);
+            let path = std::env::temp_dir().join(format!(
+                "agentplugins-check-remote-test-{}-{}",
+                std::process::id(),
+                NEXT.fetch_add(1, Ordering::SeqCst)
+            ));
+            for (relative, document) in [(MARKETPLACES[0], claude), (MARKETPLACES[1], codex)] {
+                let file = path.join(relative);
+                std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+                std::fs::write(file, document.to_string()).unwrap();
             }
-        }
-        impl Drop for Scratch {
-            fn drop(&mut self) {
-                let _ = std::fs::remove_dir_all(&self.0);
-            }
+            Self(path)
         }
     }
 
-    fn pinned() -> serde_json::Value {
-        serde_json::json!({
-            "source": "git-subdir",
-            "url": "https://github.com/beyond10x/worktree.git",
-            "path": "plugins/worktree",
-            "ref": "0.6.0",
-            "sha": "a".repeat(40),
-        })
+    impl Drop for Scratch {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    fn entries(path_prefix: &str) -> serde_json::Value {
+        serde_json::json!({"plugins": REMOTE.iter().map(|remote| serde_json::json!({
+            "name": remote.name,
+            "source": {"source": "git-subdir", "url": remote.url, "path": format!("{path_prefix}{}", remote.path)},
+        })).collect::<Vec<_>>()})
     }
 
     #[test]
-    fn a_pinned_git_subdir_entry_passes() {
-        let scratch = marketplace_with(&pinned());
-        let pins = shape(&scratch.0).expect("pinned entry");
-        assert_eq!(pins[0].tag, "0.6.0");
+    fn unpinned_entries_in_both_files_pass() {
+        let scratch = Scratch::with(&entries(""), &entries("./"));
+        shape(&scratch.0).expect("unpinned entries");
     }
 
     #[test]
-    fn an_unpinned_or_redirected_entry_fails() {
+    fn a_pin_or_a_redirect_is_refused() {
         for (key, value) in [
-            ("sha", serde_json::json!("abc")),
-            ("ref", serde_json::json!("main")),
+            ("ref", serde_json::json!("0.6.0")),
+            ("sha", serde_json::json!("a".repeat(40))),
             (
                 "url",
                 serde_json::json!("https://github.com/someone/worktree.git"),
@@ -324,10 +240,16 @@ mod tests {
             ("path", serde_json::json!("plugins/other")),
             ("source", serde_json::json!("github")),
         ] {
-            let mut source = pinned();
-            source[key] = value;
-            let scratch = marketplace_with(&source);
-            assert!(shape(&scratch.0).is_err(), "{key} change must be refused");
+            let mut claude = entries("");
+            claude["plugins"][0]["source"][key] = value;
+            let scratch = Scratch::with(&claude, &entries("./"));
+            assert!(shape(&scratch.0).is_err(), "{key} must be refused");
         }
+    }
+
+    #[test]
+    fn a_missing_codex_entry_is_refused() {
+        let scratch = Scratch::with(&entries(""), &serde_json::json!({"plugins": []}));
+        assert!(shape(&scratch.0).is_err());
     }
 }

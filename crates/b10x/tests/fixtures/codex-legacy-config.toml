@@ -1,0 +1,16 @@
+[marketplaces.beyond10x]
+source_type = "git"
+source = "https://github.com/beyond10x/agentplugins.git"
+ref = "0.10.0"
+
+[plugins."aep-plan@beyond10x"]
+enabled = true
+
+[plugins."aep-drive@beyond10x"]
+enabled = true
+
+[plugins."workspace-hygiene@beyond10x"]
+enabled = true
+
+[plugins."beyond10x@beyond10x"]
+enabled = true
