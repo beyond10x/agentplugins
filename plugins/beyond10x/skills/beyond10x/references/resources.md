@@ -11,7 +11,7 @@ Use the narrowest link that answers the request.
 | [AEP Plan plugin](https://beyond10x.github.io/agentplugins/docs/plugins/aep-plan) | Governed planning skill and specialist planning agents |
 | [AEP Drive plugin](https://beyond10x.github.io/agentplugins/docs/plugins/aep-drive) | Development-wave roles and coordination |
 | [ESS agent plugin](https://github.com/beyond10x/ess#point-your-agent-here) | ESS specification, retrofit, validation, projection and conformance guidance, released with the `ess` binary |
-| [Workspace Hygiene plugin](https://beyond10x.github.io/agentplugins/docs/plugins/workspace-hygiene) | Managed Git worktree lifecycle and cleanup guidance |
+| [Worktree plugin](https://beyond10x.github.io/agentplugins/docs/plugins/worktree) | Managed Git worktree lifecycle and cleanup guidance, released with the `worktree` binary |
 | [AEP](https://beyond10x.github.io/aep/) | Protocol concepts, commands, and adopter documentation |
 | [AEP Service](https://beyond10x.github.io/aep-service/) | Hosted AEP service boundary and operations |
 | [ESS](https://beyond10x.github.io/ess/) | Executable System Specification model, CLI, and adapters |

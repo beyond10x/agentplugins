@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased]
+
+- **Breaking:** the marketplace identity is `b10x` in both formats. Installs name plugins as
+  `<plugin>@b10x`. A registration made from an earlier release is named `beyond10x`: remove its
+  plugins and run `/plugin marketplace remove beyond10x` (Claude Code) or
+  `codex plugin marketplace remove beyond10x` (Codex), then register this release.
+- **Breaking:** `workspace-hygiene` is retired. Worktree ships its own plugin, `worktree`, from the
+  `beyond10x/worktree` repository at the version of the `worktree` binary, and the skill
+  `workspace-hygiene:worktree` becomes `worktree:worktree`. The copy here released on its own
+  cadence and had drifted: `workspace-hygiene` 0.10.0 lacked the patch-equivalent recovery-proof
+  guidance Worktree 0.5.0 generates.
+- The Claude Code marketplace lists `worktree` as a `git-subdir` entry pinned to Worktree `0.6.0`
+  and its full commit, carrying no copy. Codex reads `worktree@worktree` from the worktree
+  repository's own marketplace.
+- `agentplugins-check` checks the entry's shape offline. The new `agentplugins-check remote`
+  refuses a commit that is not the tag's, manifests at that commit that declare another version,
+  and a tag that is not the newest Worktree release; `.github/workflows/remote-plugins.yml` runs it
+  on every pull request, `main` push and daily. `workspace-hygiene` joins the retired names.
+- The routing skill, the wave skill, README, install guide and website point at `worktree`; the
+  eval corpus names 4 of 7 skills. Eval checker tests that used `workspace-hygiene` as a fixture
+  use `connectors`.
+
 ## [0.10.0] — 2026-09-23
 
 - **Breaking:** `ess-specify` is retired from this marketplace. ESS now ships its own plugin, `ess`,

@@ -3,11 +3,13 @@ sidebar_position: 3
 title: Install
 ---
 
-# Install from the `beyond10x` marketplace
+# Install from the `b10x` marketplace
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
-identity is `beyond10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`,
-`workspace-hygiene`, and `connectors`. The [Connectors guide](plugins/connectors.md) covers its
+identity is `b10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`, `connectors`
+and, in Claude Code, `worktree`. `worktree` ships from the
+[worktree repository](https://github.com/beyond10x/worktree) at the version of the `worktree`
+binary; this marketplace pins it by release tag and commit. The [Connectors guide](plugins/connectors.md) covers its
 separate CLI prerequisite.
 
 The ESS plugin is not in this marketplace. It ships from the
@@ -91,32 +93,33 @@ Copy the whole block into a Claude Code session:
 
 ```text
 /plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.10.0
-/plugin install aep-plan@beyond10x
-/plugin install aep-drive@beyond10x
+/plugin install aep-plan@b10x
+/plugin install aep-drive@b10x
 /reload-plugins
 ```
 
 The first line registers the repository at the immutable `0.10.0` release; each install names its
-plugin in the `<plugin>@beyond10x` form. `/reload-plugins` activates them immediately. Add
-`/plugin install beyond10x@beyond10x` for the front door and
-`/plugin install workspace-hygiene@beyond10x` for managed worktrees, or
-`/plugin install connectors@beyond10x` for integrations. Claude Code reads
+plugin in the `<plugin>@b10x` form. `/reload-plugins` activates them immediately. Add
+`/plugin install beyond10x@b10x` for the front door and
+`/plugin install worktree@b10x` for managed worktrees, or
+`/plugin install connectors@b10x` for integrations. Claude Code reads
 `.claude-plugin/marketplace.json` and the selected plugin's `.claude-plugin/plugin.json`. See
 [Claude Code's plugin documentation](https://code.claude.com/docs/en/discover-plugins) for the host
 commands and supported marketplace sources.
 
 ## Codex
 
-Codex offers the same plugins from the same repository under the same `beyond10x` identity.
-For a fresh installation, run this release-pinned block:
+Codex offers the four plugins this repository carries under the same `b10x` identity. It reads
+`worktree` from the worktree repository instead:
+`codex plugin marketplace add https://github.com/beyond10x/worktree.git --ref <version>`, then
+`codex plugin add worktree@worktree`. For a fresh installation, run this release-pinned block:
 
 ```bash
 codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.10.0
-codex plugin add beyond10x@beyond10x
-codex plugin add aep-plan@beyond10x
-codex plugin add aep-drive@beyond10x
-codex plugin add workspace-hygiene@beyond10x
-codex plugin add connectors@beyond10x
+codex plugin add beyond10x@b10x
+codex plugin add aep-plan@b10x
+codex plugin add aep-drive@b10x
+codex plugin add connectors@b10x
 ```
 
 An immutable marketplace pin does not advance when `codex plugin marketplace upgrade` runs. To
@@ -124,12 +127,11 @@ replace an older pin, remove the installed plugins and marketplace registration,
 block above:
 
 ```bash
-codex plugin remove beyond10x@beyond10x
-codex plugin remove aep-plan@beyond10x
-codex plugin remove aep-drive@beyond10x
-codex plugin remove workspace-hygiene@beyond10x
-codex plugin remove connectors@beyond10x
-codex plugin marketplace remove beyond10x
+codex plugin remove beyond10x@b10x
+codex plugin remove aep-plan@b10x
+codex plugin remove aep-drive@b10x
+codex plugin remove connectors@b10x
+codex plugin marketplace remove b10x
 ```
 
 The commands leave every focused plugin installed and enabled. Start a new Codex thread afterwards;

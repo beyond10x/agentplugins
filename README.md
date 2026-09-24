@@ -1,14 +1,23 @@
 # Beyond10x Agent Plugins
 
-Curated marketplace identity: `beyond10x`.
+Curated marketplace identity: `b10x`.
 
-The repository deliberately contains five focused plugins:
+The repository deliberately contains four focused plugins:
 
 - `beyond10x`: marketplace navigation, public resource discovery, and portable plugin creation.
 - `aep-plan`: governed planning, decomposition, plan review, and reverse engineering.
 - `aep-drive`: wave coordination, story scoping, implementation, and adversarial review.
-- `workspace-hygiene`: safe creation, leases, publication checks, and cleanup for Git worktrees.
 - `connectors`: provider setup, connection diagnostics, and governed CLI operation invocation.
+
+The Claude Code marketplace also lists plugins that ship from their product's own repository at
+the binary's version. It pins each one by release tag and full commit; it carries no copy:
+
+- `worktree`: safe creation, leases, publication checks, and cleanup for Git worktrees, from
+  [`beyond10x/worktree`](https://github.com/beyond10x/worktree) `plugins/worktree/`.
+
+`agentplugins-check remote` refuses a pin whose commit is not its tag, whose manifests at that
+commit declare another version, or whose tag is not the product's newest release. CI runs it on
+every pull request, every `main` push and daily.
 
 Spec-driven work — writing, retrofitting, validating and conformance-testing an ESS specification
 — is served by the ESS repository itself: its `ess` plugin ships from
@@ -39,16 +48,17 @@ Paste this pinned block into a Claude Code session:
 
 ```text
 /plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.10.0
-/plugin install aep-plan@beyond10x
-/plugin install aep-drive@beyond10x
+/plugin install aep-plan@b10x
+/plugin install aep-drive@b10x
 /reload-plugins
 ```
 
-Add `/plugin install beyond10x@beyond10x` for the front door and
-`/plugin install workspace-hygiene@beyond10x` for managed worktrees, or
-`/plugin install connectors@beyond10x` for integrations. Codex offers the same plugins
-from the same repository, following `.agents/plugins/marketplace.json`; its exact non-interactive
-CLI bootstrap and upgrade commands are in [`website/docs/install.md`](website/docs/install.md).
+Add `/plugin install beyond10x@b10x` for the front door and
+`/plugin install worktree@b10x` for managed worktrees, or
+`/plugin install connectors@b10x` for integrations. Codex offers the four plugins this repository
+carries, following `.agents/plugins/marketplace.json`; it reads `worktree` from the worktree
+repository's own marketplace. Its exact non-interactive CLI bootstrap and upgrade commands are in
+[`website/docs/install.md`](website/docs/install.md).
 
 Codex marketplace metadata lives at `.agents/plugins/marketplace.json`; Claude plugin marketplace
 metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own manifest and only the
@@ -65,7 +75,7 @@ the private organization tooling outside this tree.
 ## Evals
 
 Eight cases under [`evals/`](evals/) — one `eval-case/1` each, judged by a `trace-spec/1` document,
-run by the `aep` CLI — name 7 of this repository's 10 agents and 4 of its 8 skills in their
+run by the `aep` CLI — name 7 of this repository's 10 agents and 4 of its 7 skills in their
 `subject:` fields. Those `subject:` fields are the source of truth for eval coverage: every
 coverage number here and in [`evals/README.md`](evals/README.md) is counted from
 `evals/*/case.yaml`, never from a prose table. Covered: the agents `aep-drive:adversary`, `aep-drive:story-scoper`,
@@ -73,8 +83,8 @@ coverage number here and in [`evals/README.md`](evals/README.md) is counted from
 `aep-plan:plan-critic-parallel-safety` and `aep-plan:plan-critic-scope`, and the skills
 `aep-drive:drive`, `aep-drive:wave`, `aep-plan:planning` and `connectors:connectors`. Not
 covered: the agents `aep-drive:implementor`, `aep-plan:plan-reviewer` and
-`aep-plan:reverse-engineer`, and the skills `aep-plan:story-migration`, `beyond10x:beyond10x`,
-`beyond10x:plugin-creator` and `workspace-hygiene:worktree`. A change that breaks a covered charter
+`aep-plan:reverse-engineer`, and the skills `aep-plan:story-migration`, `beyond10x:beyond10x` and
+`beyond10x:plugin-creator`. A change that breaks a covered charter
 turns a row red instead of being noticed by a reader; a change to an uncovered one does not.
 
 Free, offline, and part of `task check`:

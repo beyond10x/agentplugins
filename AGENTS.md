@@ -9,7 +9,13 @@
 
 ## Invariants
 
-- Marketplace identity is `beyond10x` in every marketplace format.
+- Marketplace identity is `b10x` in every marketplace format.
+- A product that ships its own plugin keeps it in its own repository at the binary's version. The
+  Claude Code marketplace lists it as a `git-subdir` entry pinned by release tag and full commit
+  (`crates/agentplugins-check/src/remote.rs` `REMOTE`), never as a copy. `agentplugins-check remote`
+  (network) refuses a pin that is not the tag's commit, whose manifests declare another version, or
+  that is not the newest release; the product's release procedure opens the bot pull request that
+  moves the pin.
 - Keep exactly the focused plugin boundaries described in `README.md`. The `beyond10x` front door
   may route to specialists and teach portable plugin authoring, but it must not absorb their
   workflows or become a mixed catch-all.
