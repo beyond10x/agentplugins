@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1] — 2026-09-24
+
+- Publishes what 0.14.0 could not: the 0.14.0 release workflow's smoke test still looked for the
+  retired `name: installing` in `b10x setup guide`, so all four package jobs failed and no GitHub
+  Release or archives were published for 0.14.0. The test now looks for `name: init`. Content is
+  0.14.0's otherwise.
+
 ## [0.14.0] — 2026-09-24
 
 - **Every plugin lives here.** `ess` and `worktree` join `b10x`, `aep` and `connectors` in
