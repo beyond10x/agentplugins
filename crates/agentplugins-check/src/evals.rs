@@ -1066,18 +1066,18 @@ mod tests {
         // manifest still pins the pre-0.6.2 spellings, because it is the record of a run that
         // happened under them — so that replay takes the branch the third test covers, and this one
         // is about the rule rather than about today's corpus.
-        let case = case_about(&["aep-plan", "aep-drive", "connectors"]);
+        let case = case_about(&["aep", "b10x", "connectors"]);
         let pins = vec![
-            "beyond10x/agentplugins@aep-drive@0.6.1".to_owned(),
+            "beyond10x/agentplugins@b10x@0.6.1".to_owned(),
             "beyond10x/agentplugins@connectors@0.6.1".to_owned(),
         ];
         assert_eq!(
             treatment_args(&case, pins),
             vec![
                 "--plugin-dir",
-                "plugins/aep-plan",
+                "plugins/aep",
                 "--plugin",
-                "beyond10x/agentplugins@aep-drive@0.6.1",
+                "beyond10x/agentplugins@b10x@0.6.1",
                 "--plugin",
                 "beyond10x/agentplugins@connectors@0.6.1",
             ]
@@ -1088,27 +1088,24 @@ mod tests {
     fn a_case_whose_manifest_pins_nothing_repeats_nothing() {
         // A single-plugin stream is unambiguous and `aep` reads the treatment out of it, so a
         // replay that added arguments would be inventing the experiment.
-        assert!(treatment_args(&case_about(&["aep-drive"]), Vec::new()).is_empty());
+        assert!(treatment_args(&case_about(&["b10x"]), Vec::new()).is_empty());
     }
 
     #[test]
     fn an_ambiguous_remainder_sends_the_pins_rather_than_failing_the_gate() {
         // `--plugin-dir` reaches only the spawn a replay never performs. Refusing here would stop
         // a replay that would have succeeded, over an argument `aep` discards.
-        let two_left = case_about(&["aep-plan", "aep-drive", "connectors", "extra"]);
-        let pins = vec!["beyond10x/agentplugins@aep-drive@0.6.1".to_owned()];
+        let two_left = case_about(&["aep", "b10x", "connectors", "extra"]);
+        let pins = vec!["beyond10x/agentplugins@b10x@0.6.1".to_owned()];
         let args = treatment_args(&two_left, pins.clone());
         assert!(!args.iter().any(|a| a == "--plugin-dir"), "{args:?}");
-        assert_eq!(
-            args,
-            vec!["--plugin", "beyond10x/agentplugins@aep-drive@0.6.1"]
-        );
+        assert_eq!(args, vec!["--plugin", "beyond10x/agentplugins@b10x@0.6.1"]);
 
         // And when every subject plugin is pinned, the remainder is empty rather than wrong.
-        let all_pinned = case_about(&["aep-drive"]);
+        let all_pinned = case_about(&["b10x"]);
         assert_eq!(
             treatment_args(&all_pinned, pins),
-            vec!["--plugin", "beyond10x/agentplugins@aep-drive@0.6.1"]
+            vec!["--plugin", "beyond10x/agentplugins@b10x@0.6.1"]
         );
     }
 
@@ -1287,7 +1284,7 @@ mod tests {
     #[test]
     fn a_skill_is_resolved_by_the_name_its_document_declares() {
         let root = root();
-        resolve_skill(&root, "connectors:connectors", "t")
+        resolve_skill(&root, "connectors:integrating", "t")
             .expect("the connectors skill declares `name: connectors` under `skills/connectors/`");
         let error = resolve_skill(&root, "connectors:schema-validation", "t")
             .expect_err("a name no SKILL.md declares is not what a harness lists");
@@ -1298,7 +1295,7 @@ mod tests {
     /// go on passing its own document while judging nothing.
     #[test]
     fn a_case_naming_a_missing_agent_is_refused() {
-        let error = resolve_agent(&root(), "aep-plan:plan-critic-security", "t")
+        let error = resolve_agent(&root(), "aep:plan-critic-security", "t")
             .expect_err("an agent this repository does not ship must be refused");
         assert!(error.contains("plan-critic-security"), "{error}");
     }
@@ -1332,20 +1329,20 @@ mod tests {
         let root = root();
         let one = scope(
             &root,
-            &["plugins/aep-plan/agents/plan-critic-scope.md".to_owned()],
+            &["plugins/aep/agents/plan-critic-scope.md".to_owned()],
         )
         .expect("the corpus scopes");
         assert_eq!(
             one,
             vec![(
                 "evals/plan-critic-scope-verdict".to_owned(),
-                "plugins/aep-plan".to_owned()
+                "plugins/aep".to_owned()
             )]
         );
 
         let rubric = scope(
             &root,
-            &["plugins/aep-plan/skills/planning/references/critic-rubric.md".to_owned()],
+            &["plugins/aep/skills/planning/references/critic-rubric.md".to_owned()],
         )
         .expect("the corpus scopes");
         // The four critic cases name the rubric directly, and the golden path names the planning
@@ -1371,7 +1368,7 @@ mod tests {
     fn a_reference_beside_a_skill_is_in_that_skills_scope() {
         let matched = scope(
             &root(),
-            &["plugins/aep-drive/skills/wave/references/unit-brief.md".to_owned()],
+            &["plugins/aep/skills/implementing/references/unit-brief.md".to_owned()],
         )
         .expect("the corpus scopes");
         // The adversary's case, and the golden path — whose step 6 is the wave. Both are right.
@@ -1380,11 +1377,11 @@ mod tests {
             vec![
                 (
                     "evals/adversary-tests-only".to_owned(),
-                    "plugins/aep-drive".to_owned()
+                    "plugins/aep".to_owned()
                 ),
                 (
                     "evals/golden-path-end-to-end".to_owned(),
-                    "plugins/aep-plan".to_owned()
+                    "plugins/aep".to_owned()
                 ),
             ]
         );

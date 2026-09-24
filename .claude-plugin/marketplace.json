@@ -13,14 +13,9 @@
       "description": "Set up, upgrade and check the Beyond10x plugins and binaries, route work to them, and create portable plugins."
     },
     {
-      "name": "aep-plan",
-      "source": "./plugins/aep-plan",
-      "description": "Govern AEP planning artifacts, decomposition, review, and reverse engineering."
-    },
-    {
-      "name": "aep-drive",
-      "source": "./plugins/aep-drive",
-      "description": "Coordinate AEP development waves, story scoping, implementation, and adversarial review."
+      "name": "aep",
+      "source": "./plugins/aep",
+      "description": "Plan governed work in the AEP artifact store and deliver it in reviewed waves: decomposition, plan critique, reverse engineering, story scoping, implementation and adversarial review."
     },
     {
       "name": "connectors",

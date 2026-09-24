@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beyond10x Setup"
+  short_description: "Install, upgrade and check the Beyond10x plugins"
+  default_prompt: "Use $installing to install or upgrade the Beyond10x plugins and their binaries."

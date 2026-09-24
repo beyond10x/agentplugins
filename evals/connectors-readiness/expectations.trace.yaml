@@ -9,7 +9,7 @@ expectations:
     severity: advisory
     expect:
       env.skill_available:
-        skill: connectors:connectors
+        skill: connectors:integrating
   - id: completed
     statement: the session completed without a harness error
     expect:

@@ -20,7 +20,7 @@ them. Run it again to upgrade. The rest of this page is the manual route.
 ## The marketplace
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
-identity is `b10x`. The installable names are `b10x`, `aep-plan`, `aep-drive`, `ess`, `worktree`
+identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree`
 and `connectors`, in both hosts. `ess` and `worktree` ship from their own repositories
 ([ESS](https://github.com/beyond10x/ess), [worktree](https://github.com/beyond10x/worktree)) at
 their binaries' versions; this marketplace points at each repository's default branch and names no
@@ -29,7 +29,7 @@ version. Install the `ess` and `worktree` binaries at the version of the install
 
 ## Before you install: put `aep` on your `PATH`
 
-`aep-plan` and `aep-drive` are instruction surfaces for a program they do not ship. Both drive the
+The `aep` plugin is an instruction surface for a program it does not ship. It drives the
 `aep` CLI. Install it before the plugins so the first task does not stop at a missing command. The
 AEP version pinned below publishes native archives for x86-64 and ARM64 Linux and macOS, plus a
 `SHA256SUMS` file. Windows archives are not published.
@@ -78,7 +78,7 @@ The expected line is `protocol 0.55.0`. (`aep` retains `protocol` as its version
 compatibility.) `command not found` means the affected plugin will install and then stop at its
 first CLI command. The `b10x` front door does not need the `aep` binary.
 
-### `aep-drive`'s `drive` skill also needs Metaharness
+### The `aep:implementing` skill also needs Metaharness
 
 AEP 0.55.0 refuses to run a model-backed step map itself and names `metaharness aep drive run` as
 the command that does. Metaharness `0.7.0` includes this host; tags through `0.6.5` predate it.
@@ -96,15 +96,14 @@ install (at `0.7.0` that revision is `a23176ae`, which `git describe --tags` in 
 reports as `0.54.0-33-ga23176ae`, i.e. behind the `0.55.0` you put on `PATH`), so read that manifest
 for the Metaharness↔AEP pair rather than assuming the two versions match.
 
-The wave skill, the planning skill and every other plugin need no Metaharness.
+Wave mode, `aep:planning` and every other plugin need no Metaharness.
 
 ## Claude Code
 
 ```text
 /plugin marketplace add beyond10x/agentplugins
 /plugin install b10x@b10x
-/plugin install aep-plan@b10x
-/plugin install aep-drive@b10x
+/plugin install aep@b10x
 /reload-plugins
 ```
 
@@ -120,8 +119,7 @@ commands and supported marketplace sources.
 ```bash
 codex plugin marketplace add beyond10x/agentplugins
 codex plugin add b10x@b10x
-codex plugin add aep-plan@b10x
-codex plugin add aep-drive@b10x
+codex plugin add aep@b10x
 ```
 
 Add `ess@b10x`, `worktree@b10x` or `connectors@b10x` the same way. `codex plugin marketplace upgrade`
@@ -140,6 +138,6 @@ marketplace formats, every declared instruction file, the public documentation, 
 recorded by each plugin manifest this repository carries.
 
 After installation, invoke the skill by its displayed name or ask the agent for the capability the
-plugin describes. Start with `b10x:guide` if you want the front door to select a specialist.
+plugin describes. Start with `b10x:routing` if you want the front door to select a specialist.
 Installation does not grant filesystem, network, credential, or approval authority; the host and
 repository rules still decide those boundaries.

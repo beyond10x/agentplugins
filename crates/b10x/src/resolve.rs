@@ -205,18 +205,17 @@ mod tests {
     #[test]
     fn carried_plugins_read_their_manifest() {
         let root = std::env::temp_dir().join(format!("b10x-resolve-{}", std::process::id()));
-        let manifest = root.join("plugins/aep-plan/.claude-plugin");
+        let manifest = root.join("plugins/aep/.claude-plugin");
         std::fs::create_dir_all(&manifest).unwrap();
         std::fs::write(
             manifest.join("plugin.json"),
-            r#"{"name":"aep-plan","version":"0.12.0"}"#,
+            r#"{"name":"aep","version":"0.12.0"}"#,
         )
         .unwrap();
-        let marketplace =
-            serde_json::json!({"plugins":[{"name":"aep-plan","source":"./plugins/aep-plan"}]});
+        let marketplace = serde_json::json!({"plugins":[{"name":"aep","source":"./plugins/aep"}]});
         let versions = plugin_versions(&marketplace, &Source::Clone(&root), &mut BTreeMap::new());
         std::fs::remove_dir_all(&root).unwrap();
-        assert_eq!(versions.get("aep-plan").map(String::as_str), Some("0.12.0"));
+        assert_eq!(versions.get("aep").map(String::as_str), Some("0.12.0"));
     }
 
     #[test]

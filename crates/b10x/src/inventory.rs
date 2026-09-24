@@ -43,6 +43,9 @@ pub struct Inventory {
     pub binaries: Vec<BinaryState>,
     /// Plugin entries in settings files the host list does not report (other projects, orphans).
     pub settings: Vec<SettingsEntry>,
+    /// Hosts whose program runs but whose plugin commands fail, with the error they printed.
+    #[serde(default)]
+    pub broken: Vec<(Host, String)>,
 }
 
 /// One host's plugins and marketplaces.
@@ -358,10 +361,40 @@ fn executable(_: &std::fs::Metadata) -> bool {
 }
 
 /// Read one host, or `None` when its executable does not run.
+/// Output of a host command: `None` when the program is not installed, `Err` with what it printed
+/// when it runs and fails.
+fn host_output(program: &str, arguments: &[&str]) -> Option<Result<String, String>> {
+    let output = match Command::new(program).args(arguments).output() {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return None,
+        Err(error) => return Some(Err(format!("{program}: {error}"))),
+    };
+    if output.status.success() {
+        Some(Ok(String::from_utf8_lossy(&output.stdout).into_owned()))
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let first = stderr
+            .lines()
+            .find(|line| !line.trim().is_empty())
+            .unwrap_or("no output");
+        Some(Err(format!(
+            "`{program} {}` failed: {}",
+            arguments.join(" "),
+            first.trim()
+        )))
+    }
+}
+
 fn host_state(host: Host, home: &Path) -> Option<Result<HostState, String>> {
     let program = host.program();
-    let plugins = output(program, &["plugin", "list", "--json"])?;
-    let markets = output(program, &["plugin", "marketplace", "list", "--json"])?;
+    let plugins = match host_output(program, &["plugin", "list", "--json"])? {
+        Ok(text) => text,
+        Err(error) => return Some(Err(error)),
+    };
+    let markets = match host_output(program, &["plugin", "marketplace", "list", "--json"])? {
+        Ok(text) => text,
+        Err(error) => return Some(Err(error)),
+    };
     Some(match host {
         Host::Claude => parse_claude_plugins(&plugins).and_then(|plugins| {
             Ok(HostState {
@@ -427,11 +460,18 @@ fn settings_entries(home: &Path, catalog: &Catalog) -> Vec<SettingsEntry> {
 }
 
 /// Read everything.
-pub fn collect(catalog: &Catalog, hosts: &[Host]) -> Result<Inventory, String> {
+pub fn collect(catalog: &Catalog, hosts: &[Host]) -> Inventory {
     let home = home();
     let mut inventory = Inventory::default();
     for host in hosts {
-        let state = host_state(*host, &home).transpose()?;
+        let state = match host_state(*host, &home) {
+            None => None,
+            Some(Ok(state)) => Some(state),
+            Some(Err(error)) => {
+                inventory.broken.push((*host, error));
+                None
+            }
+        };
         match host {
             Host::Claude => inventory.claude = state,
             Host::Codex => inventory.codex = state,
@@ -455,7 +495,7 @@ pub fn collect(catalog: &Catalog, hosts: &[Host]) -> Result<Inventory, String> {
     if inventory.claude.is_some() {
         inventory.settings = settings_entries(&home, catalog);
     }
-    Ok(inventory)
+    inventory
 }
 
 #[cfg(test)]

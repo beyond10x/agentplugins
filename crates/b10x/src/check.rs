@@ -55,7 +55,7 @@ pub fn lines(catalog: &Catalog, plugins: &[Recorded], binary_version: Probe<'_>)
         if catalog.retired_marketplace(marketplace) || catalog.retired_plugins.contains_key(plugin)
         {
             lines.push(format!(
-                "b10x: legacy plugin `{plugin}@{marketplace}` is installed; run the b10x setup skill to migrate it."
+                "b10x: legacy plugin `{plugin}@{marketplace}` is installed; run `b10x:installing` to migrate it."
             ));
         }
     }
@@ -73,14 +73,14 @@ pub fn lines(catalog: &Catalog, plugins: &[Recorded], binary_version: Probe<'_>)
             };
             match binary_version(&binary.name) {
                 None => lines.push(format!(
-                    "b10x: the `{plugin}` plugin {expected} drives `{}`, which is not on PATH; run the b10x setup skill.",
+                    "b10x: the `{plugin}` plugin {expected} drives `{}`, which is not on PATH; run `b10x:installing`.",
                     binary.name
                 )),
                 Some((path, found)) => {
                     let found = found.unwrap_or_else(|| "an unknown version".to_owned());
                     if !version::same(&found, &expected) {
                         lines.push(format!(
-                            "b10x: the `{plugin}` plugin {expected} describes {} {expected}, but PATH runs {found} ({path}); run the b10x setup skill.",
+                            "b10x: the `{plugin}` plugin {expected} describes {} {expected}, but PATH runs {found} ({path}); run `b10x:installing`.",
                             binary.name
                         ));
                     }

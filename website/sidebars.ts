@@ -6,10 +6,11 @@ const sidebars: SidebarsConfig = {
     'choose-a-plugin',
     'install',
     'golden-path',
+    'structure',
     {
       type: 'category',
       label: 'Plugin reference',
-      items: ['plugins/b10x', 'plugins/aep-plan', 'plugins/aep-drive', 'plugins/ess', 'plugins/worktree', 'plugins/connectors'],
+      items: ['plugins/b10x', 'plugins/aep', 'plugins/ess', 'plugins/worktree', 'plugins/connectors'],
     },
     'trust-and-scope',
   ],

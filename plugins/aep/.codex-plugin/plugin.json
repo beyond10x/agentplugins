@@ -1,0 +1,18 @@
+{
+  "name": "aep",
+  "version": "0.12.0",
+  "description": "Plan governed work in the AEP artifact store and deliver it in reviewed waves.",
+  "author": {
+    "name": "Beyond10x"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AEP",
+    "shortDescription": "Plan and deliver governed work.",
+    "longDescription": "Create and review governed planning artifacts, decompose work, reverse-engineer an existing repository, then scope stories, coordinate isolated implementation units and route each result through adversarial review, all through the canonical AEP command.",
+    "developerName": "Beyond10x",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use aep to plan this work in the artifact store or deliver it in a reviewed wave."
+  }
+}

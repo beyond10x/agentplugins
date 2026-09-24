@@ -82,12 +82,12 @@ enum Setup {
         /// Snapshot directory or its timestamp name.
         snapshot: Option<String>,
     },
-    /// Print the setup instructions an agent follows (the `b10x:setup` skill).
+    /// Print the setup instructions an agent follows (the `b10x:installing` skill).
     Guide,
 }
 
-/// The `setup` skill, printed by `b10x setup guide` so an agent without the plugin reads the same text.
-const GUIDE: &str = include_str!("../../../plugins/b10x/skills/setup/SKILL.md");
+/// The `installing` skill, printed by `b10x setup guide` so an agent without the plugin reads the same text.
+const GUIDE: &str = include_str!("../../../plugins/b10x/skills/installing/SKILL.md");
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 enum Hosts {
@@ -153,7 +153,7 @@ fn make_plan(selection: Option<BTreeSet<String>>, hosts: Vec<Host>) -> Result<Pl
     if let Some(source) = &overridden {
         embedded.marketplace.repository.clone_from(source);
     }
-    let inventory = inventory::collect(&embedded, &hosts)?;
+    let inventory = inventory::collect(&embedded, &hosts);
     let local = overridden
         .as_deref()
         .map(std::path::Path::new)
@@ -272,7 +272,7 @@ fn setup_apply(path: &PathBuf, yes: bool) -> Result<ExitCode, String> {
         ));
     }
     let embedded = Catalog::embedded();
-    let inventory = inventory::collect(&embedded, &plan.hosts)?;
+    let inventory = inventory::collect(&embedded, &plan.hosts);
     apply::fresh(&plan, &inventory)?;
     if !yes {
         print_plan(&plan);
@@ -338,7 +338,28 @@ fn setup_undo(snapshot: Option<String>) -> Result<ExitCode, String> {
     for restored in apply::undo(&directory)? {
         println!("restored {restored}");
     }
-    println!("Run `claude plugin marketplace update` and `codex plugin marketplace upgrade`, then restart the hosts.");
+    // The restored settings name marketplaces whose snapshots apply removed; each host rebuilds them.
+    for argv in [
+        ["claude", "plugin", "marketplace", "update"],
+        ["codex", "plugin", "marketplace", "upgrade"],
+    ] {
+        match std::process::Command::new(argv[0])
+            .args(&argv[1..])
+            .output()
+        {
+            Ok(output) if output.status.success() => println!("refreshed: {}", argv.join(" ")),
+            Ok(output) => println!(
+                "could not refresh ({}): {}; run it yourself",
+                argv.join(" "),
+                String::from_utf8_lossy(&output.stderr)
+                    .lines()
+                    .next()
+                    .unwrap_or("no output")
+            ),
+            Err(_) => {}
+        }
+    }
+    println!("Restart Claude Code and start a new Codex thread.");
     Ok(ExitCode::SUCCESS)
 }
 

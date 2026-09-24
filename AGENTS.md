@@ -1,85 +1,54 @@
 # AGENTS.md — agentplugins
 
-## Serves
+The `b10x` marketplace: plugins this repository carries, pointers to plugins that products ship
+themselves, and the `b10x` setup CLI. Serves O2 (decisions as data) and O3 (any harness).
 
-- **O2 — decisions as data, with evidence.** Publishes the curated AEP and ESS instruction
-  surfaces used to plan, develop and validate governed work.
-- **O3 — any harness, observed and compared.** Keeps those instruction surfaces portable across
-  supported agent harnesses.
+## Map
 
-## Invariants
+| path | what |
+|---|---|
+| `plugins/<name>/` | plugins carried here: `b10x`, `aep`, `connectors` ([structure](website/docs/structure.md)) |
+| `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json` | the two marketplace files |
+| `catalog.json` | products, plugins, binaries, retired names — no versions |
+| `crates/b10x/` | the setup CLI; `plan.rs` is pure and fixture-tested |
+| `crates/agentplugins-check/` | the gate: marketplace, catalog, retired names, CLI spellings, evals |
+| `evals/` | eval corpus ([`evals/README.md`](evals/README.md)) |
+| `website/` | public docs; must pass `task site-build` |
+| `SETUP.md` | agent bootstrap, published as a release asset |
 
-- Marketplace identity is `b10x` in every marketplace format.
-- A product that ships its own plugin keeps it in its own repository at the binary's version. Both
-  marketplace files list it as a `git-subdir` entry with repository and path only
-  (`crates/agentplugins-check/src/remote.rs` `REMOTE`): no ref, commit or version, and never a copy.
-  Nothing in this repository names the version of anything it points at; `catalog.json` is
-  version-free and `b10x` resolves versions when it runs. `agentplugins-check remote` (network)
-  refuses a product whose default branch serves a plugin version it never released.
-- `b10x setup` is the only supported way to change installed plugins for a user: plans are pure
-  functions of recorded host output (`crates/b10x/src/plan.rs`), every rule is tested on fixtures
-  under `crates/b10x/tests/fixtures/`, and `apply` snapshots before it changes anything.
-- Keep exactly the focused plugin boundaries described in `README.md`. The `b10x` front door
-  may route to specialists and teach portable plugin authoring, but it must not absorb their
-  workflows or become a mixed catch-all.
-- The AEP canonical command in instructions is `aep`. `protocol` is compatibility only and must not
-  become the authored spelling again.
-- An authored document spells a CLI verb the way its area groups it: `aep govern|plan|drive|observe
-  <verb>` (AEP 0.52.0) and `ess specify|generate|verify|infra <verb>` (ESS 0.12.0). Every flat
-  spelling still works as a hidden alias with identical output, so nothing breaks — which is exactly
-  why a document teaching one is invisible to anything that runs a command. `agentplugins-check`
-  refuses one in any `.md` or `.yaml` this repository authors; the four exemptions are `CHANGELOG.md`,
-  `changes/`, `.engineering/` and `.github/workflows/`, the last because a workflow pins the binary
-  it runs and its spelling has to be the surface that version has.
-- Do not mention or depend on retired plugin references, former marketplace identities, or the
-  historical source-repository name.
-- Plugin folder names and manifest names are identical.
-- Changes to a `SKILL.md` must pass the skill validator; plugin changes must pass the plugin
-  validator and `task check`.
-- Anything executable in this repository is Rust.
+## Rules
+
+- Follow [`website/docs/structure.md`](website/docs/structure.md): rules R1–R8 decide plugin, skill,
+  agent and doc placement and names. `task check` enforces them (`crates/agentplugins-check/src/concept.rs`).
+- `b10x setup` is the only supported way to change a user's installed plugins; it snapshots first.
+- Instructions spell the grouped CLI verbs (`aep plan …`, `ess specify …`) and `aep`, never
+  `protocol`. The gate refuses flat spellings outside `CHANGELOG.md`, `changes/`, `.engineering/`
+  and `.github/workflows/`.
+- Retired names appear only where the gate allows them (`CHANGELOG.md`, `changes/`,
+  `.engineering/`, `catalog.json`, `crates/b10x/`, the checker's own table).
+- Anything executable is Rust.
 
 ## Gate
 
 ```console
-task check
+task check          # fmt, clippy, tests, agentplugins-check
+task site-build     # when website/ changes
+cargo run --locked --bin agentplugins-check -- remote   # network: remote plugins serve released versions
 ```
 
-## Governed planning
+## Planning
 
-Use the repository's AEP store for any non-trivial implementation, cross-repository migration, or
-release/deployment change. Before editing implementation files, run `aep plan artifact list` and
-`aep plan artifact kinds`, create or select the artifact that owns the work, and keep its lifecycle,
-scope, evidence, and relations current through `aep plan artifact` commands. Never substitute a
-transient chat plan or direct edits under `.engineering/planning/` for that record.
+Non-trivial work gets an artifact in the AEP store first (`aep plan artifact list`, then create or
+select one) and keeps it current through `aep plan artifact`. Never edit `.engineering/planning/` by
+hand. `aep:planning` is the instruction surface for this.
 
-The `aep-plan` plugin is the canonical agent instruction surface for this workflow. When it is
-not loaded, stop before planning-store writes and install or enable the release-pinned plugin using
-the adopter instructions; do not improvise the store format from this file.
+## Publishing
 
-The adopter-facing Docusaurus site lives under `website/` and is published at
-<https://beyond10x.github.io/agentplugins/>. A website change must also pass `task site-build`.
-The networked site build stays outside the offline Rust gate.
-
-Commit and push through standalone `b10x-gates bot` with protected local credentials. This
-repository never carries credential, token-minting or bot-authenticated git wrappers.
-
-## Releases
-
-Bare annotated tags are releases. Before tagging, `CHANGELOG.md`, the workspace version, and every
-plugin manifest version must agree. The release workflow reruns `task check`, verifies that
-agreement, and only then publishes the GitHub release. Public-site validation and Atlas
-publication run independently and do not delay source-release completion.
-
-## Source publication
-
-This repository owns its correctness checks, required reviews and release artifacts. Ordinary
-commits, pushes and releases require no Atlas checkout, current Atlas main or organization-wide
-dependency admission. Use standalone `b10x-gates bot --repo . -- <git-command>` with protected local
-credentials and the existing `b10x-bot[bot]` identity. Preserve repository and worktree hooks.
-
-Atlas documentation validation belongs to documentation operations; it is not a prerequisite for
-source publication. Documentation failures affect documentation delivery. Organization privacy
-rules still apply; historical brand exemptions do not authorize new public associations.
+Commit and push through `b10x-gates bot --repo . -- <git-command>` as `b10x-bot[bot]`; keep hooks.
+No credential or token machinery lives in this repository. A release is a bare annotated tag on
+`main` after `CHANGELOG.md`, the workspace version and every carried plugin manifest agree; the
+release workflow reruns the gate and publishes the `b10x` archives, `SHA256SUMS` and `SETUP.md`.
+Source publication needs no Atlas checkout.
 
 <!-- b10x-docs-operations:start -->
 ## Public documentation operations
