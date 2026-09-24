@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.13.0] — 2026-09-24
 
 - **The plugin concept, enforced.** [`website/docs/structure.md`](website/docs/structure.md) states
   eight rules (one marketplace; one plugin per product named after its CLI; skills are activities in
