@@ -29,10 +29,10 @@ says so. Change nothing the user did not confirm.
 
    - Stop if the checksum does not match.
    - If `~/.local/bin` is not on `PATH`, tell the user and use `~/.local/bin/b10x` below.
-2. **Follow the setup instructions.** Run `b10x setup guide` and follow what it prints from its
-   step 2 on. It plans with `b10x setup plan`, shows the result, asks which products to have
-   (`aep`, `ess`, `worktree`, optionally `connectors`), lists every change, and runs
-   `b10x setup apply` only after the user confirms.
-3. **Use what you installed.** A plugin loads in the next session. To use it now, run
-   `b10x skill <plugin>` to list its skills and agents and `b10x skill <plugin>:<skill>` to print
-   one, then follow the printed text.
+2. **Run the guided setup.** `b10x setup guide` prints the `/b10x:init` skill; follow it from its
+   step 2. It asks what the user wants to do (plan and deliver work, write specifications, isolated
+   Git checkouts, integrations) and how to install the CLIs (`cargo` or prebuilt), lists every
+   change, and applies it only after the user confirms.
+3. **Continue with the product.** A plugin loads in the next session. To use it now, run
+   `b10x skill <plugin>:init` (for example `b10x skill ess:init`) and follow the printed text;
+   `b10x skill <plugin>` lists the rest.

@@ -22,7 +22,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 
 | Request | Route |
 |---|---|
-| Install, upgrade or repair the Beyond10x plugins and their binaries | `b10x:installing` |
+| Install, upgrade or repair the Beyond10x plugins and their binaries | `b10x:init` |
 | Choose a plugin, understand the ecosystem, or find public documentation | `b10x:routing` (this skill) |
 | Create, update, review, or port an installable plugin | `b10x:authoring-plugins` |
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep:planning` |

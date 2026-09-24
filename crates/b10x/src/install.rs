@@ -6,7 +6,7 @@ use std::process::Command;
 
 use sha2::{Digest, Sha256};
 
-use crate::catalog::Install;
+use crate::catalog::{Install, Method};
 use crate::inventory::home;
 
 /// The Rust target triple of release archives for this machine.
@@ -147,17 +147,20 @@ fn from_cargo(
 pub fn install(
     name: &str,
     tag: &str,
+    method: Method,
     install: &Install,
     directory: &Path,
 ) -> Result<PathBuf, String> {
     let stage = staging(name)?;
     let result = (|| {
-        let built = match install {
-            Install::ReleaseArchive { repository } => from_archive(name, tag, repository, &stage)?,
-            Install::Cargo {
-                repository,
-                package,
-            } => from_cargo(name, tag, repository, package, &stage)?,
+        let built = match (method, &install.archive, &install.cargo) {
+            (Method::Prebuilt, Some(archive), _) => {
+                from_archive(name, tag, &archive.repository, &stage)?
+            }
+            (Method::Cargo, _, Some(cargo)) => {
+                from_cargo(name, tag, &cargo.repository, &cargo.package, &stage)?
+            }
+            (method, _, _) => return Err(format!("{name} cannot be installed by {method:?}")),
         };
         std::fs::create_dir_all(directory)
             .map_err(|error| format!("{}: {error}", directory.display()))?;

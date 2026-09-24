@@ -9,7 +9,7 @@ use std::process::Command;
 
 use serde::{Deserialize, Serialize};
 
-use crate::catalog::{Bind, Catalog};
+use crate::catalog::Catalog;
 use crate::inventory::Inventory;
 
 /// Versions setup compares against.
@@ -19,6 +19,9 @@ pub struct Resolved {
     pub plugins: BTreeMap<String, String>,
     /// `owner/repo` → newest release tag.
     pub latest: BTreeMap<String, String>,
+    /// `owner/repo` → whether its newest release carries prebuilt archives (`SHA256SUMS`).
+    #[serde(default)]
+    pub archives: BTreeMap<String, bool>,
 }
 
 /// Where marketplace files are read from.
@@ -53,6 +56,34 @@ pub fn fetch(url: &str) -> Option<String> {
         .status
         .success()
         .then(|| String::from_utf8_lossy(&output.stdout).into_owned())
+}
+
+/// Whether a URL answers (`curl -fsI`), following redirects.
+#[must_use]
+pub fn exists(url: &str) -> bool {
+    Command::new("curl")
+        .args(["-fsIL", "-o", "/dev/null", "--max-time", "30", url])
+        .status()
+        .is_ok_and(|status| status.success())
+}
+
+/// Where the newest release tags seen by the last plan are kept, for the offline session check.
+#[must_use]
+pub fn cache_path(home: &Path) -> std::path::PathBuf {
+    home.join(".local/state/b10x/latest.json")
+}
+
+/// Record the newest release tags and when they were read.
+pub fn remember(home: &Path, resolved: &Resolved) {
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_secs());
+    let value = serde_json::json!({"checked_at": now, "latest": resolved.latest});
+    let path = cache_path(home);
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::write(path, value.to_string());
 }
 
 /// The newest release tag of `owner/repo`, from the `releases/latest` redirect (no API token).
@@ -179,14 +210,22 @@ pub fn resolve(catalog: &Catalog, source: &Source<'_>) -> Resolved {
         .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok())
         .map(|marketplace| plugin_versions(&marketplace, source, &mut latest))
         .unwrap_or_default();
+    let mut archives = BTreeMap::new();
     for product in &catalog.products {
         for binary in &product.binaries {
-            if binary.bind == Bind::Latest {
-                tag(&mut latest, binary.install.repository());
+            let repository = binary.install.repository();
+            if let (Some(tag), Some(_)) = (tag(&mut latest, repository), &binary.install.archive) {
+                let sums =
+                    format!("https://github.com/{repository}/releases/download/{tag}/SHA256SUMS");
+                archives.insert(repository.to_owned(), exists(&sums));
             }
         }
     }
-    Resolved { plugins, latest }
+    Resolved {
+        plugins,
+        latest,
+        archives,
+    }
 }
 
 #[cfg(test)]

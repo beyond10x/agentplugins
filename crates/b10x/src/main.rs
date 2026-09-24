@@ -31,6 +31,43 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Top {
+    /// Plan the named products (`aep,ess`): their plugins and CLIs, installed or brought current.
+    /// Nothing else is touched. Writes nothing but the plan file; apply it after confirmation.
+    Init {
+        /// Products, comma separated: aep, ess, worktree, connectors.
+        #[arg(value_delimiter = ',')]
+        products: Vec<String>,
+        /// How to install CLIs; default: cargo when it is on PATH, else prebuilt.
+        #[arg(long, value_enum)]
+        method: Option<MethodArg>,
+        /// Hosts to plan for.
+        #[arg(long, value_enum, default_value_t = Hosts::All)]
+        host: Hosts,
+        /// Print the plan as JSON.
+        #[arg(long)]
+        json: bool,
+        /// Write the JSON plan to this file, for `setup apply --plan`.
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Check installed products (or the named ones) against what is newest and plan the upgrade.
+    Upgrade {
+        /// Products, comma separated; default: every installed product.
+        #[arg(value_delimiter = ',')]
+        products: Vec<String>,
+        /// How to install CLIs; default: cargo when it is on PATH, else prebuilt.
+        #[arg(long, value_enum)]
+        method: Option<MethodArg>,
+        /// Hosts to plan for.
+        #[arg(long, value_enum, default_value_t = Hosts::All)]
+        host: Hosts,
+        /// Print the plan as JSON.
+        #[arg(long)]
+        json: bool,
+        /// Write the JSON plan to this file, for `setup apply --plan`.
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     /// Plan and apply plugin and binary changes.
     Setup {
         #[command(subcommand)]
@@ -51,9 +88,12 @@ enum Top {
         /// Release tag; defaults to the newest release.
         #[arg(long)]
         tag: Option<String>,
-        /// Target directory; defaults to `~/.local/bin` (archives) or `~/.cargo/bin` (cargo).
+        /// Target directory; defaults to `~/.local/bin` (prebuilt) or `~/.cargo/bin` (cargo).
         #[arg(long)]
         dir: Option<PathBuf>,
+        /// How to install; default: cargo when it is on PATH, else prebuilt.
+        #[arg(long, value_enum)]
+        method: Option<MethodArg>,
     },
 }
 
@@ -68,6 +108,9 @@ enum Setup {
         /// Hosts to plan for.
         #[arg(long, value_enum, default_value_t = Hosts::All)]
         host: Hosts,
+        /// How to install CLIs; default: cargo when it is on PATH, else prebuilt.
+        #[arg(long, value_enum)]
+        method: Option<MethodArg>,
         /// Print the plan as JSON.
         #[arg(long)]
         json: bool,
@@ -93,8 +136,25 @@ enum Setup {
     Guide,
 }
 
-/// The `installing` skill, printed by `b10x setup guide` so an agent without the plugin reads the same text.
-const GUIDE: &str = include_str!("../../../plugins/b10x/skills/installing/SKILL.md");
+/// The `init` skill, printed by `b10x setup guide` so an agent without the plugin reads the same text.
+const GUIDE: &str = include_str!("../../../plugins/b10x/skills/init/SKILL.md");
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum MethodArg {
+    /// The release's checksummed prebuilt archive.
+    Prebuilt,
+    /// `cargo install` from the release tag.
+    Cargo,
+}
+
+impl MethodArg {
+    fn method(self) -> catalog::Method {
+        match self {
+            MethodArg::Prebuilt => catalog::Method::Prebuilt,
+            MethodArg::Cargo => catalog::Method::Cargo,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 enum Hosts {
@@ -120,7 +180,48 @@ fn main() -> ExitCode {
             check::run(&Catalog::embedded());
             Ok(ExitCode::SUCCESS)
         }
-        Top::Install { name, tag, dir } => install_one(&name, tag, dir),
+        Top::Install {
+            name,
+            tag,
+            dir,
+            method,
+        } => install_one(&name, tag, dir, method),
+        Top::Init {
+            products,
+            method,
+            host,
+            json,
+            out,
+        } => {
+            if products.is_empty() {
+                Err("name the products: aep, ess, worktree, connectors (the /b10x:init skill asks the user which)".to_owned())
+            } else {
+                emit(
+                    make_plan(
+                        Some(clean(products)),
+                        host.list(),
+                        true,
+                        method.map(MethodArg::method),
+                    ),
+                    json,
+                    out.as_deref(),
+                )
+            }
+        }
+        Top::Upgrade {
+            products,
+            method,
+            host,
+            json,
+            out,
+        } => {
+            let selection = (!products.is_empty()).then(|| clean(products));
+            emit(
+                make_plan(selection, host.list(), true, method.map(MethodArg::method)),
+                json,
+                out.as_deref(),
+            )
+        }
         Top::Skill { id } => skill::text(
             &inventory::home(),
             &Catalog::embedded().marketplace.name,
@@ -134,9 +235,10 @@ fn main() -> ExitCode {
             Setup::Plan {
                 products,
                 host,
+                method,
                 json,
                 out,
-            } => setup_plan(products, host, json, out),
+            } => setup_plan(products, host, method, json, out.as_deref()),
             Setup::Apply { plan, yes } => setup_apply(&plan, yes),
             Setup::Undo { snapshot } => setup_undo(snapshot),
             Setup::Guide => {
@@ -163,7 +265,20 @@ fn marketplace_override() -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-fn make_plan(selection: Option<BTreeSet<String>>, hosts: Vec<Host>) -> Result<Plan, String> {
+fn clean(products: Vec<String>) -> BTreeSet<String> {
+    products
+        .into_iter()
+        .map(|id| id.trim().to_owned())
+        .filter(|id| !id.is_empty() && id != "none")
+        .collect()
+}
+
+fn make_plan(
+    selection: Option<BTreeSet<String>>,
+    hosts: Vec<Host>,
+    only: bool,
+    method: Option<catalog::Method>,
+) -> Result<Plan, String> {
     let overridden = marketplace_override();
     let mut embedded = Catalog::embedded();
     if let Some(source) = &overridden {
@@ -195,12 +310,15 @@ fn make_plan(selection: Option<BTreeSet<String>>, hosts: Vec<Host>) -> Result<Pl
     }
     let resolved = resolve::resolve(&catalog, &source);
     let home = inventory::home();
+    resolve::remember(&home, &resolved);
     let context = plan::Context {
         catalog: &catalog,
         resolved: &resolved,
         selection,
         hosts,
         home: &home,
+        only,
+        method,
     };
     Ok(plan::plan(&context, &inventory))
 }
@@ -208,24 +326,52 @@ fn make_plan(selection: Option<BTreeSet<String>>, hosts: Vec<Host>) -> Result<Pl
 fn setup_plan(
     products: Option<Vec<String>>,
     host: Hosts,
+    method: Option<MethodArg>,
     json: bool,
-    out: Option<PathBuf>,
+    out: Option<&std::path::Path>,
 ) -> Result<ExitCode, String> {
-    let selection = products.map(|ids| {
-        ids.into_iter()
-            .map(|id| id.trim().to_owned())
-            .filter(|id| !id.is_empty() && id != "none")
-            .collect::<BTreeSet<_>>()
-    });
-    let plan = make_plan(selection, host.list())?;
+    emit(
+        make_plan(
+            products.map(clean),
+            host.list(),
+            false,
+            method.map(MethodArg::method),
+        ),
+        json,
+        out,
+    )
+}
+
+/// Print a plan (text, or JSON with `--json`) and write it to `--out`.
+fn emit(
+    plan: Result<Plan, String>,
+    json: bool,
+    out: Option<&std::path::Path>,
+) -> Result<ExitCode, String> {
+    let plan = plan?;
     let text = serde_json::to_string_pretty(&plan).map_err(|error| error.to_string())?;
     if let Some(out) = out {
-        std::fs::write(&out, &text).map_err(|error| format!("{}: {error}", out.display()))?;
+        if let Some(parent) = out.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|error| format!("{}: {error}", parent.display()))?;
+        }
+        std::fs::write(out, &text).map_err(|error| format!("{}: {error}", out.display()))?;
     }
     if json {
         println!("{text}");
     } else {
         print_plan(&plan);
+        if !plan.converged() {
+            match out {
+                Some(out) => println!(
+                    "\nApply after the user confirms this list: b10x setup apply --plan {} --yes",
+                    out.display()
+                ),
+                None => println!(
+                    "\nWrite the plan with --out <file>, then apply it after the user confirms."
+                ),
+            }
+        }
     }
     Ok(ExitCode::SUCCESS)
 }
@@ -271,6 +417,12 @@ fn print_plan(plan: &Plan) {
         println!("\nActions ({}):", changes.len());
         for (index, action) in changes.iter().enumerate() {
             println!("  {:>2}. {}", index + 1, action.describe());
+        }
+    }
+    if !plan.next.is_empty() {
+        println!("\nNext:");
+        for line in &plan.next {
+            println!("  {line}");
         }
     }
 }
@@ -323,7 +475,7 @@ fn setup_apply(path: &PathBuf, yes: bool) -> Result<ExitCode, String> {
         .filter(|offer| offer.selected)
         .map(|offer| offer.id.clone())
         .collect();
-    let after = make_plan(Some(selection), plan.hosts.clone())?;
+    let after = make_plan(Some(selection), plan.hosts.clone(), plan.only, plan.method)?;
     println!("\nAfter:");
     print_plan(&after);
     if after.converged() {
@@ -379,24 +531,38 @@ fn setup_undo(snapshot: Option<String>) -> Result<ExitCode, String> {
     Ok(ExitCode::SUCCESS)
 }
 
-fn install_one(name: &str, tag: Option<String>, dir: Option<PathBuf>) -> Result<ExitCode, String> {
+fn install_one(
+    name: &str,
+    tag: Option<String>,
+    dir: Option<PathBuf>,
+    method: Option<MethodArg>,
+) -> Result<ExitCode, String> {
     let catalog = Catalog::embedded();
     let (_, binary) = catalog
         .binary(name)
         .ok_or_else(|| format!("`{name}` is not a catalog binary"))?;
+    let repository = binary.install.repository();
     let tag = match tag {
         Some(tag) => tag,
-        None => resolve::latest_tag(binary.install.repository())
-            .ok_or_else(|| format!("no release found for {}", binary.install.repository()))?,
+        None => resolve::latest_tag(repository)
+            .ok_or_else(|| format!("no release found for {repository}"))?,
     };
-    let directory = dir.unwrap_or_else(|| {
-        let home = inventory::home();
-        match binary.install {
-            catalog::Install::ReleaseArchive { .. } => home.join(".local/bin"),
-            catalog::Install::Cargo { .. } => home.join(".cargo/bin"),
-        }
+    let method = method.map_or_else(
+        || {
+            if inventory::copies_on_path("cargo").is_empty() {
+                catalog::Method::Prebuilt
+            } else {
+                catalog::Method::Cargo
+            }
+        },
+        MethodArg::method,
+    );
+    let home = inventory::home();
+    let directory = dir.unwrap_or_else(|| match method {
+        catalog::Method::Prebuilt => home.join(".local/bin"),
+        catalog::Method::Cargo => home.join(".cargo/bin"),
     });
-    let path = install::install(name, &tag, &binary.install, &directory)?;
+    let path = install::install(name, &tag, method, &binary.install, &directory)?;
     println!("installed {name} {tag} at {}", path.display());
     Ok(ExitCode::SUCCESS)
 }

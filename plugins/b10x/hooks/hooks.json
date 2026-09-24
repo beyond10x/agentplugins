@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v b10x >/dev/null 2>&1; then b10x check; else echo 'b10x: the b10x binary is not on PATH, so plugin and binary versions are not checked; run `b10x:installing`.'; fi",
+            "command": "if command -v b10x >/dev/null 2>&1; then b10x check; else echo 'b10x: the b10x binary is not on PATH, so plugin and binary versions are not checked; run `b10x:init`.'; fi",
             "timeout": 20
           }
         ]

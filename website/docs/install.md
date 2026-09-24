@@ -11,21 +11,21 @@ Tell Claude Code or Codex:
 
 > Set up Beyond10x: follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md
 
-The agent installs the `b10x` binary, reads what both hosts have installed and which binaries are on
-`PATH`, asks which products you want (`aep`, `ess`, `worktree`, optionally `connectors`), lists every
-change — including earlier installs under retired names it replaces and binaries it upgrades — and
-applies them only after you confirm. It snapshots every file it changes; `b10x setup undo` restores
-them. Run it again to upgrade. The rest of this page is the manual route.
+The agent installs the `b10x` binary and runs `/b10x:init`: it asks what you want to do (plan and
+deliver work, write specifications, isolated Git checkouts, integrations) and how to install the
+command-line tools (`cargo` when you have it, or prebuilt archives), lists every change — including
+earlier installs it replaces — and applies them only after you confirm. It snapshots every file it
+changes; `b10x setup undo` restores them. Each product then starts with its own `/<plugin>:init`,
+and `/b10x:upgrade` or `/<plugin>:upgrade` checks for newer versions. The rest of this page is the
+manual route.
 
 ## The marketplace
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
-identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree`
-and `connectors`, in both hosts. `ess` and `worktree` ship from their own repositories
-([ESS](https://github.com/beyond10x/ess), [worktree](https://github.com/beyond10x/worktree)) at
-their binaries' versions; this marketplace points at each repository's default branch and names no
-version. Install the `ess` and `worktree` binaries at the version of the installed plugin. The
-[Connectors guide](plugins/connectors.md) covers its separate CLI prerequisite.
+identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree` and `connectors`,
+in both hosts; every one lives in this repository. The CLIs come from their own repositories'
+releases, prebuilt or with `cargo install`. The [Connectors guide](plugins/connectors.md) covers its
+separate CLI prerequisite.
 
 ## Before you install: put `aep` on your `PATH`
 

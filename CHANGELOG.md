@@ -1,5 +1,36 @@
 # Changelog
 
+## [Unreleased]
+
+- **Every plugin lives here.** `ess` and `worktree` join `b10x`, `aep` and `connectors` in
+  `plugins/`, all at this repository's version; the marketplace entries that pointed into the ESS
+  and worktree repositories are gone. `ess@ess` and `worktree@worktree` installs are migrated by
+  `b10x` as before.
+- **`init` and `upgrade` on every plugin.** `/b10x:init` is guided onboarding: it asks what the user
+  wants to do (plan and deliver work, write specifications, isolated Git checkouts, integrations)
+  and how to install the CLIs, then installs the matching plugins. `/aep:init`, `/ess:init`,
+  `/worktree:init`, `/connectors:init` set up one product and take its first step;
+  `/<plugin>:upgrade` and `/b10x:upgrade` check plugins and CLIs and offer the upgrade.
+- **Breaking:** skill renames under the concept's R3: `b10x:init` (was `installing`),
+  `ess:init` (was `ess`), `ess:specifying`, `ess:retrofitting`, `ess:testing-conformance` (were
+  `specify`, `retrofit`, `coverage`), `worktree:managing-worktrees` (was `worktree`).
+- `b10x init <products>` and `b10x upgrade [<products>]` plan only the named or installed products
+  and touch nothing else. CLIs install with `cargo` when it is on `PATH`, otherwise from the
+  release's checksummed prebuilt archive; `--method cargo|prebuilt` chooses, and a release without
+  archives falls back to `cargo`. Every CLI is bound to its newest release; `catalog.json` is format
+  `b10x.catalog/2` with both methods and an `intent` phrase per product. Plans end with `Next:` hints.
+- `b10x check` (session start) now says when a CLI is older than the newest release last seen, when
+  that was more than seven days ago, and when no product is set up yet (`/b10x:init`).
+- `ess:specifying` gains `references/syntax.md`: a todo service in three files covering types,
+  entities, relations, lifecycles, actors, errors, commands (created, moved, refused), events, views
+  and a component, validated by `ess specify validate`. `ess:testing-conformance` says why a new
+  domain's suite is all `unsupported`. From trial 1, whose agent had to clone ESS for this.
+- New `agentplugins-check tools` replaces `remote`: it downloads the newest `aep`, `ess` and
+  `worktree` releases, runs every command the skills spell with `--help`, and validates the ESS syntax
+  example (pull requests, `main` pushes, daily). Its first run found `drive.md` spelling a command
+  `aep` does not have. Skills quote no CLI version (the concept check refuses one); nine quotes were
+  removed.
+
 ## [0.13.1] — 2026-09-24
 
 From a trial in which an agent given only this repository's link specified a todo service with

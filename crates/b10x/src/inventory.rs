@@ -46,6 +46,9 @@ pub struct Inventory {
     /// Hosts whose program runs but whose plugin commands fail, with the error they printed.
     #[serde(default)]
     pub broken: Vec<(Host, String)>,
+    /// Whether `cargo` is on `PATH`, so binaries can be built from source.
+    #[serde(default)]
+    pub cargo: bool,
 }
 
 /// One host's plugins and marketplaces.
@@ -495,6 +498,7 @@ pub fn collect(catalog: &Catalog, hosts: &[Host]) -> Inventory {
     if inventory.claude.is_some() {
         inventory.settings = settings_entries(&home, catalog);
     }
+    inventory.cargo = !copies_on_path("cargo").is_empty();
     inventory
 }
 

@@ -27,6 +27,67 @@ impl Plugins {
     }
 }
 
+/// The two lifecycle skills every plugin carries (R3); every other skill is an activity.
+const LIFECYCLE: &[&str] = &["init", "upgrade"];
+
+/// CLIs whose versions a plugin must not quote (R5): the newest release is the only one they describe.
+const CLIS: &[&str] = &["aep", "ess", "worktree", "metaharness", "protocol"];
+
+/// Every `<cli> x.y.z` in a line, case-insensitive, with optional backticks and a `v`.
+#[must_use]
+pub fn quoted_versions(line: &str) -> Vec<String> {
+    let lower = line.to_ascii_lowercase();
+    let bytes = lower.as_bytes();
+    let mut found = Vec::new();
+    for cli in CLIS {
+        let mut from = 0;
+        while let Some(offset) = lower[from..].find(cli) {
+            let start = from + offset;
+            from = start + cli.len();
+            if start > 0 && (bytes[start - 1].is_ascii_alphanumeric() || bytes[start - 1] == b'-') {
+                continue;
+            }
+            let rest = lower[from..]
+                .trim_start_matches('`')
+                .trim_start_matches(' ')
+                .trim_start_matches('`');
+            let rest = rest.strip_prefix('v').unwrap_or(rest);
+            let digits: String = rest
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.')
+                .collect();
+            if digits.split('.').filter(|part| !part.is_empty()).count() >= 3
+                && lower[from..].starts_with([' ', '`'])
+            {
+                found.push(format!("{cli} {digits}"));
+            }
+        }
+    }
+    found
+}
+
+fn versions(directory: &Path, name: &str, problems: &mut Vec<String>) {
+    let mut stack = vec![directory.to_path_buf()];
+    while let Some(dir) = stack.pop() {
+        for path in entries(&dir) {
+            if path.is_dir() {
+                stack.push(path);
+            } else if path.extension().and_then(|e| e.to_str()) == Some("md") {
+                let text = read(&path).unwrap_or_default();
+                for (number, line) in text.lines().enumerate() {
+                    for quote in quoted_versions(line) {
+                        problems.push(format!(
+                            "R5 plugins/{name}/{}:{} quotes `{quote}`; skills describe the newest release and name no CLI version",
+                            path.strip_prefix(directory).unwrap_or(&path).display(),
+                            number + 1
+                        ));
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// The most lines the README may have before its generated documentation block.
 const README_LINES: usize = 30;
 
@@ -116,12 +177,12 @@ fn plugin(
             problems.push(format!("R3 `{name}:{folder}` has no SKILL.md"));
             continue;
         };
-        if !activity(&folder) {
+        if !LIFECYCLE.contains(&folder.as_str()) && !activity(&folder) {
             problems.push(format!(
                 "R3 `{name}:{folder}` is not an activity name (one or two words, the first ending in `ing`)"
             ));
         }
-        if folder == name {
+        if !LIFECYCLE.contains(&folder.as_str()) && folder == name {
             problems.push(format!("R3 `{name}:{folder}` is named after its plugin"));
         }
         if frontmatter_name(&text).as_deref() != Some(folder.as_str()) {
@@ -134,6 +195,14 @@ fn plugin(
         }
         skills.insert(folder);
     }
+    for lifecycle in LIFECYCLE {
+        if !skills.contains(*lifecycle) {
+            problems.push(format!(
+                "R3 `{name}` has no `{lifecycle}` skill; every plugin carries `init` and `upgrade`"
+            ));
+        }
+    }
+    versions(&directory, name, problems);
     let mut agents = BTreeSet::new();
     for path in entries(&directory.join("agents")) {
         if path.extension().and_then(|e| e.to_str()) != Some("md") {
@@ -423,6 +492,15 @@ mod tests {
     }
 
     #[test]
+    fn cli_versions_are_found_and_skill_versions_are_not() {
+        assert_eq!(quoted_versions("at AEP 0.55.0 the verb"), ["aep 0.55.0"]);
+        assert_eq!(quoted_versions("output of ESS `0.29.0`"), ["ess 0.29.0"]);
+        assert!(quoted_versions("**Skill version 0.13.1** — the version").is_empty());
+        assert!(quoted_versions("ess-cli 0.30.0 is not a quote of a CLI name").is_empty());
+        assert!(quoted_versions("aep plan artifact list").is_empty());
+    }
+
+    #[test]
     fn agents_are_read_from_the_agents_section_only() {
         let skill = "# X\n\nUses `implementor` in prose.\n\n## Agents\n\n- `story-scoper` — scopes\n- `adversary` — attacks\n\n## Next\n\n- `other` — not an agent list\n";
         assert_eq!(listed_agents(skill), ["story-scoper", "adversary"]);
@@ -432,8 +510,14 @@ mod tests {
     fn ids_are_found_at_word_starts_only() {
         let plugins: BTreeSet<String> = ["aep", "b10x"].iter().map(|s| (*s).to_owned()).collect();
         assert_eq!(
-            ids("use `aep:planning` and b10x:installing; see beyond10x/aep:x, https://x/aep:y, aep: 1", &plugins),
-            [("aep".to_owned(), "planning".to_owned()), ("b10x".to_owned(), "installing".to_owned())]
+            ids(
+                "use `aep:planning` and b10x:init; see beyond10x/aep:x, https://x/aep:y, aep: 1",
+                &plugins
+            ),
+            [
+                ("aep".to_owned(), "planning".to_owned()),
+                ("b10x".to_owned(), "init".to_owned())
+            ]
         );
     }
 

@@ -12,7 +12,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::catalog::{Bind, Catalog, Install};
+use crate::catalog::{Catalog, Install, Method};
 use crate::inventory::{Host, HostState, Installed, Inventory};
 use crate::resolve::Resolved;
 use crate::version;
@@ -95,7 +95,9 @@ pub enum Action {
         name: String,
         /// Release tag.
         tag: String,
-        /// How.
+        /// Which way.
+        method: Method,
+        /// The ways it can be installed.
         install: Install,
         /// Directory it lands in.
         directory: String,
@@ -131,10 +133,17 @@ impl Action {
             Action::InstallBinary {
                 name,
                 tag,
+                method,
                 directory,
                 reason,
                 ..
-            } => format!("{reason}: install {name} {tag} into {directory}"),
+            } => format!(
+                "{reason}: install {name} {tag} into {directory} ({})",
+                match method {
+                    Method::Prebuilt => "prebuilt archive",
+                    Method::Cargo => "cargo install",
+                }
+            ),
         }
     }
 }
@@ -148,6 +157,9 @@ pub struct Offer {
     pub summary: String,
     /// Offered but not preselected.
     pub optional: bool,
+    /// What the user wants to do, as the onboarding question offers it.
+    #[serde(default)]
+    pub intent: String,
     /// Present now, current or legacy, on any host.
     pub present: bool,
     /// In this plan's selection.
@@ -171,6 +183,15 @@ pub struct Plan {
     pub findings: Vec<Finding>,
     /// What `apply` does, in order.
     pub actions: Vec<Action>,
+    /// What to do after applying: the next skill or command for the user.
+    #[serde(default)]
+    pub next: Vec<String>,
+    /// Planned for the selected products only (`init`, `upgrade`).
+    #[serde(default)]
+    pub only: bool,
+    /// The install method asked for, if any.
+    #[serde(default)]
+    pub method: Option<Method>,
 }
 
 impl Plan {
@@ -227,6 +248,11 @@ pub struct Context<'a> {
     pub hosts: Vec<Host>,
     /// The user's home, for default install directories and settings paths.
     pub home: &'a Path,
+    /// Plan only the selected products (`init`, `upgrade`): nothing else is uninstalled, migrated or
+    /// removed. `false` makes the selection the whole desired state (`setup plan`).
+    pub only: bool,
+    /// How to install binaries; `None` picks cargo when it is on `PATH`, else prebuilt.
+    pub method: Option<Method>,
 }
 
 /// Make the plan.
@@ -237,7 +263,9 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
     let selected: BTreeSet<String> = context.selection.clone().unwrap_or_else(|| {
         present
             .iter()
-            .filter(|id| catalog.product(id).is_some_and(|product| !product.optional))
+            .filter(|id| {
+                context.only || catalog.product(id).is_some_and(|product| !product.optional)
+            })
             .cloned()
             .collect()
     });
@@ -250,6 +278,7 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
             optional: product.optional,
             present: present.contains(&product.id),
             selected: selected.contains(&product.id),
+            intent: product.intent.clone(),
         })
         .collect();
     let mut findings = Vec::new();
@@ -291,9 +320,20 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
         }
     }
     if context.hosts.contains(&Host::Claude) && inventory.claude.is_some() {
-        plan_settings(context, inventory, &mut findings, &mut actions);
+        plan_settings(context, &selected, inventory, &mut findings, &mut actions);
     }
     plan_binaries(context, inventory, &selected, &mut findings, &mut actions);
+    let mut next = Vec::new();
+    for product in &catalog.products {
+        if selected.contains(&product.id) {
+            for plugin in &product.plugins {
+                next.push(format!(
+                    "/{plugin}:init starts {plugin} here (this session, before a restart: `b10x skill {plugin}:init`)"
+                ));
+            }
+        }
+    }
+    next.push("/b10x:upgrade checks everything later; /b10x:init adds a product".to_owned());
     Plan {
         format: FORMAT.to_owned(),
         inventory_digest: digest(inventory),
@@ -302,6 +342,9 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
         resolved: context.resolved.clone(),
         findings,
         actions,
+        next,
+        only: context.only,
+        method: context.method,
     }
 }
 
@@ -454,7 +497,7 @@ fn plan_host(
     }
     for (plugin, installed) in &user {
         let managed = catalog.product_of(plugin).is_some();
-        if managed && !desired.contains(plugin) {
+        if managed && !desired.contains(plugin) && !context.only {
             let id = installed.id();
             findings.push(finding(
                 Level::Change,
@@ -470,6 +513,7 @@ fn plan_host(
     // Two retired plugins can share one replacement (`aep-plan` and `aep-drive` are both `aep`):
     // install it once per scope and project.
     let mut placed = BTreeSet::new();
+    let mut kept = BTreeSet::new();
     for plugin in &state.plugins {
         let retired_market = catalog.retired_marketplace(&plugin.marketplace);
         let retired_name = catalog.retired_plugins.contains_key(&plugin.name);
@@ -477,6 +521,10 @@ fn plan_host(
             continue;
         }
         if !catalog.knows(&plugin.name) && !retired_market {
+            continue;
+        }
+        if context.only && !wanted(catalog, selected, catalog.current_name(&plugin.name)) {
+            kept.insert(plugin.marketplace.clone());
             continue;
         }
         let id = plugin.id();
@@ -525,6 +573,9 @@ fn plan_host(
         }
     }
     for market in retire_markets {
+        if kept.contains(&market) {
+            continue;
+        }
         if state.marketplaces.iter().any(|known| known.name == market) {
             findings.push(finding(
                 Level::Change,
@@ -539,6 +590,14 @@ fn plan_host(
             });
         }
     }
+}
+
+/// Whether a plugin belongs to what this plan is for: the base, or a selected product.
+fn wanted(catalog: &Catalog, selected: &BTreeSet<String>, plugin: &str) -> bool {
+    catalog.base.iter().any(|base| base == plugin)
+        || catalog
+            .product_of(plugin)
+            .is_some_and(|product| selected.contains(&product.id))
 }
 
 fn install(host: Host, id: &str, scope: &str, project: Option<String>) -> Action {
@@ -604,6 +663,7 @@ fn uninstall(host: Host, plugin: &Installed) -> Action {
 /// retired. Their replacement is installed at the same scope when the catalog knows it.
 fn plan_settings(
     context: &Context<'_>,
+    selected: &BTreeSet<String>,
     inventory: &Inventory,
     findings: &mut Vec<Finding>,
     actions: &mut Vec<Action>,
@@ -629,6 +689,9 @@ fn plan_settings(
         let retired = catalog.retired_marketplace(marketplace)
             || catalog.retired_plugins.contains_key(plugin);
         if reported || (registered && !retired) {
+            continue;
+        }
+        if context.only && !wanted(catalog, selected, catalog.current_name(plugin)) {
             continue;
         }
         let committed = entry.scope == "project";
@@ -677,6 +740,27 @@ fn plan_settings(
     }
 }
 
+/// The install method for one binary: the explicit choice when it can be honoured, else cargo when
+/// it is on `PATH`, else the prebuilt archive when the release has one.
+fn method(context: &Context<'_>, inventory: &Inventory, install: &Install) -> Option<Method> {
+    let archive = install.archive.is_some()
+        && context
+            .resolved
+            .archives
+            .get(install.repository())
+            .copied()
+            .unwrap_or(false);
+    let cargo = install.cargo.is_some() && inventory.cargo;
+    match context.method {
+        Some(Method::Prebuilt) if archive => Some(Method::Prebuilt),
+        Some(Method::Cargo) if install.cargo.is_some() => Some(Method::Cargo),
+        _ if cargo => Some(Method::Cargo),
+        _ if archive => Some(Method::Prebuilt),
+        _ if install.cargo.is_some() => Some(Method::Cargo),
+        _ => None,
+    }
+}
+
 #[allow(clippy::too_many_lines)]
 fn plan_binaries(
     context: &Context<'_>,
@@ -686,26 +770,25 @@ fn plan_binaries(
     actions: &mut Vec<Action>,
 ) {
     let catalog = context.catalog;
+    let mut methods = BTreeSet::new();
     for product in &catalog.products {
         if !selected.contains(&product.id) {
             continue;
         }
         for binary in &product.binaries {
             let subject = binary.name.clone();
-            let target = match &binary.bind {
-                Bind::Latest => context
-                    .resolved
-                    .latest
-                    .get(binary.install.repository())
-                    .cloned(),
-                Bind::Plugin { plugin } => context.resolved.plugins.get(plugin).cloned(),
-            };
-            let Some(tag) = target else {
+            let Some(tag) = context
+                .resolved
+                .latest
+                .get(binary.install.repository())
+                .cloned()
+            else {
                 findings.push(Finding {
                     level: Level::Warn,
                     host: None,
                     subject,
-                    detail: "its version could not be resolved (offline?); not checked".to_owned(),
+                    detail: "its newest release could not be read (offline?); not checked"
+                        .to_owned(),
                 });
                 continue;
             };
@@ -715,90 +798,116 @@ fn plan_binaries(
                 .find(|state| state.name == binary.name)
                 .map(|state| state.copies.as_slice())
                 .unwrap_or_default();
-            let default_directory = match binary.install {
-                Install::ReleaseArchive { .. } => context.home.join(".local/bin"),
-                Install::Cargo { .. } => context.home.join(".cargo/bin"),
-            };
-            let bound = match &binary.bind {
-                Bind::Latest => "newest release".to_owned(),
-                Bind::Plugin { plugin } => format!("the `{plugin}` plugin"),
-            };
-            match copies.first() {
-                None if binary.optional => findings.push(Finding {
+            let current = copies.first();
+            if current
+                .is_some_and(|first| version::same(first.version.as_deref().unwrap_or(""), &tag))
+            {
+                let first = current.expect("checked above");
+                findings.push(Finding {
+                    level: Level::Ok,
+                    host: None,
+                    subject: subject.clone(),
+                    detail: format!("{tag} at {} is the newest release", first.path),
+                });
+            } else if current.is_none() && binary.optional {
+                findings.push(Finding {
                     level: Level::Note,
                     host: None,
-                    subject,
-                    detail: format!("optional, not installed (newest {tag})"),
-                }),
-                None => {
+                    subject: subject.clone(),
+                    detail: format!(
+                        "optional, not installed (newest {tag}); `b10x install {}` adds it",
+                        binary.name
+                    ),
+                });
+            } else {
+                let Some(method) = method(context, inventory, &binary.install) else {
                     findings.push(Finding {
-                        level: Level::Change,
+                        level: Level::Warn,
                         host: None,
                         subject: subject.clone(),
-                        detail: format!("not on PATH; install {tag} to match {bound}"),
+                        detail: format!("{tag} has no prebuilt archive and `cargo` is not on PATH; install a Rust toolchain (https://rustup.rs) and plan again"),
                     });
-                    actions.push(Action::InstallBinary {
-                        name: binary.name.clone(),
-                        tag,
-                        install: binary.install.clone(),
-                        directory: default_directory.to_string_lossy().into_owned(),
-                        reason: format!("install `{}`", binary.name),
+                    continue;
+                };
+                methods.insert(method);
+                let default_directory = match method {
+                    Method::Prebuilt => context.home.join(".local/bin"),
+                    Method::Cargo => context.home.join(".cargo/bin"),
+                };
+                let directory = current
+                    .and_then(|first| Path::new(&first.path).parent().map(Path::to_path_buf))
+                    .filter(|parent| parent.starts_with(context.home))
+                    .unwrap_or(default_directory);
+                let (verb, detail) = match current {
+                    None => ("install", format!("not on PATH; install {tag}")),
+                    Some(first) => (
+                        "upgrade",
+                        format!(
+                            "{} at {} is not the newest release {tag}; replace it",
+                            first
+                                .version
+                                .clone()
+                                .unwrap_or_else(|| "unknown".to_owned()),
+                            first.path
+                        ),
+                    ),
+                };
+                findings.push(Finding {
+                    level: Level::Change,
+                    host: None,
+                    subject: subject.clone(),
+                    detail,
+                });
+                actions.push(Action::InstallBinary {
+                    name: binary.name.clone(),
+                    tag: tag.clone(),
+                    method,
+                    install: binary.install.clone(),
+                    directory: directory.to_string_lossy().into_owned(),
+                    reason: format!("{verb} `{}`", binary.name),
+                });
+            }
+            for shadowed in copies.iter().skip(1) {
+                let seen = shadowed
+                    .version
+                    .clone()
+                    .unwrap_or_else(|| "unknown".to_owned());
+                if !version::same(&seen, &tag) {
+                    findings.push(Finding {
+                        level: Level::Warn,
+                        host: None,
+                        subject: subject.clone(),
+                        detail: format!(
+                            "another copy, {seen} at {}, is later on PATH and never runs; remove it if nothing else uses it",
+                            shadowed.path
+                        ),
                     });
-                }
-                Some(first) => {
-                    let current = first
-                        .version
-                        .clone()
-                        .unwrap_or_else(|| "unknown".to_owned());
-                    if version::same(&current, &tag) {
-                        findings.push(Finding {
-                            level: Level::Ok,
-                            host: None,
-                            subject: subject.clone(),
-                            detail: format!("{current} at {} matches {bound}", first.path),
-                        });
-                    } else {
-                        let directory = Path::new(&first.path)
-                            .parent()
-                            .filter(|parent| parent.starts_with(context.home))
-                            .map_or(default_directory.clone(), Path::to_path_buf);
-                        findings.push(Finding {
-                            level: Level::Change,
-                            host: None,
-                            subject: subject.clone(),
-                            detail: format!(
-                                "{current} at {} does not match {bound} ({tag}); replace it",
-                                first.path
-                            ),
-                        });
-                        actions.push(Action::InstallBinary {
-                            name: binary.name.clone(),
-                            tag: tag.clone(),
-                            install: binary.install.clone(),
-                            directory: directory.to_string_lossy().into_owned(),
-                            reason: format!("upgrade `{}`", binary.name),
-                        });
-                    }
-                    for shadowed in &copies[1..] {
-                        let seen = shadowed
-                            .version
-                            .clone()
-                            .unwrap_or_else(|| "unknown".to_owned());
-                        if !version::same(&seen, &tag) {
-                            findings.push(Finding {
-                                level: Level::Warn,
-                                host: None,
-                                subject: subject.clone(),
-                                detail: format!(
-                                    "another copy, {seen} at {}, is later on PATH and never runs; remove it if nothing else uses it",
-                                    shadowed.path
-                                ),
-                            });
-                        }
-                    }
                 }
             }
         }
+    }
+    if !methods.is_empty() {
+        let chosen: Vec<&str> = methods
+            .iter()
+            .map(|method| match method {
+                Method::Prebuilt => "prebuilt archives",
+                Method::Cargo => "cargo install",
+            })
+            .collect();
+        findings.push(Finding {
+            level: Level::Note,
+            host: None,
+            subject: "install method".to_owned(),
+            detail: format!(
+                "{} ({}); choose with --method cargo or --method prebuilt",
+                chosen.join(" and "),
+                if inventory.cargo {
+                    "cargo is on PATH"
+                } else {
+                    "cargo is not on PATH"
+                }
+            ),
+        });
     }
 }
 
@@ -844,7 +953,15 @@ mod tests {
             ]),
             latest: BTreeMap::from([
                 ("beyond10x/aep".to_owned(), "0.57.0".to_owned()),
+                ("beyond10x/ess".to_owned(), "0.30.0".to_owned()),
+                ("beyond10x/worktree".to_owned(), "0.7.0".to_owned()),
                 ("beyond10x/metaharness".to_owned(), "0.7.0".to_owned()),
+            ]),
+            archives: BTreeMap::from([
+                ("beyond10x/aep".to_owned(), true),
+                ("beyond10x/ess".to_owned(), true),
+                ("beyond10x/worktree".to_owned(), true),
+                ("beyond10x/metaharness".to_owned(), false),
             ]),
         }
     }
@@ -871,6 +988,8 @@ mod tests {
             selection: selection.map(|ids| ids.iter().map(|id| (*id).to_owned()).collect()),
             hosts: hosts.to_vec(),
             home: Path::new("/opt/b10x-home"),
+            only: false,
+            method: None,
         };
         plan(&context, inventory)
     }
@@ -1104,6 +1223,91 @@ mod tests {
         );
         assert!(
             commands.contains(&"claude plugin uninstall aep-drive@b10x --scope local".to_owned())
+        );
+    }
+
+    fn run_only(inventory: &Inventory, products: &[&str], method: Option<Method>) -> Plan {
+        let catalog = Catalog::embedded();
+        let resolved = resolved();
+        let context = Context {
+            catalog: &catalog,
+            resolved: &resolved,
+            selection: Some(products.iter().map(|id| (*id).to_owned()).collect()),
+            hosts: vec![Host::Claude],
+            home: Path::new("/opt/b10x-home"),
+            only: true,
+            method,
+        };
+        plan(&context, inventory)
+    }
+
+    #[test]
+    fn init_of_one_product_leaves_every_other_install_alone() {
+        let inventory = Inventory {
+            claude: Some(legacy_claude()),
+            ..Inventory::default()
+        };
+        let plan = run_only(&inventory, &["ess"], None);
+        let commands = commands(&plan);
+        assert!(commands.contains(&"claude plugin install ess@b10x --scope user".to_owned()));
+        assert!(commands.contains(&"claude plugin uninstall ess@ess --scope user".to_owned()));
+        assert!(
+            !commands.iter().any(|c| c.contains("aep")),
+            "aep untouched: {commands:#?}"
+        );
+        assert!(
+            !commands
+                .iter()
+                .any(|c| c.ends_with("marketplace remove beyond10x")),
+            "beyond10x still serves aep installs"
+        );
+        assert!(plan.next.iter().any(|line| line.starts_with("/ess:init")));
+    }
+
+    #[test]
+    fn cargo_is_the_default_when_present_and_prebuilt_otherwise() {
+        let method_for = |cargo: bool, asked: Option<Method>| {
+            let inventory = Inventory {
+                claude: Some(HostState::default()),
+                cargo,
+                ..Inventory::default()
+            };
+            run_only(&inventory, &["worktree"], asked)
+                .actions
+                .iter()
+                .find_map(|action| match action {
+                    Action::InstallBinary { method, .. } => Some(*method),
+                    _ => None,
+                })
+        };
+        assert_eq!(method_for(true, None), Some(Method::Cargo));
+        assert_eq!(method_for(false, None), Some(Method::Prebuilt));
+        assert_eq!(
+            method_for(true, Some(Method::Prebuilt)),
+            Some(Method::Prebuilt)
+        );
+    }
+
+    #[test]
+    fn a_release_without_archives_and_no_cargo_is_a_warning_not_an_action() {
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            binaries: vec![BinaryState {
+                name: "metaharness".to_owned(),
+                copies: vec![Copy {
+                    path: "/opt/b10x-home/.local/bin/metaharness".to_owned(),
+                    version: Some("0.6.0".to_owned()),
+                }],
+            }],
+            ..Inventory::default()
+        };
+        let plan = run_only(&inventory, &["aep"], Some(Method::Prebuilt));
+        let metaharness = plan.actions.iter().find(
+            |action| matches!(action, Action::InstallBinary { name, .. } if name == "metaharness"),
+        );
+        assert!(
+            matches!(metaharness, Some(Action::InstallBinary { method: Method::Cargo, .. })),
+            "no archive for metaharness: asking for prebuilt falls back to cargo, which the catalog has"
         );
     }
 

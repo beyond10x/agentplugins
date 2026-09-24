@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beyond10x Setup"
+  short_description: "Guided onboarding: choose what to do, install the plugins and tools"
+  default_prompt: "Use $init to set up Beyond10x: ask what I want to do and install the matching plugins and tools."

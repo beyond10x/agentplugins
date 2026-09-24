@@ -24,21 +24,13 @@
     },
     {
       "name": "worktree",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/beyond10x/worktree.git",
-        "path": "plugins/worktree"
-      },
-      "description": "Manage isolated Git worktrees with explicit ownership and safe cleanup proof, released with the worktree binary."
+      "source": "./plugins/worktree",
+      "description": "Create, lease, finish and safely clean isolated Git worktrees through the worktree CLI."
     },
     {
       "name": "ess",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/beyond10x/ess.git",
-        "path": "plugins/ess"
-      },
-      "description": "Write, retrofit, validate and project ESS specifications, and audit conformance suites, released with the ess binary."
+      "source": "./plugins/ess",
+      "description": "Write, retrofit, validate and project ESS specifications, and hold implementations to them with conformance suites."
     }
   ]
 }
