@@ -4,7 +4,7 @@ title: Connectors
 
 # Connectors
 
-The `connectors` plugin provides one shared `connectors` skill for Claude Code and Codex. It
+The `connectors` plugin provides one shared `integrating` skill for Claude Code and Codex. It
 guides provider setup, connection diagnostics, and the search → describe → invoke sequence for
 admitted integrations. It ships no binary, credentials, daemon, hooks, or automatic MCP connection.
 
@@ -46,8 +46,8 @@ plugins. For development, both marketplace-add commands also accept the absolute
 to a current local checkout containing both marketplace files.
 
 Reload Claude Code's plugins with `/reload-plugins`, or start a new Codex thread. In Claude Code,
-invoke `/connectors:connectors`; in Codex select the `connectors` skill or invoke `$connectors:connectors`.
-Both manifests load the same `skills/connectors/SKILL.md` bytes. These layouts follow the
+invoke `/connectors:integrating`; in Codex select the `integrating` skill or invoke `$connectors:integrating`.
+Both manifests load the same `skills/integrating/SKILL.md` bytes. These layouts follow the
 [OpenAI plugin packaging contract](https://developers.openai.com/plugins/build/plugins) and
 [Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference).
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.13.0] — 2026-09-24
+
+- **The plugin concept, enforced.** [`website/docs/structure.md`](website/docs/structure.md) states
+  eight rules (one marketplace; one plugin per product named after its CLI; skills are activities in
+  `-ing` form; each agent owned by one skill that lists it under `## Agents`; references resolve;
+  one README row, plugin page and sidebar entry per plugin). The new `concept` check in
+  `agentplugins-check` refuses a violation; `agentplugins-check remote` lists the renames `ess`
+  and `worktree` still owe.
+- **Breaking:** `aep-plan` and `aep-drive` are one plugin, `aep`, with three skills:
+  `aep:planning`, `aep:migrating` (was `story-migration`) and `aep:implementing` (was `wave`
+  and `drive`, now its two modes), and eleven agents. `b10x setup` replaces `aep-plan` and
+  `aep-drive` installs from any marketplace, at every scope, with one `aep` install.
+- **Breaking:** skills renamed to activities: `b10x:installing` (was `setup`), `b10x:routing`
+  (was `guide`), `b10x:authoring-plugins` (was `plugin-creator`), `connectors:integrating`
+  (was `connectors`). Every old id joins the retired names the gate refuses.
+- `b10x setup undo` refreshes both hosts' marketplaces after restoring settings, so a restored
+  registration whose snapshot `apply` removed works again (Codex failed to list plugins until
+  `codex plugin marketplace upgrade`). A host whose plugin commands fail is reported with its error
+  and the repair command instead of as not installed.
+- README is one paragraph and a table of plugins with the install command for each host; the `b10x`
+  reference moved to its plugin page, eval costs and CI to `evals/README.md`, repository rules to
+  `AGENTS.md`.
+
 ## [0.12.0] — 2026-09-24
 
 - **One-sentence onboarding.** Tell an agent to follow

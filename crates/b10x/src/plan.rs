@@ -268,12 +268,26 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
                 &mut findings,
                 &mut actions,
             ),
-            None => findings.push(Finding {
-                level: Level::Note,
-                host: Some(*host),
-                subject: host.program().to_owned(),
-                detail: format!("`{}` is not installed here; skipped", host.program()),
-            }),
+            None => match inventory.broken.iter().find(|(broken, _)| broken == host) {
+                Some((_, error)) => findings.push(Finding {
+                    level: Level::Warn,
+                    host: Some(*host),
+                    subject: host.program().to_owned(),
+                    detail: format!(
+                        "{error}; skipped. Repair it with `{}`, then plan again",
+                        match host {
+                            Host::Claude => "claude plugin marketplace update",
+                            Host::Codex => "codex plugin marketplace upgrade",
+                        }
+                    ),
+                }),
+                None => findings.push(Finding {
+                    level: Level::Note,
+                    host: Some(*host),
+                    subject: host.program().to_owned(),
+                    detail: format!("`{}` is not installed here; skipped", host.program()),
+                }),
+            },
         }
     }
     if context.hosts.contains(&Host::Claude) && inventory.claude.is_some() {
@@ -453,6 +467,9 @@ fn plan_host(
 
     // 3. Legacy installs: a retired name or a retired marketplace, at any scope.
     let mut retire_markets = BTreeSet::new();
+    // Two retired plugins can share one replacement (`aep-plan` and `aep-drive` are both `aep`):
+    // install it once per scope and project.
+    let mut placed = BTreeSet::new();
     for plugin in &state.plugins {
         let retired_market = catalog.retired_marketplace(&plugin.marketplace);
         let retired_name = catalog.retired_plugins.contains_key(&plugin.name);
@@ -483,7 +500,12 @@ fn plan_host(
                     && other.scope == plugin.scope
                     && other.project == plugin.project
             });
-            if !already && catalog.knows(&replacement) {
+            let first = placed.insert((
+                replacement.clone(),
+                plugin.scope.clone(),
+                plugin.project.clone(),
+            ));
+            if !already && first && catalog.knows(&replacement) {
                 actions.push(install(
                     host,
                     &format!("{replacement}@{name}"),
@@ -816,8 +838,7 @@ mod tests {
         Resolved {
             plugins: BTreeMap::from([
                 ("b10x".to_owned(), "0.12.0".to_owned()),
-                ("aep-plan".to_owned(), "0.12.0".to_owned()),
-                ("aep-drive".to_owned(), "0.12.0".to_owned()),
+                ("aep".to_owned(), "0.13.0".to_owned()),
                 ("ess".to_owned(), "0.30.0".to_owned()),
                 ("worktree".to_owned(), "0.6.0".to_owned()),
             ]),
@@ -887,7 +908,7 @@ mod tests {
         for expected in [
             "claude plugin marketplace add beyond10x/agentplugins",
             "claude plugin install b10x@b10x --scope user",
-            "claude plugin install aep-plan@b10x --scope user",
+            "claude plugin install aep@b10x --scope user",
             "claude plugin install ess@b10x --scope user",
             "claude plugin install worktree@b10x --scope user",
             "claude plugin uninstall workspace-hygiene@beyond10x --scope user",
@@ -917,7 +938,7 @@ mod tests {
         };
         let plan = run(&inventory, Some(&["aep"]), &[Host::Codex]);
         let commands = commands(&plan);
-        assert!(commands.contains(&"codex plugin add aep-drive@b10x".to_owned()));
+        assert!(commands.contains(&"codex plugin add aep@b10x".to_owned()));
         assert!(commands.contains(&"codex plugin remove workspace-hygiene@beyond10x".to_owned()));
         assert!(
             !commands.iter().any(|c| c.contains("worktree@b10x")),
@@ -1052,6 +1073,38 @@ mod tests {
         assert!(plan.actions.iter().any(|a| matches!(a,
             Action::Command { argv, cwd: Some(cwd), .. }
                 if argv.join(" ") == "claude plugin install b10x@b10x --scope local" && cwd == "/work/acd")));
+    }
+
+    #[test]
+    fn two_retired_plugins_in_one_project_become_one_install() {
+        let mut state = HostState::default();
+        for name in ["aep-plan", "aep-drive"] {
+            state.plugins.push(Installed {
+                name: name.to_owned(),
+                marketplace: "b10x".to_owned(),
+                version: Some("0.12.0".to_owned()),
+                scope: "local".to_owned(),
+                project: Some("/work/p".to_owned()),
+                enabled: true,
+            });
+        }
+        let inventory = Inventory {
+            claude: Some(state),
+            ..Inventory::default()
+        };
+        let plan = run(&inventory, Some(&[]), &[Host::Claude]);
+        let commands = commands(&plan);
+        let installs = commands
+            .iter()
+            .filter(|c| *c == "claude plugin install aep@b10x --scope local")
+            .count();
+        assert_eq!(installs, 1, "{commands:#?}");
+        assert!(
+            commands.contains(&"claude plugin uninstall aep-plan@b10x --scope local".to_owned())
+        );
+        assert!(
+            commands.contains(&"claude plugin uninstall aep-drive@b10x --scope local".to_owned())
+        );
     }
 
     #[test]

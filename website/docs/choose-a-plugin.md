@@ -15,14 +15,14 @@ so the capability works in Codex and Claude Code, while keeping host-specific wr
 
 ## Planning or understanding work
 
-Use **AEP Plan** when the repository has a governed artifact store, or when you need to turn a
+Use **`aep`** (its `planning` skill) when the repository has a governed artifact store, or when you need to turn a
 goal into reviewable epics, stories, and tasks. Its agents can decompose, review, or reverse-engineer
-work, but the planning skill remains responsible for legal lifecycle moves.
+work, but `aep:planning` remains responsible for legal lifecycle moves.
 
 ## Delivering a development story
 
-Use **AEP Drive** when an accepted story is ready to scope and implement. Its wave guidance defines
-coordination and review roles for an interactive session; its `drive` skill hands one story to
+Use **`aep:implementing`** when an accepted story is ready to scope and implement. Its wave mode
+defines coordination and review roles for an interactive session; its drive mode hands one story to
 the reference driver instead, where the bounds are decided by the engine rather than followed by
 an agent — and it says before it launches that the driven walk has not yet reached `complete`.
 Neither makes a draft plan implementation-ready.

@@ -51,7 +51,7 @@ expectations:
     # `--plugin <repo>@<name>@<pin>` (aep 0.44.0), which metaharness places in the scratch config home
     # and, since 0.6.1, also names to the vendor with `--plugin-dir` — the registry placement alone
     # loaded nothing (metaharness probe Q19, answered by the 2026-09-03 recording). A run launched
-    # with only `--plugin-dir plugins/aep-plan` still gaps this row for a reason that is not about
+    # with only `--plugin-dir plugins/aep` still gaps this row for a reason that is not about
     # the plugin, which is why it stays advisory until the recorded stream shows it `ok`. Since the
     # rename the manifest's pins name no plugin this repository still ships, so the replay sends the
     # pins alone and no `--plugin-dir` at all — an argument `aep`'s `ingest_recorded` discards.
@@ -366,7 +366,7 @@ expectations:
     statement: the run stayed inside the per-case cap the corpus is run under
     # 25 and not the corpus's 5, in two moves. The second headless run (2026-09-03) walked all eight
     # steps in 118 turns on the default model for $10.96, which retired the $5 cap. The third
-    # (2026-09-03, out-3) was the first with `aep-drive` actually loaded: it took the wave skill, spawned
+    # (2026-09-03, out-3) was the first with the delivery plugin actually loaded: it took the wave skill, spawned
     # 12 sub-agents, and was still inside step 7 when `--max-budget-usd` stopped it at $15.0014
     # (`session.ended` subtype `error_max_budget_usd`). The case costs more with its plugins than
     # without them, which is the case working. The runner passes the same number as `--budget-usd`,

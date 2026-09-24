@@ -7,8 +7,7 @@ import styles from './index.module.css';
 const plugins = [
   ['b10x', 'Set up and upgrade the plugins, route work, and create portable plugins.', '/docs/plugins/b10x'],
   ['ESS', 'Write, retrofit and conformance-test Executable System Specifications.', '/docs/plugins/ess'],
-  ['AEP Plan', 'Plan, decompose, review, and reverse-engineer governed work.', '/docs/plugins/aep-plan'],
-  ['AEP Drive', 'Scope stories and coordinate implementation waves with adversarial review.', '/docs/plugins/aep-drive'],
+  ['AEP', 'Plan governed work, then scope and deliver it in waves with adversarial review.', '/docs/plugins/aep'],
   ['Worktree', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/worktree'],
 ];
 

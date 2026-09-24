@@ -6,7 +6,7 @@ states: [implement]
 arm: plugin
 verdict: held
 subject:
-  skills: [connectors:connectors]
+  skills: [connectors:integrating]
   paths: [crates/agentplugins-check/src/readiness.rs]
 command_contract: connectors-readiness
 task: |

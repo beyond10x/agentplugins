@@ -259,7 +259,7 @@ fn the_walk_finds_each_violation_the_statement_names() {
     // document.
     write("website/docs/install.md", &format!("install `{retired}`\n"));
     write(
-        &format!("plugins/{three_letters}/skills/wave/SKILL.md"),
+        &format!("plugins/{three_letters}/skills/implementing/SKILL.md"),
         "---\nname: wave\n---\n\nnothing here spells it\n",
     );
     write(&format!("website/docs/plugins/{retired}.md"), "# a page\n");
@@ -292,7 +292,7 @@ fn the_walk_finds_each_violation_the_statement_names() {
     let mut expected = vec![
         format!("README.md:1: install: {retired}  # {RECORDED_SPELLING}"),
         format!("plugins/{three_letters}: filed under a retired plugin name"),
-        format!("plugins/{three_letters}/skills/wave/SKILL.md: filed under a retired plugin name"),
+        format!("plugins/{three_letters}/skills/implementing/SKILL.md: filed under a retired plugin name"),
         format!("website/docs/install.md:1: install `{retired}`"),
         format!("website/docs/plugins/{retired}.md: filed under a retired plugin name"),
     ];

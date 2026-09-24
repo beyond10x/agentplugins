@@ -17,22 +17,10 @@
       "category": "Productivity"
     },
     {
-      "name": "aep-plan",
+      "name": "aep",
       "source": {
         "source": "local",
-        "path": "./plugins/aep-plan"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "aep-drive",
-      "source": {
-        "source": "local",
-        "path": "./plugins/aep-drive"
+        "path": "./plugins/aep"
       },
       "policy": {
         "installation": "AVAILABLE",

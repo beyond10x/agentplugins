@@ -181,6 +181,22 @@ pub fn verify(root: &Path) -> Result<(), String> {
             ));
         }
         println!("remote `{name}`: default branch serves released version {version}");
+        // R3 of website/docs/structure.md, reported but not yet enforced: these plugins are renamed in
+        // their own repositories (the follow-up half), and this check turns into a refusal then.
+        let listing = curl(&format!(
+            "https://api.github.com/repos/{}/contents/{}/skills",
+            remote.repository, remote.path
+        ))?;
+        let skills: Vec<serde_json::Value> = serde_json::from_str(&listing)
+            .map_err(|error| format!("`{name}` skills listing: {error}"))?;
+        for skill in skills
+            .iter()
+            .filter_map(|entry| entry.get("name").and_then(serde_json::Value::as_str))
+        {
+            if !crate::concept::activity(skill) || skill == name {
+                println!("concept follow-up: `{name}:{skill}` is not an activity name (R3)");
+            }
+        }
     }
     Ok(())
 }

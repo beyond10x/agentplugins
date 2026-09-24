@@ -74,7 +74,7 @@ jobs:
             echo "::error::the built binary reports $printed, but the release tag is $GITHUB_REF_NAME" >&2
             exit 1
           fi
-          "$bin" setup guide | grep -q '^name: setup$'
+          "$bin" setup guide | grep -q '^name: installing$'
           package="b10x-$TARGET"
           mkdir -p "dist/$package"
           cp "$bin" LICENSE "dist/$package/"

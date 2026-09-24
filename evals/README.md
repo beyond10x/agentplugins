@@ -16,23 +16,23 @@ A case is four things and no others:
 
 Every cell in the middle column is that case's `subject:` in full, read from its `case.yaml`, and
 those fields — not this table and not any prose elsewhere — are the source of truth for what the
-corpus covers: counted from them the eight cases name **7 of this repository's 10 agents** and
+corpus covers: counted from them the eight cases name **7 of this repository's 11 agents** and
 **4 of its 8 skills**.
 
 | Case | `subject:` agents and skills | The claim it holds the subject to |
 |---|---|---|
-| `plan-critic-acceptance-verdict` | `aep-plan:plan-critic-acceptance` | the verdict became an immutable `review-result` through `new --from`, and nothing moved |
-| `plan-critic-design-verdict` | `aep-plan:plan-critic-design` | the same, for the shape lane |
-| `plan-critic-scope-verdict` | `aep-plan:plan-critic-scope` | the same, for the coverage lane |
-| `plan-critic-parallel-safety-verdict` | `aep-plan:plan-critic-parallel-safety` | the same, for the concurrency lane |
-| `decomposer-relation-census` | `aep-plan:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
-| `golden-path-end-to-end` | `aep-plan:decomposer`, `aep-plan:plan-critic-acceptance`, `aep-drive:story-scoper`, `aep-plan:planning`, `aep-drive:wave`, `aep-drive:drive` (and the path `website/docs/golden-path.md`) | the eight published steps in the published order, with the CLIs as the stores' only writers |
-| `adversary-tests-only` | `aep-drive:adversary`, `aep-drive:wave` | tests were written, `src/` was not touched, and no `aep plan artifact` command ran |
-| `connectors-readiness` | `connectors:connectors` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
+| `plan-critic-acceptance-verdict` | `aep:plan-critic-acceptance` | the verdict became an immutable `review-result` through `new --from`, and nothing moved |
+| `plan-critic-design-verdict` | `aep:plan-critic-design` | the same, for the shape lane |
+| `plan-critic-scope-verdict` | `aep:plan-critic-scope` | the same, for the coverage lane |
+| `plan-critic-parallel-safety-verdict` | `aep:plan-critic-parallel-safety` | the same, for the concurrency lane |
+| `decomposer-relation-census` | `aep:decomposer` | an undecided relation became a `decision-blocker` with a `blocks` edge, filed before the first story |
+| `golden-path-end-to-end` | `aep:decomposer`, `aep:plan-critic-acceptance`, `aep:story-scoper`, `aep:planning`, `aep:implementing`, `aep:implementing` (and the path `website/docs/golden-path.md`) | the eight published steps in the published order, with the CLIs as the stores' only writers |
+| `adversary-tests-only` | `aep:adversary`, `aep:implementing` | tests were written, `src/` was not touched, and no `aep plan artifact` command ran |
+| `connectors-readiness` | `connectors:integrating` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
 
-No case names the agents `aep-drive:implementor`, `aep-plan:plan-reviewer` or
-`aep-plan:reverse-engineer`, nor the skills `aep-plan:story-migration`, `b10x:setup`, `b10x:guide` or
-`b10x:plugin-creator`; those seven are
+No case names the agents `aep:implementor`, `aep:plan-reviewer`, `aep:reverse-engineer` or
+`aep:security-reviewer`, nor the skills `aep:migrating`, `b10x:installing`, `b10x:routing` or
+`b10x:authoring-plugins`; those eight are
 the remaining scope of
 `story:plugin-eval-cases` in `.engineering/planning`, and a change to one of them turns no row red.
 
@@ -142,15 +142,52 @@ Free, and what `task check` does:
 $ cargo run --quiet --locked --bin agentplugins-check
 ```
 
-Live, which costs money and is refused without both `METAHARNESS_LIVE=1` and a cap — see
-[`README.md` § Evals](../README.md#evals) for the arithmetic of a full sweep:
+Live, which costs money and is refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
 $ METAHARNESS_LIVE=1 aep drive eval run --corpus evals --workflow adp/default \
-    --arm plugin --harness claude --plugin-dir plugins/aep-plan \
+    --arm plugin --harness claude --plugin-dir plugins/aep \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>
 ```
+
+Without `METAHARNESS_LIVE=1` the runner accepts the corpus and refuses to spawn, by name:
+
+```console
+$ aep drive eval run --corpus evals --workflow adp/default --arm plugin --harness claude \
+    --out eval-out --observed-at 2026-09-03
+error: eval-out — 1 refusal(s):
+  EVAL-RUN-002 a spawn costs money and `METAHARNESS_LIVE=1` is not in this environment. Set it
+  deliberately, or pass `--stream FILE` to ingest a run that already happened, which spends nothing
+```
+
+## What a full live run costs
+
+| | |
+|---|---|
+| cases in the corpus | **8** |
+| per-case cap | **$5** — `story:plugin-eval-cases`, the operator's default |
+| one full run, one arm, one harness | **$40** |
+| `EVAL_BUDGET_USD` default | **$20** — `story:eval-ci-gates`, the operator's default |
+
+**So a full sweep does not fit its own default budget, and that is the intended behaviour rather
+than an oversight.** `.github/workflows/eval.yml` computes `cases × $5` before it installs a tool,
+and refuses with those four numbers in the check summary when the product exceeds
+`EVAL_BUDGET_USD`. What fits inside $20 is a diff-scoped run of up to four cases, which is what a
+pull request touching one agent or one skill actually selects. Running the whole corpus is a
+deliberate act: raise the repository variable, or dispatch one case at a time.
+
+The cap is a **cap, not an estimate** — no recorded run has priced this corpus yet, so nothing here
+claims a full sweep will cost $40 rather than refusing above it. `--assume-usd-per-run` is what the
+runner charges a run whose stream states no cost, and it is set to the per-case cap so the runner's
+own pre-spawn check is made against the budgeted number and not against its optimistic default.
+
+## CI
+
+`ci.yml` runs the free half on every pull request and it is what blocks a merge. `eval.yml` runs the
+live arm only with the `run-eval` label or a manual dispatch, only for the cases whose subject the
+diff touched, under the budget above, with the organization bot's credential and never a personal
+key. It informs; it does not gate.
 
 ## Adding a case
 

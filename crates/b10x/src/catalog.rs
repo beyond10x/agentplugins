@@ -203,7 +203,8 @@ mod tests {
     fn retired_names_map_to_current_ones() {
         let catalog = Catalog::embedded();
         assert_eq!(catalog.current_name("workspace-hygiene"), "worktree");
-        assert_eq!(catalog.current_name("aep-plan"), "aep-plan");
+        assert_eq!(catalog.current_name("aep-plan"), "aep");
+        assert_eq!(catalog.current_name("aep"), "aep");
         assert!(catalog.knows("ess-specify"));
         assert!(catalog.retired_marketplace("beyond10x"));
         assert!(!catalog.retired_marketplace("b10x"));

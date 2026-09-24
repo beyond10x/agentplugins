@@ -3,6 +3,7 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
+mod concept;
 mod evals;
 mod readiness;
 mod remote;
@@ -14,20 +15,20 @@ const PLUGINS: &[(&str, &[&str])] = &[
     (
         "b10x",
         &[
-            "skills/setup/SKILL.md",
-            "skills/guide/SKILL.md",
-            "skills/guide/references/resources.md",
+            "skills/installing/SKILL.md",
+            "skills/routing/SKILL.md",
+            "skills/routing/references/resources.md",
             "hooks/hooks.json",
-            "skills/plugin-creator/SKILL.md",
-            "skills/plugin-creator/references/compatibility.md",
+            "skills/authoring-plugins/SKILL.md",
+            "skills/authoring-plugins/references/compatibility.md",
         ],
     ),
     (
-        "aep-plan",
+        "aep",
         &[
             "skills/planning/SKILL.md",
             "skills/planning/references/critic-rubric.md",
-            "skills/story-migration/SKILL.md",
+            "skills/migrating/SKILL.md",
             "agents/decomposer.md",
             "agents/plan-reviewer.md",
             "agents/reverse-engineer.md",
@@ -35,19 +36,15 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/plan-critic-design.md",
             "agents/plan-critic-scope.md",
             "agents/plan-critic-parallel-safety.md",
-        ],
-    ),
-    (
-        "aep-drive",
-        &[
-            "skills/wave/SKILL.md",
-            "skills/drive/SKILL.md",
+            "skills/implementing/SKILL.md",
+            "skills/implementing/references/drive.md",
             "agents/story-scoper.md",
             "agents/implementor.md",
             "agents/adversary.md",
+            "agents/security-reviewer.md",
         ],
     ),
-    ("connectors", &["skills/connectors/SKILL.md"]),
+    ("connectors", &["skills/integrating/SKILL.md"]),
 ];
 
 fn json(path: &Path) -> Result<serde_json::Value, String> {
@@ -213,7 +210,7 @@ fn frontmatter(text: &str) -> Option<&str> {
 /// and a YAML dependency for two `key:` prefixes would be a parser to keep in step with whichever
 /// one each harness uses.
 fn critic_pins(root: &Path) -> Result<(), String> {
-    let directory = root.join("plugins/aep-plan/agents");
+    let directory = root.join("plugins/aep/agents");
     let mut entries = std::fs::read_dir(&directory)
         .map_err(|error| format!("reading {}: {error}", directory.display()))?
         .map(|entry| entry.map(|entry| entry.path()))
@@ -293,7 +290,7 @@ struct Retired {
 const RETIRED: &[Retired] = &[
     Retired {
         old: "aep-planning",
-        new: "aep-plan",
+        new: "aep@b10x",
         wire_next: &[],
     },
     Retired {
@@ -303,8 +300,19 @@ const RETIRED: &[Retired] = &[
     },
     Retired {
         old: "adp",
-        new: "aep-drive",
+        new: "aep@b10x",
         wire_next: &['/'],
+    },
+    // The two AEP plugins are one: `aep`.
+    Retired {
+        old: "aep-plan",
+        new: "aep@b10x",
+        wire_next: &[],
+    },
+    Retired {
+        old: "aep-drive",
+        new: "aep@b10x",
+        wire_next: &[],
     },
     // ESS ships its own plugin from its repository; this marketplace points at it.
     Retired {
@@ -326,12 +334,48 @@ const RETIRED: &[Retired] = &[
     },
     Retired {
         old: "beyond10x:beyond10x",
-        new: "b10x:guide",
+        new: "b10x:routing",
         wire_next: &[],
     },
     Retired {
         old: "beyond10x:plugin-creator",
-        new: "b10x:plugin-creator",
+        new: "b10x:authoring-plugins",
+        wire_next: &[],
+    },
+    // Skills are activities (website/docs/structure.md R3).
+    Retired {
+        old: "aep:wave",
+        new: "aep:implementing",
+        wire_next: &[],
+    },
+    Retired {
+        old: "aep:drive",
+        new: "aep:implementing",
+        wire_next: &[],
+    },
+    Retired {
+        old: "aep:story-migration",
+        new: "aep:migrating",
+        wire_next: &[],
+    },
+    Retired {
+        old: "b10x:setup",
+        new: "b10x:installing",
+        wire_next: &[],
+    },
+    Retired {
+        old: "b10x:guide",
+        new: "b10x:routing",
+        wire_next: &[],
+    },
+    Retired {
+        old: "b10x:plugin-creator",
+        new: "b10x:authoring-plugins",
+        wire_next: &[],
+    },
+    Retired {
+        old: "connectors:connectors",
+        new: "connectors:integrating",
         wire_next: &[],
     },
 ];
@@ -814,6 +858,16 @@ fn check(root: &Path) -> Result<(), String> {
     critic_pins(root)?;
     retired_names(root)?;
     flat_spellings(root)?;
+    concept::check(
+        root,
+        &concept::Plugins {
+            carried: PLUGINS.iter().map(|(name, _)| (*name).to_owned()).collect(),
+            remote: remote::REMOTE
+                .iter()
+                .map(|remote| remote.name.to_owned())
+                .collect(),
+        },
+    )?;
     evals::evals(root)
 }
 
@@ -902,9 +956,9 @@ mod tests {
     fn a_deleted_critic_fails_the_check() {
         let required: &[&str] = PLUGINS
             .iter()
-            .find(|(name, _)| *name == "aep-plan")
+            .find(|(name, _)| *name == "aep")
             .map(|(_, required)| *required)
-            .expect("aep-plan is one of the focused plugins");
+            .expect("aep is one of the focused plugins");
         let critic = "agents/plan-critic-design.md";
         assert!(
             required.contains(&critic),
@@ -917,26 +971,25 @@ mod tests {
             .expect("checker is under repository root");
         let sandbox =
             std::env::temp_dir().join(format!("agentplugins-check-critic-{}", std::process::id()));
-        let plugin_root = sandbox.join("plugins").join("aep-plan");
+        let plugin_root = sandbox.join("plugins").join("aep");
         let write = |target: &Path, bytes: &str| {
             std::fs::create_dir_all(target.parent().expect("every entry has a directory"))
                 .expect("the sandbox is writable");
             std::fs::write(target, bytes).expect("the sandbox is writable");
         };
         for manifest in [".codex-plugin/plugin.json", ".claude-plugin/plugin.json"] {
-            let committed =
-                std::fs::read_to_string(repository.join("plugins/aep-plan").join(manifest))
-                    .expect("the committed manifest is readable");
+            let committed = std::fs::read_to_string(repository.join("plugins/aep").join(manifest))
+                .expect("the committed manifest is readable");
             write(&plugin_root.join(manifest), &committed);
         }
         for relative in required.iter().filter(|relative| **relative != critic) {
             write(&plugin_root.join(relative), "");
         }
 
-        let error = plugin(&sandbox, "aep-plan", required)
+        let error = plugin(&sandbox, "aep", required)
             .expect_err("a plugin missing one of its critics must fail the check");
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
-        assert_eq!(error, format!("plugin `aep-plan` is missing `{critic}`"));
+        assert_eq!(error, format!("plugin `aep` is missing `{critic}`"));
     }
 
     /// A critic that declares no `model:`/`effort:` runs on whatever the calling session was on,
@@ -950,7 +1003,7 @@ mod tests {
             std::process::id(),
             std::thread::current().id()
         ));
-        let agents = sandbox.join("plugins/aep-plan/agents");
+        let agents = sandbox.join("plugins/aep/agents");
         let write = |name: &str, body: &str| {
             std::fs::create_dir_all(&agents).expect("the sandbox is writable");
             std::fs::write(agents.join(name), body).expect("the sandbox is writable");
@@ -1045,7 +1098,7 @@ mod tests {
             retired_hits("a\nplugins/aep-planning/x\n", planning, false),
             vec![2]
         );
-        assert!(retired_hits("plugins/aep-plan/x\n", planning, false).is_empty());
+        assert!(retired_hits("plugins/aep/x\n", planning, false).is_empty());
     }
 
     /// The marker excuses a line in a specification a transcript is replayed against, and nowhere
@@ -1108,7 +1161,7 @@ mod tests {
         // The three places the old names are the truth: what the changelog says the plugins were
         // called, what a dated change record said on its day, and the transcript of a run that
         // happened under them.
-        write("README.md", "install `aep-plan` from the marketplace\n");
+        write("README.md", "install `aep` from the marketplace\n");
         write("CHANGELOG.md", "renamed `ess-schema` to `ess-specify`\n");
         write("changes/2026-09-03-rename.yaml", "plugin: adp\n");
         write(
@@ -1136,7 +1189,7 @@ mod tests {
     /// about the folder as much as about the prose.
     ///
     /// Measured on a copy of this worktree in a scratch directory, 2026-09-03: a
-    /// `plugins/<retired>/skills/wave/SKILL.md` whose body never spells the retired name, and a
+    /// `plugins/<retired>/skills/implementing/SKILL.md` whose body never spells the retired name, and a
     /// `website/docs/plugins/<retired>.md` whose body never spells it either, both left
     /// `cargo run --bin agentplugins-check` printing
     /// `valid: marketplace beyond10x, 5 focused plugin(s)`.
@@ -1160,7 +1213,7 @@ mod tests {
 
         // A leftover from a rename that moved the parent and missed one file. Its text names the
         // new world; only where it sits still names the old one.
-        let plugin_file = format!("plugins/{retired}/skills/wave/SKILL.md");
+        let plugin_file = format!("plugins/{retired}/skills/implementing/SKILL.md");
         let page = format!("website/docs/plugins/{retired}.md");
         write(
             &plugin_file,

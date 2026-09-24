@@ -25,7 +25,7 @@ nobody has decided, and what the plan does with that instead of guessing.
 
 ## Prerequisites
 
-Install `aep-plan` and `aep-drive` from the marketplace — see [Install](./install.md) — and the
+Install `aep` from the marketplace — see [Install](./install.md) — and the
 `ess` plugin from the [ESS repository](https://github.com/beyond10x/ess#point-your-agent-here),
 and have the `aep` CLI on your PATH. Step 3 also uses the `ess` CLI.
 
@@ -342,7 +342,7 @@ story:commercial-client-record moved proposed -> active (revision 4)
 ```
 
 ```text
-Take story:commercial-client-record through the aep-drive wave: scope it into units, implement the units,
+Take story:commercial-client-record through the aep wave: scope it into units, implement the units,
 and have the adversary review the result against the story's acceptance and this repository's gate.
 ```
 
@@ -368,7 +368,7 @@ Drive story:commercial-client-record. Run aep doctor first and stop if anything 
 the run will cost before you launch it, and print the run id and how to follow it.
 ```
 
-The `drive` skill checks the checkout, points `metaharness aep drive run` at the task document that names the
+The drive mode of `aep:implementing` checks the checkout, points `metaharness aep drive run` at the task document that names the
 story, launches it against the project's step map, and prints the run id. It moves no artifact
 itself — the moves are the driver's, which is the whole property being tested — and it relays a
 refusal (a held lock, missing evidence, two step maps that both fit) verbatim and stops.

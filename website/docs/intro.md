@@ -13,9 +13,8 @@ directly when the work is already clear.
 
 | Plugin | Use it for | Includes |
 |---|---|---|
-| [`b10x`](./plugins/b10x.md) | Setup, upgrades and navigation | setup skill and `b10x` binary, drift check, router, portable plugin creator |
-| [`aep-plan`](./plugins/aep-plan.md) | Governed plans and artifact stores | planning skill, decomposer, plan reviewer, reverse engineer |
-| [`aep-drive`](./plugins/aep-drive.md) | Governed development delivery | wave skill, story scoper, implementor, adversary |
+| [`b10x`](./plugins/b10x.md) | Setup, upgrades and navigation | `installing`, `routing` and `authoring-plugins` skills, the `b10x` binary, drift check |
+| [`aep`](./plugins/aep.md) | Governed planning and delivery | `planning`, `migrating` and `implementing` skills; decomposer, plan critics, reverse engineer, story scoper, implementor, adversary, security reviewer |
 | [`ess`](./plugins/ess.md) | Executable System Specifications | specify, retrofit, coverage skills; author, conformance, retrofitter agents |
 | [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
