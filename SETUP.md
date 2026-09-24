@@ -33,3 +33,6 @@ says so. Change nothing the user did not confirm.
    step 2 on. It plans with `b10x setup plan`, shows the result, asks which products to have
    (`aep`, `ess`, `worktree`, optionally `connectors`), lists every change, and runs
    `b10x setup apply` only after the user confirms.
+3. **Use what you installed.** A plugin loads in the next session. To use it now, run
+   `b10x skill <plugin>` to list its skills and agents and `b10x skill <plugin>:<skill>` to print
+   one, then follow the printed text.

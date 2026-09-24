@@ -28,12 +28,15 @@ Run `b10x --version`. If it is missing, install it:
 
 ## 2. Plan
 
+Plan for the host you run in: `--host claude` in Claude Code, `--host codex` in Codex. Add the
+other host (`--host all`) only when the user says they use it too.
+
 ```bash
 mkdir -p ~/.local/state/b10x
-b10x setup plan --json --out ~/.local/state/b10x/plan.json
+b10x setup plan --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-Read the JSON. `offers` lists the products and which are preselected; `findings` says what was
+It prints a readable summary and writes the plan to the file; read the file. `offers` lists the products and which are preselected; `findings` says what was
 found, each with a `level`; `actions` is what would run.
 
 ## 3. Show the state, then ask which products
@@ -50,7 +53,7 @@ Then ask **one** multi-select question: which products to have. Preselect the of
 If the answer differs from the preselection, plan again with exactly that set:
 
 ```bash
-b10x setup plan --json --products aep,ess --out ~/.local/state/b10x/plan.json
+b10x setup plan --host claude --products aep,ess --out ~/.local/state/b10x/plan.json
 ```
 
 `--products none` keeps only the `b10x` plugin. A product left out has its plugins removed from
@@ -86,8 +89,10 @@ converged. On a failed action, show that action's line and error verbatim, and o
 
 ## 6. Finish
 
-- Claude Code: new plugins load after `/reload-plugins` or a restart.
-- Codex: start a new thread; instructions load when a thread starts.
+- New plugins load in a new session: Claude Code after `/reload-plugins` or a restart, Codex in a
+  new thread.
+- To use one in this session, `b10x skill <plugin>` lists its skills and agents and
+  `b10x skill <plugin>:<skill>` prints one; follow the printed text as if the skill were loaded.
 - If a `warn` finding named a shadowed binary copy, repeat its path: it never runs, and removing it
   is the user's call.
 

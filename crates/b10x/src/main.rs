@@ -7,6 +7,7 @@ mod install;
 mod inventory;
 mod plan;
 mod resolve;
+mod skill;
 mod version;
 
 use std::collections::BTreeSet;
@@ -37,6 +38,12 @@ enum Top {
     },
     /// Offline drift check for a session-start hook; prints only problems; always exits 0.
     Check,
+    /// Print an installed skill or agent (`ess:specify`), or list a plugin's (`ess`). A host loads
+    /// new plugins only in a new session; this works in the session that installed them.
+    Skill {
+        /// `<plugin>` or `<plugin>:<skill-or-agent>`.
+        id: String,
+    },
     /// Install one catalog binary at an exact release.
     Install {
         /// Binary name, e.g. `ess`.
@@ -114,6 +121,15 @@ fn main() -> ExitCode {
             Ok(ExitCode::SUCCESS)
         }
         Top::Install { name, tag, dir } => install_one(&name, tag, dir),
+        Top::Skill { id } => skill::text(
+            &inventory::home(),
+            &Catalog::embedded().marketplace.name,
+            &id,
+        )
+        .map(|text| {
+            print!("{text}");
+            ExitCode::SUCCESS
+        }),
         Top::Setup { command } => match command {
             Setup::Plan {
                 products,
@@ -312,7 +328,7 @@ fn setup_apply(path: &PathBuf, yes: bool) -> Result<ExitCode, String> {
     print_plan(&after);
     if after.converged() {
         println!(
-            "\nConverged. Restart Claude Code (or /reload-plugins) and start a new Codex thread."
+            "\nConverged. New plugins load in a new session: restart Claude Code (or /reload-plugins) or start a new Codex thread. In this session, `b10x skill <plugin>` lists a plugin's skills and `b10x skill <plugin>:<skill>` prints one."
         );
         Ok(ExitCode::SUCCESS)
     } else {
