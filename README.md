@@ -2,71 +2,73 @@
 
 Curated marketplace identity: `b10x`.
 
-The repository deliberately contains four focused plugins:
+## Point your agent here
 
-- `beyond10x`: marketplace navigation, public resource discovery, and portable plugin creation.
-- `aep-plan`: governed planning, decomposition, plan review, and reverse engineering.
-- `aep-drive`: wave coordination, story scoping, implementation, and adversarial review.
-- `connectors`: provider setup, connection diagnostics, and governed CLI operation invocation.
+Tell Claude Code or Codex:
 
-The Claude Code marketplace also lists plugins that ship from their product's own repository at
-the binary's version. It pins each one by release tag and full commit; it carries no copy:
+> Set up Beyond10x: follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md
 
-- `worktree`: safe creation, leases, publication checks, and cleanup for Git worktrees, from
-  [`beyond10x/worktree`](https://github.com/beyond10x/worktree) `plugins/worktree/`.
+The agent installs the `b10x` binary, shows what is installed now — plugins on both hosts, the
+binaries they drive, earlier installs under retired names — asks which products you want, lists
+every change, and applies it only after you confirm. Run it again at any time to upgrade; the `b10x`
+plugin's session-start check says when a plugin and its binary have drifted apart.
 
-`agentplugins-check remote` refuses a pin whose commit is not its tag, whose manifests at that
-commit declare another version, or whose tag is not the product's newest release. CI runs it on
-every pull request, every `main` push and daily.
+| product | plugins | binary |
+|---|---|---|
+| `aep` | `aep-plan` (planning, decomposition, plan review, reverse engineering), `aep-drive` (wave coordination, story scoping, implementation, adversarial review) | `aep`; `metaharness` for `aep-drive:drive` |
+| `ess` | `ess` (specify, retrofit, validate, project, conformance), from [`beyond10x/ess`](https://github.com/beyond10x/ess) | `ess`, at the plugin's version |
+| `worktree` | `worktree` (managed Git worktrees, leases, recovery proof, cleanup), from [`beyond10x/worktree`](https://github.com/beyond10x/worktree) | `worktree`, at the plugin's version |
+| `connectors` (optional) | `connectors` (provider setup, diagnostics, governed invocation) | not managed |
 
-Spec-driven work — writing, retrofitting, validating and conformance-testing an ESS specification
-— is served by the ESS repository itself: its `ess` plugin ships from
-[`beyond10x/ess`](https://github.com/beyond10x/ess) at the same version as the `ess` binary, and
-the binary prints the same skills through `ess skill`. See its README, *Point your agent here*.
+Every install also gets `b10x`: the `setup` skill that drives the above, the `guide` router and the
+portable `plugin-creator`.
 
-`beyond10x` is the front door, not a catch-all. It routes a task to the smallest specialist and
-keeps plugin-creation workflows portable by making shared skills the canonical implementation for
-Codex and Claude Code. It does not copy or replace the specialists' instructions.
+## How it stays current
 
-## Install
+- **This repository names no version of anything it points at.** `ess` and `worktree` are
+  `git-subdir` entries with a repository and a path only; the host installs whatever that product's
+  default branch serves, which is the product's own release. `catalog.json` lists products, plugins,
+  binaries and retired names, and no versions.
+- **Versions are resolved when setup runs:** a plugin's version from the marketplace, a binary bound
+  to a plugin at that plugin's version, a binary bound to `latest` at its newest release.
+- **`agentplugins-check`** refuses a pinned remote entry and a catalog that disagrees with either
+  marketplace file; **`agentplugins-check remote`** (every pull request, `main` push and daily)
+  refuses a product whose default branch serves a plugin version it never released.
+- **On the machine**, `b10x check` runs at session start and prints one line per drift.
 
-The `connectors` plugin is included in release `0.11.0` for both hosts.
-See the [Connectors installation guide](website/docs/plugins/connectors.md)
-for both hosts. Install the standalone `connectors` CLI first.
+## The `b10x` binary
 
-`aep-plan` and `aep-drive` drive the `aep` CLI. Install the verified Linux or macOS archive for
-[AEP `0.55.0`](https://github.com/beyond10x/aep/releases/tag/0.55.0) first, then check it with
-`aep --version`. The complete download and checksum commands are in
-[`website/docs/install.md`](website/docs/install.md), which also names the Metaharness build that
-`aep-drive`'s `drive` skill needs for `metaharness aep drive`. That build links its own copy of AEP
-rather than the binary you install here: `metaharness`'s `crates/metaharness-aep/Cargo.toml` pins
-the `aep-*` crates to a `beyond10x/aep` git revision — at Metaharness `0.7.0` that is `a23176ae`,
-which `git describe --tags` reports as `0.54.0-33-ga23176ae` — so read that manifest for the
-Metaharness↔AEP pair instead of assuming it matches the `0.55.0` on your `PATH`.
+| command | does |
+|---|---|
+| `b10x setup plan [--products aep,ess,…] [--host claude\|codex\|all] [--json] [--out <file>]` | read both hosts, `PATH` and project settings; print findings and exact actions; write nothing |
+| `b10x setup apply --plan <file> --yes` | refuse a stale plan, snapshot every file it changes, run the actions, check that the result converged |
+| `b10x setup undo [<snapshot>]` | restore the files the newest (or named) snapshot holds |
+| `b10x setup guide` | print the setup instructions an agent follows |
+| `b10x check` | the session-start drift check; offline, prints only problems |
+| `b10x install <binary> [--tag <tag>]` | install one catalog binary from its checksummed release archive, or with `cargo install --git --tag` |
 
-Paste this pinned block into a Claude Code session:
+`B10X_MARKETPLACE=<local checkout>` makes setup register and read that checkout instead of this
+repository, for testing an unpublished marketplace.
 
-```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.11.0
-/plugin install aep-plan@b10x
-/plugin install aep-drive@b10x
-/reload-plugins
-```
+## Manual install
 
-Add `/plugin install beyond10x@b10x` for the front door and
-`/plugin install worktree@b10x` for managed worktrees, or
-`/plugin install connectors@b10x` for integrations. Codex offers the four plugins this repository
-carries, following `.agents/plugins/marketplace.json`; it reads `worktree` from the worktree
-repository's own marketplace. Its exact non-interactive CLI bootstrap and upgrade commands are in
-[`website/docs/install.md`](website/docs/install.md).
+Claude Code: `/plugin marketplace add beyond10x/agentplugins`, then `/plugin install <plugin>@b10x`.
+Codex: `codex plugin marketplace add beyond10x/agentplugins`, then `codex plugin add <plugin>@b10x`.
+The binaries are yours to match; [`website/docs/install.md`](website/docs/install.md) has the
+commands. Setup does all of this and checks it.
+
+## Repository
 
 Codex marketplace metadata lives at `.agents/plugins/marketplace.json`; Claude plugin marketplace
-metadata lives at `.claude-plugin/marketplace.json`. Each plugin owns its own manifest and only the
-skills or agents in its stated scope.
+metadata lives at `.claude-plugin/marketplace.json`. Each plugin this repository carries owns its
+manifest and only the skills or agents in its stated scope. `b10x` is the front door, not a
+catch-all: it routes a task to the smallest specialist and does not copy the specialists'
+instructions.
 
 Run `task check` before publishing. The gate fails on missing focused content, mismatched plugin
-names, a marketplace identity other than `beyond10x`, or plugin versions that disagree with the
-workspace release. Run `task site-build` for the public documentation under `website/`.
+names, a marketplace identity other than `b10x`, a pinned remote entry, a catalog that disagrees
+with the marketplaces, or plugin versions that disagree with the workspace release. Run
+`task site-build` for the public documentation under `website/`.
 
 The adopter guide is published at <https://beyond10x.github.io/agentplugins/>. This repository
 contains no credential or bot-token delivery machinery; release mutations are performed through
@@ -75,7 +77,7 @@ the private organization tooling outside this tree.
 ## Evals
 
 Eight cases under [`evals/`](evals/) — one `eval-case/1` each, judged by a `trace-spec/1` document,
-run by the `aep` CLI — name 7 of this repository's 10 agents and 4 of its 7 skills in their
+run by the `aep` CLI — name 7 of this repository's 10 agents and 4 of its 8 skills in their
 `subject:` fields. Those `subject:` fields are the source of truth for eval coverage: every
 coverage number here and in [`evals/README.md`](evals/README.md) is counted from
 `evals/*/case.yaml`, never from a prose table. Covered: the agents `aep-drive:adversary`, `aep-drive:story-scoper`,
@@ -83,8 +85,8 @@ coverage number here and in [`evals/README.md`](evals/README.md) is counted from
 `aep-plan:plan-critic-parallel-safety` and `aep-plan:plan-critic-scope`, and the skills
 `aep-drive:drive`, `aep-drive:wave`, `aep-plan:planning` and `connectors:connectors`. Not
 covered: the agents `aep-drive:implementor`, `aep-plan:plan-reviewer` and
-`aep-plan:reverse-engineer`, and the skills `aep-plan:story-migration`, `beyond10x:beyond10x` and
-`beyond10x:plugin-creator`. A change that breaks a covered charter
+`aep-plan:reverse-engineer`, and the skills `aep-plan:story-migration`, `b10x:setup`, `b10x:guide` and
+`b10x:plugin-creator`. A change that breaks a covered charter
 turns a row red instead of being noticed by a reader; a change to an uncovered one does not.
 
 Free, offline, and part of `task check`:

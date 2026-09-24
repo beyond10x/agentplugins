@@ -1,0 +1,12 @@
+{
+  "marketplaces": [
+    {
+      "name": "beyond10x",
+      "root": "/opt/b10x-home/.codex/.tmp/marketplaces/beyond10x",
+      "marketplaceSource": {
+        "sourceType": "git",
+        "source": "https://github.com/beyond10x/agentplugins.git"
+      }
+    }
+  ]
+}

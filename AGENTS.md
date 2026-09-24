@@ -10,13 +10,16 @@
 ## Invariants
 
 - Marketplace identity is `b10x` in every marketplace format.
-- A product that ships its own plugin keeps it in its own repository at the binary's version. The
-  Claude Code marketplace lists it as a `git-subdir` entry pinned by release tag and full commit
-  (`crates/agentplugins-check/src/remote.rs` `REMOTE`), never as a copy. `agentplugins-check remote`
-  (network) refuses a pin that is not the tag's commit, whose manifests declare another version, or
-  that is not the newest release; the product's release procedure opens the bot pull request that
-  moves the pin.
-- Keep exactly the focused plugin boundaries described in `README.md`. The `beyond10x` front door
+- A product that ships its own plugin keeps it in its own repository at the binary's version. Both
+  marketplace files list it as a `git-subdir` entry with repository and path only
+  (`crates/agentplugins-check/src/remote.rs` `REMOTE`): no ref, commit or version, and never a copy.
+  Nothing in this repository names the version of anything it points at; `catalog.json` is
+  version-free and `b10x` resolves versions when it runs. `agentplugins-check remote` (network)
+  refuses a product whose default branch serves a plugin version it never released.
+- `b10x setup` is the only supported way to change installed plugins for a user: plans are pure
+  functions of recorded host output (`crates/b10x/src/plan.rs`), every rule is tested on fixtures
+  under `crates/b10x/tests/fixtures/`, and `apply` snapshots before it changes anything.
+- Keep exactly the focused plugin boundaries described in `README.md`. The `b10x` front door
   may route to specialists and teach portable plugin authoring, but it must not absorb their
   workflows or become a mixed catch-all.
 - The AEP canonical command in instructions is `aep`. `protocol` is compatibility only and must not

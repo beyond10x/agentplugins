@@ -17,7 +17,7 @@ A case is four things and no others:
 Every cell in the middle column is that case's `subject:` in full, read from its `case.yaml`, and
 those fields — not this table and not any prose elsewhere — are the source of truth for what the
 corpus covers: counted from them the eight cases name **7 of this repository's 10 agents** and
-**4 of its 7 skills**.
+**4 of its 8 skills**.
 
 | Case | `subject:` agents and skills | The claim it holds the subject to |
 |---|---|---|
@@ -31,8 +31,8 @@ corpus covers: counted from them the eight cases name **7 of this repository's 1
 | `connectors-readiness` | `connectors:connectors` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
 
 No case names the agents `aep-drive:implementor`, `aep-plan:plan-reviewer` or
-`aep-plan:reverse-engineer`, nor the skills `aep-plan:story-migration`, `beyond10x:beyond10x` or
-`beyond10x:plugin-creator`; those six are
+`aep-plan:reverse-engineer`, nor the skills `aep-plan:story-migration`, `b10x:setup`, `b10x:guide` or
+`b10x:plugin-creator`; those seven are
 the remaining scope of
 `story:plugin-eval-cases` in `.engineering/planning`, and a change to one of them turns no row red.
 

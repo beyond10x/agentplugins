@@ -5,16 +5,27 @@ title: Install
 
 # Install from the `b10x` marketplace
 
-The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
-identity is `b10x`. The installable names are `beyond10x`, `aep-plan`, `aep-drive`, `connectors`
-and, in Claude Code, `worktree`. `worktree` ships from the
-[worktree repository](https://github.com/beyond10x/worktree) at the version of the `worktree`
-binary; this marketplace pins it by release tag and commit. The [Connectors guide](plugins/connectors.md) covers its
-separate CLI prerequisite.
+## Set up with one sentence
 
-The ESS plugin is not in this marketplace. It ships from the
-[ESS repository](https://github.com/beyond10x/ess#point-your-agent-here) at the version of the `ess`
-binary it describes, and `ess skill` prints the same skills from the binary.
+Tell Claude Code or Codex:
+
+> Set up Beyond10x: follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md
+
+The agent installs the `b10x` binary, reads what both hosts have installed and which binaries are on
+`PATH`, asks which products you want (`aep`, `ess`, `worktree`, optionally `connectors`), lists every
+change — including earlier installs under retired names it replaces and binaries it upgrades — and
+applies them only after you confirm. It snapshots every file it changes; `b10x setup undo` restores
+them. Run it again to upgrade. The rest of this page is the manual route.
+
+## The marketplace
+
+The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
+identity is `b10x`. The installable names are `b10x`, `aep-plan`, `aep-drive`, `ess`, `worktree`
+and `connectors`, in both hosts. `ess` and `worktree` ship from their own repositories
+([ESS](https://github.com/beyond10x/ess), [worktree](https://github.com/beyond10x/worktree)) at
+their binaries' versions; this marketplace points at each repository's default branch and names no
+version. Install the `ess` and `worktree` binaries at the version of the installed plugin. The
+[Connectors guide](plugins/connectors.md) covers its separate CLI prerequisite.
 
 ## Before you install: put `aep` on your `PATH`
 
@@ -65,7 +76,7 @@ aep --version
 
 The expected line is `protocol 0.55.0`. (`aep` retains `protocol` as its version label for
 compatibility.) `command not found` means the affected plugin will install and then stop at its
-first CLI command. The `beyond10x` front door does not need the binary.
+first CLI command. The `b10x` front door does not need the `aep` binary.
 
 ### `aep-drive`'s `drive` skill also needs Metaharness
 
@@ -89,52 +100,32 @@ The wave skill, the planning skill and every other plugin need no Metaharness.
 
 ## Claude Code
 
-Copy the whole block into a Claude Code session:
-
 ```text
-/plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.11.0
+/plugin marketplace add beyond10x/agentplugins
+/plugin install b10x@b10x
 /plugin install aep-plan@b10x
 /plugin install aep-drive@b10x
 /reload-plugins
 ```
 
-The first line registers the repository at the immutable `0.11.0` release; each install names its
-plugin in the `<plugin>@b10x` form. `/reload-plugins` activates them immediately. Add
-`/plugin install beyond10x@b10x` for the front door and
-`/plugin install worktree@b10x` for managed worktrees, or
-`/plugin install connectors@b10x` for integrations. Claude Code reads
-`.claude-plugin/marketplace.json` and the selected plugin's `.claude-plugin/plugin.json`. See
+Add `/plugin install ess@b10x`, `/plugin install worktree@b10x` or
+`/plugin install connectors@b10x` as needed. The marketplace follows the default branch, whose
+gate keeps every entry installable; `/reload-plugins` activates new plugins. Claude Code reads
+`.claude-plugin/marketplace.json` and each plugin's `.claude-plugin/plugin.json`. See
 [Claude Code's plugin documentation](https://code.claude.com/docs/en/discover-plugins) for the host
 commands and supported marketplace sources.
 
 ## Codex
 
-Codex offers the four plugins this repository carries under the same `b10x` identity. It reads
-`worktree` from the worktree repository instead:
-`codex plugin marketplace add https://github.com/beyond10x/worktree.git --ref <version>`, then
-`codex plugin add worktree@worktree`. For a fresh installation, run this release-pinned block:
-
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.11.0
-codex plugin add beyond10x@b10x
+codex plugin marketplace add beyond10x/agentplugins
+codex plugin add b10x@b10x
 codex plugin add aep-plan@b10x
 codex plugin add aep-drive@b10x
-codex plugin add connectors@b10x
 ```
 
-An immutable marketplace pin does not advance when `codex plugin marketplace upgrade` runs. To
-replace an older pin, remove the installed plugins and marketplace registration, then run the fresh
-block above:
-
-```bash
-codex plugin remove beyond10x@b10x
-codex plugin remove aep-plan@b10x
-codex plugin remove aep-drive@b10x
-codex plugin remove connectors@b10x
-codex plugin marketplace remove b10x
-```
-
-The commands leave every focused plugin installed and enabled. Start a new Codex thread afterwards;
+Add `ess@b10x`, `worktree@b10x` or `connectors@b10x` the same way. `codex plugin marketplace upgrade`
+refreshes the marketplace. Start a new Codex thread afterwards;
 plugin instructions are injected when a thread starts, not retroactively into a running thread.
 The same plugins remain available from the Plugins surface. The authoritative description of what
 Codex will find is
@@ -142,14 +133,13 @@ Codex will find is
 in this repository; Codex reads it together with the selected plugin's `.codex-plugin/plugin.json`.
 The `aep` binary requirement above applies unchanged.
 
-## Pinning
+## Upgrading
 
-The blocks above are already pinned to the bare `0.11.0` release tag. Upgrade by changing that tag
-deliberately, re-registering the marketplace source, and running `/reload-plugins`. The release gate
-validates both marketplace formats, every declared instruction file, the public documentation, and
-the version recorded by each plugin manifest.
+Run setup again, or `b10x setup plan` and `b10x setup apply` yourself. The release gate validates both
+marketplace formats, every declared instruction file, the public documentation, and the version
+recorded by each plugin manifest this repository carries.
 
 After installation, invoke the skill by its displayed name or ask the agent for the capability the
-plugin describes. Start with `beyond10x` if you want the front door to select a specialist.
+plugin describes. Start with `b10x:guide` if you want the front door to select a specialist.
 Installation does not grant filesystem, network, credential, or approval authority; the host and
 repository rules still decide those boundaries.

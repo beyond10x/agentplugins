@@ -1,0 +1,16 @@
+[
+  {
+    "name": "beyond10x",
+    "source": "git",
+    "url": "https://github.com/beyond10x/agentplugins.git",
+    "ref": "0.10.0",
+    "installLocation": "/opt/b10x-home/.claude/plugins/marketplaces/beyond10x"
+  },
+  {
+    "name": "ess",
+    "source": "git",
+    "url": "https://github.com/beyond10x/ess.git",
+    "ref": "0.30.0",
+    "installLocation": "/opt/b10x-home/.claude/plugins/marketplaces/ess"
+  }
+]

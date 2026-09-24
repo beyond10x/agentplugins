@@ -8,9 +8,9 @@
   },
   "plugins": [
     {
-      "name": "beyond10x",
-      "source": "./plugins/beyond10x",
-      "description": "Navigate Beyond10x resources and create portable Codex and Claude Code plugins."
+      "name": "b10x",
+      "source": "./plugins/b10x",
+      "description": "Set up, upgrade and check the Beyond10x plugins and binaries, route work to them, and create portable plugins."
     },
     {
       "name": "aep-plan",
@@ -32,11 +32,18 @@
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/beyond10x/worktree.git",
-        "path": "plugins/worktree",
-        "ref": "0.6.0",
-        "sha": "3d4954b7f0cde907a5b8a27a6c3d095368d4a1cf"
+        "path": "plugins/worktree"
       },
       "description": "Manage isolated Git worktrees with explicit ownership and safe cleanup proof, released with the worktree binary."
+    },
+    {
+      "name": "ess",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/beyond10x/ess.git",
+        "path": "plugins/ess"
+      },
+      "description": "Write, retrofit, validate and project ESS specifications, and audit conformance suites, released with the ess binary."
     }
   ]
 }

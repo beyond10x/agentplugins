@@ -7,10 +7,10 @@ Use the narrowest link that answers the request.
 | [Getting started](https://beyond10x.github.io/getting-started/) | Public entry point and adoption paths |
 | [Agent Plugins](https://beyond10x.github.io/agentplugins/) | Marketplace overview, installation, and plugin selection |
 | [Golden path](https://beyond10x.github.io/agentplugins/docs/golden-path) | One worked run, from a feature idea to a critiqued plan, on a repository that already exists |
-| [Beyond10x plugin](https://beyond10x.github.io/agentplugins/docs/plugins/beyond10x) | This router and the portable plugin-creation workflow |
+| [b10x plugin](https://beyond10x.github.io/agentplugins/docs/plugins/b10x) | Setup, this router and the portable plugin-creation workflow |
 | [AEP Plan plugin](https://beyond10x.github.io/agentplugins/docs/plugins/aep-plan) | Governed planning skill and specialist planning agents |
 | [AEP Drive plugin](https://beyond10x.github.io/agentplugins/docs/plugins/aep-drive) | Development-wave roles and coordination |
-| [ESS agent plugin](https://github.com/beyond10x/ess#point-your-agent-here) | ESS specification, retrofit, validation, projection and conformance guidance, released with the `ess` binary |
+| [ESS agent plugin](https://beyond10x.github.io/agentplugins/docs/plugins/ess) | ESS specification, retrofit, validation, projection and conformance guidance, released with the `ess` binary |
 | [Worktree plugin](https://beyond10x.github.io/agentplugins/docs/plugins/worktree) | Managed Git worktree lifecycle and cleanup guidance, released with the `worktree` binary |
 | [AEP](https://beyond10x.github.io/aep/) | Protocol concepts, commands, and adopter documentation |
 | [AEP Service](https://beyond10x.github.io/aep-service/) | Hosted AEP service boundary and operations |

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "aep-drive@beyond10x",
+    "version": "0.10.0",
+    "scope": "user",
+    "enabled": true,
+    "installPath": "/opt/b10x-home/.claude/plugins/cache/beyond10x/aep-drive/0.10.0",
+    "installedAt": "2026-09-24T12:17:07.833Z",
+    "lastUpdated": "2026-09-24T12:17:07.833Z"
+  },
+  {
+    "id": "aep-plan@beyond10x",
+    "version": "0.10.0",
+    "scope": "user",
+    "enabled": true,
+    "installPath": "/opt/b10x-home/.claude/plugins/cache/beyond10x/aep-plan/0.10.0",
+    "installedAt": "2026-09-24T12:17:07.406Z",
+    "lastUpdated": "2026-09-24T12:17:07.406Z"
+  },
+  {
+    "id": "beyond10x@beyond10x",
+    "version": "0.10.0",
+    "scope": "user",
+    "enabled": true,
+    "installPath": "/opt/b10x-home/.claude/plugins/cache/beyond10x/beyond10x/0.10.0",
+    "installedAt": "2026-09-24T12:17:08.803Z",
+    "lastUpdated": "2026-09-24T12:17:08.803Z"
+  },
+  {
+    "id": "ess@ess",
+    "version": "0.30.0",
+    "scope": "user",
+    "enabled": true,
+    "installPath": "/opt/b10x-home/.claude/plugins/cache/ess/ess/0.30.0",
+    "installedAt": "2026-09-24T12:17:14.322Z",
+    "lastUpdated": "2026-09-24T12:17:14.322Z"
+  },
+  {
+    "id": "workspace-hygiene@beyond10x",
+    "version": "0.10.0",
+    "scope": "user",
+    "enabled": true,
+    "installPath": "/opt/b10x-home/.claude/plugins/cache/beyond10x/workspace-hygiene/0.10.0",
+    "installedAt": "2026-09-24T12:17:08.287Z",
+    "lastUpdated": "2026-09-24T12:17:08.287Z"
+  }
+]

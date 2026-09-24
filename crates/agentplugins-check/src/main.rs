@@ -12,10 +12,12 @@ const MARKETPLACE: &str = "b10x";
 
 const PLUGINS: &[(&str, &[&str])] = &[
     (
-        "beyond10x",
+        "b10x",
         &[
-            "skills/beyond10x/SKILL.md",
-            "skills/beyond10x/references/resources.md",
+            "skills/setup/SKILL.md",
+            "skills/guide/SKILL.md",
+            "skills/guide/references/resources.md",
+            "hooks/hooks.json",
             "skills/plugin-creator/SKILL.md",
             "skills/plugin-creator/references/compatibility.md",
         ],
@@ -54,9 +56,74 @@ fn json(path: &Path) -> Result<serde_json::Value, String> {
     serde_json::from_str(&text).map_err(|error| format!("parsing {}: {error}", path.display()))
 }
 
-/// `remote` is whether this marketplace format also lists [`remote::REMOTE`] after the plugins it
-/// carries; only the Claude Code format can point into another repository.
-fn marketplace(root: &Path, relative: &str, remote: bool) -> Result<(), String> {
+/// `catalog.json`, which `b10x setup` plans from, names exactly the marketplace's plugins, pins no
+/// version, and maps every retired plugin name to one the marketplace lists.
+fn catalog(root: &Path) -> Result<(), String> {
+    let document = json(&root.join("catalog.json"))?;
+    if document.get("format").and_then(serde_json::Value::as_str) != Some("b10x.catalog/1") {
+        return Err("catalog.json is not `b10x.catalog/1`".to_owned());
+    }
+    let strings = |value: Option<&serde_json::Value>| -> Vec<String> {
+        value
+            .and_then(serde_json::Value::as_array)
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(|item| item.as_str().map(str::to_owned))
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let mut named = strings(document.get("base"));
+    for product in document
+        .get("products")
+        .and_then(serde_json::Value::as_array)
+        .ok_or("catalog.json has no products")?
+    {
+        named.extend(strings(product.get("plugins")));
+    }
+    named.sort();
+    let mut listed: Vec<String> = PLUGINS
+        .iter()
+        .map(|(name, _)| (*name).to_owned())
+        .chain(remote::REMOTE.iter().map(|remote| remote.name.to_owned()))
+        .collect();
+    listed.sort();
+    if named != listed {
+        return Err(format!(
+            "catalog.json names {named:?}; the marketplaces list {listed:?}"
+        ));
+    }
+    if let Some(retired) = document
+        .get("retired_plugins")
+        .and_then(serde_json::Value::as_object)
+    {
+        for (old, new) in retired {
+            if !new
+                .as_str()
+                .is_some_and(|new| listed.iter().any(|name| name == new))
+            {
+                return Err(format!(
+                    "catalog.json retires `{old}` to {new}, which no marketplace lists"
+                ));
+            }
+        }
+    }
+    let text = std::fs::read_to_string(root.join("catalog.json")).map_err(|e| e.to_string())?;
+    let pinned = text
+        .as_bytes()
+        .windows(3)
+        .any(|w| w[0].is_ascii_digit() && w[1] == b'.' && w[2].is_ascii_digit());
+    if pinned {
+        return Err(
+            "catalog.json names a version; it must resolve versions at run time".to_owned(),
+        );
+    }
+    Ok(())
+}
+
+/// Both marketplace formats list the plugins this repository carries, then [`remote::REMOTE`].
+fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
     let document = json(&root.join(relative))?;
     if document.get("name").and_then(serde_json::Value::as_str) != Some(MARKETPLACE) {
         return Err(format!(
@@ -70,12 +137,7 @@ fn marketplace(root: &Path, relative: &str, remote: bool) -> Result<(), String> 
     let expected = PLUGINS
         .iter()
         .map(|(name, _)| *name)
-        .chain(
-            remote::REMOTE
-                .iter()
-                .filter(|_| remote)
-                .map(|remote| remote.name),
-        )
+        .chain(remote::REMOTE.iter().map(|remote| remote.name))
         .collect::<Vec<_>>();
     if entries.len() != expected.len() {
         return Err(format!(
@@ -236,7 +298,7 @@ const RETIRED: &[Retired] = &[
     },
     Retired {
         old: "ess-schema",
-        new: "ess@ess (beyond10x/ess marketplace)",
+        new: "ess@b10x",
         wire_next: &[],
     },
     Retired {
@@ -244,16 +306,32 @@ const RETIRED: &[Retired] = &[
         new: "aep-drive",
         wire_next: &['/'],
     },
-    // ESS ships its own plugin, at the binary's version, from the ESS repository.
+    // ESS ships its own plugin from its repository; this marketplace points at it.
     Retired {
         old: "ess-specify",
-        new: "ess@ess (beyond10x/ess marketplace)",
+        new: "ess@b10x",
         wire_next: &[],
     },
-    // Worktree ships its own plugin from its repository; this marketplace pins it by tag.
+    // Worktree ships its own plugin from its repository; this marketplace points at it.
     Retired {
         old: "workspace-hygiene",
         new: "worktree@b10x",
+        wire_next: &[],
+    },
+    // The front door is `b10x`; its router skill is `guide`.
+    Retired {
+        old: "beyond10x@b10x",
+        new: "b10x@b10x",
+        wire_next: &[],
+    },
+    Retired {
+        old: "beyond10x:beyond10x",
+        new: "b10x:guide",
+        wire_next: &[],
+    },
+    Retired {
+        old: "beyond10x:plugin-creator",
+        new: "b10x:plugin-creator",
         wire_next: &[],
     },
 ];
@@ -274,11 +352,18 @@ const RETIRED_SKIP_DIRS: &[&str] = &[".git", "target", "node_modules"];
 /// loophole for a real reference: every plugin name in this file is a name [`plugin`] and
 /// [`marketplace`] resolve against the tree, or a path [`critic_pins`] opens, so a stale one here
 /// fails a check rather than escaping one.
+///
+/// `catalog.json` and `crates/b10x/` are the migration: `b10x setup` finds a retired install by its
+/// old name and replaces it, so they must spell every old name, and the fixtures under
+/// `crates/b10x/tests/` are recorded host output from installs made under those names.
+/// [`catalog`] checks that every name the catalog retires maps to one a marketplace lists.
 const RETIRED_ALLOWED: &[&str] = &[
     "CHANGELOG.md",
     "changes/",
     ".engineering/",
     "crates/agentplugins-check/src/main.rs",
+    "catalog.json",
+    "crates/b10x/",
 ];
 
 /// Whether a byte can be part of the same word as a name, so `handpicked` does not read as `adp`.
@@ -719,8 +804,9 @@ fn flat_spellings(root: &Path) -> Result<(), String> {
 }
 
 fn check(root: &Path) -> Result<(), String> {
-    marketplace(root, ".agents/plugins/marketplace.json", false)?;
-    marketplace(root, ".claude-plugin/marketplace.json", true)?;
+    marketplace(root, ".agents/plugins/marketplace.json")?;
+    marketplace(root, ".claude-plugin/marketplace.json")?;
+    catalog(root)?;
     remote::shape(root)?;
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
@@ -1016,7 +1102,7 @@ mod tests {
         assert_eq!(
             error,
             "1 retired plugin name(s) remain, and `AGENTS.md` § Invariants forbids depending on \
-             one:\n  README.md:1 names `ess-schema`, which is now `ess@ess (beyond10x/ess marketplace)`"
+             one:\n  README.md:1 names `ess-schema`, which is now `ess@b10x`"
         );
 
         // The three places the old names are the truth: what the changelog says the plugins were

@@ -5,7 +5,8 @@ import Heading from '@theme/Heading';
 import styles from './index.module.css';
 
 const plugins = [
-  ['Beyond10x', 'Route work, find public resources, and create portable plugins.', '/docs/plugins/beyond10x'],
+  ['b10x', 'Set up and upgrade the plugins, route work, and create portable plugins.', '/docs/plugins/b10x'],
+  ['ESS', 'Write, retrofit and conformance-test Executable System Specifications.', '/docs/plugins/ess'],
   ['AEP Plan', 'Plan, decompose, review, and reverse-engineer governed work.', '/docs/plugins/aep-plan'],
   ['AEP Drive', 'Scope stories and coordinate implementation waves with adversarial review.', '/docs/plugins/aep-drive'],
   ['Worktree', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/worktree'],

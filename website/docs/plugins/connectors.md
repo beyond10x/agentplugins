@@ -29,22 +29,20 @@ rate-limit responses.
 
 ## Install in either host
 
-Release `0.11.0` includes this plugin. For a fresh marketplace registration, use the release pin:
+Setup offers this plugin as optional. To add it by hand:
 
 ```bash
-claude plugin marketplace add https://github.com/beyond10x/agentplugins.git#0.11.0
+claude plugin marketplace add beyond10x/agentplugins
 claude plugin install connectors@b10x
 ```
 
 ```bash
-codex plugin marketplace add https://github.com/beyond10x/agentplugins.git --ref 0.11.0
+codex plugin marketplace add beyond10x/agentplugins
 codex plugin add connectors@b10x
 ```
 
-An existing `beyond10x` registration pinned to `0.7.0` must be repointed before it can offer this
-plugin; refreshing an immutable tag does not add newer content. Follow the
-[upgrade instructions](../install.md) and preserve the other installed plugins when changing
-that registration. For development, both marketplace-add commands also accept the absolute path
+[Setup](../install.md) replaces an older or pinned registration and keeps the other installed
+plugins. For development, both marketplace-add commands also accept the absolute path
 to a current local checkout containing both marketplace files.
 
 Reload Claude Code's plugins with `/reload-plugins`, or start a new Codex thread. In Claude Code,
