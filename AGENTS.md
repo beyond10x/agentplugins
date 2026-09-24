@@ -1,17 +1,17 @@
 # AGENTS.md — agentplugins
 
-The `b10x` marketplace: plugins this repository carries, pointers to plugins that products ship
-themselves, and the `b10x` setup CLI. Serves O2 (decisions as data) and O3 (any harness).
+The `b10x` marketplace: every Beyond10x plugin, and the `b10x` CLI that installs them with their
+CLIs. Serves O2 (decisions as data) and O3 (any harness).
 
 ## Map
 
 | path | what |
 |---|---|
-| `plugins/<name>/` | plugins carried here: `b10x`, `aep`, `connectors` ([structure](website/docs/structure.md)) |
+| `plugins/<name>/` | every plugin: `b10x`, `aep`, `ess`, `worktree`, `connectors` ([structure](website/docs/structure.md)) |
 | `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json` | the two marketplace files |
 | `catalog.json` | products, plugins, binaries, retired names — no versions |
 | `crates/b10x/` | the setup CLI; `plan.rs` is pure and fixture-tested |
-| `crates/agentplugins-check/` | the gate: marketplace, catalog, retired names, CLI spellings, evals |
+| `crates/agentplugins-check/` | the gate: marketplace, catalog, concept, retired names, CLI spellings, evals; `tools` checks skills against the newest CLI releases |
 | `evals/` | eval corpus ([`evals/README.md`](evals/README.md)) |
 | `website/` | public docs; must pass `task site-build` |
 | `SETUP.md` | agent bootstrap, published as a release asset |
@@ -20,7 +20,7 @@ themselves, and the `b10x` setup CLI. Serves O2 (decisions as data) and O3 (any 
 
 - Follow [`website/docs/structure.md`](website/docs/structure.md): rules R1–R8 decide plugin, skill,
   agent and doc placement and names. `task check` enforces them (`crates/agentplugins-check/src/concept.rs`).
-- `b10x setup` is the only supported way to change a user's installed plugins; it snapshots first.
+- `b10x` (`init`, `upgrade`, `setup`) is the only supported way to change a user's installed plugins; it snapshots first.
 - Instructions spell the grouped CLI verbs (`aep plan …`, `ess specify …`) and `aep`, never
   `protocol`. The gate refuses flat spellings outside `CHANGELOG.md`, `changes/`, `.engineering/`
   and `.github/workflows/`.
@@ -33,7 +33,7 @@ themselves, and the `b10x` setup CLI. Serves O2 (decisions as data) and O3 (any 
 ```console
 task check          # fmt, clippy, tests, agentplugins-check
 task site-build     # when website/ changes
-cargo run --locked --bin agentplugins-check -- remote   # network: remote plugins serve released versions
+cargo run --locked --bin agentplugins-check -- tools    # network: every spelled command exists in the newest aep, ess, worktree
 ```
 
 ## Planning

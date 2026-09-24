@@ -31,7 +31,7 @@ corpus covers: counted from them the eight cases name **7 of this repository's 1
 | `connectors-readiness` | `connectors:integrating` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
 
 No case names the agents `aep:implementor`, `aep:plan-reviewer`, `aep:reverse-engineer` or
-`aep:security-reviewer`, nor the skills `aep:migrating`, `b10x:installing`, `b10x:routing` or
+`aep:security-reviewer`, nor the skills `aep:migrating`, `b10x:init`, `b10x:routing` or
 `b10x:authoring-plugins`; those eight are
 the remaining scope of
 `story:plugin-eval-cases` in `.engineering/planning`, and a change to one of them turns no row red.

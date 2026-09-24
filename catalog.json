@@ -1,81 +1,60 @@
 {
-  "format": "b10x.catalog/1",
+  "format": "b10x.catalog/2",
   "marketplace": {
     "name": "b10x",
     "repository": "beyond10x/agentplugins"
   },
-  "base": [
-    "b10x"
-  ],
+  "base": ["b10x"],
   "products": [
     {
       "id": "aep",
+      "intent": "Plan and deliver work (epics, stories, reviewed implementation waves)",
       "summary": "Plan governed work in an artifact store and deliver it in reviewed waves.",
-      "plugins": [
-        "aep"
-      ],
+      "plugins": ["aep"],
       "binaries": [
         {
           "name": "aep",
-          "bind": {
-            "kind": "latest"
-          },
           "install": {
-            "kind": "release-archive",
-            "repository": "beyond10x/aep"
+            "archive": { "repository": "beyond10x/aep" },
+            "cargo": { "repository": "beyond10x/aep", "package": "aep-cli" }
           }
         },
         {
           "name": "metaharness",
           "optional": true,
-          "bind": {
-            "kind": "latest"
-          },
           "install": {
-            "kind": "cargo",
-            "repository": "beyond10x/metaharness",
-            "package": "metaharness-cli"
+            "archive": { "repository": "beyond10x/metaharness" },
+            "cargo": { "repository": "beyond10x/metaharness", "package": "metaharness-cli" }
           }
         }
       ]
     },
     {
       "id": "ess",
+      "intent": "Write specifications of a system or API (schemas, OpenAPI, conformance)",
       "summary": "Write, retrofit, validate and conformance-test Executable System Specifications.",
-      "plugins": [
-        "ess"
-      ],
+      "plugins": ["ess"],
       "binaries": [
         {
           "name": "ess",
-          "bind": {
-            "kind": "plugin",
-            "plugin": "ess"
-          },
           "install": {
-            "kind": "release-archive",
-            "repository": "beyond10x/ess"
+            "archive": { "repository": "beyond10x/ess" },
+            "cargo": { "repository": "beyond10x/ess", "package": "ess-cli" }
           }
         }
       ]
     },
     {
       "id": "worktree",
+      "intent": "Work in isolated Git checkouts that clean up safely",
       "summary": "Create, lease, finish and safely clean isolated Git worktrees.",
-      "plugins": [
-        "worktree"
-      ],
+      "plugins": ["worktree"],
       "binaries": [
         {
           "name": "worktree",
-          "bind": {
-            "kind": "plugin",
-            "plugin": "worktree"
-          },
           "install": {
-            "kind": "cargo",
-            "repository": "beyond10x/worktree",
-            "package": "b10x-worktree-cli"
+            "archive": { "repository": "beyond10x/worktree" },
+            "cargo": { "repository": "beyond10x/worktree", "package": "b10x-worktree-cli" }
           }
         }
       ]
@@ -83,26 +62,21 @@
     {
       "id": "connectors",
       "optional": true,
+      "intent": "Connect external tools and providers",
       "summary": "Set up providers and invoke governed integrations through the connectors CLI.",
-      "plugins": [
-        "connectors"
-      ],
+      "plugins": ["connectors"],
       "binaries": []
     }
   ],
   "retired_plugins": {
+    "aep-drive": "aep",
+    "aep-plan": "aep",
     "aep-planning": "aep",
     "adp": "aep",
     "beyond10x": "b10x",
     "ess-schema": "ess",
     "ess-specify": "ess",
-    "workspace-hygiene": "worktree",
-    "aep-plan": "aep",
-    "aep-drive": "aep"
+    "workspace-hygiene": "worktree"
   },
-  "retired_marketplaces": [
-    "beyond10x",
-    "ess",
-    "worktree"
-  ]
+  "retired_marketplaces": ["beyond10x", "ess", "worktree"]
 }

@@ -6,16 +6,19 @@ use std::process::{Command, ExitCode};
 mod concept;
 mod evals;
 mod readiness;
-mod remote;
+mod tools;
 
 /// The marketplace identity in every marketplace format.
 const MARKETPLACE: &str = "b10x";
 
+/// Every plugin, in marketplace order, and the files each must carry. Each has the lifecycle
+/// skills `init` and `upgrade` (website/docs/structure.md R3), which `concept` checks for all.
 const PLUGINS: &[(&str, &[&str])] = &[
     (
         "b10x",
         &[
-            "skills/installing/SKILL.md",
+            "skills/init/SKILL.md",
+            "skills/upgrade/SKILL.md",
             "skills/routing/SKILL.md",
             "skills/routing/references/resources.md",
             "hooks/hooks.json",
@@ -45,6 +48,19 @@ const PLUGINS: &[(&str, &[&str])] = &[
         ],
     ),
     ("connectors", &["skills/integrating/SKILL.md"]),
+    ("worktree", &["skills/managing-worktrees/SKILL.md"]),
+    (
+        "ess",
+        &[
+            "skills/specifying/SKILL.md",
+            "skills/specifying/references/syntax.md",
+            "skills/retrofitting/SKILL.md",
+            "skills/testing-conformance/SKILL.md",
+            "agents/author.md",
+            "agents/retrofitter.md",
+            "agents/conformance.md",
+        ],
+    ),
 ];
 
 fn json(path: &Path) -> Result<serde_json::Value, String> {
@@ -57,8 +73,8 @@ fn json(path: &Path) -> Result<serde_json::Value, String> {
 /// version, and maps every retired plugin name to one the marketplace lists.
 fn catalog(root: &Path) -> Result<(), String> {
     let document = json(&root.join("catalog.json"))?;
-    if document.get("format").and_then(serde_json::Value::as_str) != Some("b10x.catalog/1") {
-        return Err("catalog.json is not `b10x.catalog/1`".to_owned());
+    if document.get("format").and_then(serde_json::Value::as_str) != Some("b10x.catalog/2") {
+        return Err("catalog.json is not `b10x.catalog/2`".to_owned());
     }
     let strings = |value: Option<&serde_json::Value>| -> Vec<String> {
         value
@@ -80,11 +96,7 @@ fn catalog(root: &Path) -> Result<(), String> {
         named.extend(strings(product.get("plugins")));
     }
     named.sort();
-    let mut listed: Vec<String> = PLUGINS
-        .iter()
-        .map(|(name, _)| (*name).to_owned())
-        .chain(remote::REMOTE.iter().map(|remote| remote.name.to_owned()))
-        .collect();
+    let mut listed: Vec<String> = PLUGINS.iter().map(|(name, _)| (*name).to_owned()).collect();
     listed.sort();
     if named != listed {
         return Err(format!(
@@ -119,7 +131,8 @@ fn catalog(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-/// Both marketplace formats list the plugins this repository carries, then [`remote::REMOTE`].
+/// Both marketplace formats list exactly [`PLUGINS`], in order, each from its local directory
+/// (website/docs/structure.md R1: every plugin lives here).
 fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
     let document = json(&root.join(relative))?;
     if document.get("name").and_then(serde_json::Value::as_str) != Some(MARKETPLACE) {
@@ -131,11 +144,7 @@ fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
         .get("plugins")
         .and_then(serde_json::Value::as_array)
         .ok_or_else(|| format!("{relative} has no plugins array"))?;
-    let expected = PLUGINS
-        .iter()
-        .map(|(name, _)| *name)
-        .chain(remote::REMOTE.iter().map(|remote| remote.name))
-        .collect::<Vec<_>>();
+    let expected = PLUGINS.iter().map(|(name, _)| *name).collect::<Vec<_>>();
     if entries.len() != expected.len() {
         return Err(format!(
             "{relative} contains {} plugins; expected {}",
@@ -150,6 +159,18 @@ fn marketplace(root: &Path, relative: &str) -> Result<(), String> {
         if actual != Some(plugin) {
             return Err(format!(
                 "{relative} plugin {index} is {actual:?}; expected `{plugin}`"
+            ));
+        }
+        let local = format!("./plugins/{plugin}");
+        let source = &entries[index]["source"];
+        let path = source.as_str().or_else(|| {
+            (source.get("source").and_then(serde_json::Value::as_str) == Some("local"))
+                .then(|| source.get("path").and_then(serde_json::Value::as_str))
+                .flatten()
+        });
+        if path != Some(local.as_str()) {
+            return Err(format!(
+                "{relative} plugin `{plugin}` must come from `{local}`; every plugin lives in this repository"
             ));
         }
         let count = entries
@@ -343,6 +364,36 @@ const RETIRED: &[Retired] = &[
         wire_next: &[],
     },
     // Skills are activities (website/docs/structure.md R3).
+    Retired {
+        old: "ess:specify",
+        new: "ess:specifying",
+        wire_next: &[],
+    },
+    Retired {
+        old: "ess:retrofit",
+        new: "ess:retrofitting",
+        wire_next: &[],
+    },
+    Retired {
+        old: "ess:coverage",
+        new: "ess:testing-conformance",
+        wire_next: &[],
+    },
+    Retired {
+        old: "ess:ess",
+        new: "ess:init",
+        wire_next: &[],
+    },
+    Retired {
+        old: "worktree:worktree",
+        new: "worktree:managing-worktrees",
+        wire_next: &[],
+    },
+    Retired {
+        old: "b10x:installing",
+        new: "b10x:init",
+        wire_next: &[],
+    },
     Retired {
         old: "aep:wave",
         new: "aep:implementing",
@@ -851,7 +902,6 @@ fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
     catalog(root)?;
-    remote::shape(root)?;
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
     }
@@ -862,10 +912,7 @@ fn check(root: &Path) -> Result<(), String> {
         root,
         &concept::Plugins {
             carried: PLUGINS.iter().map(|(name, _)| (*name).to_owned()).collect(),
-            remote: remote::REMOTE
-                .iter()
-                .map(|remote| remote.name.to_owned())
-                .collect(),
+            remote: std::collections::BTreeSet::new(),
         },
     )?;
     evals::evals(root)
@@ -910,12 +957,12 @@ fn main() -> ExitCode {
     }
     let result = match arguments.as_slice() {
         [] => check(&root),
-        [remote] if remote == "remote" => check(&root).and_then(|()| remote::verify(&root)),
+        [tools] if tools == "tools" => check(&root).and_then(|()| tools::verify(&root)),
         [release, verify, version] if release == "release" && verify == "verify" => {
             check(&root).and_then(|()| verify_release(&root, version))
         }
         _ => Err(
-            "usage: agentplugins-check [remote | release verify <version> | evals | evals scope <path>...]"
+            "usage: agentplugins-check [tools | release verify <version> | evals | evals scope <path>...]"
                 .to_owned(),
         ),
     };
@@ -923,9 +970,8 @@ fn main() -> ExitCode {
     match result {
         Ok(()) => {
             println!(
-                "valid: marketplace {MARKETPLACE}, {} focused plugin(s), {} remote plugin(s)",
-                PLUGINS.len(),
-                remote::REMOTE.len()
+                "valid: marketplace {MARKETPLACE}, {} plugin(s)",
+                PLUGINS.len()
             );
             ExitCode::SUCCESS
         }

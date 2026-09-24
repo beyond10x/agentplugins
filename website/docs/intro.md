@@ -18,8 +18,8 @@ directly when the work is already clear.
 | [`ess`](./plugins/ess.md) | Executable System Specifications | specify, retrofit, coverage skills; author, conformance, retrofitter agents |
 | [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
-`ess` and `worktree` ship from their own repositories at the version of the binary they describe;
-this marketplace points at them and names no version.
+Every plugin starts with `/<plugin>:init` and checks itself with `/<plugin>:upgrade`; `/b10x:init`
+asks what you want to do and installs the matching plugins and CLIs.
 
 The marketplace contains instructions, not credentials. A plugin does not acquire authority to
 write a repository, contact a service, or bypass an approval boundary merely because it is

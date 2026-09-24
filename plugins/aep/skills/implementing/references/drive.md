@@ -43,7 +43,7 @@ is given and guesses none.
 
 ## 2. Point the driver at the story
 
-**`metaharness aep drive run --help` has to answer before anything else.** AEP 0.55.0 hands every
+**`metaharness aep drive run --help` has to answer before anything else.** AEP hands every
 model-backed map to Metaharness and refuses it itself, naming this command. Metaharness
 `0.7.0` includes the verb; earlier tags through `0.6.5` predate it.
 `unrecognized subcommand 'aep'` means the installed
@@ -119,7 +119,7 @@ $ metaharness aep drive status
 
 The AEP planning executable and the Metaharness runner are distinct tools. Pass the source-matched AEP executable with `--aep-binary`; do not substitute the Metaharness binary for planning commands. AEP still provides planning, command-only driving and offline evidence ingestion.
 
-**There is no `aep drive watch` yet.** It is a proposed verb — `aep` `story:drive-watch-is-a-verb`,
+**`aep drive` has no `watch` verb yet.** It is a proposed verb — `aep` `story:drive-watch-is-a-verb`,
 draft — so until it exists, print the script the `aep` repository documents instead:
 `scripts/drive-watch` in `beyond10x/aep`, which follows a run's states as they happen and switches
 to each new state's transcript by itself. Print the path, say it is a script in that repository and

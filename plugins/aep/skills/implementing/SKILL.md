@@ -3,7 +3,7 @@ name: implementing
 description: Implement accepted AEP work, in one of two modes. A wave picks the stories that can be implemented at once, proposes the wave for approval, dispatches one implementor per story into its own worktree, sends each result to the adversary and merges what goes green. A drive hands one story to a governed `metaharness aep drive` run and reports the run id. Use when the operator asks to implement, build or deliver planned stories, to pick or start the next wave, to implement several stories in parallel or fan out across sub-agents, to drive a story or start a governed run, or asks why a wave's rules are instructions and a drive's are enforced. A wave proposes first and stops; a drive starts one run and reports; neither moves an artifact itself.
 ---
 
-**Skill version 0.13.1** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
+**Skill version 0.14.0** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
 
 # Implementing accepted work
 

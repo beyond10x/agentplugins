@@ -371,7 +371,7 @@ It costs seconds.
 One integration branch for the wave; one branch and one worktree per unit, each forked from the
 integration branch.
 
-Invoke the `worktree:worktree` skill and create every checkout with `worktree create`,
+Invoke the `worktree:managing-worktrees` skill and create every checkout with `worktree create`,
 including the coordinator's integration checkout. Record each managed id, owning session,
 story/task id and published branch alongside the paths below. Acquire a coordinator lease before
 using a tree and renew it while agents or checks run. Each implementor and adversary maintains

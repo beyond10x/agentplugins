@@ -158,10 +158,11 @@ pub fn run(action: &Action) -> Result<(), String> {
         Action::InstallBinary {
             name,
             tag,
+            method,
             install,
             directory,
             ..
-        } => crate::install::install(name, tag, install, Path::new(directory)).map(|_| ()),
+        } => crate::install::install(name, tag, *method, install, Path::new(directory)).map(|_| ()),
     }
 }
 

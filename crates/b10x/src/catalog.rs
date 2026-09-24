@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub const EMBEDDED: &str = include_str!("../../../catalog.json");
 
 /// The only catalog format this binary reads.
-pub const FORMAT: &str = "b10x.catalog/1";
+pub const FORMAT: &str = "b10x.catalog/2";
 
 /// The whole catalog.
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -46,6 +46,8 @@ pub struct Product {
     /// Offered, never preselected.
     #[serde(default)]
     pub optional: bool,
+    /// What the user wants to do, as the onboarding question offers it.
+    pub intent: String,
     /// One line for the selection prompt.
     pub summary: String,
     /// Plugin names in the marketplace.
@@ -54,7 +56,7 @@ pub struct Product {
     pub binaries: Vec<Binary>,
 }
 
-/// A binary a product's plugins run.
+/// A binary a product's plugins run. Every binary is bound to its repository's newest release.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Binary {
     /// Executable name on `PATH`.
@@ -62,52 +64,54 @@ pub struct Binary {
     /// Reported but never installed unprompted.
     #[serde(default)]
     pub optional: bool,
-    /// Which version the binary must have.
-    pub bind: Bind,
-    /// How to install it.
+    /// The ways it can be installed.
     pub install: Install,
 }
 
-/// Which version a binary must have.
+/// The ways a binary can be installed; at least one is present.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(tag = "kind", rename_all = "kebab-case")]
-pub enum Bind {
-    /// The repository's newest release.
-    Latest,
-    /// The version of this installed plugin, whose text describes that exact binary.
-    Plugin {
-        /// Plugin name.
-        plugin: String,
-    },
+pub struct Install {
+    /// `<name>-<version>-<target>.tar.gz` plus `SHA256SUMS` on the release.
+    pub archive: Option<Archive>,
+    /// `cargo install --git … --tag … <package>`.
+    pub cargo: Option<Cargo>,
 }
 
-/// How a binary is installed.
+/// A release that carries prebuilt archives.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(tag = "kind", rename_all = "kebab-case")]
-pub enum Install {
-    /// `<name>-<version>-<target>.tar.gz` plus `SHA256SUMS` on the release.
-    ReleaseArchive {
-        /// `owner/repo`.
-        repository: String,
-    },
-    /// `cargo install --git … --tag … <package>`.
-    Cargo {
-        /// `owner/repo`.
-        repository: String,
-        /// Cargo package that builds the binary.
-        package: String,
-    },
+pub struct Archive {
+    /// `owner/repo`.
+    pub repository: String,
+}
+
+/// A cargo package that builds the binary.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Cargo {
+    /// `owner/repo`.
+    pub repository: String,
+    /// Cargo package.
+    pub package: String,
+}
+
+/// How to install a binary this time.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Method {
+    /// The release's checksummed archive.
+    Prebuilt,
+    /// `cargo install` from the release tag.
+    Cargo,
 }
 
 impl Install {
     /// The GitHub repository the binary is released from.
     #[must_use]
     pub fn repository(&self) -> &str {
-        match self {
-            Install::ReleaseArchive { repository } | Install::Cargo { repository, .. } => {
-                repository
-            }
-        }
+        self.archive
+            .as_ref()
+            .map(|archive| archive.repository.as_str())
+            .or_else(|| self.cargo.as_ref().map(|cargo| cargo.repository.as_str()))
+            .unwrap_or_default()
     }
 }
 

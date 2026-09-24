@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.13.1** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.14.0** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -56,7 +56,7 @@ or relations. Ask for them at the moment you need them:
 | Per reviewer, what did their findings change and what did their verdicts cost? | `aep plan artifact review-value [--since <YYYY-MM-DD>]` |
 | Is the whole store still consistent? | `aep plan artifact validate` |
 
-That is every `aep plan artifact` verb that answers a question at AEP 0.55.0. The nine that are
+That is every `aep plan artifact` verb that answers a question. The nine that are
 missing from it write — `new`, `move`, `relate`, `unrelate`, `body`, `set`, `scope`, `evidence`,
 `catch-up` — and guardrail 2 governs those. Run `aep plan artifact --help` when this table and the
 CLI disagree; the CLI is right.
@@ -103,18 +103,18 @@ that rests on it as resting on an assertion.
 An ESS conformance report is recorded from the file rather than typed: `aep plan artifact evidence
 <id> --from <report>` reads the kind, the source and the instant out of an
 `ess-conformance-report/1` — the instant is the report's own `completed_at` — and refuses a report
-of no scenarios or with no `spec_digest` (AEP 0.43.0). A report/2, which ESS 0.20.0 writes on
-`--report-format 2`, is accepted only beside `--suite <the exact suite JSON it ran>` (AEP 0.55.0).
+of no scenarios or with no `spec_digest`. A report/2, which ESS writes on
+`--report-format 2`, is accepted only beside `--suite <the exact suite JSON it ran>`.
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
-`draft → validated → conforming` (AEP 0.50.0) — and `aep plan artifact set <id> --model-digest
+`draft → validated → conforming` — and `aep plan artifact set <id> --model-digest
 <hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The
-`ess:specify` skill says how the report is produced — the `ess` plugin from the `beyond10x/ess` marketplace, or `ess skill specify` from the binary.
+`ess:specifying` skill says how the report is produced — the `ess` plugin from the `beyond10x/ess` marketplace, or `ess skill specify` from the binary.
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
 relations, status, and prose use `new`, `relate`/`unrelate`, `move`, and `body` respectively. **A
 wrong edge is taken back in the words that made it** — `unrelate <id> <relation> <target>`, or the
 colon form `unrelate <id> <relation>:<target>` — so a backwards `blocks` is a command, not a
-paragraph apologising for one. Before AEP 0.53.0 there was no such verb and sessions wrote the
+paragraph apologising for one. Before that verb existed, sessions wrote the
 correction into the artifact's body instead; if `unrelate` is refused as an unknown verb, the
 installed CLI predates it and the honest report says so. Supply the complete
 body from a file or standard input — `body --from` after creation, or `new … --from` at creation; the
@@ -206,10 +206,10 @@ created decision-blocker:api-token-scope (open) at .engineering/planning/decisio
 means something beside `blocks:`, and `validate` says so.
 
 **7. An epic or story that introduces a new noun models it first.** Where the artifact's outcome
-names an entity no ESS document in the repository declares (`ess/1`, or `ess/2` from ESS 0.20.0), do not decompose it and do not write
+names an entity no ESS document in the repository declares (`ess/1`, or `ess/2`), do not decompose it and do not write
 stories around it. Draft the domain first — `aep plan reverse openapi --domain <name> --out <domain-doc>
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
-`ess:specify` skill (`ess skill specify` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
+`ess:specifying` skill (`ess skill specify` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
 artifact body through `aep plan artifact body`. A noun with no typed home is the relation nobody can
 check later.
 

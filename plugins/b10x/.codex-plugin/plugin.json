@@ -1,6 +1,6 @@
 {
   "name": "b10x",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "description": "Set up, upgrade and check the Beyond10x plugins and binaries, route work to them, and create portable plugins.",
   "author": {
     "name": "Beyond10x"

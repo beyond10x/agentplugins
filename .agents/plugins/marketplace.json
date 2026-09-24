@@ -43,8 +43,7 @@
     {
       "name": "worktree",
       "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/beyond10x/worktree.git",
+        "source": "local",
         "path": "./plugins/worktree"
       },
       "policy": {
@@ -56,8 +55,7 @@
     {
       "name": "ess",
       "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/beyond10x/ess.git",
+        "source": "local",
         "path": "./plugins/ess"
       },
       "policy": {
