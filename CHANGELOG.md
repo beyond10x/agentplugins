@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.14.0] — 2026-09-24
 
 - **Every plugin lives here.** `ess` and `worktree` join `b10x`, `aep` and `connectors` in
   `plugins/`, all at this repository's version; the marketplace entries that pointed into the ESS
