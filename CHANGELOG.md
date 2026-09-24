@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.1] — 2026-09-24
+
+From a trial in which an agent given only this repository's link specified a todo service with
+`ess`: it finished with a valid specification, and these were the steps that cost it time.
+
+- New `b10x skill <plugin>` lists an installed plugin's skills and agents, and
+  `b10x skill <plugin>:<skill>` prints one, from Claude Code's recorded install or Codex's cache. A
+  host loads new plugins only in a new session; the session that ran setup reads the skill through
+  this instead of searching the plugin cache. `b10x setup apply` and `SETUP.md` (new step 3) say so.
+- The `b10x:installing` skill plans for the host it runs in (`--host claude` or `--host codex`) and
+  adds the other only when the user uses it; the trial had installed into Codex for a Claude-only
+  task. It writes the plan with `--out` alone, so the full JSON no longer floods the session.
+
 ## [0.13.0] — 2026-09-24
 
 - **The plugin concept, enforced.** [`website/docs/structure.md`](website/docs/structure.md) states
