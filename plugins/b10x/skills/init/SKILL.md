@@ -39,9 +39,10 @@ question tool when it has one (Claude Code: `AskUserQuestion` with `multiSelect:
 command -v cargo
 ```
 
-Ask: *How should the command-line tools be installed?* — **cargo** (builds from the release tag;
-offered first when `cargo` is on `PATH`) or **prebuilt** (downloads the release's checksummed
-archive; no Rust toolchain needed). Without `cargo`, say prebuilt is used and skip the question.
+Ask: *How should the command-line tools be installed?* — **prebuilt** (the default: downloads the
+release's checksummed archive; no Rust toolchain needed) or **cargo** (builds every crate from the
+release tag; offered only when `cargo` is on `PATH`). Without `cargo`, say prebuilt is used and skip
+the question.
 
 ## 4. Plan and confirm
 

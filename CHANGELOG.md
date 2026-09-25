@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.14.7] — 2026-09-25
+
+The operator's decision on the install method, asked for by a team adopting ESS: anyone with Rust
+installed used to get a full source build of every CLI.
+
+- `b10x` installs CLIs from the release's checksummed prebuilt archive by default; `cargo` is used
+  when `--method cargo` asks for it or a release has no archive. Before, `cargo` on `PATH` made it
+  the default.
+- `b10x:init` offers prebuilt first; the product `init` skills say which method is planned and
+  offer the other; `SETUP.md`, the install page and the plugin pages say the same.
+
 ## [0.14.6] — 2026-09-25
 
 The fixes for the trial findings shipped in aep 0.59.3 and ess 0.32.0; the skills now describe that

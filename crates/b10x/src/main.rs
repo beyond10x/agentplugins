@@ -37,7 +37,7 @@ enum Top {
         /// Products, comma separated: aep, ess, worktree, connectors.
         #[arg(value_delimiter = ',')]
         products: Vec<String>,
-        /// How to install CLIs; default: cargo when it is on PATH, else prebuilt.
+        /// How to install CLIs; default: prebuilt, cargo when a release has no archive.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
         /// Hosts to plan for.
@@ -55,7 +55,7 @@ enum Top {
         /// Products, comma separated; default: every installed product.
         #[arg(value_delimiter = ',')]
         products: Vec<String>,
-        /// How to install CLIs; default: cargo when it is on PATH, else prebuilt.
+        /// How to install CLIs; default: prebuilt, cargo when a release has no archive.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
         /// Hosts to plan for.
@@ -91,7 +91,7 @@ enum Top {
         /// Target directory; defaults to `~/.local/bin` (prebuilt) or `~/.cargo/bin` (cargo).
         #[arg(long)]
         dir: Option<PathBuf>,
-        /// How to install; default: cargo when it is on PATH, else prebuilt.
+        /// How to install; default: prebuilt, cargo when a release has no archive.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
     },
@@ -108,7 +108,7 @@ enum Setup {
         /// Hosts to plan for.
         #[arg(long, value_enum, default_value_t = Hosts::All)]
         host: Hosts,
-        /// How to install CLIs; default: cargo when it is on PATH, else prebuilt.
+        /// How to install CLIs; default: prebuilt, cargo when a release has no archive.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
         /// Print the plan as JSON.
