@@ -169,7 +169,8 @@ commands:
         summary: The branch exists and holds no copies.
 
   # Two outcomes of one command: all but one need a `when` over the command's input, or the result
-  # is not determined by the input and `validate` refuses it as `conflicting_declaration`.
+  # is not determined by the input and `validate` refuses it as `conflicting_declaration`. Error
+  # outcomes count; `wrong_state: true` outcomes do not (LendCopy below has two without a `when`).
   - name: library.lending.AddCopy
     naming:
       wire: add-copy
@@ -310,6 +311,10 @@ State names start with an upper-case letter (`OnLoan`); `validate` refuses `on_l
 variants may be written as the source spells them.
 
 ## What `when` can and cannot say
+
+A predicate (`when`, `invariants`, a view's `filter`) is one comparison (`pages > 0`,
+`format == Hardcover`) or a bare fact path. `&&`, `||` and `in [...]` are refused, and a list's
+length cannot be tested. A view that should hold "state A or B" is two views, one per state.
 
 A `when` reads only the command's own input. A condition on another entity — "the branch must be
 open", "the customer is active" — is not an input guard. Express it as a transition of that entity (a

@@ -14,6 +14,10 @@ says so. Change nothing the user did not confirm.
      | `Darwin` | `x86_64` | `x86_64-apple-darwin` |
      | `Darwin` | `arm64` | `aarch64-apple-darwin` |
 
+   - **Ask the user first.** Show the target, the download URL
+     (`https://github.com/beyond10x/agentplugins/releases/latest/download/b10x-<target>.tar.gz`) and
+     the install path (`~/.local/bin/b10x`), and continue only after they agree. Without agreement,
+     stop and give them this step to run themselves.
    - Download, check and install into a fresh directory under `~/.cache` (not `/tmp`):
 
      ```bash

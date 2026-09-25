@@ -95,6 +95,7 @@ fn check(text: &str, sandbox: &Sandbox<'_>, version: &str) -> Result<String, Str
     let mut problems = Vec::new();
     let mut inits = 0;
     let mut tested = BTreeSet::new();
+    let mut foreign = BTreeSet::new();
     for (number, line) in text.lines().enumerate() {
         let Ok(event) = serde_json::from_str::<Value>(line) else {
             continue;
@@ -171,12 +172,33 @@ fn check(text: &str, sandbox: &Sandbox<'_>, version: &str) -> Result<String, Str
                 let id = id.as_str().unwrap_or_default();
                 if let Some((owner, _)) = id.split_once(':') {
                     if !loaded.contains(owner) {
-                        problems.push(format!(
-                            "{at}: {} `{id}` belongs to no plugin the sandbox loaded",
-                            list.trim_end_matches('s')
-                        ));
+                        foreign.insert(id.to_owned());
                     }
                 }
+            }
+        }
+    }
+    // Skills and agents offered from outside the sandbox (claude.ai account skills reach sub-agent
+    // sessions, trial 3) only matter when the run used one.
+    for (number, line) in text.lines().enumerate() {
+        let Ok(event) = serde_json::from_str::<Value>(line) else {
+            continue;
+        };
+        for block in event["message"]["content"].as_array().into_iter().flatten() {
+            if block["type"] != "tool_use" {
+                continue;
+            }
+            let input = &block["input"];
+            let used = match block["name"].as_str() {
+                Some("Skill") => input["skill"].as_str().or(input["command"].as_str()),
+                Some("Agent" | "Task") => input["subagent_type"].as_str(),
+                _ => None,
+            };
+            if let Some(used) = used.filter(|used| foreign.contains(*used)) {
+                problems.push(format!(
+                    "line {}: the run used `{used}`, which belongs to no plugin the sandbox loaded",
+                    number + 1
+                ));
             }
         }
     }
@@ -190,8 +212,16 @@ fn check(text: &str, sandbox: &Sandbox<'_>, version: &str) -> Result<String, Str
     }
     if problems.is_empty() {
         let tested: Vec<String> = tested.into_iter().collect();
+        let unused = if foreign.is_empty() {
+            String::new()
+        } else {
+            format!(
+                "; {} skill(s)/agent(s) from outside the sandbox were offered and not used",
+                foreign.len()
+            )
+        };
         Ok(format!(
-            "isolated: {inits} session(s), plugins {} at {version}, all from {}",
+            "isolated: {inits} session(s), plugins {} at {version}, all from {}{unused}",
             tested.join(", "),
             root.display()
         ))
@@ -255,11 +285,23 @@ mod tests {
     }
 
     #[test]
-    fn a_host_agent_fails_the_run() {
+    fn a_host_agent_offered_and_unused_is_a_note() {
         let run = init(SANDBOXED, r#""host-plugin:plan-critic-design""#);
+        let summary = check(&run, &sandbox(), "0.14.3").unwrap();
+        assert!(
+            summary.contains("1 skill(s)/agent(s) from outside"),
+            "{summary}"
+        );
+    }
+
+    #[test]
+    fn a_host_agent_used_fails_the_run() {
+        let run = init(SANDBOXED, r#""host-plugin:plan-critic-design""#)
+            + "\n"
+            + r#"{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Agent","input":{"subagent_type":"host-plugin:plan-critic-design"}}]}}"#;
         let error = check(&run, &sandbox(), "0.14.3").unwrap_err();
         assert!(
-            error.contains("agent `host-plugin:plan-critic-design`"),
+            error.contains("used `host-plugin:plan-critic-design`"),
             "{error}"
         );
     }

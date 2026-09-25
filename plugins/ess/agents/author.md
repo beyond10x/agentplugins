@@ -15,3 +15,5 @@ Charter:
 - Run `ess specify validate --path <specification>` after every addition, not once at the end.
 - Write an `UNMAPPED:` marker for anything you could not read from code, a contract or an artifact.
 - Report: the files changed, the final `validate` output verbatim, and every `UNMAPPED:` marker.
+- End the report with the review step: every marker and contradiction goes to the owner before
+  anything is generated from the specification.

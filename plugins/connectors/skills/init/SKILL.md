@@ -1,6 +1,6 @@
 ---
 name: init
-description: Start with Connectors in this project — make sure the `connectors` CLI is available and take the first step. Connectors is provider setup, connection diagnostics and governed invocation of integrations. Use when the user wants to connect external tools or providers, asks to set up connectors, or when `connectors:integrating` reports that `connectors` is missing.
+description: Start with Connectors in this project — make sure the `connectors` CLI is available and take the first step. Connectors is provider setup, connection diagnostics and governed invocation of integrations. Use when the user wants to connect external tools or providers, asks to set up connectors, or when `connectors:integrating` reports that `connectors` is missing. Installs CLIs only after the user confirms the plan.
 ---
 
 # Start with Connectors
@@ -10,7 +10,7 @@ description: Start with Connectors in this project — make sure the `connectors
 Run `connectors --version`. The plugin itself is set up with `b10x init connectors` (plan, confirm,
 `b10x setup apply`); the CLI is installed by hand as `connectors:integrating` describes.
 
-No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
+No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 
 ## 2. First step here
 
