@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.14.9] — 2026-09-25
+
+Trials become measurable: their prompts live in the repository, and each run is scored against a
+committed baseline, so a drop in quality fails instead of waiting to be noticed.
+
+- `trials/<name>/trial.yaml` defines each trial (prompt, fixture, setup, measures, expected
+  outputs); `task trial:run TRIAL=<name>` builds the sandbox, prepares the fixture and runs it. Seven
+  trials: ESS new spec, retrofit, pipeline and full package; aep backlog planning; worktree
+  onboarding; upgrade from a seeded install. The gate checks the definitions.
+- New trial `ess-full-package`: every ESS output (JSON Schema, OpenAPI, AsyncAPI, docs and site,
+  Rust and Go type libraries, the Go conformance suite), then an in-memory Go implementation run
+  with `go test` against the generated suite. Sandboxes get `go`.
+- `agentplugins-check trial-report` measures a run: tool calls, the last `validate` verdict,
+  synthesis scenarios and refusals, `UNMAPPED:` markers read from the files written, which outputs
+  exist, and `go test` passed/failed/skipped. With `--baseline trials/baseline.json` it exits 1 when
+  a measure gets worse; `--write-baseline` records an accepted run. `trial:run` calls it after the
+  isolation check.
+
 ## [0.14.8] — 2026-09-25
 
 `b10x-harness` joins the catalog, and `b10x` chooses a prebuilt archive only where one exists for

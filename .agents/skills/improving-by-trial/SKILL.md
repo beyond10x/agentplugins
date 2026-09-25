@@ -17,22 +17,44 @@ task trial:sandbox NAME=<name>
 This creates `/var/tmp/b10x-trials-$USER/<name>/` (the Taskfile's `TRIALS`) with its own `home/`, a `b10x` built from this
 checkout, and an `env` file. The `env` file sets `HOME` to the sandbox and `B10X_MARKETPLACE` to
 this checkout, so `b10x init` installs the plugins as they are in the working tree, before any
-release. It also unsets `ANTHROPIC_API_KEY`, `TMPDIR` and `TMPPREFIX`. Put the fixture the trial
-needs (a small service, a `TODO.md`, an OpenAPI document) under `work/`, and commit it there with
-`git` when the trial needs history or a remote.
+release. It also unsets `ANTHROPIC_API_KEY`, `TMPDIR` and `TMPPREFIX`. A defined trial
+(`task trial:run TRIAL=<name>`, § 2) builds its own sandbox and fixture; for an ad-hoc one, put the
+fixture it needs (a small service, a `TODO.md`, an OpenAPI document) under `work/`, and commit it
+there with `git` when the trial needs history or a remote.
 
 To trial the released version instead, remove `home/.local/bin/b10x` and unset `B10X_MARKETPLACE`
 in `env`; the agent then follows `SETUP.md` from the release.
 
 ## 2. Run it headless, never as a sub-agent
 
+The round's trials are defined in `trials/`, one directory each:
+
+| file | holds |
+|---|---|
+| `trials/<name>/trial.yaml` | `name`, `kind`, `prompt`, optional `dir` (the run's subdirectory of `work/`), `fixture` (a directory beside it), `remote` (a bare `origin` in the sandbox), `seeded`, `setup` (shell lines run from the sandbox root with its `env` before the run), `measures`, and `outputs` (name → path below the run's directory) |
+| `trials/<name>/fixture/` | the small service or backlog the trial starts from |
+| `trials/baseline.json` | the measures of the last accepted run of each trial |
+
+`task check` validates every definition. Run one by name:
+
 ```console
-task trial:run NAME=<name> PROMPT='<the user sentence>' [DIR=<subdirectory of work>]
+task trial:run TRIAL=<name>
+```
+
+This builds a fresh sandbox (`trial:sandbox`), copies the fixture into `work/<dir>` and commits it
+there (`agentplugins-check trial-prepare`), runs the definition's `setup` (installing the plugins
+under test with `b10x init … --out plan.json` and `b10x setup apply --plan plan.json --yes`, or
+seeding an older release), then runs the prompt. An ad-hoc trial still runs in an existing sandbox:
+
+```console
+task trial:run NAME=<name> PROMPT='<the user sentence>' [DIR=<subdirectory of work>] [SEEDED=true]
 ```
 
 The task copies the operator's credentials in (mode 600), runs `claude -p` with the sandbox's
 `env`, `--strict-mcp-config` (no MCP server, including the account's claude.ai connectors) and
-stream-json output into `run.jsonl`, and deletes the credentials when it finishes.
+stream-json output into `run.jsonl`, and deletes the credentials when it finishes. The sandbox
+`PATH` has `cargo` and `go`, and `go` is an allowed tool, so a trial can build and test an
+implementation.
 
 **Never run a trial as a sub-agent of the working session.** A sub-agent gets the session's own
 agents and plugins whatever `HOME` its shell uses. In trial 3 the aep critics that ran were this
@@ -44,7 +66,7 @@ confused it, and pasting the final command output verbatim. Give it no other hin
 
 ## 3. Only an isolated run counts
 
-`trial:run` ends with:
+`trial:run` checks isolation before it measures:
 
 ```console
 agentplugins-check trial-isolation <sandbox>/run.jsonl --sandbox <sandbox> --version <version>
@@ -62,15 +84,37 @@ trial 3, sandboxes under `~/.cache` loaded the operator's `~/.claude/CLAUDE.md` 
 its commit rules) and a `.claude/settings.local.json` an earlier trial left in `~/.cache`, which
 enabled `aep@b10x`. `trial:sandbox` refuses to build below any of those files; that is why `TRIALS`
 is outside `$HOME`. Neither leak shows in the `init` event, so the placement is the only guard. An upgrade trial seeds older plugins on
-purpose: run it with `SEEDED=true`, so plugins must match what the sandbox was seeded with.
+purpose (`seeded: true` in its definition, or `SEEDED=true`), so plugins must match what the sandbox
+was seeded with; a registry that did not exist before the run is read after it.
 
 ## 4. Read the run
 
-From `run.jsonl`:
+`trial:run` ends with the numbers, one line each:
+
+```console
+agentplugins-check trial-report <sandbox>/run.jsonl --trial <name> [--baseline trials/baseline.json] [--write-baseline]
+```
+
+| measure | read from |
+|---|---|
+| `tool_calls` | `tool_use` blocks in the run |
+| `validate` | the last `ess specify validate` the run ran: `valid`, not valid, or not run |
+| `synthesis` | `N scenario(s) … M refusal(s)` in the last `ess verify conform synthesize` output |
+| `unmapped` | `UNMAPPED:` markers in the YAML files the run wrote, read from disk, not from its prose |
+| `outputs` | which of the definition's `outputs` exist (a directory counts when it is not empty) |
+| `go_test` | passed, failed and skipped tests of the last `go test` (`-v` or `-json`); a package that does not build counts as a failure |
+
+A trial reports the measures its definition lists; without `--trial`, an ad-hoc run gets every
+measure but `outputs`. With `--baseline` it exits 1 when a measure got worse than the trial's entry:
+validate stops passing, refusals or `go test` failures go up, a synthesis or `go test` that ran no
+longer runs, an output the baseline had is missing, or tool calls rise by more than 50%. Other
+changes print and pass. `--write-baseline` records the run as the trial's entry; do that for an
+isolated run the round accepts, and commit `trials/baseline.json` with the fixes it led to.
+
+The numbers say what happened, not why. From `run.jsonl`, also collect:
 
 | collect | how |
 |---|---|
-| tool calls | count of `tool_use` blocks |
 | stuck points | every refusal and error in `tool_result`s, verbatim |
 | guesses | what the final report says it inferred or could not find |
 | waste | calls repeated, files read twice, commands that failed and were retried unchanged |
@@ -108,9 +152,12 @@ and the fix is in a release, not when the issue closes.
    passes when the finding does not recur. New findings go back to step 5.
 4. Release when every trial of the round passes.
 
-Each round has 3 ESS trials (a new specification; a retrofit of an existing service; generate plus
-a synthesized suite), and 1 trial each for aep planning, worktree, and onboarding or upgrade.
-Change the domain each round so the agents cannot copy the previous answer from the skills.
+Each round runs every trial in `trials/`: 4 ESS trials (`ess-new`, a new specification;
+`ess-retrofit`, an existing service; `ess-pipeline`, generation plus a synthesized suite;
+`ess-full-package`, every output plus a Go implementation held to the synthesized suite), and
+`aep-backlog`, `worktree-onboarding` and `upgrade-seeded`. Change the domains and fixtures each
+round so the agents cannot copy the previous answer from the skills; a changed trial starts a new
+baseline entry.
 
 ## 7. Clean up
 

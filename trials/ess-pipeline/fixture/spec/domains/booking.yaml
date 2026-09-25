@@ -1,0 +1,177 @@
+domain: rehearsal.booking
+
+summary: Holding, confirming and releasing a rehearsal room for one slot.
+
+naming:
+  wire: bookings
+  display: Bookings
+
+types:
+  - name: rehearsal.booking.BookingId
+    kind: newtype
+    of: Uuid
+
+  - name: rehearsal.booking.Room
+    kind: enum
+    variants: [Studio, Hall, Booth]
+
+  - name: rehearsal.booking.BandName
+    kind: newtype
+    of: String
+
+entities:
+  - name: rehearsal.booking.Booking
+
+    identity:
+      name: booking_id
+      type: rehearsal.booking.BookingId
+
+    fields:
+      - name: band
+        type: rehearsal.booking.BandName
+      - name: room
+        type: rehearsal.booking.Room
+      - name: starts_at
+        type: Timestamp
+      - name: hours
+        type: Integer
+
+    invariants:
+      - hours > 0
+
+    lifecycle:
+      initial: Held
+      states: [Held, Confirmed, Released]
+      terminal: [Released]
+      transitions:
+        - name: confirm
+          from: [Held]
+          to: Confirmed
+        - name: release
+          from: [Held, Confirmed]
+          to: Released
+
+actors:
+  - name: rehearsal.booking.BandLeader
+    may:
+      - rehearsal.booking.HoldRoom
+      - rehearsal.booking.ConfirmBooking
+      - rehearsal.booking.ReleaseBooking
+
+errors:
+  - name: rehearsal.booking.InvalidLength
+    summary: The booking is not for a positive number of hours.
+    fields:
+      - name: hours
+        type: Integer
+
+  - name: rehearsal.booking.BookingStateConflict
+    summary: The booking is not in a state this command acts from.
+    fields:
+      - name: state
+        type: rehearsal.booking.Booking.State
+
+commands:
+  - name: rehearsal.booking.HoldRoom
+    input:
+      - name: band
+        type: rehearsal.booking.BandName
+      - name: room
+        type: rehearsal.booking.Room
+      - name: starts_at
+        type: Timestamp
+      - name: hours
+        type: Integer
+    outcomes:
+      - name: held
+        when: hours > 0
+        creates: rehearsal.booking.Booking
+        instance: booking_id
+        emits:
+          - rehearsal.booking.RoomHeld
+        payload:
+          rehearsal.booking.RoomHeld:
+            band: input.band
+            room: input.room
+            hours: input.hours
+        summary: The room is held for the band.
+      - name: refused
+        error: rehearsal.booking.InvalidLength
+        summary: The length was not positive, and nothing was held.
+
+  - name: rehearsal.booking.ConfirmBooking
+    input:
+      - name: booking_id
+        type: rehearsal.booking.BookingId
+    outcomes:
+      - name: confirmed
+        moves: rehearsal.booking.Booking.confirm
+        instance: booking_id
+        emits:
+          - rehearsal.booking.BookingConfirmed
+        payload:
+          rehearsal.booking.BookingConfirmed:
+            booking_id: input.booking_id
+        summary: The band has paid and the room is theirs.
+      - name: wrong-state
+        wrong_state: true
+        error: rehearsal.booking.BookingStateConflict
+        summary: The booking is not held, so nothing was confirmed.
+
+  - name: rehearsal.booking.ReleaseBooking
+    input:
+      - name: booking_id
+        type: rehearsal.booking.BookingId
+    outcomes:
+      - name: released
+        moves: rehearsal.booking.Booking.release
+        instance: booking_id
+        emits:
+          - rehearsal.booking.BookingReleased
+        payload:
+          rehearsal.booking.BookingReleased:
+            booking_id: input.booking_id
+        summary: The room is free again.
+      - name: wrong-state
+        wrong_state: true
+        error: rehearsal.booking.BookingStateConflict
+        summary: The booking was already released.
+
+events:
+  - name: rehearsal.booking.RoomHeld
+    fields:
+      - name: booking_id
+        type: rehearsal.booking.BookingId
+      - name: band
+        type: rehearsal.booking.BandName
+      - name: room
+        type: rehearsal.booking.Room
+      - name: hours
+        type: Integer
+
+  - name: rehearsal.booking.BookingConfirmed
+    fields:
+      - name: booking_id
+        type: rehearsal.booking.BookingId
+
+  - name: rehearsal.booking.BookingReleased
+    fields:
+      - name: booking_id
+        type: rehearsal.booking.BookingId
+
+views:
+  - name: rehearsal.booking.BookingById
+    source: rehearsal.booking.Booking
+    consistency: read_your_writes
+    fields:
+      - name: booking_id
+        type: rehearsal.booking.BookingId
+      - name: band
+        type: rehearsal.booking.BandName
+      - name: room
+        type: rehearsal.booking.Room
+      - name: hours
+        type: Integer
+    naming:
+      wire: by-id
+      display: Booking by id

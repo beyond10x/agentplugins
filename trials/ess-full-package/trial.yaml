@@ -1,0 +1,34 @@
+name: ess-full-package
+kind: ess-full-package
+prompt: |
+  I'd like to see the whole ESS package end to end on a small service. Pick a neutral domain
+  yourself — something with a lifecycle, a couple of commands that can be refused and at least one
+  event — and write its ESS specification in `spec/`.
+
+  Then produce every output ESS offers from it, each in its own directory under `out/`:
+  `out/schema` (JSON Schema), `out/openapi`, `out/asyncapi`, `out/docs`, `out/site`,
+  `out/types-rust` (a Rust type library), `out/types-go` (a Go type library) and `out/conformance`
+  (the Go conformance suite).
+
+  Then write a minimal in-memory Go implementation of the service in `impl/` that implements the
+  suite's `Target`, run `go test -v ./...` in `impl/`, and tell me how many scenarios passed, failed
+  and were skipped. Don't edit the generated suite to make it pass.
+
+  When you're done, list the skills and agents you used, quote any instruction text that confused
+  you, and paste the last validation output, the last synthesis output and the last `go test`
+  summary verbatim.
+dir: service
+setup:
+  - b10x init ess --host claude --out plan.json
+  - b10x setup apply --plan plan.json --yes
+measures: [tool_calls, validate, synthesis, unmapped, outputs, go_test]
+outputs:
+  schema: out/schema
+  openapi: out/openapi
+  asyncapi: out/asyncapi
+  docs: out/docs
+  site: out/site
+  types-rust: out/types-rust
+  types-go: out/types-go
+  conformance: out/conformance
+  implementation: impl

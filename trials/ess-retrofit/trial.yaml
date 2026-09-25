@@ -1,0 +1,15 @@
+name: ess-retrofit
+kind: ess-retrofit
+prompt: |
+  This repository is our tool-lending service. Write an ESS specification in `spec/` that describes
+  what the code actually does today — not what it should do — validate it, and synthesize its
+  conformance suite. Tell me what you could not map from the code, and what the synthesis refused.
+
+  When you're done, list the skills and agents you used, quote any instruction text that confused
+  you, and paste the last validation output and the last synthesis output verbatim.
+dir: toolshed
+fixture: fixture
+setup:
+  - b10x init ess --host claude --out plan.json
+  - b10x setup apply --plan plan.json --yes
+measures: [tool_calls, validate, synthesis, unmapped]
