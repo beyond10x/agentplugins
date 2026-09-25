@@ -87,16 +87,18 @@ trial agent's explanation of a refusal is a hypothesis.
 | a product CLI or language (`ess`, `aep`, `worktree`) | an issue in that repository, created through the bot (`AGENTS.md`); the skill here documents the workaround until it is fixed |
 | both | both: the workaround here, the issue there, each naming the other |
 
-The issue body has the trial name, the exact command and output, the expected behaviour, the
-workaround the skill now documents, and ends with the line *Found by an agentplugins trial*. That
-line is the ledger: the bot may not label issues (403), so the list is a body search.
+The issue body has the trial name, the exact command and output, the expected behaviour and the
+workaround the skill now documents, and ends with the line *Found by an agentplugins trial*. The
+bot creates it with the label `trial-finding` (`"labels": ["trial-finding"]` in the request). The
+label is the ledger:
 
 ```console
-gh search issues --owner beyond10x --state open --match body "Found by an agentplugins trial"
+gh search issues --owner beyond10x --label trial-finding --state open     # still broken
+gh search issues --owner beyond10x --label trial-finding --state closed   # fixed: released yet?
 ```
 
-Check that list before each round, and delete a workaround from the skills once its issue is
-fixed and released.
+Check both lists before each round. Delete a workaround from the skills once its issue is fixed
+and the fix is in a release, not when the issue closes.
 
 ## 6. Fix, gate, re-run
 
