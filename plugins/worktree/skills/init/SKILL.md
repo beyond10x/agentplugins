@@ -26,17 +26,17 @@ Activate a workspace profile once, then check the setup. The profile is a small 
 worktree repository publishes a default one:
 
 ```bash
-mkdir -p ~/.config/worktree
-curl -fsSL -o ~/.config/worktree/default.toml \
+curl -fsSL --create-dirs -o ~/.config/worktree/default.toml \
   https://raw.githubusercontent.com/beyond10x/worktree/main/profiles/default.toml
 worktree activate --profile ~/.config/worktree/default.toml --workspace <workspace-root>
 worktree doctor --check
 ```
 
 `activate` copies the profile into `~/.config/worktree/config.toml`, so the template file may stay
-where it is or be committed into a repository the user shares with others. Ask the user for the
-workspace root (an absolute path to the directory that holds their repositories) rather than
-guessing it.
+where it is or be committed into a repository the user shares with others; `--help` calls it a
+"committed" template, but any local file works. Ask the user for the workspace root (an absolute
+path to the directory that holds their repositories) rather than guessing it. With nobody to ask
+(a headless run), use the directory that holds the current repository and say so in the report.
 
 `worktree doctor --check` fails with `no active profile` until `activate` has run.
 

@@ -56,7 +56,13 @@ Retrofit-specific rules:
   does in the code today. No delete path found: `UNMAPPED:`.
 - **Views follow reads.** One view per read operation clients use; its fields are the fields the
   response carries. An entity with `invariants` also needs a view holding every state, or the suite
-  refuses the invariant checks (`ess:specifying`, conformance section).
+  refuses the invariant checks (`ess:specifying`, conformance section). That view is structural,
+  not a read the code has: say so in a comment. It is the one view a retrofit may add.
+- **A command the code ignores in some state is a synthesis refusal, and that is correct.** When
+  the code does nothing (no error) for a command in a state its transition does not start from,
+  declare no `wrong_state:` outcome and no error. `synthesize` then reports `ESS-SYNTH-012` for
+  that state and still writes the scenario, which requires that nothing happened: the code's
+  behaviour. Report the refusals; do not add an error the code never raises.
 - **A service that publishes no events still needs one per success outcome.** `validate` refuses an
   outcome that neither emits nor names an error (`empty_change`); a view does not count. Declare an
   event for the fact the outcome produces (`OrderPaid`), leave it out of the component's
