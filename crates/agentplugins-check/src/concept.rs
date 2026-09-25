@@ -32,7 +32,14 @@ impl Plugins {
 const LIFECYCLE: &[&str] = &["init", "upgrade"];
 
 /// CLIs whose versions a plugin must not quote (R5): the newest release is the only one they describe.
-const CLIS: &[&str] = &["aep", "ess", "worktree", "metaharness", "protocol"];
+const CLIS: &[&str] = &[
+    "aep",
+    "ess",
+    "worktree",
+    "metaharness",
+    "b10x-harness",
+    "protocol",
+];
 
 /// Every `<cli> x.y.z` in a line, case-insensitive, with optional backticks and a `v`.
 #[must_use]

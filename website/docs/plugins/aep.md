@@ -63,3 +63,7 @@ moves no artifact itself.
 
 Drive mode needs a Metaharness build that carries `metaharness aep drive`: AEP 0.55.0 refuses
 a model-backed map itself and names that command. [Install](../install.md) names the build to use.
+
+`b10x` treats both `metaharness` and `b10x-harness`, the Beyond10x agent loop that Metaharness's
+`b10x` adapter runs, as optional CLIs of this plugin: it reports them, and `b10x install <cli>` adds
+one. `b10x-harness` runs on Linux only.

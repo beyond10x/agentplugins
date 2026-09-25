@@ -1,6 +1,7 @@
 //! Installing one binary at one exact release: a checksummed release archive, or `cargo install`
 //! from the tag. Either way the binary is staged first and moved into place with one rename.
 
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -36,13 +37,40 @@ fn run(program: &str, arguments: &[&str]) -> Result<(), String> {
     }
 }
 
+/// The release archive of `name` at `tag` for `target`: `<name>-<version>-<target>.tar.gz`.
+#[must_use]
+pub fn archive_name(name: &str, tag: &str, target: &str) -> String {
+    format!("{}{target}.tar.gz", archive_prefix(name, tag))
+}
+
+/// What every archive name of `name` at `tag` starts with, before the target.
+fn archive_prefix(name: &str, tag: &str) -> String {
+    format!("{name}-{}-", tag.trim_start_matches('v'))
+}
+
+/// `(digest, file)` for every line of a `SHA256SUMS` document.
+fn listed(sums: &str) -> impl Iterator<Item = (&str, &str)> {
+    sums.lines().filter_map(|line| {
+        let (digest, name) = line.split_once(char::is_whitespace)?;
+        Some((digest, name.trim().trim_start_matches('*')))
+    })
+}
+
 /// The hex SHA-256 listed for `file` in a `SHA256SUMS` document.
 #[must_use]
 pub fn listed_digest<'a>(sums: &'a str, file: &str) -> Option<&'a str> {
-    sums.lines().find_map(|line| {
-        let (digest, name) = line.split_once(char::is_whitespace)?;
-        (name.trim().trim_start_matches('*') == file).then_some(digest)
-    })
+    listed(sums).find_map(|(digest, name)| (name == file).then_some(digest))
+}
+
+/// The targets a `SHA256SUMS` document lists an archive of `name` at `tag` for.
+#[must_use]
+pub fn listed_targets(sums: &str, name: &str, tag: &str) -> BTreeSet<String> {
+    let prefix = archive_prefix(name, tag);
+    listed(sums)
+        .filter_map(|(_, file)| file.strip_prefix(&prefix)?.strip_suffix(".tar.gz"))
+        .filter(|target| !target.is_empty() && !target.contains('/'))
+        .map(str::to_owned)
+        .collect()
 }
 
 /// Lower-case hex of bytes.
@@ -72,7 +100,7 @@ fn staging(name: &str) -> Result<PathBuf, String> {
 fn from_archive(name: &str, tag: &str, repository: &str, stage: &Path) -> Result<PathBuf, String> {
     let target = target()?;
     let version = tag.trim_start_matches('v');
-    let archive = format!("{name}-{version}-{target}.tar.gz");
+    let archive = archive_name(name, tag, target);
     let base = format!("https://github.com/{repository}/releases/download/{tag}");
     let archive_path = stage.join(&archive);
     let sums_path = stage.join("SHA256SUMS");
@@ -198,5 +226,31 @@ mod tests {
             Some("bbb")
         );
         assert_eq!(listed_digest(sums, "ess-0.30.0.tar.gz"), None);
+    }
+
+    #[test]
+    fn targets_are_read_from_the_archive_names_sums_lists() {
+        let sums = "\
+aaa  b10x-harness-0.13.2-x86_64-unknown-linux-gnu.tar.gz
+bbb  b10x-harness-0.13.2-x86_64-unknown-linux-gnu.tar.gz.sig
+ccc *b10x-harness-0.13.1-aarch64-unknown-linux-gnu.tar.gz
+ddd  harness-0.13.2-aarch64-apple-darwin.tar.gz
+eee  b10x-harness-lsp-0.13.2-aarch64-unknown-linux-gnu.tar.gz
+fff  b10x-harness-0.13.2-.tar.gz
+";
+        assert_eq!(
+            listed_targets(sums, "b10x-harness", "0.13.2"),
+            BTreeSet::from(["x86_64-unknown-linux-gnu".to_owned()])
+        );
+        assert_eq!(
+            listed_targets(sums, "b10x-harness", "v0.13.2"),
+            listed_targets(sums, "b10x-harness", "0.13.2"),
+            "a leading v on the tag is not part of the archive name"
+        );
+        assert!(listed_targets("", "b10x-harness", "0.13.2").is_empty());
+        for target in listed_targets(sums, "b10x-harness", "0.13.2") {
+            let name = archive_name("b10x-harness", "0.13.2", &target);
+            assert_eq!(listed_digest(sums, &name), Some("aaa"));
+        }
     }
 }

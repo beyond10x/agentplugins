@@ -49,5 +49,5 @@ A skill that is not loaded yet in this session prints with `b10x skill aep:<skil
 ## Next
 
 - Plan: `aep:planning`. Deliver: `aep:implementing`.
-- Drive mode also needs `metaharness`; `b10x init aep` offers it.
+- Drive mode also needs `metaharness`, which the plan lists as optional: `b10x install metaharness`.
 - Later, `aep:upgrade` checks for a newer plugin and CLI.

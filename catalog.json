@@ -26,6 +26,15 @@
             "archive": { "repository": "beyond10x/metaharness" },
             "cargo": { "repository": "beyond10x/metaharness", "package": "metaharness-cli" }
           }
+        },
+        {
+          "name": "b10x-harness",
+          "optional": true,
+          "platforms": ["linux"],
+          "install": {
+            "archive": { "repository": "beyond10x/harness" },
+            "cargo": { "repository": "beyond10x/harness", "package": "b10x-harness-cli" }
+          }
         }
       ]
     },

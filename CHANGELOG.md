@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.14.8] — 2026-09-25
+
+`b10x-harness` joins the catalog, and `b10x` chooses a prebuilt archive only where one exists for
+the machine.
+
+- `catalog.json`: `b10x-harness` (the Beyond10x agent loop that Metaharness's `b10x` adapter runs)
+  is an optional binary of `aep`, installed with `b10x install b10x-harness`. It runs on Linux only:
+  a new `platforms` field on a catalog binary keeps `b10x` from planning it elsewhere.
+- `b10x` reads which targets the newest release's `SHA256SUMS` lists and chooses prebuilt only when
+  this machine's target is among them; otherwise `cargo`, or a warning that names the target. A
+  release with an archive for some machines no longer sends the others to a download that fails.
+- `b10x install <cli>` follows the same default. Since 0.14.7 it still chose `cargo` whenever `cargo`
+  was on `PATH`, although its help and the docs said prebuilt.
+- `aep:init`: `metaharness` is optional in the plan and installed with `b10x install metaharness`;
+  the skill said `b10x init aep` offers it.
+- Docs name `b10x-harness` beside `metaharness`.
+
 ## [0.14.7] — 2026-09-25
 
 The operator's decision on the install method, asked for by a team adopting ESS: anyone with Rust

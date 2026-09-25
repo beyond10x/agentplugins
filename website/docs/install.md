@@ -98,6 +98,10 @@ for the Metaharness↔AEP pair rather than assuming the two versions match.
 
 Wave mode, `aep:planning` and every other plugin need no Metaharness.
 
+`b10x-harness`, the Beyond10x agent loop Metaharness's `b10x` adapter runs, is optional as well:
+`b10x install b10x-harness` installs its newest release. It runs on Linux only, from a prebuilt
+archive where the release has one for the machine, otherwise built with `cargo`.
+
 ## Claude Code
 
 ```text
