@@ -159,6 +159,16 @@ Each round runs every trial in `trials/`: 4 ESS trials (`ess-new`, a new specifi
 round so the agents cannot copy the previous answer from the skills; a changed trial starts a new
 baseline entry.
 
+### Every product release is re-verified
+
+`verified.json` names, per CLI (`aep`, `ess`, `worktree`), the release the skills were last
+verified against. The daily `agentplugins-check tools` run fails with one line per CLI whose newest
+release is newer. Then:
+
+1. Run `agentplugins-check tools` and fix every command it reports.
+2. Run an ESS trial round (at least `ess-full-package`) against the new release.
+3. Set the CLI to the new release in `verified.json` in the same pull request.
+
 ## 7. Clean up
 
 `trial:run` deletes the credentials it copied. When the round is released, check that no

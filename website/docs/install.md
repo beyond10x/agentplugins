@@ -145,3 +145,18 @@ After installation, invoke the skill by its displayed name or ask the agent for 
 plugin describes. Start with `b10x:routing` if you want the front door to select a specialist.
 Installation does not grant filesystem, network, credential, or approval authority; the host and
 repository rules still decide those boundaries.
+
+## Pin a version
+
+A repository can hold a CLI at one release instead of the newest:
+
+```bash
+b10x pin ess 0.32.0   # exactly this release
+b10x pin aep 0.59     # the newest 0.59.x
+b10x unpin ess
+```
+
+The pins go into `b10x.toml` in the current directory (or the nearest one above); commit it.
+`b10x init`, `b10x upgrade`, `b10x setup plan` and `b10x install` then use the pinned release,
+`upgrade` names a newer one without installing it, and `b10x check` says when the CLI on `PATH`
+does not match the pin.

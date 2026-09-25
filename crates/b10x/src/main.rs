@@ -5,6 +5,7 @@ mod catalog;
 mod check;
 mod install;
 mod inventory;
+mod pins;
 mod plan;
 mod resolve;
 mod skill;
@@ -73,8 +74,22 @@ enum Top {
         #[command(subcommand)]
         command: Setup,
     },
-    /// Offline drift check for a session-start hook; prints only problems; always exits 0.
+    /// Drift check for a session-start hook; prints only problems; always exits 0. Refreshes the
+    /// newest-release record from GitHub at most once a day, within a few seconds.
     Check,
+    /// Pin a CLI for this repository in `b10x.toml` (here, or the nearest one above):
+    /// `0.32.0` is that release, `0.59` the newest `0.59.x`.
+    Pin {
+        /// Catalog binary, e.g. `ess`.
+        name: String,
+        /// `x.y.z` or `x.y`.
+        version: String,
+    },
+    /// Remove a CLI's pin from the nearest `b10x.toml`.
+    Unpin {
+        /// Catalog binary, e.g. `ess`.
+        name: String,
+    },
     /// Print an installed skill or agent (`ess:specifying`), or list a plugin's (`ess`). A host loads
     /// new plugins only in a new session; this works in the session that installed them.
     Skill {
@@ -85,7 +100,7 @@ enum Top {
     Install {
         /// Binary name, e.g. `ess`.
         name: String,
-        /// Release tag; defaults to the newest release.
+        /// Release tag; defaults to this repository's pin (`b10x.toml`), else the newest release.
         #[arg(long)]
         tag: Option<String>,
         /// Target directory; defaults to `~/.local/bin` (prebuilt) or `~/.cargo/bin` (cargo).
@@ -180,6 +195,8 @@ fn main() -> ExitCode {
             check::run(&Catalog::embedded());
             Ok(ExitCode::SUCCESS)
         }
+        Top::Pin { name, version } => pin(&name, &version),
+        Top::Unpin { name } => unpin(&name),
         Top::Install {
             name,
             tag,
@@ -297,9 +314,16 @@ fn make_plan(
         .as_deref()
         .map(std::path::Path::new)
         .filter(|path| path.is_dir());
+    // The marketplace's newest release; a host clone older than it would call old plugins current
+    // (the clone is refreshed only by applying), so the plan then reads the repository itself.
+    let upstream = local
+        .is_none()
+        .then(|| embedded.marketplace.repository.clone());
+    let newest = upstream.as_deref().and_then(resolve::latest_tag);
     let source = match (local, resolve::clone_of(&inventory, &embedded)) {
-        (Some(path), _) | (None, Some(path)) => Source::Clone(path),
-        (None, None) => Source::Remote(&embedded.marketplace.repository),
+        (Some(path), _) => Source::Clone(path),
+        (None, Some(path)) if !resolve::stale(path, newest.as_deref()) => Source::Clone(path),
+        (None, _) => Source::Remote(&embedded.marketplace.repository),
     };
     let mut catalog = resolve::catalog(&source);
     if let Some(source) = &overridden {
@@ -316,8 +340,12 @@ fn make_plan(
             }
         }
     }
-    let resolved = resolve::resolve(&catalog, &source);
     let home = inventory::home();
+    let pins = repository_pins(&catalog, &home)?;
+    let mut resolved = resolve::resolve(&catalog, &source, pins.as_ref());
+    if let (Some(repository), Some(tag)) = (upstream, newest) {
+        resolved.latest.insert(repository, tag);
+    }
     resolve::remember(&home, &resolved);
     let context = plan::Context {
         catalog: &catalog,
@@ -331,6 +359,83 @@ fn make_plan(
         upgrade,
     };
     Ok(plan::plan(&context, &inventory))
+}
+
+/// The pins that apply in the current directory; every pinned name must be a catalog binary.
+fn repository_pins(
+    catalog: &Catalog,
+    home: &std::path::Path,
+) -> Result<Option<pins::PinFile>, String> {
+    let Ok(here) = std::env::current_dir() else {
+        return Ok(None);
+    };
+    let found = pins::read(&here, home)?;
+    if let Some(file) = &found {
+        for name in file.pins.keys() {
+            if catalog.binary(name).is_none() {
+                return Err(format!(
+                    "{} pins `{name}`, which is not a catalog binary; `b10x unpin {name}` removes it",
+                    file.path.display()
+                ));
+            }
+        }
+    }
+    Ok(found)
+}
+
+fn pin(name: &str, version: &str) -> Result<ExitCode, String> {
+    let catalog = Catalog::embedded();
+    let (_, binary) = catalog.binary(name).ok_or_else(|| {
+        let known: Vec<&str> = catalog
+            .products
+            .iter()
+            .flat_map(|product| product.binaries.iter().map(|binary| binary.name.as_str()))
+            .collect();
+        format!(
+            "`{name}` is not a catalog binary; choose from {}",
+            known.join(", ")
+        )
+    })?;
+    let spec = pins::Spec::parse(version)?;
+    let repository = binary.install.repository();
+    let newest = resolve::latest_tag(repository);
+    let tag = resolve::pinned_tag(repository, spec, newest.as_deref())
+        .filter(|tag| resolve::release_exists(repository, tag))
+        .ok_or_else(|| format!("{repository} has no release matching `{version}`"))?;
+    let home = inventory::home();
+    let here = std::env::current_dir().map_err(|error| error.to_string())?;
+    if here == home {
+        return Err(format!(
+            "run it inside a repository: a {} in $HOME pins nothing",
+            pins::FILE
+        ));
+    }
+    let path = pins::find(&here, &home).unwrap_or_else(|| here.join(pins::FILE));
+    pins::set(&path, name, version.trim().trim_start_matches('v'))?;
+    println!(
+        "pinned {name} to {version} ({tag}) in {}; `b10x install {name}` installs it, commit the file to share the pin",
+        path.display()
+    );
+    if let Some(newest) = newest.filter(|newest| !version::same(newest, &tag)) {
+        println!("the newest release is {newest}; `b10x unpin {name}` follows it again");
+    }
+    Ok(ExitCode::SUCCESS)
+}
+
+fn unpin(name: &str) -> Result<ExitCode, String> {
+    let home = inventory::home();
+    let here = std::env::current_dir().map_err(|error| error.to_string())?;
+    let path = pins::find(&here, &home)
+        .ok_or_else(|| format!("no {} here or above; nothing is pinned", pins::FILE))?;
+    if pins::remove(&path, name)? {
+        println!(
+            "unpinned {name} in {}; `b10x upgrade` follows the newest release",
+            path.display()
+        );
+        Ok(ExitCode::SUCCESS)
+    } else {
+        Err(format!("{} does not pin `{name}`", path.display()))
+    }
 }
 
 fn setup_plan(
@@ -566,9 +671,30 @@ fn install_one(
         .binary(name)
         .ok_or_else(|| format!("`{name}` is not a catalog binary"))?;
     let repository = binary.install.repository();
-    let tag = match tag {
-        Some(tag) => tag,
-        None => resolve::latest_tag(repository)
+    let pinned = match &tag {
+        Some(_) => None,
+        None => repository_pins(&catalog, &inventory::home())?
+            .and_then(|file| Some((file.pins.get(name)?.clone(), file.path))),
+    };
+    let tag = match (tag, pinned) {
+        (Some(tag), _) => tag,
+        (None, Some((spec, file))) => {
+            let parsed = pins::Spec::parse(&spec)?;
+            let tag = resolve::pinned_tag(
+                repository,
+                parsed,
+                resolve::latest_tag(repository).as_deref(),
+            )
+            .ok_or_else(|| {
+                format!(
+                    "{repository} has no release matching the pin {spec} in {}",
+                    file.display()
+                )
+            })?;
+            println!("{name} is pinned to {spec} by {}", file.display());
+            tag
+        }
+        (None, None) => resolve::latest_tag(repository)
             .ok_or_else(|| format!("no release found for {repository}"))?,
     };
     let target = install::target().ok();

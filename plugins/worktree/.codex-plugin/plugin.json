@@ -1,6 +1,6 @@
 {
   "name": "worktree",
-  "version": "0.14.10",
+  "version": "0.14.11",
   "description": "Create, lease, finish, audit and safely clean isolated Git worktrees through the worktree CLI.",
   "author": {
     "name": "Beyond10x"
