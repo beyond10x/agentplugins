@@ -215,6 +215,46 @@ fn syntax(root: &Path, ess: &Path, scratch: &Path) -> Result<(), String> {
         )
     })?;
     println!("tools `ess`: syntax example — {}", out.trim());
+    let ess = ess.to_string_lossy();
+    let path = dir.to_string_lossy();
+    let suite = scratch.join("syntax-suite.json");
+    let generated = scratch.join("syntax-generated");
+    let generated = generated.to_string_lossy();
+    let synthesized = run(
+        &ess,
+        &[
+            "verify",
+            "conform",
+            "synthesize",
+            "--path",
+            &path,
+            "--out",
+            &suite.to_string_lossy(),
+        ],
+    )
+    .map_err(|error| format!("{}: synthesize failed: {error}", reference.display()))?;
+    if !synthesized.contains(" 0 refusal(s)") {
+        return Err(format!(
+            "{}: the example synthesizes with refusals: {}",
+            reference.display(),
+            synthesized.trim()
+        ));
+    }
+    println!("tools `ess`: syntax example — {}", synthesized.trim());
+    for arguments in [
+        &["generate", "--kind", "schema"][..],
+        &["generate", "project", "openapi"][..],
+    ] {
+        let mut arguments = arguments.to_vec();
+        arguments.extend(["--path", &path, "--out", &generated]);
+        run(&ess, &arguments).map_err(|error| {
+            format!(
+                "{}: `ess {}` failed on the example: {error}",
+                reference.display(),
+                arguments[..arguments.len() - 4].join(" ")
+            )
+        })?;
+    }
     Ok(())
 }
 

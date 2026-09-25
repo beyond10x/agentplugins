@@ -108,7 +108,7 @@ of no scenarios or with no `spec_digest`. A report/2, which ESS writes on
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
 `draft → validated → conforming` — and `aep plan artifact set <id> --model-digest
 <hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The
-`ess:specifying` skill says how the report is produced — the `ess` plugin from the `beyond10x/ess` marketplace, or `ess skill specify` from the binary.
+`ess:specifying` skill says how the report is produced (`b10x skill ess:specifying` prints it where the `ess` plugin is not loaded).
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
 relations, status, and prose use `new`, `relate`/`unrelate`, `move`, and `body` respectively. **A
@@ -127,9 +127,10 @@ template.** `aep plan artifact new` writes the kind's template into the store, a
 archive is still an artifact: it stays in the store, and its `move --to archived` is a lifecycle
 move a checker reads as work scheduled before the open question was filed. The complete example file
 is in [references/store-conventions.md](references/store-conventions.md), and `aep plan artifact new
---help` lists every flag. **A body file for `--from` goes under `$TMPDIR`, never a hard-coded
-`/tmp`.** The runner sets `TMPDIR` to a directory it owns and reads back; `/tmp` is outside every
-record it keeps.
+--help` lists every flag. **A body file for `--from` is a scratch file inside the repository, in a
+git-ignored directory** (for example `.engineering/drafts/`, added to `.gitignore`), or standard
+input (`--from -`). Not a hard-coded `/tmp`, and not `$TMPDIR` either, which may point outside the
+repository and outside a sandbox the session was confined to.
 
 ```console
 $ aep plan artifact body story:credential-store --from story-body.md
@@ -209,7 +210,7 @@ means something beside `blocks:`, and `validate` says so.
 names an entity no ESS document in the repository declares (`ess/1`, or `ess/2`), do not decompose it and do not write
 stories around it. Draft the domain first — `aep plan reverse openapi --domain <name> --out <domain-doc>
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
-`ess:specifying` skill (`ess skill specify` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
+`ess:specifying` skill (`b10x skill ess:specifying` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
 artifact body through `aep plan artifact body`. A noun with no typed home is the relation nobody can
 check later.
 
@@ -328,7 +329,21 @@ $ aep plan reverse scan --format json
 ```
 
 `reverse init` writes `.engineering/project.yaml` and refuses the two things that quietly break
-later — an absolute path, and a `git+` source pinned to a branch rather than a commit. `reverse scan`
+later — an absolute path, and a `git+` source pinned to a branch rather than a commit.
+
+The two values, for a project that follows the published protocols:
+
+| flag | value |
+|---|---|
+| `--protocols` | `git+https://github.com/beyond10x/aep#<commit>`, where `<commit>` is the commit of the release tag matching the installed `aep` (command below) |
+| `--profile` | `development.standard`, unless the repository already names another |
+
+```console
+$ git ls-remote https://github.com/beyond10x/aep "refs/tags/$(aep --version | awk '{print $NF}')^{}"
+```
+
+Where a backlog exists, `reverse init` is still the command that creates the store; `aep:migrating`
+then moves the backlog into it. `reverse scan`
 reads and interprets nothing: it emits located facts — README headings, marked lines, tests that say
 they will not run, CI jobs and the variables on them, task targets, packages, published contracts —
 each carrying the `path:line` it was read from. It writes nothing and it has no clock and no network,
@@ -460,7 +475,10 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
   you have recorded your reading of the review rather than the review. That includes the fenced
   ` ```findings ` block the rubric has each critic close with: it is the half a program reads, and a
   record whose findings were flattened into prose is one `aep plan artifact findings` cannot compare
-  against the next round.
+  against the next round. On `approve` the rubric's block is `[]`, which the store accepts. The one
+  edit allowed: a critic that closed with an empty fence (no `[]` inside) is recorded with `[]` in
+  it, because the store refuses the empty fence ("a review with nothing to report writes no block
+  at all"). Say in the report that you made that edit.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
   `aep plan artifact relations` before you rely on it, the way you would any other vocabulary.
 * Write them one at a time. Four critics return at once; the store takes one writer.

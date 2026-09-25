@@ -10,7 +10,7 @@ Use the `worktree` CLI as the sole owner of linked-worktree lifecycle. It keeps 
 ## Start repository work
 
 1. From a primary checkout run `worktree create --purpose <short-purpose>`. Add `--repo <path>`, `--base <revision>`, or `--id <stable-id>` when needed.
-2. Treat the printed path as the task checkout and do all changes there.
+2. Treat the printed path as the task checkout and do all changes there. The tree starts on a detached HEAD; run `git switch -c <branch>` in it before the first commit, so the work has a branch to push.
 3. If already inside a managed tree, reuse it; do not nest another worktree.
 4. For automation, add `--json` and consume the versioned output.
 

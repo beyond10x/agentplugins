@@ -90,6 +90,10 @@ takes is refused as `missing_causation` — so a first domain has one state and 
 gains a second state only together with the outcome that moves it. The header's `domains:` list and
 the declaring source must agree in both directions; either half alone is a refusal.
 
+**Lifecycle state names start with an upper-case letter** (`InTransit`, not `in_transit`); a
+lower-case one is refused as `invalid state name identifier`. A source that stores `in_transit`
+still maps onto `InTransit` — note the mapping beside the state. Enum variants carry no such rule.
+
 **A relation is an entry, not a convention.** Two entities linked by a field that happens to be
 named after the other one are not related as far as anything can check; the `relations:` entry is
 what makes the link a fact a program reads. Three more refusals come with it, and they are the
@@ -113,10 +117,24 @@ Grow it from there — types, commands, events, views, and a component that owns
 shows every one of those sections in a small specification that validates; read it before writing
 the first command.
 
-`--path` takes one ESS file or a directory. A directory is read through its `ess-inputs.yaml` when
-one exists — an exact file list, which is what lets authored inputs sit in nested directories beside
-generated files — and otherwise through the `system.yaml` layout above, which the CLI
-calls legacy and still accepts.
+`--path` takes one ESS file or a directory. Without an `ess-inputs.yaml`, a directory is read as
+every YAML file below it — so generated output written inside it is read back as specification and
+refused (`unknown field openapi`). **Add an `ess-inputs.yaml` as soon as anything is generated**, and
+write generated output outside the specification's own files:
+
+```yaml
+# ess-inputs.yaml, beside system.yaml
+format: ess-inputs/1
+specification:
+  - system.yaml
+  - components.yaml
+  - domains/rooms.yaml
+scenarios: []
+```
+
+`specification` lists every authored file, relative to this file, and each must exist. `scenarios`
+lists authored scenario files, `[]` when there are none. `--path <directory>` then reads exactly
+that list. The CLI help calls the list-less `system.yaml` layout "legacy"; it still validates.
 
 **A draft is a proposal, never a silent completion.** Every relation you could not read from code,
 an OpenAPI document or an existing artifact is written with an `UNMAPPED:` marker beside the place
@@ -163,6 +181,10 @@ ess generate --path <specification> --kind schema --out <directory>
 ess generate project openapi --path <specification> --out <directory>
 ```
 
+Each writes into its own subdirectory of `--out`: `--out generated` gives `generated/schema/…` and
+`generated/openapi/…`. Pass the parent, not `generated/schema`, or the files land in
+`generated/schema/schema/`.
+
 The same typed IR must produce the same ordered files and bytes. Compare a regenerated temporary
 tree with the committed tree before replacing anything. A stale committed file is drift; a file no
 projection owns is not authority.
@@ -181,6 +203,12 @@ aep plan artifact evidence <specification-artifact> --from <report.json>
 
 `synthesize` writes the suite the specification obliges — nothing for a domain with no commands or
 outcomes, so the two-entity draft above yields `0 scenario(s)` and no report worth recording.
+An entity `invariant` is checked after every outcome that leaves the entity in some state, which
+needs a view that holds instances in that state and publishes the fields the invariant reads.
+Without one, `synthesize` refuses the check (`no view of <entity> holds an instance in <State>`, or
+`<field> is published by no view of the entity`); a view over the entity with no `filter` that
+publishes those fields covers every state (the `Copies` view in the syntax reference). `--target go` or `--target typescript` writes the suite as a test
+package your implementation runs; `ess:testing-conformance` says what to run it against.
 `run` holds a built-in reference implementation to it; `--target` lists the ones this binary
 carries. `evidence --from` reads the kind, the source and the instant out of the report and refuses
 a report of no scenarios or with no `spec_digest`. A report/2 (`--report-format 2`) is

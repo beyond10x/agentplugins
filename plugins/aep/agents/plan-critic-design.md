@@ -55,6 +55,12 @@ that legitimately touch one file and do not say so is theirs.
 edge, not a rewrite, and your reason field should say which edge would say it — read the name from
 `aep plan artifact relations` rather than supplying one from memory.
 
+**An ordering edge that records a shared file is not a serialising chain by itself.** When an edge
+exists because two items edit one file (the parallel-safety critic asks for exactly that edge), the
+remaining choice is between that order and splitting the shared surface so the items no longer
+collide. Report it as that trade-off, naming both options and the file; do not ask for the edge to
+be removed. A chain is your finding only when the edges have no such reason written beside them.
+
 ## What is not yours to say
 
 * **The number of items.** Four or nine is the drafter's judgement unless the shape is broken.

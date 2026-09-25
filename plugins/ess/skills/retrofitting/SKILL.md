@@ -1,7 +1,7 @@
 ---
 name: retrofitting
 description: >-
-  Derive an ESS specification for a system that already exists and has none — from its OpenAPI contract, its observed Kubernetes deployment, or its code — then validate it and hand it to conformance. Use when the user asks to retrofit, adopt, reverse-engineer or "get a spec out of" an existing service or repository, when a codebase has an OpenAPI document or a cluster but no `system.yaml` or `ess-inputs.yaml`, or when a specification must describe behaviour that is already shipped rather than behaviour still to be built. Not for a domain drafted from nothing, which is the `specify` skill; not for raising coverage of a suite that already exists, which is the `coverage` skill.
+  Derive an ESS specification for a system that already exists and has none — from its OpenAPI contract, its observed Kubernetes deployment, or its code — then validate it and hand it to conformance. Use when the user asks to retrofit, adopt, reverse-engineer or "get a spec out of" an existing service or repository, when a codebase has an OpenAPI document or a cluster but no `system.yaml` or `ess-inputs.yaml`, or when a specification must describe behaviour that is already shipped rather than behaviour still to be built. Not for a domain drafted from nothing, which is the `ess:specifying` skill; not for raising coverage of a suite that already exists, which is the `ess:testing-conformance` skill.
 ---
 
 # Retrofitting a specification onto an existing system
@@ -21,6 +21,10 @@ cites it. What you cannot read is an `UNMAPPED:` marker, never a plausible value
 
 Use every source that exists. Where two disagree, the draft records both and marks the field
 `UNMAPPED:`; the disagreement is a finding, not something to resolve by choosing.
+
+`ess infra import openapi` reads OpenAPI 3.1 only. A 3.0 document exits 1 with the refusal
+`only OpenAPI 3.1 is supported, found 3.0.x`; `aep plan reverse openapi` accepts it. Do not
+rewrite the contract's version line to get past the refusal.
 
 `aep` is optional. Without it, write the domain by hand from the schemas, in the shape the `ess:specifying`
 skill shows.
@@ -51,7 +55,13 @@ Retrofit-specific rules:
 - **Relations need an owner decision.** `owns` against `references` is decided by what a delete
   does in the code today. No delete path found: `UNMAPPED:`.
 - **Views follow reads.** One view per read operation clients use; its fields are the fields the
-  response carries.
+  response carries. An entity with `invariants` also needs a view holding every state, or the suite
+  refuses the invariant checks (`ess:specifying`, conformance section).
+- **Wire values keep their spelling in a comment.** A stored status `in_transit` becomes the state
+  `InTransit`; state names must start upper-case.
+- **A rule the language cannot hold stays in the code, and is named.** A limit read from stored
+  state, or a constraint across records, is `UNMAPPED:` with its source line
+  ([syntax reference](../specifying/references/syntax.md), "What `when` can and cannot say").
 
 ## 3. Prove the draft describes the system
 

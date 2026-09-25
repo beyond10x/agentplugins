@@ -17,7 +17,7 @@ tools` checks the skills against the newest CLI releases. A change that breaks a
 | **R5 content** | A skill describes its CLI's newest release and quotes no CLI version. `agentplugins-check tools` runs every spelled command against that release. |
 | **R6 distribution** | `SETUP.md` and `b10x` install everything; CLIs come prebuilt or from `cargo`. Retired names live only in `catalog.json`, and setup migrates them. |
 | **R7 references** | Every `<plugin>:<skill-or-agent>` written in this repository names a file that exists. |
-| **R8 docs** | One README row, one page under `plugins/` and one sidebar entry per plugin. The README is one paragraph and that table. |
+| **R8 docs** | One README row, one page under `plugins/` and one sidebar entry per plugin. The README is one paragraph, that table, and the generated tree of every skill and agent, each linked to its file. |
 
 ## The plugins
 

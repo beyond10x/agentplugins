@@ -28,7 +28,9 @@ Ask **one** multi-select question: *What do you want to do with Beyond10x?*
 | Work in isolated Git checkouts that clean up safely | `worktree` |
 | Connect external tools and providers | `connectors` |
 
-Preselect what the user already named ("I want to write specs" → specifications). Use the host's
+Preselect what the user already named ("I want to write specs" → specifications). When planning is
+chosen, preselect specifications too and say why: AEP planning models every new noun as an ESS
+domain before writing stories around it, so `aep` without `ess` stops at the first new entity. Use the host's
 question tool when it has one (Claude Code: `AskUserQuestion` with `multiSelect: true`).
 
 ## 3. Ask how to install the CLIs

@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.14.3] — 2026-09-25
+
+From trial 3: five fresh agents on 0.14.2 (an ESS specification from nothing, an ESS retrofit of an
+existing service, an ESS pipeline through generate and a synthesized suite, AEP planning over a
+`TODO.md`, worktree onboarding) plus a migration of a seeded older install.
+
+- `ess:specifying`: lifecycle state names start upper-case; `ess-inputs.yaml` is documented and
+  recommended once anything is generated, since a directory without it is read whole;
+  `generate --out <dir>` writes its own `schema/` or `openapi/` below `<dir>`; an entity invariant
+  needs a view holding every state and publishing the fields it reads, or `synthesize` refuses the
+  check. The syntax example gains that view: it synthesized with 3 refusals, now 12 scenarios and 0.
+- The syntax reference says how to write rules the trials hit: a limit read from stored state, and
+  no double booking (a per-slot lifecycle, or `UNMAPPED:`). A time range is ordered by an `Integer`
+  length; comparing two `Timestamp`s validates and then fails `synthesize`, and `Duration` does not
+  compare with a number.
+- `ess:retrofitting`: `ess infra import openapi` reads OpenAPI 3.1 only; `aep plan reverse openapi`
+  accepts 3.0. Its description named the retired `specify` and `coverage` skills.
+- `ess:testing-conformance`: what the built-in targets `interpreted`, `oracle-fixture` and `billing`
+  are, why a new domain reports nothing useful against them, and `synthesize --target go|typescript`
+  to hold a real implementation to the suite.
+- `aep:planning`: the `--protocols` and `--profile` values for `reverse init`; body files live in a
+  git-ignored directory of the repository, not `$TMPDIR`; a critic's empty findings fence is recorded as
+  `[]`, which the store accepts, since it refuses the empty fence. Two references to `ess skill`, which no longer exists, now name
+  `b10x skill ess:specifying`.
+- `aep:migrating`: `reverse init` creates the store in every case; a backlog item that introduces a
+  new noun gets its ESS domain before its stories. Provenance says whose revisions it counts.
+- `b10x:init` and `aep:init` offer `ess` with `aep`.
+- The design and parallel-safety critics name the same two remedies for a shared file (an ordering
+  edge, or splitting the file) instead of asking for opposite changes in consecutive rounds.
+- `worktree:init`: where to get a profile and where it goes; `doctor --check` exits 0 with
+  `profiles=0`; cleanup needs a remote. `worktree:managing-worktrees`: switch to a branch before the
+  first commit.
+- `b10x:routing` routes ESS and worktree work to their skills instead of to `ess skill`.
+- `b10x upgrade` installs the replacement of a legacy plugin it removes; it used to remove it and
+  only note the replacement as missing. A legacy `local` install is not reinstalled at `local` when
+  the user scope covers it. A plan names Beyond10x plugins on a host it does not cover. `b10x check` no longer says nothing is set up
+  when only a legacy plugin is installed.
+- `agentplugins-check tools` also synthesizes and generates the ESS syntax example.
+- `agentplugins-check` parses its arguments with clap; new `trial-isolation` checks that a headless
+  trial loaded only the plugins its sandbox installed, at the version under test, and no MCP server.
+  Sandboxes live outside `$HOME` (`/var/tmp/b10x-trials-$USER`): below it, a trial loaded the
+  operator's `CLAUDE.md` and a settings file an earlier trial left behind. `task trial:sandbox` and
+  `task trial:run`, and the repository skill `improving-by-trial`, describe the loop.
+- The README lists every plugin's skills and agents, linked to their files; the gate keeps it
+  exact. The retired-name sweep covers `ess skill` and the `beyond10x/ess` marketplace.
+
 ## [0.14.2] — 2026-09-24
 
 From trial 2, in which fresh agents given only a sentence and this repository's link onboarded

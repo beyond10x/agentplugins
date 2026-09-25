@@ -15,6 +15,7 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 | `evals/` | eval corpus ([`evals/README.md`](evals/README.md)) |
 | `website/` | public docs; must pass `task site-build` |
 | `SETUP.md` | agent bootstrap, published as a release asset |
+| `.agents/skills/improving-by-trial/` | how plugins are improved: isolated headless trials (`task trial:sandbox`, `task trial:run`), triage, fix, re-run |
 
 ## Rules
 
@@ -27,6 +28,8 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 - Retired names appear only where the gate allows them (`CHANGELOG.md`, `changes/`,
   `.engineering/`, `catalog.json`, `crates/b10x/`, the checker's own table).
 - Anything executable is Rust.
+- Trial findings for another repository become an issue there, ending *Found by an agentplugins
+  trial*; the skill here documents the workaround until it is fixed ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
 
 ## Gate
 

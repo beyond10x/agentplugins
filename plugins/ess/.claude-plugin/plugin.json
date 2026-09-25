@@ -2,7 +2,7 @@
   "name": "ess",
   "displayName": "ESS",
   "description": "Write, retrofit, validate and project Executable System Specifications, and hold implementations to them with conformance suites.",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "author": {
     "name": "Beyond10x"
   },

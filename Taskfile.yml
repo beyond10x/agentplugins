@@ -1,5 +1,10 @@
 version: '3'
 
+vars:
+  # Outside the home directory: Claude Code reads CLAUDE.md, .claude/CLAUDE.md and .claude/settings*.json
+  # in every directory above its working directory, so a sandbox under $HOME inherits the operator's.
+  TRIALS: '/var/tmp/b10x-trials-{{.USER}}'
+
 tasks:
   check:
     desc: Run the complete offline repository gate.
@@ -16,6 +21,71 @@ tasks:
     desc: Validate the eval corpus and replay every recorded transcript (free, no model call).
     cmds:
       - cargo run --quiet --locked --bin agentplugins-check -- evals
+
+  trial:sandbox:
+    desc: "Create a clean trial sandbox for this checkout: task trial:sandbox NAME=<name> (see .agents/skills/improving-by-trial)."
+    requires:
+      vars: [NAME]
+    vars:
+      T: '{{.TRIALS}}/{{.NAME}}'
+    cmds:
+      # Claude Code also reads `.claude/settings*.json` in the directories above its working
+      # directory; one there enables plugins in every sandbox below it.
+      - |
+        d='{{.T}}'
+        while [ "$d" != / ]; do
+          d="$(dirname "$d")"
+          for f in "$d/CLAUDE.md" "$d/.claude/CLAUDE.md" "$d/.claude/settings.json" "$d/.claude/settings.local.json"; do
+            if [ -e "$f" ]; then
+              echo "refusing: $f would load into every sandbox below it; set TRIALS elsewhere"
+              exit 1
+            fi
+          done
+        done
+      - rm -rf '{{.T}}'
+      - mkdir -p -m 700 '{{.TRIALS}}'
+      - mkdir -p '{{.T}}/home/.local/bin' '{{.T}}/work' '{{.T}}/tools'
+      - for t in claude codex; do p="$(command -v $t)" && ln -sf "$(readlink -f "$p")" '{{.T}}/tools/'$t; done; true
+      - for t in cargo rustc rustup; do ln -sf "$HOME/.cargo/bin/$t" '{{.T}}/tools/'$t; done
+      - echo '{}' > '{{.T}}/home/.claude.json'
+      - nice -n 19 env CARGO_BUILD_JOBS=4 cargo build --quiet --locked -p b10x
+      - cp "${CARGO_TARGET_DIR:-target}/debug/b10x" '{{.T}}/home/.local/bin/b10x'
+      - |
+        {
+          echo "export HOME='{{.T}}/home'"
+          echo "export PATH='{{.T}}/home/.local/bin:{{.T}}/home/.cargo/bin:{{.T}}/tools:/usr/bin:/bin'"
+          echo "export RUSTUP_HOME='$HOME/.rustup' CARGO_HOME='$HOME/.cargo' CARGO_BUILD_JOBS=4"
+          echo "export B10X_MARKETPLACE='{{.ROOT_DIR}}'"
+          echo "export GIT_AUTHOR_NAME=trial GIT_AUTHOR_EMAIL=trial@example.invalid GIT_COMMITTER_NAME=trial GIT_COMMITTER_EMAIL=trial@example.invalid"
+          echo "unset ANTHROPIC_API_KEY TMPDIR TMPPREFIX"
+        } > '{{.T}}/env'
+      - echo '{{.T}}'
+
+  trial:run:
+    desc: "Run one headless trial in a sandbox and check its isolation: task trial:run NAME=<name> PROMPT='…' [DIR=<subdir of work>] [SEEDED=true for an upgrade trial]."
+    requires:
+      vars: [NAME, PROMPT]
+    vars:
+      T: '{{.TRIALS}}/{{.NAME}}'
+      DIR: '{{.DIR | default ""}}'
+      SEEDED: '{{if eq (.SEEDED | default "") "true"}}--seeded{{end}}'
+      VERSION:
+        sh: sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1
+    cmds:
+      - cp '{{.T}}/home/.claude/plugins/installed_plugins.json' '{{.T}}/registry-at-start.json'
+      - install -m 600 "$HOME/.claude/.credentials.json" '{{.T}}/home/.claude/.credentials.json'
+      - defer: rm -f '{{.T}}/home/.claude/.credentials.json'
+      - |
+        (. '{{.T}}/env' && mkdir -p '{{.T}}/work/{{.DIR}}' && cd '{{.T}}/work/{{.DIR}}' &&
+         timeout 2400 claude -p "$PROMPT" --permission-mode acceptEdits \
+           --allowedTools 'Bash(b10x:*)' 'Bash(ess:*)' 'Bash(aep:*)' 'Bash(worktree:*)' 'Bash(git:*)' \
+             'Bash(mkdir:*)' 'Bash(ls:*)' 'Bash(cat:*)' 'Bash(find:*)' 'Bash(curl:*)' 'Bash(tar:*)' \
+             'Bash(sha256sum:*)' 'Bash(mv:*)' 'Bash(chmod:*)' Read Write Edit Glob Grep Skill Task Agent \
+           --strict-mcp-config --output-format stream-json --verbose > '{{.T}}/run.jsonl' 2> '{{.T}}/run.err'
+         echo "EXIT=$?" >> '{{.T}}/run.err')
+      - cargo run --quiet --locked --bin agentplugins-check -- trial-isolation '{{.T}}/run.jsonl' --sandbox '{{.T}}' --marketplace '{{.ROOT_DIR}}' --version '{{.VERSION}}' {{.SEEDED}}
+    env:
+      PROMPT: '{{.PROMPT}}'
 
   site-build:
     desc: Install and build the public Docusaurus documentation (network).
