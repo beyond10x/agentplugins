@@ -91,7 +91,7 @@ tasks:
       - |
         (. '{{.T}}/env' && dir="$(cat '{{.T}}/workdir')" && mkdir -p "{{.T}}/work/$dir" && cd "{{.T}}/work/$dir" &&
          timeout 2400 claude -p "$(cat '{{.T}}/prompt.txt')" --permission-mode acceptEdits \
-           --allowedTools 'Bash(b10x:*)' 'Bash(ess:*)' 'Bash(aep:*)' 'Bash(worktree:*)' 'Bash(git:*)' 'Bash(go:*)' \
+           --allowedTools 'Bash(b10x:*)' 'Bash(ess:*)' 'Bash(aep:*)' 'Bash(worktree:*)' 'Bash(git:*)' 'Bash(go:*)' 'Bash(cargo:*)' \
              'Bash(mkdir:*)' 'Bash(ls:*)' 'Bash(cat:*)' 'Bash(find:*)' 'Bash(curl:*)' 'Bash(tar:*)' \
              'Bash(sha256sum:*)' 'Bash(mv:*)' 'Bash(chmod:*)' Read Write Edit Glob Grep Skill Task Agent \
            --strict-mcp-config --output-format stream-json --verbose > '{{.T}}/run.jsonl' 2> '{{.T}}/run.err'

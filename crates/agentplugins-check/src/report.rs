@@ -283,10 +283,44 @@ fn go_counts(output: &str) -> Option<GoTest> {
     Some(counts)
 }
 
+/// Whether a shell command runs `go test`, however it is spelled: `go test`, `go -C <dir> test`,
+/// behind environment assignments or after `cd … &&`.
+fn runs_go_test(command: &str) -> bool {
+    let words: Vec<String> = shlex::split(command)
+        .unwrap_or_else(|| command.split_whitespace().map(str::to_owned).collect());
+    words.iter().enumerate().any(|(index, word)| {
+        if word != "go" && !word.ends_with("/go") {
+            return false;
+        }
+        // In command position: every word since the last separator is an environment assignment.
+        let start = words[..index]
+            .iter()
+            .rposition(|w| matches!(w.as_str(), "&&" | "||" | ";" | "|" | "then" | "do"))
+            .map_or(0, |separator| separator + 1);
+        if !words[start..index]
+            .iter()
+            .all(|w| w.contains('=') && !w.starts_with('-'))
+        {
+            return false;
+        }
+        let mut rest = words[index + 1..].iter();
+        while let Some(next) = rest.next() {
+            match next.as_str() {
+                "-C" => {
+                    rest.next();
+                }
+                flag if flag.starts_with('-') => {}
+                verb => return verb == "test",
+            }
+        }
+        false
+    })
+}
+
 fn go_test(run: &Run) -> Option<GoTest> {
     run.shells
         .iter()
-        .filter(|shell| shell.command.contains("go test"))
+        .filter(|shell| runs_go_test(&shell.command))
         .rev()
         .find_map(|shell| go_counts(shell.output.as_deref()?))
 }
@@ -655,6 +689,27 @@ mod tests {
         ));
         assert_eq!(report.measures.tool_calls, Some(5));
         std::fs::remove_dir_all(&sandbox).unwrap();
+    }
+
+    #[test]
+    fn every_spelling_of_go_test_is_recognised() {
+        for command in [
+            "go test ./...",
+            "cd impl && go test -v ./...",
+            "go -C /work/impl test -count=1 -v ./... 2>&1 | tail -20",
+            "ESS_REPORT_OUT=r.json go -C impl test ./...",
+            "/usr/local/go/bin/go test ./...",
+        ] {
+            assert!(runs_go_test(command), "{command}");
+        }
+        for command in [
+            "go vet ./...",
+            "go -C impl build ./...",
+            "echo go test",
+            "cargo test",
+        ] {
+            assert!(!runs_go_test(command), "{command}");
+        }
     }
 
     #[test]

@@ -4,6 +4,8 @@ prompt: |
   Our backlog for this little tool is just `TODO.md`. I'd like to plan it properly with AEP from
   now on: turn what's there into epics and stories, leave out what's already done, and make sure
   the result validates. Don't delete `TODO.md`.
+  Nobody will answer questions during this run: where you would ask, decide, write down what you
+  decided and why, and go on.
 
   When you're done, list the skills and agents you used, quote any instruction text that confused
   you, and paste the last validation output verbatim.

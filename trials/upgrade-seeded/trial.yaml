@@ -2,7 +2,8 @@ name: upgrade-seeded
 kind: upgrade
 prompt: |
   I installed the Beyond10x plugins a while ago and haven't touched them since. Bring everything up
-  to date, and tell me what changed.
+  to date, and tell me what changed. Nobody will answer questions during this run: where you would
+  ask, decide, write down what you decided and why, and go on.
 
   When you're done, list the skills and agents you used, quote any instruction text that confused
   you, and paste the last command output verbatim.

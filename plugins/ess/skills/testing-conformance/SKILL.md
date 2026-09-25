@@ -216,7 +216,11 @@ ess verify conform synthesize --path <specification> --target go --out <dir>
 ess verify conform synthesize --path <specification> --target typescript --out <dir>
 ```
 
-The package's `README.md` lists the methods and the wiring test. A method you cannot answer returns
+Generate the Go package **inside the implementation's own module** (`--out <impl>/conformance`) so
+its test can import it; a copy outside the module has no `go.mod` to import from. Numbers in a
+payload you return compare equal only as `float64`: an `int64` or a `json.Number` fails although
+the type check accepts it (beyond10x/ess#101, until fixed). The package's `README.md` lists the
+methods and the wiring test. A method you cannot answer returns
 `ErrUnsupported` (a skip), never a made-up result. Keep a suite for a domain nobody has implemented;
 run it once something answers it.
 

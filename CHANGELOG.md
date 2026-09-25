@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.14.10] — 2026-09-25
+
+From round 5, the first measured trial round: seven trials on 0.14.9, all isolated. The
+full-package trial generated every ESS output and ran `go test` against the synthesized suite: 13
+passed, 0 failed, 0 skipped.
+
+- `agentplugins-check trial-report` recognises every spelling of `go test` (`go -C <dir> test`,
+  behind environment assignments, after `cd … &&`) and only in command position; it had reported the
+  full-package run as "not run".
+- `b10x setup plan` with no selection keeps every installed product, optional ones included; it
+  proposed uninstalling an installed `connectors`.
+- `ess:specifying`: every `--kind` of `ess generate` (`schema`, `openapi`, `asyncapi`, `docs`,
+  `site`, `docs-ir`) and `ess generate types`; one `--out` per kind side by side, because nested
+  output directories are refused; which kinds add their own folder (`site` does not). OpenAPI and
+  AsyncAPI need a component that says how the service is reached, or they write `0 artifact(s)`
+  without a refusal (beyond10x/ess#102).
+- `ess:testing-conformance`: generate the Go suite inside the implementation's module; return payload
+  numbers as `float64` (beyond10x/ess#101).
+- Trials: `cargo` is allowed (the Rust type library can be compiled); the aep, worktree and upgrade
+  prompts say nobody will answer questions.
+
 ## [0.14.9] — 2026-09-25
 
 Trials become measurable: their prompts live in the repository, and each run is scored against a

@@ -270,15 +270,9 @@ pub struct Context<'a> {
 pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
     let catalog = context.catalog;
     let present = present(catalog, inventory);
-    let selected: BTreeSet<String> = context.selection.clone().unwrap_or_else(|| {
-        present
-            .iter()
-            .filter(|id| {
-                context.only || catalog.product(id).is_some_and(|product| !product.optional)
-            })
-            .cloned()
-            .collect()
-    });
+    // With no explicit selection, what is installed stays installed, optional products included:
+    // leaving one out would uninstall it (connectors, trial 5).
+    let selected: BTreeSet<String> = context.selection.clone().unwrap_or_else(|| present.clone());
     let offers = catalog
         .products
         .iter()
@@ -1358,6 +1352,32 @@ mod tests {
             upgrade: true,
         };
         plan(&context, inventory)
+    }
+
+    #[test]
+    fn an_installed_optional_product_stays_when_nothing_is_selected() {
+        let mut claude = HostState::default();
+        claude.marketplaces.push(market());
+        claude.plugins.push(installed("b10x", "b10x", "user", None));
+        claude
+            .plugins
+            .push(installed("connectors", "b10x", "user", None));
+        let inventory = Inventory {
+            claude: Some(claude),
+            ..Inventory::default()
+        };
+        let plan = run(&inventory, None, &[Host::Claude]);
+        let commands = commands(&plan);
+        assert!(
+            !commands
+                .iter()
+                .any(|c| c.contains("uninstall connectors@b10x")),
+            "{commands:#?}"
+        );
+        assert!(plan
+            .offers
+            .iter()
+            .any(|offer| offer.id == "connectors" && offer.selected));
     }
 
     #[test]
