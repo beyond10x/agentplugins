@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.14.6] — 2026-09-25
+
+The fixes for the trial findings shipped in aep 0.59.3 and ess 0.32.0; the skills now describe that
+behaviour instead of the workarounds. Each change was checked against the released binaries.
+
+**`ess`**
+
+- `ess:retrofitting`: `ess infra import openapi` reads OpenAPI 3.0 as well as 3.1. A nullable field
+  imports as a coverage gap, carried into the draft as an `UNMAPPED:` marker; an object schema must
+  be closed with `additionalProperties: false`, and that refusal is reported, not worked around.
+- Syntax reference: two fields are compared through one struct (`window.ends_at >
+  window.starts_at`); a right-hand side without a dot is a literal, so the flat form is refused. The
+  stored-value case links ESS's design note for guards over stored fields.
+- `ess:specifying`: the note that the CLI help calls the `system.yaml` layout "legacy" is gone; the
+  help no longer says so.
+
+**`aep`**
+
+- `aep:planning`: the store's refusal of an empty findings fence now says to write `[]`; the skill
+  points at it instead of quoting the old message.
+
 ## [0.14.5] — 2026-09-25
 
 From the round-4 trials on 0.14.4 (an ESS retrofit of a stock-reservation service and worktree

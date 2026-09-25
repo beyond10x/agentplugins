@@ -22,9 +22,11 @@ cites it. What you cannot read is an `UNMAPPED:` marker, never a plausible value
 Use every source that exists. Where two disagree, the draft records both and marks the field
 `UNMAPPED:`; the disagreement is a finding, not something to resolve by choosing.
 
-`ess infra import openapi` reads OpenAPI 3.1 only. A 3.0 document exits 1 with the refusal
-`only OpenAPI 3.1 is supported, found 3.0.x`; `aep plan reverse openapi` accepts it. Do not
-rewrite the contract's version line to get past the refusal.
+`ess infra import openapi` reads OpenAPI 3.0 and 3.1. A nullable field (`nullable: true`, or a 3.1
+`type: [T, "null"]`) imports as a coverage gap at its pointer, because the interface has no null:
+carry each gap into the draft as an `UNMAPPED:` marker. An object schema must be closed with
+`additionalProperties: false`, or the import refuses it; that refusal is a finding about the
+contract, so report it rather than editing the contract to pass.
 
 `aep` is optional. Without it, write the domain by hand from the schemas, in the shape the `ess:specifying`
 skill shows.

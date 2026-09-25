@@ -475,10 +475,9 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
   you have recorded your reading of the review rather than the review. That includes the fenced
   ` ```findings ` block the rubric has each critic close with: it is the half a program reads, and a
   record whose findings were flattened into prose is one `aep plan artifact findings` cannot compare
-  against the next round. On `approve` the rubric's block is `[]`, which the store accepts. The one
-  edit allowed: a critic that closed with an empty fence (no `[]` inside) is recorded with `[]` in
-  it, because the store refuses the empty fence ("a review with nothing to report writes no block
-  at all"). Say in the report that you made that edit.
+  against the next round. On `approve` the rubric's block is `[]`. The one edit allowed: a critic
+  that closed with an empty fence is recorded with `[]` in it, as the store's refusal says; say in
+  the report that you made that edit.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
   `aep plan artifact relations` before you rely on it, the way you would any other vocabulary.
 * Write them one at a time. Four critics return at once; the store takes one writer.

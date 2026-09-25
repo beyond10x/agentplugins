@@ -325,11 +325,12 @@ Two cases trials hit:
 
 | rule | how to write it |
 |---|---|
-| a value stored on the entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | not expressible: a `when` sees only the dispatch input. Mark it `UNMAPPED:` at the outcome, citing the source line |
+| a value stored on the entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | not expressible: a `when` sees only the dispatch input. Mark it `UNMAPPED:` at the outcome, citing the source line. A guard over stored fields is proposed in ESS's [design note](https://github.com/beyond10x/ess/blob/main/docs/design/cross-record-and-stored-field-guards.md) |
 | two records must not overlap ("a room cannot be booked twice for one hour") | make the contested unit an entity with its own lifecycle (a `Slot` that is `Free` or `Booked`); a second booking is then `wrong_state` on that slot. Overlap between arbitrary time ranges is not expressible; mark it `UNMAPPED:` |
 
-**Order a time range by its length, not by comparing two `Timestamp`s.** `ends_at > starts_at`
-validates, but `ess verify conform synthesize` refuses it (`no declared scale contains both
-values`). `Duration` does not work either: it is text, and `validate` refuses `length > 0`. Take
-`starts_at: Timestamp` and an `Integer` in a named unit (`duration_minutes`) and guard on
-`duration_minutes > 0`.
+**Compare two fields through one struct.** A right-hand side without a dot is a literal, so
+`ends_at > starts_at` compares `ends_at` with the text `"starts_at"` and `validate` refuses it.
+Declare the two fields in one struct (`Window` with `starts_at` and `ends_at`, both `Timestamp`),
+take it as input, and guard on `window.ends_at > window.starts_at`; `synthesize` orders the two
+instants. `Duration` does not compare with a number (it is text), so a length is an `Integer` in a
+named unit (`duration_minutes > 0`).
