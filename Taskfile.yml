@@ -45,7 +45,7 @@ tasks:
       - rm -rf '{{.T}}'
       - mkdir -p -m 700 '{{.TRIALS}}'
       - mkdir -p '{{.T}}/home/.local/bin' '{{.T}}/work' '{{.T}}/tools'
-      - for t in claude codex; do p="$(command -v $t)" && ln -sf "$(readlink -f "$p")" '{{.T}}/tools/'$t; done; true
+      - for t in claude codex go gofmt; do p="$(command -v $t)" && ln -sf "$(readlink -f "$p")" '{{.T}}/tools/'$t; done; true
       - for t in cargo rustc rustup; do ln -sf "$HOME/.cargo/bin/$t" '{{.T}}/tools/'$t; done
       - echo '{}' > '{{.T}}/home/.claude.json'
       - nice -n 19 env CARGO_BUILD_JOBS=4 cargo build --quiet --locked -p b10x
@@ -62,28 +62,42 @@ tasks:
       - echo '{{.T}}'
 
   trial:run:
-    desc: "Run one headless trial in a sandbox and check its isolation: task trial:run NAME=<name> PROMPT='…' [DIR=<subdir of work>] [SEEDED=true for an upgrade trial]."
-    requires:
-      vars: [NAME, PROMPT]
+    desc: "Run one headless trial, check its isolation and measure it: task trial:run TRIAL=<name under trials/> (in a fresh sandbox), or task trial:run NAME=<name> PROMPT='…' [DIR=<subdir of work>] [SEEDED=true for an upgrade trial] in an existing one."
     vars:
+      NAME: '{{.NAME | default .TRIAL}}'
       T: '{{.TRIALS}}/{{.NAME}}'
       DIR: '{{.DIR | default ""}}'
-      SEEDED: '{{if eq (.SEEDED | default "") "true"}}--seeded{{end}}'
       VERSION:
         sh: sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1
+    preconditions:
+      - sh: test -n '{{.TRIAL}}' || { test -n '{{.NAME}}' && test -n "$PROMPT"; }
+        msg: "set TRIAL=<name> (a definition under trials/), or NAME=<name> and PROMPT='…'"
     cmds:
-      - cp '{{.T}}/home/.claude/plugins/installed_plugins.json' '{{.T}}/registry-at-start.json'
+      - task: trial:sandbox
+        vars: { NAME: '{{.NAME}}' }
+        if: test -n '{{.TRIAL}}'
+      - cmd: cargo run --quiet --locked --bin agentplugins-check -- trial-prepare '{{.TRIAL}}' --sandbox '{{.T}}'
+        if: test -n '{{.TRIAL}}'
+      - cmd: |
+          printf '%s' "$PROMPT" > '{{.T}}/prompt.txt'
+          printf '%s' '{{.DIR}}' > '{{.T}}/workdir'
+          rm -f '{{.T}}/setup.sh' '{{.T}}/seeded'
+          if [ '{{.SEEDED}}' = true ]; then : > '{{.T}}/seeded'; fi
+        if: test -z '{{.TRIAL}}'
+      - if [ -f '{{.T}}/setup.sh' ]; then (. '{{.T}}/env' && cd '{{.T}}' && . ./setup.sh); fi
+      - rm -f '{{.T}}/registry-at-start.json'; if [ -f '{{.T}}/home/.claude/plugins/installed_plugins.json' ]; then cp '{{.T}}/home/.claude/plugins/installed_plugins.json' '{{.T}}/registry-at-start.json'; fi
       - install -m 600 "$HOME/.claude/.credentials.json" '{{.T}}/home/.claude/.credentials.json'
       - defer: rm -f '{{.T}}/home/.claude/.credentials.json'
       - |
-        (. '{{.T}}/env' && mkdir -p '{{.T}}/work/{{.DIR}}' && cd '{{.T}}/work/{{.DIR}}' &&
-         timeout 2400 claude -p "$PROMPT" --permission-mode acceptEdits \
-           --allowedTools 'Bash(b10x:*)' 'Bash(ess:*)' 'Bash(aep:*)' 'Bash(worktree:*)' 'Bash(git:*)' \
+        (. '{{.T}}/env' && dir="$(cat '{{.T}}/workdir')" && mkdir -p "{{.T}}/work/$dir" && cd "{{.T}}/work/$dir" &&
+         timeout 2400 claude -p "$(cat '{{.T}}/prompt.txt')" --permission-mode acceptEdits \
+           --allowedTools 'Bash(b10x:*)' 'Bash(ess:*)' 'Bash(aep:*)' 'Bash(worktree:*)' 'Bash(git:*)' 'Bash(go:*)' \
              'Bash(mkdir:*)' 'Bash(ls:*)' 'Bash(cat:*)' 'Bash(find:*)' 'Bash(curl:*)' 'Bash(tar:*)' \
              'Bash(sha256sum:*)' 'Bash(mv:*)' 'Bash(chmod:*)' Read Write Edit Glob Grep Skill Task Agent \
            --strict-mcp-config --output-format stream-json --verbose > '{{.T}}/run.jsonl' 2> '{{.T}}/run.err'
          echo "EXIT=$?" >> '{{.T}}/run.err')
-      - cargo run --quiet --locked --bin agentplugins-check -- trial-isolation '{{.T}}/run.jsonl' --sandbox '{{.T}}' --marketplace '{{.ROOT_DIR}}' --version '{{.VERSION}}' {{.SEEDED}}
+      - cargo run --quiet --locked --bin agentplugins-check -- trial-isolation '{{.T}}/run.jsonl' --sandbox '{{.T}}' --marketplace '{{.ROOT_DIR}}' --version '{{.VERSION}}' $([ -f '{{.T}}/seeded' ] && echo --seeded)
+      - cargo run --quiet --locked --bin agentplugins-check -- trial-report '{{.T}}/run.jsonl' --sandbox '{{.T}}' {{if .TRIAL}}--trial '{{.TRIAL}}' --baseline '{{.ROOT_DIR}}/trials/baseline.json'{{end}}
     env:
       PROMPT: '{{.PROMPT}}'
 

@@ -16,6 +16,7 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 | `website/` | public docs; must pass `task site-build` |
 | `SETUP.md` | agent bootstrap, published as a release asset |
 | `.agents/skills/improving-by-trial/` | how plugins are improved: isolated headless trials (`task trial:sandbox`, `task trial:run`), triage, fix, re-run |
+| `trials/` | the round's trial definitions (`<name>/trial.yaml`, fixtures) and `baseline.json`; `task trial:run TRIAL=<name>` runs one, `agentplugins-check trial-report` measures it against the baseline |
 
 ## Rules
 
@@ -34,7 +35,7 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 ## Gate
 
 ```console
-task check          # fmt, clippy, tests, agentplugins-check
+task check          # fmt, clippy, tests, agentplugins-check (includes the trial definitions)
 task site-build     # when website/ changes
 cargo run --locked --bin agentplugins-check -- tools    # network: every spelled command exists in the newest aep, ess, worktree
 ```

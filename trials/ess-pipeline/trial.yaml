@@ -1,0 +1,21 @@
+name: ess-pipeline
+kind: ess-pipeline
+prompt: |
+  There's an ESS specification for our rehearsal-room bookings in `spec/`. Generate its JSON
+  Schema into `out/schema`, its OpenAPI into `out/openapi` and its docs into `out/docs`, and
+  synthesize the conformance suite as the canonical document at `out/conformance.json`. Tell me how
+  many scenarios it has and whether the synthesis refused anything, and why.
+
+  When you're done, list the skills and agents you used, quote any instruction text that confused
+  you, and paste the last synthesis output verbatim.
+dir: rehearsal
+fixture: fixture
+setup:
+  - b10x init ess --host claude --out plan.json
+  - b10x setup apply --plan plan.json --yes
+measures: [tool_calls, validate, synthesis, outputs]
+outputs:
+  schema: out/schema
+  openapi: out/openapi
+  docs: out/docs
+  conformance: out/conformance.json

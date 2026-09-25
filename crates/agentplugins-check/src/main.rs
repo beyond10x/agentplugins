@@ -8,8 +8,10 @@ use clap::{Parser, Subcommand};
 mod concept;
 mod evals;
 mod readiness;
+mod report;
 mod tools;
 mod trial;
+mod trials;
 
 /// The marketplace identity in every marketplace format.
 const MARKETPLACE: &str = "b10x";
@@ -928,6 +930,7 @@ fn check(root: &Path) -> Result<(), String> {
             remote: std::collections::BTreeSet::new(),
         },
     )?;
+    trials::check(root)?;
     evals::evals(root)
 }
 
@@ -997,6 +1000,83 @@ enum Top {
         #[arg(long)]
         seeded: bool,
     },
+    /// Prepare a fresh sandbox for a trial defined under `trials/`: copy and commit its fixture,
+    /// and write the prompt, working directory and setup `task trial:run` reads.
+    TrialPrepare {
+        /// The trial's name (its directory under `trials/`).
+        trial: String,
+        /// The sandbox directory made by `task trial:sandbox`.
+        #[arg(long)]
+        sandbox: PathBuf,
+    },
+    /// Measure a trial run: tool calls, validation, synthesis, `UNMAPPED:` markers, outputs and
+    /// `go test` counts, one line each; with `--baseline`, exit 1 when a measure got worse.
+    TrialReport {
+        /// The run's stream-json output.
+        run: PathBuf,
+        /// The trial under `trials/` the run executed; without it, an ad-hoc `PROMPT=` run gets
+        /// every measure that needs no definition.
+        #[arg(long)]
+        trial: Option<String>,
+        /// The sandbox directory; default: the directory holding the run.
+        #[arg(long)]
+        sandbox: Option<PathBuf>,
+        /// Compare with this baseline (`trials/baseline.json`) and exit 1 when a measure got worse.
+        #[arg(long, requires = "trial")]
+        baseline: Option<PathBuf>,
+        /// Record this run as the trial's baseline, in `--baseline` or `trials/baseline.json`.
+        #[arg(long, requires = "trial")]
+        write_baseline: bool,
+    },
+}
+
+/// `trial-report`: print the measures, compare them with the baseline, and record them.
+fn trial_report(
+    root: &Path,
+    run: &Path,
+    trial: Option<&str>,
+    sandbox: Option<PathBuf>,
+    baseline: Option<PathBuf>,
+    write_baseline: bool,
+) -> Result<bool, String> {
+    let definition = trial.map(|name| trials::load(root, name)).transpose()?;
+    let text = std::fs::read_to_string(run)
+        .map_err(|error| format!("reading {}: {error}", run.display()))?;
+    let sandbox = sandbox
+        .or_else(|| run.parent().map(Path::to_path_buf))
+        .ok_or("no sandbox: pass --sandbox")?;
+    let report = report::measure(&text, &sandbox, definition.as_ref())?;
+    println!("trial {}: {}", trial.unwrap_or("(ad hoc)"), run.display());
+    for line in &report.lines {
+        println!("  {line}");
+    }
+    let mut held = true;
+    if let (Some(trial), Some(path)) = (trial, baseline.as_deref()) {
+        match report::read_baseline(path)?.get(trial) {
+            None => println!(
+                "baseline: none recorded for `{trial}` in {}",
+                path.display()
+            ),
+            Some(then) => {
+                let worse = report::worse(then, &report.measures);
+                if worse.is_empty() {
+                    println!("baseline: no measure got worse than {}", path.display());
+                } else {
+                    held = write_baseline;
+                    eprintln!("worse than the baseline in {}:", path.display());
+                    for line in worse {
+                        eprintln!("  {line}");
+                    }
+                }
+            }
+        }
+    }
+    if let (Some(trial), true) = (trial, write_baseline) {
+        let path = baseline.unwrap_or_else(|| root.join(trials::BASELINE));
+        report::write_baseline(&path, trial, &report.measures)?;
+        println!("baseline: recorded `{trial}` in {}", path.display());
+    }
+    Ok(held)
 }
 
 #[derive(Debug, Subcommand)]
@@ -1034,6 +1114,41 @@ fn main() -> ExitCode {
                     println!("{summary}");
                     ExitCode::SUCCESS
                 }
+                Err(error) => {
+                    eprintln!("error: {error}");
+                    ExitCode::from(1)
+                }
+            };
+        }
+        Some(Top::TrialPrepare { trial, sandbox }) => {
+            return match trials::prepare(&root, &trial, &sandbox) {
+                Ok(summary) => {
+                    println!("{summary}");
+                    ExitCode::SUCCESS
+                }
+                Err(error) => {
+                    eprintln!("error: {error}");
+                    ExitCode::from(1)
+                }
+            };
+        }
+        Some(Top::TrialReport {
+            run,
+            trial,
+            sandbox,
+            baseline,
+            write_baseline,
+        }) => {
+            return match trial_report(
+                &root,
+                &run,
+                trial.as_deref(),
+                sandbox,
+                baseline,
+                write_baseline,
+            ) {
+                Ok(true) => ExitCode::SUCCESS,
+                Ok(false) => ExitCode::from(1),
                 Err(error) => {
                     eprintln!("error: {error}");
                     ExitCode::from(1)

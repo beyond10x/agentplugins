@@ -1,0 +1,10 @@
+format: ess/1
+system: rehearsal
+version: v1
+
+summary: >-
+  Rehearsal rooms for a music school: a band holds a room for a slot, confirms it when the band
+  leader pays, and releases it when plans change.
+
+domains:
+  - rehearsal.booking

@@ -1,0 +1,15 @@
+name: ess-new
+kind: ess-new
+prompt: |
+  I'm starting a small service for a community seed library: members borrow seed packets in
+  spring, and bring back seeds from their harvest in autumn so the library can restock. Some
+  varieties run out, and a member can only have five packets out at once. Write an ESS
+  specification for it in `spec/` and make sure it validates.
+
+  When you're done, list the skills and agents you used, quote any instruction text that confused
+  you, and paste the last validation output verbatim.
+dir: seedlib
+setup:
+  - b10x init ess --host claude --out plan.json
+  - b10x setup apply --plan plan.json --yes
+measures: [tool_calls, validate, unmapped]

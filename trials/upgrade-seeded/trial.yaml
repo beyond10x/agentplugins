@@ -1,0 +1,17 @@
+name: upgrade-seeded
+kind: upgrade
+prompt: |
+  I installed the Beyond10x plugins a while ago and haven't touched them since. Bring everything up
+  to date, and tell me what changed.
+
+  When you're done, list the skills and agents you used, quote any instruction text that confused
+  you, and paste the last command output verbatim.
+seeded: true
+setup:
+  - git -c advice.detachedHead=false clone --quiet --depth 1 --branch 0.12.0 https://github.com/beyond10x/agentplugins.git home/seed-marketplace
+  - claude plugin marketplace add "$PWD/home/seed-marketplace"
+  - |
+    for plugin in $(grep -o '"\./plugins/[a-z0-9-]*"' home/seed-marketplace/.claude-plugin/marketplace.json | tr -d '"'); do
+      claude plugin install "${plugin##*/}@b10x"
+    done
+measures: [tool_calls]
