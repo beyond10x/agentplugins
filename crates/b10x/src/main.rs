@@ -75,7 +75,7 @@ enum Top {
     },
     /// Offline drift check for a session-start hook; prints only problems; always exits 0.
     Check,
-    /// Print an installed skill or agent (`ess:specify`), or list a plugin's (`ess`). A host loads
+    /// Print an installed skill or agent (`ess:specifying`), or list a plugin's (`ess`). A host loads
     /// new plugins only in a new session; this works in the session that installed them.
     Skill {
         /// `<plugin>` or `<plugin>:<skill-or-agent>`.

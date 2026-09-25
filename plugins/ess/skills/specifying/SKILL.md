@@ -142,7 +142,7 @@ it would go, and named again in the report:
 
 ```yaml
       # UNMAPPED: the epic says a shipment has a carrier; no code, contract or
-      # artifact here says what a carrier is. Ask before typing it.
+      # artifact here says what a carrier is. Open question for the owner.
 ```
 
 **A relation whose cardinality or ownership you cannot read is `UNMAPPED:`, not an entry with a
@@ -153,12 +153,23 @@ where the entry would go:
 
 ```yaml
       # UNMAPPED: a shipment has lines, and nothing here says whether deleting the
-      # shipment deletes them (owns) or orphans them (references). Ask.
+      # shipment deletes them (owns) or orphans them (references). Open question.
 ```
 
-Imports never guess, and a domain an agent drafts is an import. Never invent a field type, a
-lifecycle state or an edge to make a document validate — leave the marker, and name what would
-settle it.
+Imports never guess, and a domain an agent drafts is an import. Never invent an entity, a field
+type, a lifecycle state or an edge to make a document validate — leave the marker, and name what
+would settle it. An entity no source names, added so that a command type-checks, is an invention
+even when it validates.
+
+A marker records the question; it does not ask it. In an interactive session, put the open markers
+to the user as questions at the end (Claude Code: `AskUserQuestion`), one per marker, and write the
+answers into the specification. Headless, or as the `author` agent, leave the markers and list them
+in the report.
+
+**A second source document goes into one of three places.** The same system, as another domain,
+when the document says it is part of that system (a companion note, shared requirement ids). A
+separate system when it describes its own deployable service. An external boundary when the system
+only calls it. When the document does not say which, it is an open question: ask, or mark it.
 
 ## Read before changing
 
@@ -168,6 +179,9 @@ From the specification root, establish the current answer:
 ess specify validate --path <specification>
 ess specify compile --path <specification> --format json
 ```
+
+A headless run (`claude -p`) needs permission to run the CLI, or it cannot validate anything:
+`--allowedTools "Bash(ess:*)"`.
 
 `validate` and `compile` accumulate diagnostics. Relay every refusal; do not stop at the first or
 edit generated output around it.
@@ -235,7 +249,9 @@ the persisted envelope changes. Adding internal Rust capabilities is not enough.
 strict v1 reader such as `infra-ir/1`, add an old-reader compatibility test; unknown fields are
 currently refused.
 
-Finish by running the repository's full gate and report the exact command and exit status.
+Finish by running the repository's full gate, where it has one, and report the exact command and
+exit status. Where it has none, `ess specify validate` plus `ess verify conform synthesize` with 0
+refusals is the check; report both outputs.
 
 ## Agents
 
@@ -243,6 +259,9 @@ Finish by running the repository's full gate and report the exact command and ex
 
 ## Next
 
-- The specification validates: project it (`ess generate`) or synthesise a conformance suite, then `ess:testing-conformance`.
+- First, review: every `UNMAPPED:` marker and every contradiction between sources goes to the owner
+  and is resolved in the specification. A specification validates with markers still in it, so
+  `validate` alone is not the review. Then plan the work around it with `aep:planning`.
+- The specification validates and is reviewed: project it (`ess generate`) or synthesise a conformance suite, then `ess:testing-conformance`.
 - A system already exists and has no specification: `ess:retrofitting`.
 - `ess` missing or older than expected: `ess:upgrade`.

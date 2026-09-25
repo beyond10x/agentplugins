@@ -52,8 +52,9 @@ agentplugins-check trial-isolation <sandbox>/run.jsonl --sandbox <sandbox> --ver
 
 It fails when a plugin loaded from outside the sandbox home and the checkout, when a plugin is not
 in the sandbox's own registry as it was before the run, when a plugin is not at the version under
-test, or when an agent or skill came from a plugin the sandbox did not load. A failing run is
-discarded, not interpreted.
+test, or when the run used an agent or skill from a plugin the sandbox did not load. One that was
+only offered (claude.ai account skills reach sub-agent sessions) is printed as a note. A failing run
+is discarded, not interpreted.
 
 **A sandbox under the home directory is not isolated.** Claude Code reads `CLAUDE.md`,
 `.claude/CLAUDE.md` and `.claude/settings*.json` in every directory above its working directory. In

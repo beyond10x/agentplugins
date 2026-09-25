@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.14.4] — 2026-09-25
+
+From the round-3 trials on 0.14.3 and the first product fix they led to.
+
+- `worktree:init`: `worktree doctor --check` now fails with `no active profile` (worktree 0.7.1);
+  the `profiles=0` workaround is gone.
+- ESS syntax reference: a predicate is one comparison or a bare fact path; `&&`, `||` and `in` are
+  refused and a list's length cannot be tested, so "state A or B" is two views. Error outcomes count
+  toward "all but one needs a `when`"; `wrong_state` outcomes do not.
+- `ess:specifying`: where a repository has no gate, validate plus a synthesis with 0 refusals is the
+  check to report.
+- `ess:retrofitting`: a service that publishes no events declares one per success outcome for the
+  fact it produces, and leaves it out of `publishes:`; `validate` refuses an outcome with nothing
+  observable. An entity the code gives no status gets one structural state, marked as such.
+- `SETUP.md` step 1 asks the user before it installs `b10x`, showing the target, URL and path; the
+  product `init` skills say they install CLIs only after the user confirms.
+- `ess:specifying`: never invent an entity to make a command type-check; in an interactive session
+  the open `UNMAPPED:` markers become questions to the user; a second source document goes into the
+  same system, a new system or an external boundary by what it says, and is an open question when
+  it says neither; `## Next` starts with reviewing markers and contradictions with the owner; a
+  headless run needs `--allowedTools "Bash(ess:*)"` (also on the plugin page). The `author` agent
+  ends its report with that review step. Marker examples no longer say "Ask".
+- The docs intro and `b10x skill --help` name the current skills (`init`, `specifying`, …).
+- `agentplugins-check trial-isolation`: a skill or agent from outside the sandbox fails a run only
+  when the run used it; one merely offered (claude.ai account skills in sub-agent sessions) is a note.
+
 ## [0.14.3] — 2026-09-25
 
 From trial 3: five fresh agents on 0.14.2 (an ESS specification from nothing, an ESS retrofit of an

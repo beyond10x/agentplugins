@@ -1,6 +1,6 @@
 ---
 name: init
-description: Start with worktree in this project — make sure the `worktree` CLI is available and take the first step. worktree is isolated Git worktrees with leases, recovery proof and safe cleanup. Use when the user wants isolated checkouts for agent work, asks to set up or install worktree, or when `worktree:managing-worktrees` reports that `worktree` is missing.
+description: Start with worktree in this project — make sure the `worktree` CLI is available and take the first step. worktree is isolated Git worktrees with leases, recovery proof and safe cleanup. Use when the user wants isolated checkouts for agent work, asks to set up or install worktree, or when `worktree:managing-worktrees` reports that `worktree` is missing. Installs CLIs only after the user confirms the plan.
 ---
 
 # Start with worktree
@@ -18,7 +18,7 @@ It prints what it would do, including the install method: `cargo` when a Rust to
 both are possible, re-run with `--method cargo` or `--method prebuilt` to match, show the plan, and
 after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
-No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
+No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 
 ## 2. First step here
 
@@ -38,8 +38,7 @@ where it is or be committed into a repository the user shares with others. Ask t
 workspace root (an absolute path to the directory that holds their repositories) rather than
 guessing it.
 
-`worktree doctor --check` exits 0 even when no profile is active; read its `profiles=` line and
-treat `profiles=0` as not set up.
+`worktree doctor --check` fails with `no active profile` until `activate` has run.
 
 **A repository needs a remote before its trees can be cleaned up.** Cleanup proves that each
 commit reached a remote, so in a repository with no remote (`git remote` prints nothing) `create`

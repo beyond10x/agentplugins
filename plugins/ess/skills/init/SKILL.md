@@ -1,6 +1,6 @@
 ---
 name: init
-description: Start with ESS (Executable System Specifications) in this project — make sure the `ess` CLI is installed, explain what ESS does, and take the first step of a specification. Use when the user wants to start writing specs, asks what ESS is or how to adopt it, asks to set up or install ESS, points at the ESS repository, or when another ESS skill reports that `ess` is missing.
+description: Start with ESS (Executable System Specifications) in this project — make sure the `ess` CLI is installed, explain what ESS does, and take the first step of a specification. Use when the user wants to start writing specs, asks what ESS is or how to adopt it, asks to set up or install ESS, points at the ESS repository, or when another ESS skill reports that `ess` is missing. Installs CLIs only after the user confirms the plan.
 ---
 
 # Start with ESS
@@ -22,7 +22,7 @@ It prints what it would do, including the install method: `cargo` when a Rust to
 both are possible, re-run with `--method cargo` or `--method prebuilt` to match, show the plan, and
 after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
-No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
+No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 
 ## 2. Pick the work
 
