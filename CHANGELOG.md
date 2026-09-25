@@ -2,29 +2,46 @@
 
 ## [0.14.4] — 2026-09-25
 
-From the round-3 trials on 0.14.3 and the first product fix they led to.
+From the round-3 trials on 0.14.3, the first product fix they led to (worktree 0.7.1), and eight
+findings from a team adopting ESS. Two isolated trials on this version passed (an ESS retrofit and
+worktree onboarding).
 
-- `worktree:init`: `worktree doctor --check` now fails with `no active profile` (worktree 0.7.1);
-  the `profiles=0` workaround is gone.
-- ESS syntax reference: a predicate is one comparison or a bare fact path; `&&`, `||` and `in` are
+**Setup**
+
+- `SETUP.md` step 1 asks the user before it installs `b10x`, showing the target, the download URL
+  and the install path. The product `init` skills say they install CLIs only after the user
+  confirms.
+
+**`ess`**
+
+- `ess:specifying`: never invent an entity so that a command type-checks. In an interactive session
+  the open `UNMAPPED:` markers become questions to the user; headless runs and the `author` agent
+  keep them and list them. Marker examples no longer say "Ask".
+- `ess:specifying`: a second source document goes into the same system, a new system or an
+  external boundary, by what it says about itself; when it says neither, that is an open question.
+- `ess:specifying`: `## Next` starts with the owner reviewing every marker and contradiction, then
+  planning (`aep:planning`), then generate and conformance. The `author` agent ends its report the
+  same way.
+- `ess:specifying`: a headless run needs `--allowedTools "Bash(ess:*)"` (also on the plugin page).
+  Where a repository has no gate, validate plus a synthesis with 0 refusals is the check to report.
+- Syntax reference: a predicate is one comparison or a bare fact path; `&&`, `||` and `in` are
   refused and a list's length cannot be tested, so "state A or B" is two views. Error outcomes count
   toward "all but one needs a `when`"; `wrong_state` outcomes do not.
-- `ess:specifying`: where a repository has no gate, validate plus a synthesis with 0 refusals is the
-  check to report.
 - `ess:retrofitting`: a service that publishes no events declares one per success outcome for the
-  fact it produces, and leaves it out of `publishes:`; `validate` refuses an outcome with nothing
-  observable. An entity the code gives no status gets one structural state, marked as such.
-- `SETUP.md` step 1 asks the user before it installs `b10x`, showing the target, URL and path; the
-  product `init` skills say they install CLIs only after the user confirms.
-- `ess:specifying`: never invent an entity to make a command type-check; in an interactive session
-  the open `UNMAPPED:` markers become questions to the user; a second source document goes into the
-  same system, a new system or an external boundary by what it says, and is an open question when
-  it says neither; `## Next` starts with reviewing markers and contradictions with the owner; a
-  headless run needs `--allowedTools "Bash(ess:*)"` (also on the plugin page). The `author` agent
-  ends its report with that review step. Marker examples no longer say "Ask".
+  fact it produces and leaves it out of `publishes:`, since `validate` refuses an outcome with
+  nothing observable. An entity the code gives no status gets one structural state, marked as such.
+
+**`worktree`**
+
+- `worktree:init`: `worktree doctor --check` fails with `no active profile` since worktree 0.7.1;
+  the `profiles=0` workaround is gone.
+
+**Docs and tooling**
+
 - The docs intro and `b10x skill --help` name the current skills (`init`, `specifying`, …).
 - `agentplugins-check trial-isolation`: a skill or agent from outside the sandbox fails a run only
-  when the run used it; one merely offered (claude.ai account skills in sub-agent sessions) is a note.
+  when the run used it; one merely offered (claude.ai account skills in sub-agent sessions) is a
+  note.
 
 ## [0.14.3] — 2026-09-25
 
@@ -47,9 +64,9 @@ existing service, an ESS pipeline through generate and a synthesized suite, AEP 
   are, why a new domain reports nothing useful against them, and `synthesize --target go|typescript`
   to hold a real implementation to the suite.
 - `aep:planning`: the `--protocols` and `--profile` values for `reverse init`; body files live in a
-  git-ignored directory of the repository, not `$TMPDIR`; a critic's empty findings fence is recorded as
-  `[]`, which the store accepts, since it refuses the empty fence. Two references to `ess skill`, which no longer exists, now name
-  `b10x skill ess:specifying`.
+  git-ignored directory of the repository, not `$TMPDIR`; a critic's empty findings fence is
+  recorded as `[]`, which the store accepts, since it refuses the empty fence. Two references to
+  `ess skill`, which no longer exists, now name `b10x skill ess:specifying`.
 - `aep:migrating`: `reverse init` creates the store in every case; a backlog item that introduces a
   new noun gets its ESS domain before its stories. Provenance says whose revisions it counts.
 - `b10x:init` and `aep:init` offer `ess` with `aep`.
@@ -61,8 +78,8 @@ existing service, an ESS pipeline through generate and a synthesized suite, AEP 
 - `b10x:routing` routes ESS and worktree work to their skills instead of to `ess skill`.
 - `b10x upgrade` installs the replacement of a legacy plugin it removes; it used to remove it and
   only note the replacement as missing. A legacy `local` install is not reinstalled at `local` when
-  the user scope covers it. A plan names Beyond10x plugins on a host it does not cover. `b10x check` no longer says nothing is set up
-  when only a legacy plugin is installed.
+  the user scope covers it. A plan names Beyond10x plugins on a host it does not cover. `b10x check`
+  no longer says nothing is set up when only a legacy plugin is installed.
 - `agentplugins-check tools` also synthesizes and generates the ESS syntax example.
 - `agentplugins-check` parses its arguments with clap; new `trial-isolation` checks that a headless
   trial loaded only the plugins its sandbox installed, at the version under test, and no MCP server.
