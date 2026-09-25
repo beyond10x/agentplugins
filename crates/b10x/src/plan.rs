@@ -12,7 +12,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::catalog::{Catalog, Install, Method};
+use crate::catalog::{Binary, Catalog, Install, Method};
 use crate::inventory::{Host, HostState, Installed, Inventory};
 use crate::resolve::Resolved;
 use crate::version;
@@ -254,8 +254,11 @@ pub struct Context<'a> {
     /// Plan only the selected products (`init`, `upgrade`): nothing else is uninstalled, migrated or
     /// removed. `false` makes the selection the whole desired state (`setup plan`).
     pub only: bool,
-    /// How to install binaries; `None` picks the prebuilt archive when the release has one, else cargo.
+    /// How to install binaries; `None` picks the prebuilt archive when the release has one for
+    /// [`Context::target`], else cargo.
     pub method: Option<Method>,
+    /// This machine's release-archive target triple; `None` when no archive is built for it.
+    pub target: Option<String>,
     /// Update only what is installed: no new plugins, and a host with nothing Beyond10x on it is
     /// left alone (`upgrade`).
     pub upgrade: bool,
@@ -818,17 +821,23 @@ fn plan_settings(
     }
 }
 
+/// Whether the newest release of `binary` carries a prebuilt archive for this machine's target.
+fn has_archive(context: &Context<'_>, binary: &Binary) -> bool {
+    binary.install.archive.is_some()
+        && context.target.as_deref().is_some_and(|target| {
+            context
+                .resolved
+                .archive_targets
+                .get(&binary.name)
+                .is_some_and(|targets| targets.contains(target))
+        })
+}
+
 /// The install method for one binary: the explicit choice when it can be honoured, else the prebuilt
-/// archive when the release has one, else cargo.
-fn method(context: &Context<'_>, install: &Install) -> Option<Method> {
-    let archive = install.archive.is_some()
-        && context
-            .resolved
-            .archives
-            .get(install.repository())
-            .copied()
-            .unwrap_or(false);
-    let cargo = install.cargo.is_some();
+/// archive when the release has one for this machine's target, else cargo.
+fn method(context: &Context<'_>, binary: &Binary) -> Option<Method> {
+    let archive = has_archive(context, binary);
+    let cargo = binary.install.cargo.is_some();
     if cargo && (matches!(context.method, Some(Method::Cargo)) || !archive) {
         Some(Method::Cargo)
     } else if archive {
@@ -876,6 +885,27 @@ fn plan_binaries(
                 .map(|state| state.copies.as_slice())
                 .unwrap_or_default();
             let current = copies.first();
+            if !binary.runs_on(context.target.as_deref()) {
+                if current.is_none() && !binary.optional {
+                    findings.push(Finding {
+                        level: Level::Warn,
+                        host: None,
+                        subject: subject.clone(),
+                        detail: format!(
+                            "runs on {} only; not installed on this machine",
+                            binary.platforms.join(", ")
+                        ),
+                    });
+                } else if current.is_none() {
+                    findings.push(Finding {
+                        level: Level::Note,
+                        host: None,
+                        subject: subject.clone(),
+                        detail: format!("optional, runs on {} only", binary.platforms.join(", ")),
+                    });
+                }
+                continue;
+            }
             if current
                 .is_some_and(|first| version::same(first.version.as_deref().unwrap_or(""), &tag))
             {
@@ -897,12 +927,13 @@ fn plan_binaries(
                     ),
                 });
             } else {
-                let Some(method) = method(context, &binary.install) else {
+                let Some(method) = method(context, binary) else {
+                    let target = context.target.as_deref().unwrap_or("this machine");
                     findings.push(Finding {
                         level: Level::Warn,
                         host: None,
                         subject: subject.clone(),
-                        detail: format!("{tag} has no prebuilt archive and `cargo` is not on PATH; install a Rust toolchain (https://rustup.rs) and plan again"),
+                        detail: format!("{tag} has no prebuilt archive for {target} and `cargo` is not on PATH; install a Rust toolchain (https://rustup.rs) and plan again"),
                     });
                     continue;
                 };
@@ -1033,14 +1064,30 @@ mod tests {
                 ("beyond10x/ess".to_owned(), "0.30.0".to_owned()),
                 ("beyond10x/worktree".to_owned(), "0.7.0".to_owned()),
                 ("beyond10x/metaharness".to_owned(), "0.7.0".to_owned()),
+                ("beyond10x/harness".to_owned(), "0.13.2".to_owned()),
             ]),
-            archives: BTreeMap::from([
-                ("beyond10x/aep".to_owned(), true),
-                ("beyond10x/ess".to_owned(), true),
-                ("beyond10x/worktree".to_owned(), true),
-                ("beyond10x/metaharness".to_owned(), false),
+            archive_targets: BTreeMap::from([
+                ("aep".to_owned(), every_target()),
+                ("ess".to_owned(), every_target()),
+                ("worktree".to_owned(), every_target()),
+                ("metaharness".to_owned(), BTreeSet::new()),
+                (
+                    "b10x-harness".to_owned(),
+                    BTreeSet::from([X86_LINUX.to_owned()]),
+                ),
             ]),
         }
+    }
+
+    const X86_LINUX: &str = "x86_64-unknown-linux-gnu";
+    const ARM_LINUX: &str = "aarch64-unknown-linux-gnu";
+    const ARM_MACOS: &str = "aarch64-apple-darwin";
+
+    fn every_target() -> BTreeSet<String> {
+        [X86_LINUX, ARM_LINUX, "x86_64-apple-darwin", ARM_MACOS]
+            .into_iter()
+            .map(str::to_owned)
+            .collect()
     }
 
     fn binaries(ess: &[(&str, &str)]) -> Vec<BinaryState> {
@@ -1067,6 +1114,7 @@ mod tests {
             home: Path::new("/opt/b10x-home"),
             only: false,
             method: None,
+            target: Some(X86_LINUX.to_owned()),
             upgrade: false,
         };
         plan(&context, inventory)
@@ -1306,6 +1354,7 @@ mod tests {
             home: Path::new("/opt/b10x-home"),
             only: true,
             method: None,
+            target: Some(X86_LINUX.to_owned()),
             upgrade: true,
         };
         plan(&context, inventory)
@@ -1428,6 +1477,7 @@ mod tests {
             home: Path::new("/opt/b10x-home"),
             only: true,
             method,
+            target: Some(X86_LINUX.to_owned()),
             upgrade: false,
         };
         plan(&context, inventory)
@@ -1475,6 +1525,98 @@ mod tests {
         assert_eq!(method_for(true, None), Some(Method::Prebuilt));
         assert_eq!(method_for(false, None), Some(Method::Prebuilt));
         assert_eq!(method_for(true, Some(Method::Cargo)), Some(Method::Cargo));
+    }
+
+    /// Plan `aep` on `target` with an older `b10x-harness` installed, whose newest release carries
+    /// an archive for x86-64 Linux only; `cargo_option` keeps or strips the catalog's cargo route.
+    fn plan_harness(target: Option<&str>, cargo_option: bool) -> Plan {
+        let mut catalog = Catalog::embedded();
+        if !cargo_option {
+            for product in &mut catalog.products {
+                for binary in &mut product.binaries {
+                    if binary.name == "b10x-harness" {
+                        binary.install.cargo = None;
+                    }
+                }
+            }
+        }
+        let resolved = resolved();
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            binaries: vec![BinaryState {
+                name: "b10x-harness".to_owned(),
+                copies: vec![Copy {
+                    path: "/opt/b10x-home/.local/bin/b10x-harness".to_owned(),
+                    version: Some("0.13.1".to_owned()),
+                }],
+            }],
+            ..Inventory::default()
+        };
+        let context = Context {
+            catalog: &catalog,
+            resolved: &resolved,
+            selection: Some(BTreeSet::from(["aep".to_owned()])),
+            hosts: vec![Host::Claude],
+            home: Path::new("/opt/b10x-home"),
+            only: true,
+            method: None,
+            target: target.map(str::to_owned),
+            upgrade: false,
+        };
+        plan(&context, &inventory)
+    }
+
+    fn harness_method(plan: &Plan) -> Option<Method> {
+        plan.actions.iter().find_map(|action| match action {
+            Action::InstallBinary { name, method, .. } if name == "b10x-harness" => Some(*method),
+            _ => None,
+        })
+    }
+
+    #[test]
+    fn prebuilt_only_for_a_target_the_release_has_an_archive_for() {
+        assert_eq!(
+            harness_method(&plan_harness(Some(X86_LINUX), true)),
+            Some(Method::Prebuilt)
+        );
+        assert_eq!(
+            harness_method(&plan_harness(Some(ARM_LINUX), true)),
+            Some(Method::Cargo)
+        );
+        assert_eq!(
+            harness_method(&plan_harness(Some(ARM_MACOS), true)),
+            None,
+            "a Linux-only binary is not planned on macOS, not even with cargo"
+        );
+        assert_eq!(
+            harness_method(&plan_harness(None, true)),
+            None,
+            "an unknown machine is not a platform the binary declares"
+        );
+    }
+
+    #[test]
+    fn no_archive_for_the_target_and_no_cargo_route_is_a_warning_not_an_action() {
+        assert_eq!(
+            harness_method(&plan_harness(Some(X86_LINUX), false)),
+            Some(Method::Prebuilt)
+        );
+        {
+            let target = ARM_LINUX;
+            let plan = plan_harness(Some(target), false);
+            assert_eq!(harness_method(&plan), None);
+            assert!(
+                plan.findings
+                    .iter()
+                    .any(|finding| finding.level == Level::Warn
+                        && finding.subject == "b10x-harness"
+                        && finding
+                            .detail
+                            .contains(&format!("no prebuilt archive for {target}"))),
+                "{:#?}",
+                plan.findings
+            );
+        }
     }
 
     #[test]
@@ -1534,6 +1676,7 @@ mod tests {
             home: Path::new("/opt/b10x-home"),
             only: true,
             method: None,
+            target: Some(X86_LINUX.to_owned()),
             upgrade: true,
         };
         let plan = plan(&context, &inventory);

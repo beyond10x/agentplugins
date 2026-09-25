@@ -64,8 +64,26 @@ pub struct Binary {
     /// Reported but never installed unprompted.
     #[serde(default)]
     pub optional: bool,
+    /// Operating systems it runs on (`linux`, `macos`); empty means every one.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub platforms: Vec<String>,
     /// The ways it can be installed.
     pub install: Install,
+}
+
+impl Binary {
+    /// Whether it runs on the operating system of `target` (a release-archive triple).
+    #[must_use]
+    pub fn runs_on(&self, target: Option<&str>) -> bool {
+        self.platforms.is_empty()
+            || target.is_some_and(|target| {
+                self.platforms.iter().any(|os| match os.as_str() {
+                    "linux" => target.contains("-linux"),
+                    "macos" => target.contains("-apple-darwin"),
+                    _ => false,
+                })
+            })
+    }
 }
 
 /// The ways a binary can be installed; at least one is present.
@@ -189,6 +207,25 @@ impl Catalog {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn a_binary_limited_to_linux_runs_only_on_linux_targets() {
+        let mut binary = super::Binary {
+            name: "b10x-harness".to_owned(),
+            optional: true,
+            platforms: vec!["linux".to_owned()],
+            install: super::Install {
+                archive: None,
+                cargo: None,
+            },
+        };
+        assert!(binary.runs_on(Some("x86_64-unknown-linux-gnu")));
+        assert!(binary.runs_on(Some("aarch64-unknown-linux-gnu")));
+        assert!(!binary.runs_on(Some("aarch64-apple-darwin")));
+        assert!(!binary.runs_on(None));
+        binary.platforms.clear();
+        assert!(binary.runs_on(None));
+    }
+
     use super::*;
 
     #[test]

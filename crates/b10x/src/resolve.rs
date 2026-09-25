@@ -3,13 +3,14 @@
 //! `plugin.json`, a plugin it points at from that repository's newest release, a binary bound to
 //! `latest` from the newest release.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::process::Command;
 
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::Catalog;
+use crate::install::listed_targets;
 use crate::inventory::Inventory;
 
 /// Versions setup compares against.
@@ -19,9 +20,10 @@ pub struct Resolved {
     pub plugins: BTreeMap<String, String>,
     /// `owner/repo` → newest release tag.
     pub latest: BTreeMap<String, String>,
-    /// `owner/repo` → whether its newest release carries prebuilt archives (`SHA256SUMS`).
+    /// Binary name → the targets its newest release carries a prebuilt archive for, as its
+    /// `SHA256SUMS` lists them; absent or empty when the release has none.
     #[serde(default)]
-    pub archives: BTreeMap<String, bool>,
+    pub archive_targets: BTreeMap<String, BTreeSet<String>>,
 }
 
 /// Where marketplace files are read from.
@@ -56,15 +58,6 @@ pub fn fetch(url: &str) -> Option<String> {
         .status
         .success()
         .then(|| String::from_utf8_lossy(&output.stdout).into_owned())
-}
-
-/// Whether a URL answers (`curl -fsI`), following redirects.
-#[must_use]
-pub fn exists(url: &str) -> bool {
-    Command::new("curl")
-        .args(["-fsIL", "-o", "/dev/null", "--max-time", "30", url])
-        .status()
-        .is_ok_and(|status| status.success())
 }
 
 /// Where the newest release tags seen by the last plan are kept, for the offline session check.
@@ -210,21 +203,31 @@ pub fn resolve(catalog: &Catalog, source: &Source<'_>) -> Resolved {
         .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok())
         .map(|marketplace| plugin_versions(&marketplace, source, &mut latest))
         .unwrap_or_default();
-    let mut archives = BTreeMap::new();
+    let mut archive_targets = BTreeMap::new();
+    let mut sums_of = BTreeMap::new();
     for product in &catalog.products {
         for binary in &product.binaries {
             let repository = binary.install.repository();
             if let (Some(tag), Some(_)) = (tag(&mut latest, repository), &binary.install.archive) {
-                let sums =
-                    format!("https://github.com/{repository}/releases/download/{tag}/SHA256SUMS");
-                archives.insert(repository.to_owned(), exists(&sums));
+                let sums: &Option<String> =
+                    sums_of.entry(repository.to_owned()).or_insert_with(|| {
+                        fetch(&format!(
+                            "https://github.com/{repository}/releases/download/{tag}/SHA256SUMS"
+                        ))
+                    });
+                archive_targets.insert(
+                    binary.name.clone(),
+                    sums.as_deref()
+                        .map(|sums| listed_targets(sums, &binary.name, &tag))
+                        .unwrap_or_default(),
+                );
             }
         }
     }
     Resolved {
         plugins,
         latest,
-        archives,
+        archive_targets,
     }
 }
 

@@ -37,7 +37,7 @@ enum Top {
         /// Products, comma separated: aep, ess, worktree, connectors.
         #[arg(value_delimiter = ',')]
         products: Vec<String>,
-        /// How to install CLIs; default: prebuilt, cargo when a release has no archive.
+        /// How to install CLIs; default: prebuilt, cargo when a release has no archive for this machine.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
         /// Hosts to plan for.
@@ -55,7 +55,7 @@ enum Top {
         /// Products, comma separated; default: every installed product.
         #[arg(value_delimiter = ',')]
         products: Vec<String>,
-        /// How to install CLIs; default: prebuilt, cargo when a release has no archive.
+        /// How to install CLIs; default: prebuilt, cargo when a release has no archive for this machine.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
         /// Hosts to plan for.
@@ -91,7 +91,7 @@ enum Top {
         /// Target directory; defaults to `~/.local/bin` (prebuilt) or `~/.cargo/bin` (cargo).
         #[arg(long)]
         dir: Option<PathBuf>,
-        /// How to install; default: prebuilt, cargo when a release has no archive.
+        /// How to install; default: prebuilt when the release has an archive for this machine, else cargo.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
     },
@@ -108,7 +108,7 @@ enum Setup {
         /// Hosts to plan for.
         #[arg(long, value_enum, default_value_t = Hosts::All)]
         host: Hosts,
-        /// How to install CLIs; default: prebuilt, cargo when a release has no archive.
+        /// How to install CLIs; default: prebuilt, cargo when a release has no archive for this machine.
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
         /// Print the plan as JSON.
@@ -327,6 +327,7 @@ fn make_plan(
         home: &home,
         only,
         method,
+        target: install::target().ok().map(str::to_owned),
         upgrade,
     };
     Ok(plan::plan(&context, &inventory))
@@ -570,16 +571,34 @@ fn install_one(
         None => resolve::latest_tag(repository)
             .ok_or_else(|| format!("no release found for {repository}"))?,
     };
-    let method = method.map_or_else(
-        || {
-            if inventory::copies_on_path("cargo").is_empty() {
-                catalog::Method::Prebuilt
-            } else {
-                catalog::Method::Cargo
-            }
-        },
-        MethodArg::method,
-    );
+    let target = install::target().ok();
+    if !binary.runs_on(target) {
+        return Err(format!(
+            "`{name}` runs on {} only",
+            binary.platforms.join(", ")
+        ));
+    }
+    let method = if let Some(method) = method {
+        method.method()
+    } else {
+        let listed = binary.install.archive.is_some()
+            && target.is_some_and(|target| {
+                resolve::fetch(&format!(
+                    "https://github.com/{repository}/releases/download/{tag}/SHA256SUMS"
+                ))
+                .is_some_and(|sums| install::listed_targets(&sums, name, &tag).contains(target))
+            });
+        if listed {
+            catalog::Method::Prebuilt
+        } else if binary.install.cargo.is_some() && !inventory::copies_on_path("cargo").is_empty() {
+            catalog::Method::Cargo
+        } else {
+            return Err(format!(
+                "{tag} of `{name}` has no prebuilt archive for {} and `cargo` is not on PATH",
+                target.unwrap_or("this machine")
+            ));
+        }
+    };
     let home = inventory::home();
     let directory = dir.unwrap_or_else(|| match method {
         catalog::Method::Prebuilt => home.join(".local/bin"),
