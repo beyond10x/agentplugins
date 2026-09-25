@@ -1,1 +1,60 @@
-{}
+{
+  "aep-backlog": {
+    "tool_calls": 313
+  },
+  "ess-full-package": {
+    "tool_calls": 68,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 13,
+      "refusals": 0
+    },
+    "unmapped": 0,
+    "outputs": [
+      "asyncapi",
+      "conformance",
+      "docs",
+      "implementation",
+      "openapi",
+      "schema",
+      "site",
+      "types-go",
+      "types-rust"
+    ],
+    "go_test": {
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "ess-new": {
+    "tool_calls": 12,
+    "validate": "valid",
+    "unmapped": 7
+  },
+  "ess-pipeline": {
+    "tool_calls": 19,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 12,
+      "refusals": 0
+    },
+    "outputs": [
+      "conformance",
+      "docs",
+      "schema"
+    ]
+  },
+  "ess-retrofit": {
+    "tool_calls": 29,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 16,
+      "refusals": 2
+    },
+    "unmapped": 7
+  },
+  "worktree-onboarding": {
+    "tool_calls": 19
+  }
+}

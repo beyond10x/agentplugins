@@ -2,7 +2,7 @@
   "name": "aep",
   "displayName": "AEP",
   "description": "Plan governed work in the AEP artifact store and deliver it in reviewed waves: decomposition, plan critique, reverse engineering, story scoping, implementation and adversarial review.",
-  "version": "0.14.9",
+  "version": "0.14.10",
   "author": {
     "name": "Beyond10x"
   },

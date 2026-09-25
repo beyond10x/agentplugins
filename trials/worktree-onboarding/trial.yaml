@@ -4,6 +4,8 @@ prompt: |
   Set up worktree for this repository so I can work on changes in isolated checkouts. Then use it
   to fix the typo in `README.md` in an isolated checkout on a branch, commit it there, and tell me
   where the checkout is. Leave this checkout as it is.
+  Nobody will answer questions during this run: where you would ask, decide, write down what you
+  decided and why, and go on.
 
   When you're done, list the skills and agents you used, quote any instruction text that confused
   you, and paste the last command output verbatim.

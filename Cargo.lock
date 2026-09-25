@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "agentplugins-check"
-version = "0.14.9"
+version = "0.14.10"
 dependencies = [
  "clap",
  "serde",
@@ -76,7 +76,7 @@ dependencies = [
 
 [[package]]
 name = "b10x"
-version = "0.14.9"
+version = "0.14.10"
 dependencies = [
  "clap",
  "serde",

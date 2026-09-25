@@ -191,13 +191,18 @@ edit generated output around it.
 Use the projection command, never a handwritten parallel generator:
 
 ```console
-ess generate --path <specification> --kind schema --out <directory>
-ess generate project openapi --path <specification> --out <directory>
+ess generate --path <specification> --kind <kind> --out <directory>
 ```
 
-Each writes into its own subdirectory of `--out`: `--out generated` gives `generated/schema/…` and
-`generated/openapi/…`. Pass the parent, not `generated/schema`, or the files land in
-`generated/schema/schema/`.
+`--kind` is `schema` (JSON Schema), `openapi`, `asyncapi`, `docs` (Markdown pages), `site` (the
+same pages as HTML) or `docs-ir`. Give each kind its own `--out`, side by side (`out/schema`,
+`out/openapi`, …): an output directory inside another is refused. `schema`, `openapi`, `asyncapi`
+and `docs` add a folder named after the kind below `--out` (`out/schema/schema/…`); `site` writes
+into `--out` itself. Type libraries come from `ess generate types --target rust|go|typescript`.
+
+**OpenAPI and AsyncAPI need a component** that owns the domain and says how it is reached
+(`components.yaml`, `reached_by`). Without one, `openapi` writes `0 artifact(s)` and prints no
+refusal: that is a missing declaration, not a clean result.
 
 The same typed IR must produce the same ordered files and bytes. Compare a regenerated temporary
 tree with the committed tree before replacing anything. A stale committed file is drift; a file no
