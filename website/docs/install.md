@@ -13,7 +13,7 @@ Tell Claude Code or Codex:
 
 The agent installs the `b10x` binary and runs `/b10x:init`: it asks what you want to do (plan and
 deliver work, write specifications, isolated Git checkouts, integrations) and how to install the
-command-line tools (`cargo` when you have it, or prebuilt archives), lists every change — including
+command-line tools (prebuilt archives by default, or `cargo`), lists every change — including
 earlier installs it replaces — and applies them only after you confirm. It snapshots every file it
 changes; `b10x setup undo` restores them. Each product then starts with its own `/<plugin>:init`,
 and `/b10x:upgrade` or `/<plugin>:upgrade` checks for newer versions. The rest of this page is the

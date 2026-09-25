@@ -254,7 +254,7 @@ pub struct Context<'a> {
     /// Plan only the selected products (`init`, `upgrade`): nothing else is uninstalled, migrated or
     /// removed. `false` makes the selection the whole desired state (`setup plan`).
     pub only: bool,
-    /// How to install binaries; `None` picks cargo when it is on `PATH`, else prebuilt.
+    /// How to install binaries; `None` picks the prebuilt archive when the release has one, else cargo.
     pub method: Option<Method>,
     /// Update only what is installed: no new plugins, and a host with nothing Beyond10x on it is
     /// left alone (`upgrade`).
@@ -818,9 +818,9 @@ fn plan_settings(
     }
 }
 
-/// The install method for one binary: the explicit choice when it can be honoured, else cargo when
-/// it is on `PATH`, else the prebuilt archive when the release has one.
-fn method(context: &Context<'_>, inventory: &Inventory, install: &Install) -> Option<Method> {
+/// The install method for one binary: the explicit choice when it can be honoured, else the prebuilt
+/// archive when the release has one, else cargo.
+fn method(context: &Context<'_>, install: &Install) -> Option<Method> {
     let archive = install.archive.is_some()
         && context
             .resolved
@@ -828,14 +828,13 @@ fn method(context: &Context<'_>, inventory: &Inventory, install: &Install) -> Op
             .get(install.repository())
             .copied()
             .unwrap_or(false);
-    let cargo = install.cargo.is_some() && inventory.cargo;
-    match context.method {
-        Some(Method::Prebuilt) if archive => Some(Method::Prebuilt),
-        Some(Method::Cargo) if install.cargo.is_some() => Some(Method::Cargo),
-        _ if cargo => Some(Method::Cargo),
-        _ if archive => Some(Method::Prebuilt),
-        _ if install.cargo.is_some() => Some(Method::Cargo),
-        _ => None,
+    let cargo = install.cargo.is_some();
+    if cargo && (matches!(context.method, Some(Method::Cargo)) || !archive) {
+        Some(Method::Cargo)
+    } else if archive {
+        Some(Method::Prebuilt)
+    } else {
+        None
     }
 }
 
@@ -898,7 +897,7 @@ fn plan_binaries(
                     ),
                 });
             } else {
-                let Some(method) = method(context, inventory, &binary.install) else {
+                let Some(method) = method(context, &binary.install) else {
                     findings.push(Finding {
                         level: Level::Warn,
                         host: None,
@@ -1458,7 +1457,7 @@ mod tests {
     }
 
     #[test]
-    fn cargo_is_the_default_when_present_and_prebuilt_otherwise() {
+    fn prebuilt_is_the_default_and_cargo_only_when_asked_or_without_archives() {
         let method_for = |cargo: bool, asked: Option<Method>| {
             let inventory = Inventory {
                 claude: Some(HostState::default()),
@@ -1473,12 +1472,9 @@ mod tests {
                     _ => None,
                 })
         };
-        assert_eq!(method_for(true, None), Some(Method::Cargo));
+        assert_eq!(method_for(true, None), Some(Method::Prebuilt));
         assert_eq!(method_for(false, None), Some(Method::Prebuilt));
-        assert_eq!(
-            method_for(true, Some(Method::Prebuilt)),
-            Some(Method::Prebuilt)
-        );
+        assert_eq!(method_for(true, Some(Method::Cargo)), Some(Method::Cargo));
     }
 
     #[test]

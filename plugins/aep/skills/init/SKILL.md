@@ -13,9 +13,10 @@ Run `aep --version`. If it answers, go to step 2: `b10x:init` just installed it,
 b10x init aep --out ~/.local/state/b10x/plan.json
 ```
 
-It prints what it would do, including the install method: `cargo` when a Rust toolchain is on
-`PATH`, otherwise a prebuilt, checksummed release archive. Ask the user which method they want if
-both are possible, re-run with `--method cargo` or `--method prebuilt` to match, show the plan, and
+It prints what it would do, including the install method: the prebuilt, checksummed release archive
+by default, or `cargo` (a source build) when the user asks for it and a Rust toolchain is on `PATH`.
+When both are possible, say which is planned and offer the other; re-run with `--method cargo` if
+they choose it, show the plan, and
 after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
 Planning models new data with ESS (`aep:planning` rule 7). If `ess --version` does not answer, offer

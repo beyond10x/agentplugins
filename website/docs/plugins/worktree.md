@@ -18,8 +18,8 @@ or audits old linked worktrees.
 /plugin install worktree@b10x
 ```
 
-Codex: `codex plugin add worktree@b10x`. Then `/worktree:init` installs the CLI — with `cargo`, or
-the prebuilt, checksummed archive from the [worktree release](https://github.com/beyond10x/worktree/releases) —
+Codex: `codex plugin add worktree@b10x`. Then `/worktree:init` installs the CLI — the prebuilt,
+checksummed archive from the [worktree release](https://github.com/beyond10x/worktree/releases), or with `cargo` on request —
 and runs:
 
 ```bash

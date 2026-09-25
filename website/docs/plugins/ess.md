@@ -20,8 +20,8 @@ to raise or audit a conformance suite against a real implementation.
 /plugin install ess@b10x
 ```
 
-Codex: `codex plugin add ess@b10x`. Then `/ess:init` installs the CLI — with `cargo`, or the prebuilt,
-checksummed archive from the [ESS release](https://github.com/beyond10x/ess/releases).
+Codex: `codex plugin add ess@b10x`. Then `/ess:init` installs the CLI — the prebuilt,
+checksummed archive from the [ESS release](https://github.com/beyond10x/ess/releases), or with `cargo` on request.
 
 In a headless run (`claude -p`), allow the CLI or nothing can be validated:
 `--allowedTools "Bash(ess:*)"`.

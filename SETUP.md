@@ -36,8 +36,8 @@ says so. Change nothing the user did not confirm.
    - If `~/.local/bin` is not on `PATH`, tell the user and use `~/.local/bin/b10x` below.
 2. **Run the guided setup.** `b10x setup guide` prints the `/b10x:init` skill; follow it from its
    step 2. It asks what the user wants to do (plan and deliver work, write specifications, isolated
-   Git checkouts, integrations) and how to install the CLIs (`cargo` or prebuilt), lists every
-   change, and applies it only after the user confirms.
+   Git checkouts, integrations) and how to install the CLIs (prebuilt by default, or `cargo`),
+   lists every change, and applies it only after the user confirms.
 3. **Continue with the product.** A plugin loads in the next session. To use it now, run
    `b10x skill <plugin>:init` (for example `b10x skill ess:init`) and follow the printed text;
    `b10x skill <plugin>` lists the rest.

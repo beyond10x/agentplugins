@@ -2,7 +2,7 @@
   "name": "worktree",
   "displayName": "Worktree",
   "description": "Create, lease, finish, audit and safely clean isolated Git worktrees through the worktree CLI.",
-  "version": "0.14.6",
+  "version": "0.14.7",
   "author": {
     "name": "Beyond10x"
   },
