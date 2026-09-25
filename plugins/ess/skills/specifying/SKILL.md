@@ -134,7 +134,7 @@ scenarios: []
 
 `specification` lists every authored file, relative to this file, and each must exist. `scenarios`
 lists authored scenario files, `[]` when there are none. `--path <directory>` then reads exactly
-that list. The CLI help calls the list-less `system.yaml` layout "legacy"; it still validates.
+that list. A directory with only `system.yaml` still validates, read whole.
 
 **A draft is a proposal, never a silent completion.** Every relation you could not read from code,
 an OpenAPI document or an existing artifact is written with an `UNMAPPED:` marker beside the place
