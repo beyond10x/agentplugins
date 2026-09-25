@@ -289,7 +289,25 @@ views:
     naming:
       wire: available
       display: Available copies
+
+  # An invariant is checked after every outcome, through a view that holds the entity in the
+  # resulting state and publishes the fields the invariant reads. With no `filter`, this one
+  # holds every state; without it, `ess verify conform synthesize` refuses the `pages > 0` checks.
+  - name: library.lending.Copies
+    source: library.lending.Copy
+    consistency: read_your_writes
+    fields:
+      - name: copy_id
+        type: library.lending.CopyId
+      - name: pages
+        type: Integer
+    naming:
+      wire: copies
+      display: Copies
 ```
+
+State names start with an upper-case letter (`OnLoan`); `validate` refuses `on_loan`. Enum
+variants may be written as the source spells them.
 
 ## What `when` can and cannot say
 
@@ -297,3 +315,16 @@ A `when` reads only the command's own input. A condition on another entity — "
 open", "the customer is active" — is not an input guard. Express it as a transition of that entity (a
 command that `moves` it, answered by `wrong_state` from states it does not start from), or leave an
 `UNMAPPED:` marker naming the rule and report it; never invent an outcome the compiler cannot decide.
+
+Two cases trials hit:
+
+| rule | how to write it |
+|---|---|
+| a value stored on the entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | not expressible: a `when` sees only the dispatch input. Mark it `UNMAPPED:` at the outcome, citing the source line |
+| two records must not overlap ("a room cannot be booked twice for one hour") | make the contested unit an entity with its own lifecycle (a `Slot` that is `Free` or `Booked`); a second booking is then `wrong_state` on that slot. Overlap between arbitrary time ranges is not expressible; mark it `UNMAPPED:` |
+
+**Order a time range by its length, not by comparing two `Timestamp`s.** `ends_at > starts_at`
+validates, but `ess verify conform synthesize` refuses it (`no declared scale contains both
+values`). `Duration` does not work either: it is text, and `validate` refuses `length > 0`. Take
+`starts_at: Timestamp` and an `Integer` in a named unit (`duration_minutes`) and guard on
+`duration_minutes > 0`.

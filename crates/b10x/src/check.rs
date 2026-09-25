@@ -128,7 +128,7 @@ pub fn lines(
         }
     } else if !installed
         .iter()
-        .any(|plugin| catalog.product_of(plugin).is_some())
+        .any(|plugin| catalog.product_of(catalog.current_name(plugin)).is_some())
     {
         lines.push(
             "b10x: no Beyond10x product is set up yet; /b10x:init asks what you want to do and installs it."
@@ -229,5 +229,16 @@ mod tests {
         let out = lines(&catalog, &plugins, &|_: &str| None, None, 0);
         assert_eq!(out.len(), 1);
         assert!(out[0].contains("/b10x:init"));
+    }
+
+    #[test]
+    fn a_legacy_plugin_is_not_nothing_set_up() {
+        let catalog = Catalog::embedded();
+        let plugins = [
+            plugin("b10x", "b10x", "0.12.0"),
+            plugin("aep-plan", "b10x", "0.12.0"),
+        ];
+        let out = lines(&catalog, &plugins, &|_: &str| None, None, 0);
+        assert!(!out.iter().any(|l| l.contains("/b10x:init")), "{out:#?}");
     }
 }

@@ -132,7 +132,7 @@ enum Setup {
         /// Snapshot directory or its timestamp name.
         snapshot: Option<String>,
     },
-    /// Print the setup instructions an agent follows (the `b10x:installing` skill).
+    /// Print the setup instructions an agent follows (the `b10x:init` skill).
     Guide,
 }
 
@@ -292,7 +292,7 @@ fn make_plan(
     if let Some(source) = &overridden {
         embedded.marketplace.repository.clone_from(source);
     }
-    let inventory = inventory::collect(&embedded, &hosts);
+    let inventory = inventory::collect(&embedded, &[Host::Claude, Host::Codex]);
     let local = overridden
         .as_deref()
         .map(std::path::Path::new)
@@ -457,7 +457,7 @@ fn setup_apply(path: &PathBuf, yes: bool) -> Result<ExitCode, String> {
         ));
     }
     let embedded = Catalog::embedded();
-    let inventory = inventory::collect(&embedded, &plan.hosts);
+    let inventory = inventory::collect(&embedded, &[Host::Claude, Host::Codex]);
     apply::fresh(&plan, &inventory)?;
     if !yes {
         print_plan(&plan);

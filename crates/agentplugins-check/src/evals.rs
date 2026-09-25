@@ -936,39 +936,44 @@ fn skill_directory(root: &Path, plugin: &str, name: &str, case: &str) -> Result<
     ))
 }
 
-/// The corpus subcommands, or [`None`] when these arguments are not one.
+/// The corpus subcommands.
+#[derive(Debug, clap::Subcommand)]
+pub(crate) enum Action {
+    /// Check one live run: its command contract and the AEP report beside the stream.
+    CheckStream {
+        /// The case directory, relative to the repository root.
+        case: std::path::PathBuf,
+        /// The `.events.jsonl` stream the run wrote.
+        stream: std::path::PathBuf,
+    },
+    /// Print the cases (and their plugins) that the changed paths concern.
+    Scope {
+        /// Changed repository-relative paths.
+        changed: Vec<String>,
+    },
+}
+
+/// Run a corpus subcommand; none validates the corpus and replays every recorded transcript.
 ///
-/// Handled before the marketplace check's own argument match and never inside it, so that adding
-/// this surface moved three lines of `main` and touched no existing arm. The `Ok` arm there prints
-/// *marketplace b10x* and would be a false sentence under either verb below.
-pub(crate) fn cli(root: &Path, arguments: &[String]) -> Option<std::process::ExitCode> {
-    let verdict = match arguments
-        .iter()
-        .map(String::as_str)
-        .collect::<Vec<_>>()
-        .as_slice()
-    {
-        ["evals"] => evals(root),
-        ["evals", "check-stream", case, stream] => {
-            check_stream(root, Path::new(case), Path::new(stream))
-        }
-        ["evals", "scope", changed @ ..] => {
-            let changed: Vec<String> = changed.iter().map(|path| (*path).to_owned()).collect();
-            scope(root, &changed).map(|matched| {
-                for (case, plugin) in matched {
-                    println!("{case}\t{plugin}");
-                }
-            })
-        }
-        _ => return None,
+/// Kept apart from the marketplace check, whose success line prints *marketplace b10x* and would be
+/// a false sentence under either verb here.
+pub(crate) fn run(root: &Path, action: Option<Action>) -> std::process::ExitCode {
+    let verdict = match action {
+        None => evals(root),
+        Some(Action::CheckStream { case, stream }) => check_stream(root, &case, &stream),
+        Some(Action::Scope { changed }) => scope(root, &changed).map(|matched| {
+            for (case, plugin) in matched {
+                println!("{case}\t{plugin}");
+            }
+        }),
     };
-    Some(match verdict {
+    match verdict {
         Ok(()) => std::process::ExitCode::SUCCESS,
         Err(error) => {
             eprintln!("error: {error}");
             std::process::ExitCode::from(1)
         }
-    })
+    }
 }
 
 fn check_commands(case: &Case, stream: &Path) -> Result<(), String> {

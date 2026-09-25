@@ -295,13 +295,7 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
             Host::Claude => inventory.claude.as_ref(),
             Host::Codex => inventory.codex.as_ref(),
         };
-        let untouched = state.is_some_and(|state| {
-            !state.plugins.iter().any(|plugin| {
-                plugin.marketplace == catalog.marketplace.name
-                    || catalog.retired_marketplace(&plugin.marketplace)
-                    || catalog.retired_plugins.contains_key(&plugin.name)
-            })
-        });
+        let untouched = state.is_some_and(|state| !holds_beyond10x(catalog, state));
         if context.upgrade && untouched {
             findings.push(Finding {
                 level: Level::Note,
@@ -345,6 +339,24 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
             },
         }
     }
+    for (host, state) in [
+        (Host::Claude, inventory.claude.as_ref()),
+        (Host::Codex, inventory.codex.as_ref()),
+    ] {
+        if state.is_some_and(|state| holds_beyond10x(catalog, state))
+            && !context.hosts.contains(&host)
+        {
+            findings.push(Finding {
+                level: Level::Note,
+                host: Some(host),
+                subject: host.program().to_owned(),
+                detail: format!(
+                    "Beyond10x plugins are installed for `{}` too and this plan leaves them alone; `--host all` covers both",
+                    host.program()
+                ),
+            });
+        }
+    }
     if context.hosts.contains(&Host::Claude) && inventory.claude.is_some() {
         plan_settings(context, &selected, inventory, &mut findings, &mut actions);
     }
@@ -373,6 +385,15 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
         method: context.method,
         upgrade: context.upgrade,
     }
+}
+
+/// Whether a host holds anything from Beyond10x: a current plugin, or a legacy one.
+fn holds_beyond10x(catalog: &Catalog, state: &HostState) -> bool {
+    state.plugins.iter().any(|plugin| {
+        plugin.marketplace == catalog.marketplace.name
+            || catalog.retired_marketplace(&plugin.marketplace)
+            || catalog.retired_plugins.contains_key(&plugin.name)
+    })
 }
 
 fn scope_args(plugin: &Installed) -> Vec<String> {
@@ -478,11 +499,25 @@ fn plan_host(
         .filter(|plugin| plugin.marketplace == name && plugin.scope == "user")
         .map(|plugin| (plugin.name.as_str(), plugin))
         .collect();
+    // Plugins a legacy install on this host stands in for: section 3 removes the legacy install,
+    // so an upgrade installs its replacement instead of only noting that it is missing.
+    let replacing: BTreeSet<&str> = state
+        .plugins
+        .iter()
+        .filter(|plugin| {
+            catalog.retired_marketplace(&plugin.marketplace)
+                || catalog.retired_plugins.contains_key(&plugin.name)
+        })
+        .map(|plugin| catalog.current_name(&plugin.name))
+        .collect();
     for plugin in &desired {
         let id = format!("{plugin}@{name}");
         let target = context.resolved.plugins.get(*plugin);
         match user.get(plugin) {
-            None if context.upgrade && !catalog.base.iter().any(|base| base == plugin) => {
+            None if context.upgrade
+                && !catalog.base.iter().any(|base| base == plugin)
+                && !replacing.contains(plugin) =>
+            {
                 findings.push(finding(
                     Level::Note,
                     &id,
@@ -575,7 +610,10 @@ fn plan_host(
                 plugin.scope
             ),
         ));
-        if plugin.scope != "user" {
+        // A local install is this user's alone, so the user-scope install of a selected product
+        // already covers it. A project install is committed for everyone and is replaced in place.
+        let covered = plugin.scope == "local" && desired.contains(&replacement.as_str());
+        if plugin.scope != "user" && !covered {
             let already = state.plugins.iter().any(|other| {
                 other.name == replacement
                     && other.marketplace == name
@@ -763,7 +801,13 @@ fn plan_settings(
                     && installed.scope == entry.scope
                     && installed.project == entry.project
             });
-        if entry.enabled && entry.scope != "user" && !already && catalog.knows(replacement) {
+        let covered = entry.scope == "local" && wanted(catalog, selected, replacement);
+        if entry.enabled
+            && entry.scope != "user"
+            && !covered
+            && !already
+            && catalog.knows(replacement)
+        {
             actions.push(install(
                 Host::Claude,
                 &target,
@@ -1201,7 +1245,7 @@ mod tests {
     }
 
     #[test]
-    fn an_orphan_in_a_project_file_is_removed_and_replaced_in_place() {
+    fn a_local_orphan_is_removed_and_its_replacement_goes_to_user_scope() {
         let mut state = HostState::default();
         state.marketplaces.push(Market {
             name: "b10x".to_owned(),
@@ -1224,9 +1268,122 @@ mod tests {
         assert!(plan.actions.iter().any(
             |a| matches!(a, Action::RemoveSetting { key, .. } if key == "beyond10x@beyond10x")
         ));
-        assert!(plan.actions.iter().any(|a| matches!(a,
-            Action::Command { argv, cwd: Some(cwd), .. }
-                if argv.join(" ") == "claude plugin install b10x@b10x --scope local" && cwd == "/work/acd")));
+        let commands = commands(&plan);
+        assert!(
+            !commands.iter().any(|c| c.contains("--scope local")),
+            "{commands:#?}"
+        );
+        assert!(commands.contains(&"claude plugin install b10x@b10x --scope user".to_owned()));
+    }
+
+    fn market() -> Market {
+        Market {
+            name: "b10x".to_owned(),
+            source: "beyond10x/agentplugins".to_owned(),
+            reference: None,
+            location: None,
+        }
+    }
+
+    fn installed(name: &str, marketplace: &str, scope: &str, project: Option<&str>) -> Installed {
+        Installed {
+            name: name.to_owned(),
+            marketplace: marketplace.to_owned(),
+            version: Some("0.12.0".to_owned()),
+            scope: scope.to_owned(),
+            project: project.map(str::to_owned),
+            enabled: true,
+        }
+    }
+
+    fn run_upgrade(inventory: &Inventory, hosts: &[Host]) -> Plan {
+        let catalog = Catalog::embedded();
+        let resolved = resolved();
+        let context = Context {
+            catalog: &catalog,
+            resolved: &resolved,
+            selection: None,
+            hosts: hosts.to_vec(),
+            home: Path::new("/opt/b10x-home"),
+            only: true,
+            method: None,
+            upgrade: true,
+        };
+        plan(&context, inventory)
+    }
+
+    #[test]
+    fn upgrade_installs_the_replacement_of_a_legacy_plugin_it_removes() {
+        let mut claude = HostState::default();
+        claude.marketplaces.push(market());
+        claude.plugins.push(installed("b10x", "b10x", "user", None));
+        claude
+            .plugins
+            .push(installed("worktree", "worktree", "user", None));
+        let inventory = Inventory {
+            claude: Some(claude),
+            ..Inventory::default()
+        };
+        let commands = commands(&run_upgrade(&inventory, &[Host::Claude]));
+        assert!(
+            commands.contains(&"claude plugin uninstall worktree@worktree --scope user".to_owned()),
+            "{commands:#?}"
+        );
+        assert!(
+            commands.contains(&"claude plugin install worktree@b10x --scope user".to_owned()),
+            "{commands:#?}"
+        );
+    }
+
+    #[test]
+    fn a_legacy_local_install_the_user_scope_covers_is_only_removed() {
+        let mut claude = HostState::default();
+        claude.marketplaces.push(market());
+        claude
+            .plugins
+            .push(installed("aep-plan", "b10x", "local", Some("/work/p")));
+        claude
+            .plugins
+            .push(installed("aep-drive", "b10x", "project", Some("/work/q")));
+        let inventory = Inventory {
+            claude: Some(claude),
+            ..Inventory::default()
+        };
+        let commands = commands(&run(&inventory, Some(&["aep"]), &[Host::Claude]));
+        assert!(
+            commands.contains(&"claude plugin install aep@b10x --scope user".to_owned()),
+            "{commands:#?}"
+        );
+        assert!(
+            !commands
+                .iter()
+                .any(|c| c == "claude plugin install aep@b10x --scope local"),
+            "{commands:#?}"
+        );
+        assert!(
+            commands.contains(&"claude plugin install aep@b10x --scope project".to_owned()),
+            "a committed project install is replaced in place: {commands:#?}"
+        );
+    }
+
+    #[test]
+    fn beyond10x_on_a_host_outside_the_plan_is_named() {
+        let mut codex = HostState::default();
+        codex.plugins.push(installed("ess", "b10x", "user", None));
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            codex: Some(codex),
+            ..Inventory::default()
+        };
+        let plan = run(&inventory, Some(&["ess"]), &[Host::Claude]);
+        assert!(
+            plan.findings
+                .iter()
+                .any(|f| f.host == Some(Host::Codex) && f.detail.contains("--host all")),
+            "{:#?}",
+            plan.findings
+        );
+        assert!(!commands(&plan).iter().any(|c| c.starts_with("codex")));
     }
 
     #[test]

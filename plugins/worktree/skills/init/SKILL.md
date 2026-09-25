@@ -22,15 +22,28 @@ No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/down
 
 ## 2. First step here
 
-Activate a workspace profile once, then check the setup:
+Activate a workspace profile once, then check the setup. The profile is a small template; the
+worktree repository publishes a default one:
 
 ```bash
-worktree activate --profile <profile.toml> --workspace <workspace-root>
+mkdir -p ~/.config/worktree
+curl -fsSL -o ~/.config/worktree/default.toml \
+  https://raw.githubusercontent.com/beyond10x/worktree/main/profiles/default.toml
+worktree activate --profile ~/.config/worktree/default.toml --workspace <workspace-root>
 worktree doctor --check
 ```
 
-`worktree doctor --check` names anything missing. Ask the user for the workspace root (the directory
-that holds their repositories) rather than guessing it.
+`activate` copies the profile into `~/.config/worktree/config.toml`, so the template file may stay
+where it is or be committed into a repository the user shares with others. Ask the user for the
+workspace root (an absolute path to the directory that holds their repositories) rather than
+guessing it.
+
+`worktree doctor --check` exits 0 even when no profile is active; read its `profiles=` line and
+treat `profiles=0` as not set up.
+
+**A repository needs a remote before its trees can be cleaned up.** Cleanup proves that each
+commit reached a remote, so in a repository with no remote (`git remote` prints nothing) `create`
+works and every later `gc` refuses. Tell the user before they start work there.
 
 ## 3. Pick the work
 

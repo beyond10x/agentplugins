@@ -6,7 +6,8 @@
 //! - **R3** a skill is an activity named in `-ing` form, one or two words, never its plugin's name.
 //! - **R4** an agent is owned by exactly one skill of its plugin, which lists it under `## Agents`.
 //! - **R7** every `<plugin>:<skill-or-agent>` id written in this repository resolves.
-//! - **R8** one README row, one plugin page and one sidebar entry per plugin; the README stays short.
+//! - **R8** one README row, one plugin page and one sidebar entry per plugin; the README stays short,
+//!   besides a generated tree of every skill and agent.
 //!
 //! R1, R5 and R6 are the marketplace, manifest-version and retired-name checks in `main.rs`.
 
@@ -390,21 +391,86 @@ pub fn readme_rows(readme: &str) -> Vec<String> {
         .collect()
 }
 
+/// Markers around the README's plugin tree, which [`tree`] generates.
+const TREE_START: &str = "<!-- plugin-tree:start -->";
+const TREE_END: &str = "<!-- plugin-tree:end -->";
+
+/// One carried plugin's skills and agents, by name.
+pub struct Contents {
+    /// Skill folder names.
+    pub skills: BTreeSet<String>,
+    /// Agent file stems.
+    pub agents: BTreeSet<String>,
+}
+
+/// The README's plugin tree, in table order: every skill (lifecycle first) and agent, each linked
+/// to its source file.
+#[must_use]
+pub fn tree(order: &[String], contents: &BTreeMap<String, Contents>) -> String {
+    let mut lines = vec![TREE_START.to_owned()];
+    for name in order {
+        let Some(plugin) = contents.get(name) else {
+            continue;
+        };
+        lines.push(format!(
+            "- [`{name}`](plugins/{name}/) · [docs](website/docs/plugins/{name}.md)"
+        ));
+        let lifecycle = LIFECYCLE.iter().map(|s| (*s).to_owned());
+        let rest = plugin
+            .skills
+            .iter()
+            .filter(|s| !LIFECYCLE.contains(&s.as_str()))
+            .cloned();
+        let skills: Vec<String> = lifecycle
+            .chain(rest)
+            .filter(|s| plugin.skills.contains(s))
+            .map(|s| format!("[`{s}`](plugins/{name}/skills/{s}/SKILL.md)"))
+            .collect();
+        lines.push(format!("  - skills: {}", skills.join(" · ")));
+        if !plugin.agents.is_empty() {
+            let agents: Vec<String> = plugin
+                .agents
+                .iter()
+                .map(|a| format!("[`{a}`](plugins/{name}/agents/{a}.md)"))
+                .collect();
+            lines.push(format!("  - agents: {}", agents.join(" · ")));
+        }
+    }
+    lines.push(TREE_END.to_owned());
+    lines.join("\n")
+}
+
 /// R8.
-fn docs(root: &Path, plugins: &Plugins, problems: &mut Vec<String>) -> Result<(), String> {
+fn docs(
+    root: &Path,
+    plugins: &Plugins,
+    contents: &BTreeMap<String, Contents>,
+    problems: &mut Vec<String>,
+) -> Result<(), String> {
     let all = plugins.all();
     let readme = read(&root.join("README.md"))?;
     let head = readme
         .split("<!-- b10x-docs:start -->")
         .next()
         .unwrap_or_default();
-    if head.lines().count() > README_LINES {
+    let written = match (head.find(TREE_START), head.find(TREE_END)) {
+        (Some(start), Some(end)) if start < end => &head[start..end + TREE_END.len()],
+        _ => "",
+    };
+    let prose = head.lines().count() - written.lines().count();
+    if prose > README_LINES {
         problems.push(format!(
-            "R8 README.md has {} lines before its documentation block; the most is {README_LINES}: one paragraph, the plugin table, one link line",
-            head.lines().count()
+            "R8 README.md has {prose} lines before its documentation block, besides the plugin tree; the most is {README_LINES}: one paragraph, the plugin table, one link line",
         ));
     }
-    let rows: BTreeSet<String> = readme_rows(head).into_iter().collect();
+    let rows = readme_rows(head);
+    let expected = tree(&rows, contents);
+    if written != expected {
+        problems.push(format!(
+            "R8 README.md plugin tree is missing or stale; it must read:\n{expected}"
+        ));
+    }
+    let rows: BTreeSet<String> = rows.into_iter().collect();
     if rows != all {
         problems.push(format!(
             "R8 README.md table lists {rows:?}; the catalog has {all:?}"
@@ -441,15 +507,17 @@ pub fn check(root: &Path, plugins: &Plugins) -> Result<(), String> {
         .map_err(|error| format!("parsing catalog.json: {error}"))?;
     products(&catalog, &mut problems);
     let mut known = BTreeMap::new();
+    let mut contents = BTreeMap::new();
     for name in &plugins.carried {
         let (skills, agents) = plugin(root, name, &mut problems);
         known.insert(
             name.clone(),
             skills.union(&agents).cloned().collect::<BTreeSet<_>>(),
         );
+        contents.insert(name.clone(), Contents { skills, agents });
     }
     references(root, plugins, &known, &mut problems);
-    docs(root, plugins, &mut problems)?;
+    docs(root, plugins, &contents, &mut problems)?;
     if problems.is_empty() {
         Ok(())
     } else {
@@ -518,6 +586,36 @@ mod tests {
                 ("aep".to_owned(), "planning".to_owned()),
                 ("b10x".to_owned(), "init".to_owned())
             ]
+        );
+    }
+
+    #[test]
+    fn the_tree_lists_lifecycle_skills_first_and_links_every_file() {
+        let mut contents = BTreeMap::new();
+        contents.insert(
+            "ess".to_owned(),
+            Contents {
+                skills: ["specifying", "upgrade", "init"].map(str::to_owned).into(),
+                agents: ["author"].map(str::to_owned).into(),
+            },
+        );
+        contents.insert(
+            "b10x".to_owned(),
+            Contents {
+                skills: ["init", "upgrade"].map(str::to_owned).into(),
+                agents: BTreeSet::new(),
+            },
+        );
+        let order = ["ess".to_owned(), "b10x".to_owned()];
+        assert_eq!(
+            tree(&order, &contents),
+            "<!-- plugin-tree:start -->\n\
+             - [`ess`](plugins/ess/) · [docs](website/docs/plugins/ess.md)\n  \
+             - skills: [`init`](plugins/ess/skills/init/SKILL.md) · [`upgrade`](plugins/ess/skills/upgrade/SKILL.md) · [`specifying`](plugins/ess/skills/specifying/SKILL.md)\n  \
+             - agents: [`author`](plugins/ess/agents/author.md)\n\
+             - [`b10x`](plugins/b10x/) · [docs](website/docs/plugins/b10x.md)\n  \
+             - skills: [`init`](plugins/b10x/skills/init/SKILL.md) · [`upgrade`](plugins/b10x/skills/upgrade/SKILL.md)\n\
+             <!-- plugin-tree:end -->"
         );
     }
 

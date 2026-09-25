@@ -3,10 +3,13 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
+use clap::{Parser, Subcommand};
+
 mod concept;
 mod evals;
 mod readiness;
 mod tools;
+mod trial;
 
 /// The marketplace identity in every marketplace format.
 const MARKETPLACE: &str = "b10x";
@@ -335,13 +338,12 @@ const RETIRED: &[Retired] = &[
         new: "aep@b10x",
         wire_next: &[],
     },
-    // ESS ships its own plugin from its repository; this marketplace points at it.
+    // ESS and worktree plugins live here under `b10x` (website/docs/structure.md R1).
     Retired {
         old: "ess-specify",
         new: "ess@b10x",
         wire_next: &[],
     },
-    // Worktree ships its own plugin from its repository; this marketplace points at it.
     Retired {
         old: "workspace-hygiene",
         new: "worktree@b10x",
@@ -411,7 +413,7 @@ const RETIRED: &[Retired] = &[
     },
     Retired {
         old: "b10x:setup",
-        new: "b10x:installing",
+        new: "b10x:init",
         wire_next: &[],
     },
     Retired {
@@ -427,6 +429,17 @@ const RETIRED: &[Retired] = &[
     Retired {
         old: "connectors:connectors",
         new: "connectors:integrating",
+        wire_next: &[],
+    },
+    // The `ess` binary no longer prints skills; `b10x skill` does.
+    Retired {
+        old: "ess skill",
+        new: "b10x skill ess:<skill>",
+        wire_next: &[],
+    },
+    Retired {
+        old: "beyond10x/ess` marketplace",
+        new: "the b10x marketplace",
         wire_next: &[],
     },
 ];
@@ -945,26 +958,88 @@ fn verify_release(root: &Path, version: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Validates the Beyond10x agent plugin marketplace. With no subcommand: the offline gate.
+#[derive(Debug, Parser)]
+#[command(name = "agentplugins-check")]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Top>,
+}
+
+#[derive(Debug, Subcommand)]
+enum Top {
+    /// The offline gate, then every spelled CLI command against the newest releases (network).
+    Tools,
+    /// Release checks.
+    Release {
+        #[command(subcommand)]
+        action: ReleaseAction,
+    },
+    /// Validate the eval corpus and replay recorded transcripts, or one of the corpus verbs.
+    Evals {
+        #[command(subcommand)]
+        action: Option<evals::Action>,
+    },
+    /// Check that a headless trial run loaded only the sandbox's plugins, at the version under test.
+    TrialIsolation {
+        /// The run's stream-json output.
+        run: PathBuf,
+        /// The sandbox directory (its `home/` is the run's `HOME`).
+        #[arg(long)]
+        sandbox: PathBuf,
+        /// A directory marketplace the plugins may load from in place (the checkout under test).
+        #[arg(long)]
+        marketplace: Option<PathBuf>,
+        /// The agentplugins version under test.
+        #[arg(long)]
+        version: String,
+        /// An upgrade trial: plugins start at the versions the sandbox was seeded with.
+        #[arg(long)]
+        seeded: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum ReleaseAction {
+    /// Check that every version in the repository agrees with the tag.
+    Verify {
+        /// The tag being released.
+        version: String,
+    },
+}
+
 fn main() -> ExitCode {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .and_then(Path::parent)
         .expect("checker is under the repository root")
         .to_path_buf();
-    let arguments = std::env::args().skip(1).collect::<Vec<_>>();
-    if let Some(code) = evals::cli(&root, &arguments) {
-        return code;
-    }
-    let result = match arguments.as_slice() {
-        [] => check(&root),
-        [tools] if tools == "tools" => check(&root).and_then(|()| tools::verify(&root)),
-        [release, verify, version] if release == "release" && verify == "verify" => {
-            check(&root).and_then(|()| verify_release(&root, version))
+    let result = match Cli::parse().command {
+        None => check(&root),
+        Some(Top::Tools) => check(&root).and_then(|()| tools::verify(&root)),
+        Some(Top::Release {
+            action: ReleaseAction::Verify { version },
+        }) => check(&root).and_then(|()| verify_release(&root, &version)),
+        Some(Top::Evals { action }) => return evals::run(&root, action),
+        Some(Top::TrialIsolation {
+            run,
+            sandbox,
+            marketplace,
+            version,
+            seeded,
+        }) => {
+            return match trial::isolation(&run, &sandbox, marketplace.as_deref(), &version, seeded)
+            {
+                Ok(summary) => {
+                    println!("{summary}");
+                    ExitCode::SUCCESS
+                }
+                Err(error) => {
+                    eprintln!("error: {error}");
+                    ExitCode::from(1)
+                }
+            };
         }
-        _ => Err(
-            "usage: agentplugins-check [tools | release verify <version> | evals | evals scope <path>...]"
-                .to_owned(),
-        ),
     };
 
     match result {

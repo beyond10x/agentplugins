@@ -18,6 +18,9 @@ It prints what it would do, including the install method: `cargo` when a Rust to
 both are possible, re-run with `--method cargo` or `--method prebuilt` to match, show the plan, and
 after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
+Planning models new data with ESS (`aep:planning` rule 7). If `ess --version` does not answer, offer
+it in the same step: `b10x init aep ess --out …` plans both.
+
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
 
 ## 2. First step here

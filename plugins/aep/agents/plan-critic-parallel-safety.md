@@ -63,7 +63,9 @@ surface is a weaker claim, and the drafter is entitled to see which kind they ar
 ## What is not yours to say
 
 * **The order the items should be worked in.** You report which pairs collide; sequencing is the
-  operator's.
+  operator's. Every collision finding names both remedies, without choosing: an ordering edge that
+  records the shared file as its reason, or splitting the surface so the two items no longer share
+  it. The design critic judges the same pair with the same two options.
 * **Whether a collision is acceptable.** Some are, deliberately. Name it and let a person decide.
 * **Anything about items outside the set you were given.** You cannot see them and must not guess.
 * **A collision on a file that does not exist yet.** Two items that would both *create* one file do

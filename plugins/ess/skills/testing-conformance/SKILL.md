@@ -194,12 +194,31 @@ most often assumed:
 Three consecutive runs with identical counts, and one run of the job's own script in the job's own
 image, before claiming a number.
 
-## A new domain has no target yet
+## Which target runs your suite
 
-A suite synthesised for a domain nobody has implemented reports every scenario `unsupported`: none
-of the built-in targets runs your domain, and that is expected until an implementation (or a
-target wrapping one) answers `ExecuteCommand` and `QueryView`. Keep the suite; run it once there is
-something to run it against.
+`ess verify conform run --target` names a target built into the `ess` binary. None of them runs
+your implementation:
+
+| `--target` | what it is | on your own domain |
+|---|---|---|
+| `interpreted` | a placeholder for running the specification itself; it decides nothing yet | every scenario `unsupported`, run `failed` |
+| `oracle-fixture` | a hand-written implementation of ESS's own `examples/oracle-fixture` | every scenario `error` |
+| `billing` | a hand-written implementation of ESS's own `examples/billing` | every scenario `error` |
+
+(Counts observed with a 21-scenario suite for a new domain.) They say nothing about your system, so
+never record such a report as evidence.
+
+To hold your implementation to the suite, generate it as a test package in the implementation's
+language and implement the package's `Target` interface over your service:
+
+```console
+ess verify conform synthesize --path <specification> --target go --out <dir>
+ess verify conform synthesize --path <specification> --target typescript --out <dir>
+```
+
+The package's `README.md` lists the methods and the wiring test. A method you cannot answer returns
+`ErrUnsupported` (a skip), never a made-up result. Keep a suite for a domain nobody has implemented;
+run it once something answers it.
 
 ## Agents
 

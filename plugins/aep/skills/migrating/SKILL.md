@@ -95,6 +95,16 @@ things if it is not held to a rule.
 
 ### Step 4 — write
 
+**The store must exist first.** Where `.engineering/project.yaml` is missing, create it with
+`aep plan reverse init`; the `aep:planning` skill § 5 gives the `--protocols` and `--profile`
+values. That applies with or without a backlog; only the steps after it differ.
+
+**A backlog item that introduces a new noun gets its domain first.** The `aep:planning` rule 7
+holds during a migration too: where an item names an entity no ESS document declares, draft and
+validate the domain (`ess:specifying`) before writing the stories around it, and cite the file in
+their bodies. Without `ess` installed, run `b10x init ess` and ask before applying its plan. The
+classification table still lists the item; its stories are written after the domain validates.
+
 One artifact at a time, body supplied at creation:
 
 ```console
@@ -193,7 +203,7 @@ references — there is no door for an arbitrary key. So dates live in the body:
 
 Migrated from `.agents/plans/DEV-630_dispatch-retry-backoff.md`.
 
-- First written 2026-06-16 · last touched 2026-06-16 · 1 revision
+- Source first written 2026-06-16 · last touched 2026-06-16 · 1 git revision of the source
 - Status quoted from that file, line 17: **PLANNED — not yet implemented**
 - Ticket [DEV-630](https://example.atlassian.net/browse/DEV-630)
 ```
@@ -203,7 +213,7 @@ The three git facts, in order:
 ```console
 $ git log --follow --diff-filter=A --format=%aI -- <path> | tail -1   # first written
 $ git log -1 --format=%cI -- <path>                                   # last touched
-$ git log --oneline --follow -- <path> | wc -l                        # revisions
+$ git log --oneline --follow -- <path> | wc -l                        # git revisions of the source
 ```
 
 Quote dates the document states about itself too — `**Option A … LANDED** (2026-04-28)`,

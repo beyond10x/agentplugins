@@ -27,8 +27,10 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Create, update, review, or port an installable plugin | `b10x:authoring-plugins` |
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep:planning` |
 | Scope and deliver accepted development work through a reviewed wave | `aep:implementing` |
-| Specify, retrofit or conformance-test an ESS model | `ess` (from the `b10x` marketplace, released with the `ess` binary; `ess skill` prints the same skills) |
-| Create, inspect, finish, or safely clean Git worktrees | `worktree` (from the `b10x` marketplace, released with the `worktree` binary) |
+| Specify a system or API | `ess:specifying` |
+| Derive a specification for an existing system | `ess:retrofitting` |
+| Run or raise a conformance suite | `ess:testing-conformance` |
+| Create, inspect, finish, or safely clean Git worktrees | `worktree:managing-worktrees` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors:integrating` |
 
 ## Preserve boundaries
