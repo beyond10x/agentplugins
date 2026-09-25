@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.14.5] — 2026-09-25
+
+From the round-4 trials on 0.14.4 (an ESS retrofit of a stock-reservation service and worktree
+onboarding, both isolated). The skills were checked against ess 0.31.0, the newest release, which
+changes nothing they describe.
+
+**`ess`**
+
+- `ess:retrofitting`: a command the code silently ignores in some state gets no `wrong_state:`
+  outcome and no error. `synthesize` then reports `ESS-SYNTH-012` for that state and still writes
+  a scenario requiring that nothing happened, which is the code's behaviour; report it, and do not
+  add an error the code never raises. The view that invariants need is structural: mark it as such.
+
+**`worktree`**
+
+- `worktree:init`: the profile download creates its directory (`curl --create-dirs`) instead of a
+  separate `mkdir`; any local file works as the profile although `--help` says "committed"; a
+  headless run uses the directory that holds the current repository as the workspace root and
+  says so.
+- `worktree:managing-worktrees`: always pass `--id` to `gc`.
+
 ## [0.14.4] — 2026-09-25
 
 From the round-3 trials on 0.14.3, the first product fix they led to (worktree 0.7.1), and eight
