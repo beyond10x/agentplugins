@@ -2,9 +2,9 @@
 format: aep.planning-md/1
 id: story:retire-ess-specify
 kind: story
-status: draft
+status: implemented
 title: Retire ess-specify; spec-driven work routes to the ESS repository's own plugin
-revision: 1
+revision: 5
 ---
 # Retire `ess-specify`; spec-driven work routes to the ESS repository's own plugin
 
@@ -33,3 +33,8 @@ the ESS marketplace and `ess skill`.
 ## Not in scope
 
 - An eval case for the ESS plugin. ESS runs no eval corpus; the dropped case is not re-homed.
+
+
+## Outcome (2026-09-25)
+
+`ess-specify` was retired in agentplugins 0.10.0 (PR #11, `514ef9e0`, release run 35920939084). The routing target then moved: ess#68 removed the ESS repository plugin, and the ESS plugin ships from this repository as `plugins/ess` (`ess@b10x`, #17 `f03fa470`, #18 `7574cb86`, release 0.14.1).
