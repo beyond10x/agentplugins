@@ -857,21 +857,54 @@ fn plan_binaries(
         }
         for binary in &product.binaries {
             let subject = binary.name.clone();
-            let Some(tag) = context
+            let newest = context
                 .resolved
                 .latest
                 .get(binary.install.repository())
-                .cloned()
-            else {
+                .cloned();
+            let pin = context.resolved.pinned.get(&binary.name);
+            let Some(tag) = (match pin {
+                Some(pin) => pin.tag.clone(),
+                None => newest.clone(),
+            }) else {
                 findings.push(Finding {
                     level: Level::Warn,
                     host: None,
                     subject,
-                    detail: "its newest release could not be read (offline?); not checked"
-                        .to_owned(),
+                    detail: match pin {
+                        Some(pin) => format!(
+                            "pinned to {} by {}, but no such release could be read (offline, or no such release?); not checked",
+                            pin.spec, pin.file
+                        ),
+                        None => "its newest release could not be read (offline?); not checked"
+                            .to_owned(),
+                    },
                 });
                 continue;
             };
+            // How the finding names the release the plan holds the binary to.
+            let (held, pinned_by) = match pin {
+                Some(pin) => (
+                    format!("{tag}, pinned to {} by {}", pin.spec, pin.file),
+                    Some(pin),
+                ),
+                None => (format!("the newest release {tag}"), None),
+            };
+            if let (Some(pin), Some(newest)) = (pinned_by, &newest) {
+                if !version::same(newest, &tag)
+                    && crate::pins::Spec::parse(&pin.spec).is_ok_and(|spec| spec.older_than(newest))
+                {
+                    findings.push(Finding {
+                        level: Level::Note,
+                        host: None,
+                        subject: subject.clone(),
+                        detail: format!(
+                            "newer release {newest} exists; pinned to {} by {}, so it stays at {tag} (`b10x unpin {}` follows the newest)",
+                            pin.spec, pin.file, binary.name
+                        ),
+                    });
+                }
+            }
             let copies = inventory
                 .binaries
                 .iter()
@@ -908,7 +941,28 @@ fn plan_binaries(
                     level: Level::Ok,
                     host: None,
                     subject: subject.clone(),
-                    detail: format!("{tag} at {} is the newest release", first.path),
+                    detail: match pinned_by {
+                        Some(pin) => format!(
+                            "{tag} at {}, pinned to {} by {}",
+                            first.path, pin.spec, pin.file
+                        ),
+                        None => format!("{tag} at {} is the newest release", first.path),
+                    },
+                });
+            } else if let (true, Some(pin), Some(first)) = (context.upgrade, pinned_by, current) {
+                // An upgrade never moves a pinned CLI; it only says how to match the pin.
+                findings.push(Finding {
+                    level: Level::Warn,
+                    host: None,
+                    subject: subject.clone(),
+                    detail: format!(
+                        "{} at {} does not match its pin {} ({}); upgrade leaves it, `b10x install {}` installs {tag}",
+                        first.version.as_deref().unwrap_or("unknown"),
+                        first.path,
+                        pin.spec,
+                        pin.file,
+                        binary.name
+                    ),
                 });
             } else if current.is_none() && binary.optional {
                 findings.push(Finding {
@@ -941,11 +995,11 @@ fn plan_binaries(
                     .filter(|parent| parent.starts_with(context.home))
                     .unwrap_or(default_directory);
                 let (verb, detail) = match current {
-                    None => ("install", format!("not on PATH; install {tag}")),
+                    None => ("install", format!("not on PATH; install {held}")),
                     Some(first) => (
                         "upgrade",
                         format!(
-                            "{} at {} is not the newest release {tag}; replace it",
+                            "{} at {} is not {held}; replace it",
                             first
                                 .version
                                 .clone()
@@ -1070,7 +1124,94 @@ mod tests {
                     BTreeSet::from([X86_LINUX.to_owned()]),
                 ),
             ]),
+            pinned: BTreeMap::new(),
         }
+    }
+
+    fn pinned_ess(spec: &str, tag: &str) -> Resolved {
+        let mut resolved = resolved();
+        resolved.pinned.insert(
+            "ess".to_owned(),
+            crate::pins::Pinned {
+                spec: spec.to_owned(),
+                tag: Some(tag.to_owned()),
+                file: "/work/repo/b10x.toml".to_owned(),
+            },
+        );
+        resolved
+    }
+
+    fn run_pinned(inventory: &Inventory, resolved: &Resolved, upgrade: bool) -> Plan {
+        let catalog = Catalog::embedded();
+        let context = Context {
+            catalog: &catalog,
+            resolved,
+            selection: Some(BTreeSet::from(["ess".to_owned()])),
+            hosts: vec![Host::Claude],
+            home: Path::new("/opt/b10x-home"),
+            only: true,
+            method: None,
+            target: Some(X86_LINUX.to_owned()),
+            upgrade,
+        };
+        plan(&context, inventory)
+    }
+
+    fn installs(plan: &Plan) -> Vec<String> {
+        plan.actions
+            .iter()
+            .filter_map(|action| match action {
+                Action::InstallBinary { name, tag, .. } => Some(format!("{name} {tag}")),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn a_pinned_cli_installs_its_pinned_release_and_the_finding_names_the_pin() {
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            binaries: binaries(&[("/opt/b10x-home/.local/bin/ess", "0.30.0")]),
+            ..Inventory::default()
+        };
+        let plan = run_pinned(&inventory, &pinned_ess("0.29", "0.29.4"), false);
+        assert_eq!(installs(&plan), ["ess 0.29.4"]);
+        assert!(plan.findings.iter().any(|f| f.level == Level::Change
+            && f.detail.contains("pinned to 0.29 by /work/repo/b10x.toml")));
+        assert!(plan
+            .findings
+            .iter()
+            .any(|f| f.level == Level::Note && f.detail.contains("newer release 0.30.0")));
+    }
+
+    #[test]
+    fn a_cli_at_its_pin_is_ok_and_upgrade_reports_the_newer_release_but_changes_nothing() {
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            binaries: binaries(&[("/opt/b10x-home/.local/bin/ess", "0.29.4")]),
+            ..Inventory::default()
+        };
+        let plan = run_pinned(&inventory, &pinned_ess("0.29.4", "0.29.4"), true);
+        assert!(installs(&plan).is_empty(), "{:#?}", plan.actions);
+        assert!(plan.findings.iter().any(|f| f.level == Level::Ok
+            && f.detail == "0.29.4 at /opt/b10x-home/.local/bin/ess, pinned to 0.29.4 by /work/repo/b10x.toml"));
+        assert!(plan
+            .findings
+            .iter()
+            .any(|f| f.detail.contains("newer release 0.30.0")));
+        // A copy that drifted from its pin is named, not moved, by an upgrade.
+        let drifted = Inventory {
+            claude: Some(HostState::default()),
+            binaries: binaries(&[("/opt/b10x-home/.local/bin/ess", "0.30.0")]),
+            ..Inventory::default()
+        };
+        let plan = run_pinned(&drifted, &pinned_ess("0.29.4", "0.29.4"), true);
+        assert!(installs(&plan).is_empty(), "{:#?}", plan.actions);
+        assert!(plan
+            .findings
+            .iter()
+            .any(|f| f.level == Level::Warn
+                && f.detail.contains("`b10x install ess` installs 0.29.4")));
     }
 
     const X86_LINUX: &str = "x86_64-unknown-linux-gnu";

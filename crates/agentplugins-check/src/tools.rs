@@ -6,6 +6,10 @@
 //! checked against its `SHA256SUMS` — and runs `<cli> <subcommands> --help` for every command a
 //! code span or code block in that plugin spells. ESS's syntax example must also still validate.
 //! It runs on every pull request, every `main` push and daily; a red run is fixed by a skill edit.
+//!
+//! It also fails when a CLI's newest release is newer than `verified.json`, the release its skills
+//! were last verified against: every product release is re-verified (this check and an ESS trial
+//! round) before `verified.json` moves. The offline gate only checks that file's shape.
 
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -20,6 +24,53 @@ const TOOLS: &[(&str, &str, &str)] = &[
 
 /// Most subcommand words taken from one spelled command.
 const DEPTH: usize = 4;
+
+/// The file naming, per CLI, the release the skills were last verified against.
+pub const VERIFIED: &str = "verified.json";
+
+/// A key for an `x.y.z` version or tag.
+fn key(version: &str) -> Option<(u64, u64, u64)> {
+    let mut parts = version.trim_start_matches('v').split('.');
+    let triple = (
+        parts.next()?.parse().ok()?,
+        parts.next()?.parse().ok()?,
+        parts.next()?.parse().ok()?,
+    );
+    parts.next().is_none().then_some(triple)
+}
+
+/// Offline: `verified.json` names exactly the CLIs the skills drive, each at an `x.y.z` release.
+pub fn verified(root: &Path) -> Result<std::collections::BTreeMap<String, String>, String> {
+    let path = root.join(VERIFIED);
+    let text = std::fs::read_to_string(&path).map_err(|error| format!("{VERIFIED}: {error}"))?;
+    let map: std::collections::BTreeMap<String, String> = serde_json::from_str(&text)
+        .map_err(|error| format!("{VERIFIED}: an object of CLI → `x.y.z` release: {error}"))?;
+    let expected: BTreeSet<&str> = TOOLS.iter().map(|(_, cli, _)| *cli).collect();
+    let named: BTreeSet<&str> = map.keys().map(String::as_str).collect();
+    if named != expected {
+        return Err(format!(
+            "{VERIFIED}: names {named:?}; it must name exactly {expected:?}"
+        ));
+    }
+    for (cli, release) in &map {
+        if key(release).is_none() {
+            return Err(format!(
+                "{VERIFIED}: `{cli}` is `{release}`, not an `x.y.z` release"
+            ));
+        }
+    }
+    Ok(map)
+}
+
+/// The line for a CLI whose newest release is newer than the one its skills were verified against.
+#[must_use]
+pub fn unverified(cli: &str, newest: &str, verified: &str) -> Option<String> {
+    (key(newest)? > key(verified)?).then(|| {
+        format!(
+            "{cli} {newest} is newer than {VERIFIED} ({verified}): re-verify the skills (`agentplugins-check tools` and an ESS trial round), then set `{cli}` to {newest} in {VERIFIED}"
+        )
+    })
+}
 
 fn run(program: &str, arguments: &[&str]) -> Result<String, String> {
     let output = Command::new(program)
@@ -264,9 +315,16 @@ pub fn verify(root: &Path) -> Result<(), String> {
         std::env::temp_dir().join(format!("agentplugins-check-tools-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&scratch);
     let result = (|| {
+        let verified = verified(root)?;
         let mut problems = Vec::new();
         for (plugin, cli, repository) in TOOLS {
             let (tag, binary) = fetch(cli, repository, &scratch)?;
+            if let Some(line) = verified
+                .get(*cli)
+                .and_then(|release| unverified(cli, &tag, release))
+            {
+                problems.push(line);
+            }
             let mut checked = 0;
             for file in markdown(&root.join("plugins").join(plugin)) {
                 let text = std::fs::read_to_string(&file).map_err(|error| error.to_string())?;
@@ -296,7 +354,7 @@ pub fn verify(root: &Path) -> Result<(), String> {
             Ok(())
         } else {
             Err(format!(
-                "{} spelled command(s) the newest releases do not have:\n  {}",
+                "{} problem(s) against the newest releases:\n  {}",
                 problems.len(),
                 problems.join("\n  ")
             ))
@@ -309,6 +367,22 @@ pub fn verify(root: &Path) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_newer_release_than_verified_is_named_with_the_step() {
+        let line = unverified("ess", "0.32.2", "0.32.1").unwrap();
+        assert!(line.starts_with("ess 0.32.2 is newer than verified.json (0.32.1)"));
+        assert!(line.contains("ESS trial round"));
+        assert_eq!(unverified("ess", "0.32.1", "0.32.1"), None);
+        assert_eq!(unverified("ess", "v0.32.0", "0.32.1"), None);
+    }
+
+    #[test]
+    fn the_committed_verified_file_has_its_shape() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let map = verified(&root).unwrap();
+        assert_eq!(map.len(), TOOLS.len());
+    }
 
     #[test]
     fn commands_are_read_from_code_only() {

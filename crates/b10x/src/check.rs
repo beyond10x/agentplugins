@@ -1,12 +1,52 @@
-//! The session-start check. Offline and quick: it reads what the hosts recorded on disk, runs each
-//! installed product's `--version`, and compares with the newest releases the last plan saw. It
-//! prints one line per problem, nothing when all is well, and never fails the session.
+//! The session-start check. Quick: it reads what the hosts recorded on disk, runs each installed
+//! product's `--version`, and compares with the newest releases recorded in
+//! `~/.local/state/b10x/latest.json`. That record is refreshed from GitHub at most once a day,
+//! within a few seconds; offline, the old record stands. It prints one line per problem, nothing
+//! when all is well, and never fails the session.
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 use crate::catalog::Catalog;
 use crate::inventory::{copies_on_path, home};
-use crate::version;
+use crate::pins::{self, PinFile, Spec};
+use crate::{resolve, version};
+
+/// The releases the skills were last verified against: the repository's `verified.json`.
+const VERIFIED: &str = include_str!("../../../verified.json");
+
+/// How often the newest-release record is refreshed from GitHub.
+const REFRESH_EVERY: u64 = 86_400;
+
+/// How long one refresh may take, in seconds; the repositories are read in parallel.
+const REFRESH_SECONDS: u64 = 3;
+
+/// CLI → the release its skills were last verified against.
+#[must_use]
+pub fn verified() -> BTreeMap<String, String> {
+    serde_json::from_str(VERIFIED).unwrap_or_default()
+}
+
+/// Refresh the newest-release record when the last try is a day old: the marketplace repository
+/// and every catalog binary's, each within [`REFRESH_SECONDS`]. Failures leave the record as it was.
+pub fn refresh(home: &Path, catalog: &Catalog, now: u64) {
+    let record = resolve::recorded(home);
+    let last = ["checked_at", "attempted_at"]
+        .iter()
+        .filter_map(|key| record.get(*key).and_then(serde_json::Value::as_u64))
+        .max();
+    if last.is_some_and(|last| now.saturating_sub(last) < REFRESH_EVERY) {
+        return;
+    }
+    let mut repositories = BTreeSet::from([catalog.marketplace.repository.clone()]);
+    for product in &catalog.products {
+        for binary in &product.binaries {
+            repositories.insert(binary.install.repository().to_owned());
+        }
+    }
+    let tags = resolve::latest_tags(&repositories, REFRESH_SECONDS);
+    resolve::record(home, &tags, now);
+}
 
 /// A recorded install: `name`, `marketplace`, version.
 pub type Recorded = (String, String, Option<String>);
@@ -52,17 +92,52 @@ pub fn latest(home: &Path) -> Option<(u64, serde_json::Map<String, serde_json::V
     Some((at, map))
 }
 
+/// What the check compares against besides the machine: the repository's pins and the releases the
+/// skills were verified against.
+pub struct Expected<'a> {
+    /// The pin file that applies in the session's directory.
+    pub pins: Option<&'a PinFile>,
+    /// CLI → the release the skills were verified against.
+    pub verified: &'a BTreeMap<String, String>,
+}
+
 /// The lines to print.
 #[must_use]
+#[allow(clippy::too_many_lines)]
 pub fn lines(
     catalog: &Catalog,
     plugins: &[Recorded],
     binary_version: Probe<'_>,
     last: Option<(u64, &serde_json::Map<String, serde_json::Value>)>,
     now: u64,
+    expected: &Expected<'_>,
 ) -> Vec<String> {
     let mut lines = Vec::new();
     let name = catalog.marketplace.name.as_str();
+    let newest_of = |repository: &str| {
+        last.and_then(|(_, map)| map.get(repository))
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned)
+    };
+    let oldest_plugin = plugins
+        .iter()
+        .filter(|(_, marketplace, _)| marketplace == name)
+        .filter_map(|(_, _, found)| found.as_deref())
+        .filter(|found| version::key(found).is_some())
+        .min_by_key(|found| version::key(found));
+    if let (Some(have), Some(newest)) = (oldest_plugin, newest_of(&catalog.marketplace.repository))
+    {
+        if version::key(have) < version::key(&newest) {
+            lines.push(format!(
+                "b10x: the Beyond10x plugins ({have}) are older than the newest release {newest}; /b10x:upgrade updates them."
+            ));
+        }
+    }
+    let pinned = |binary: &str| {
+        expected
+            .pins
+            .and_then(|file| Some((file.pins.get(binary)?, file.path.display().to_string())))
+    };
     for (plugin, marketplace, _) in plugins {
         if catalog.retired_marketplace(marketplace) || catalog.retired_plugins.contains_key(plugin)
         {
@@ -87,15 +162,14 @@ pub fn lines(
         }
         any_product = true;
         for binary in product.binaries.iter().filter(|binary| !binary.optional) {
-            let newest = last
-                .and_then(|(_, map)| map.get(binary.install.repository()))
-                .and_then(serde_json::Value::as_str)
-                .map(str::to_owned);
+            let newest = newest_of(binary.install.repository());
             match binary_version(&binary.name) {
                 None => lines.push(format!(
                     "b10x: the `{}` plugin is installed but the `{}` CLI is not on PATH; /{}:init installs it.",
                     product.id, binary.name, product.id
                 )),
+                // A pinned CLI is held to its pin below, not to the newest release.
+                Some(_) if pinned(&binary.name).is_some() => {}
                 Some((path, found)) => {
                     let found = found.unwrap_or_else(|| "an unknown version".to_owned());
                     if let Some(newest) = newest {
@@ -105,11 +179,38 @@ pub fn lines(
                         );
                         if behind {
                             lines.push(format!(
-                                "b10x: `{}` {found} ({path}) is older than the newest release {newest}; /{}:upgrade updates it.",
-                                binary.name, product.id
+                                "b10x: `{}` {found} ({path}) is older than the newest release {newest}; /b10x:upgrade updates it.",
+                                binary.name
                             ));
                         }
                     }
+                }
+            }
+        }
+    }
+    for product in &catalog.products {
+        for binary in &product.binaries {
+            let Some((spec, file)) = pinned(&binary.name) else {
+                continue;
+            };
+            let Ok(parsed) = Spec::parse(spec) else {
+                continue;
+            };
+            if let Some((path, found)) = binary_version(&binary.name) {
+                let found = found.unwrap_or_else(|| "an unknown version".to_owned());
+                if !parsed.matches(&found) {
+                    lines.push(format!(
+                        "b10x: `{}` {found} ({path}) does not match the pin {spec} in {file}; `b10x install {}` installs the pinned release.",
+                        binary.name, binary.name
+                    ));
+                }
+            }
+            if let Some(described) = expected.verified.get(&binary.name) {
+                if parsed.older_than(described) {
+                    lines.push(format!(
+                        "b10x: skills describe {} {described}; this repository pins {spec} ({file}).",
+                        binary.name
+                    ));
                 }
             }
         }
@@ -141,6 +242,8 @@ pub fn lines(
 /// Run the check and print its lines.
 pub fn run(catalog: &Catalog) {
     let home = home();
+    let now = resolve::now();
+    refresh(&home, catalog, now);
     let plugins = recorded(&home);
     let first = |name: &str| {
         copies_on_path(name)
@@ -149,11 +252,21 @@ pub fn run(catalog: &Catalog) {
             .map(|copy| (copy.path, copy.version))
     };
     let cached = latest(&home);
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |elapsed| elapsed.as_secs());
     let last = cached.as_ref().map(|(at, map)| (*at, map));
-    for line in lines(catalog, &plugins, &first, last, now) {
+    let pin_file = match std::env::current_dir().map(|here| pins::read(&here, &home)) {
+        Ok(Ok(found)) => found,
+        Ok(Err(error)) => {
+            println!("b10x: {error}");
+            None
+        }
+        Err(_) => None,
+    };
+    let verified = verified();
+    let expected = Expected {
+        pins: pin_file.as_ref(),
+        verified: &verified,
+    };
+    for line in lines(catalog, &plugins, &first, last, now, &expected) {
         println!("{line}");
     }
 }
@@ -170,6 +283,105 @@ mod tests {
         let mut map = serde_json::Map::new();
         map.insert("beyond10x/ess".to_owned(), serde_json::json!(ess));
         map
+    }
+
+    static NOTHING_VERIFIED: BTreeMap<String, String> = BTreeMap::new();
+
+    fn unpinned() -> Expected<'static> {
+        Expected {
+            pins: None,
+            verified: &NOTHING_VERIFIED,
+        }
+    }
+
+    fn ess_at(version: &'static str) -> impl Fn(&str) -> Option<(String, Option<String>)> {
+        move |_: &str| {
+            Some((
+                "/opt/b10x-home/.local/bin/ess".to_owned(),
+                Some(version.to_owned()),
+            ))
+        }
+    }
+
+    #[test]
+    fn the_embedded_verified_releases_parse() {
+        let verified = verified();
+        for cli in ["aep", "ess", "worktree"] {
+            assert!(
+                verified.get(cli).and_then(|v| version::key(v)).is_some(),
+                "{cli}: {verified:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn plugins_older_than_the_newest_agentplugins_release_name_upgrade() {
+        let catalog = Catalog::embedded();
+        let plugins = [
+            plugin("b10x", "b10x", "0.14.7"),
+            plugin("ess", "b10x", "0.14.7"),
+        ];
+        let mut map = cache("0.30.0");
+        map.insert(
+            "beyond10x/agentplugins".to_owned(),
+            serde_json::json!("0.14.10"),
+        );
+        let out = lines(
+            &catalog,
+            &plugins,
+            &ess_at("0.30.0"),
+            Some((1_000, &map)),
+            1_000,
+            &unpinned(),
+        );
+        assert_eq!(
+            out,
+            ["b10x: the Beyond10x plugins (0.14.7) are older than the newest release 0.14.10; /b10x:upgrade updates them."]
+        );
+    }
+
+    #[test]
+    fn a_pinned_cli_is_held_to_its_pin_and_newer_skills_are_noted() {
+        let catalog = Catalog::embedded();
+        let plugins = [plugin("ess", "b10x", "0.14.0")];
+        let map = cache("0.32.1");
+        let file = PinFile {
+            path: std::path::PathBuf::from("/work/repo/b10x.toml"),
+            pins: BTreeMap::from([("ess".to_owned(), "0.32.0".to_owned())]),
+        };
+        let verified = BTreeMap::from([("ess".to_owned(), "0.32.1".to_owned())]);
+        let expected = Expected {
+            pins: Some(&file),
+            verified: &verified,
+        };
+        // At the pin: no "older than the newest" nag, only the skills note.
+        let out = lines(
+            &catalog,
+            &plugins,
+            &ess_at("0.32.0"),
+            Some((1_000, &map)),
+            1_000,
+            &expected,
+        );
+        assert_eq!(
+            out,
+            ["b10x: skills describe ess 0.32.1; this repository pins 0.32.0 (/work/repo/b10x.toml)."]
+        );
+        // Off the pin: the fixing command is named.
+        let out = lines(
+            &catalog,
+            &plugins,
+            &ess_at("0.32.1"),
+            Some((1_000, &map)),
+            1_000,
+            &expected,
+        );
+        assert!(
+            out.iter()
+                .any(|l| l.contains("does not match the pin 0.32.0")
+                    && l.contains("`b10x install ess`")),
+            "{out:#?}"
+        );
     }
 
     #[test]
@@ -191,7 +403,8 @@ mod tests {
             &plugins,
             &found,
             Some((1_000, &map)),
-            1_000 + 86_400
+            1_000 + 86_400,
+            &unpinned()
         )
         .is_empty());
     }
@@ -210,12 +423,19 @@ mod tests {
             ))
         };
         let map = cache("0.30.0");
-        let out = lines(&catalog, &plugins, &found, Some((0, &map)), 30 * 86_400);
+        let out = lines(
+            &catalog,
+            &plugins,
+            &found,
+            Some((0, &map)),
+            30 * 86_400,
+            &unpinned(),
+        );
         assert_eq!(out.len(), 3, "{out:#?}");
         assert!(out
             .iter()
             .any(|l| l.contains("older than the newest release 0.30.0")
-                && l.contains("/ess:upgrade")));
+                && l.contains("/b10x:upgrade")));
         assert!(out
             .iter()
             .any(|l| l.contains("workspace-hygiene@beyond10x")));
@@ -226,7 +446,7 @@ mod tests {
     fn points_at_init_when_nothing_is_set_up() {
         let catalog = Catalog::embedded();
         let plugins = [plugin("b10x", "b10x", "0.14.0")];
-        let out = lines(&catalog, &plugins, &|_: &str| None, None, 0);
+        let out = lines(&catalog, &plugins, &|_: &str| None, None, 0, &unpinned());
         assert_eq!(out.len(), 1);
         assert!(out[0].contains("/b10x:init"));
     }
@@ -238,7 +458,7 @@ mod tests {
             plugin("b10x", "b10x", "0.12.0"),
             plugin("aep-plan", "b10x", "0.12.0"),
         ];
-        let out = lines(&catalog, &plugins, &|_: &str| None, None, 0);
+        let out = lines(&catalog, &plugins, &|_: &str| None, None, 0, &unpinned());
         assert!(!out.iter().any(|l| l.contains("/b10x:init")), "{out:#?}");
     }
 }

@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.14.11] — 2026-09-26
+
+Keeping installs current, keeping the skills matched to each product release, and pinning a tooling
+version per repository.
+
+- `b10x check` (the session-start line) refreshes the newest releases from GitHub at most once a day,
+  in parallel with a short timeout, and names `/b10x:upgrade` when the installed plugins or a CLI are
+  older. It used to compare against a record written only by the last plan, so a machine on 0.14.7
+  heard nothing about 0.14.10.
+- `b10x upgrade` and `b10x setup plan` read plugin versions from the newest release when the local
+  marketplace copy is older than it; they reported 0.14.7 as current until the apply step refreshed
+  the copy.
+- `verified.json` records the aep, ess and worktree releases the skills were last verified against;
+  the daily `agentplugins-check tools` fails when a newer release exists, until the skills are
+  re-verified and the file is bumped.
+- `b10x pin <cli> <version>` and `b10x unpin <cli>` keep a committed `b10x.toml` (`[pins]`, exact or
+  a minor line such as `0.32`). `init`, `upgrade`, `setup plan` and `install` install the pinned
+  release; `upgrade` reports newer ones and changes nothing; `b10x check` warns when the CLI on
+  `PATH` differs from the pin and when the skills describe a newer release. The matching `requires`
+  line in `ess-inputs.yaml` waits for beyond10x/ess#106.
+
 ## [0.14.10] — 2026-09-25
 
 From round 5, the first measured trial round: seven trials on 0.14.9, all isolated. The

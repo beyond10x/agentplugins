@@ -10,6 +10,7 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 | `plugins/<name>/` | every plugin: `b10x`, `aep`, `ess`, `worktree`, `connectors` ([structure](website/docs/structure.md)) |
 | `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json` | the two marketplace files |
 | `catalog.json` | products, plugins, binaries, retired names — no versions |
+| `verified.json` | per CLI, the release the skills were last verified against; `tools` fails when a newer one is out |
 | `crates/b10x/` | the setup CLI; `plan.rs` is pure and fixture-tested |
 | `crates/agentplugins-check/` | the gate: marketplace, catalog, concept, retired names, CLI spellings, evals; `tools` checks skills against the newest CLI releases |
 | `evals/` | eval corpus ([`evals/README.md`](evals/README.md)) |
@@ -29,6 +30,8 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 - Retired names appear only where the gate allows them (`CHANGELOG.md`, `changes/`,
   `.engineering/`, `catalog.json`, `crates/b10x/`, the checker's own table).
 - Anything executable is Rust.
+- Every `aep`, `ess` and `worktree` release is re-verified before `verified.json` moves to it:
+  `agentplugins-check tools`, then an ESS trial round ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
 - Trial findings for another repository become an issue there, labelled `trial-finding` by the
   bot; the skill here documents the workaround until the fix is released ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
 

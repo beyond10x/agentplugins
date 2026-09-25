@@ -917,6 +917,7 @@ fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
     catalog(root)?;
+    tools::verified(root)?;
     for (name, required) in PLUGINS {
         plugin(root, name, required)?;
     }
