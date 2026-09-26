@@ -1,0 +1,6 @@
+interface:
+  display_name: "Clean Up Worktrees"
+  short_description: "Review and safely remove finished managed worktrees"
+  default_prompt: "Use $cleanup to review this repository's managed worktrees, finish and garbage-collect only the ones I approve, and report what was kept and why."
+policy:
+  allow_implicit_invocation: false

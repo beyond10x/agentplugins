@@ -53,7 +53,8 @@ hand. `aep:planning` is the instruction surface for this.
 
 Commit and push through `b10x-gates bot --repo . -- <git-command>` as `b10x-bot[bot]`; keep hooks.
 No credential or token machinery lives in this repository. A release is a bare annotated tag on
-`main` after `CHANGELOG.md`, the workspace version and every carried plugin manifest agree; the
+`main` after `CHANGELOG.md`, the workspace version, every carried plugin manifest and every
+`**Skill version**` line agree; the
 release workflow reruns the gate and publishes the `b10x` archives, `SHA256SUMS` and `SETUP.md`,
 with the version's `CHANGELOG.md` section as the release notes.
 Source publication needs no Atlas checkout.

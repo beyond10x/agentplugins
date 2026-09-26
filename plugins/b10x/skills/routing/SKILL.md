@@ -34,6 +34,15 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Create, inspect, finish, or safely clean Git worktrees | `worktree:managing-worktrees` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors:integrating` |
 
+Three entry points are commands: only the operator starts them, and a model cannot invoke them.
+When a request matches one, route to the activity it hands off to and name the command to the operator.
+
+| Command | Hands off to |
+|---|---|
+| `/aep:wave [story-id…]` (`aep:wave`) | `aep:implementing`, wave mode |
+| `/aep:drive <story-id>` (`aep:drive`) | `aep:implementing`, drive mode |
+| `/worktree:cleanup` (`worktree:cleanup`) | `worktree:managing-worktrees` |
+
 ## Preserve boundaries
 
 - Do not treat this plugin as a substitute for the routed specialist.
