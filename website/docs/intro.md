@@ -15,7 +15,7 @@ directly when the work is already clear.
 |---|---|---|
 | [`b10x`](./plugins/b10x.md) | Setup, upgrades and navigation | `init`, `upgrade`, `routing` and `authoring-plugins` skills, the `b10x` binary, drift check |
 | [`aep`](./plugins/aep.md) | Governed planning and delivery | `planning`, `migrating` and `implementing` skills; decomposer, plan critics, reverse engineer, story scoper, implementor, adversary, security reviewer |
-| [`ess`](./plugins/ess.md) | Executable System Specifications | `specifying`, `retrofitting` and `testing-conformance` skills; author, conformance, retrofitter agents |
+| [`ess`](./plugins/ess.md) | Executable System Specifications | `specifying`, `retrofitting`, `testing-conformance` and `hardening` skills; author, conformance, retrofitter agents |
 | [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
 Every plugin starts with `/<plugin>:init` and checks itself with `/<plugin>:upgrade`; `/b10x:init`

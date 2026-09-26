@@ -61,6 +61,11 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "skills/specifying/references/syntax.md",
             "skills/retrofitting/SKILL.md",
             "skills/testing-conformance/SKILL.md",
+            "skills/hardening/SKILL.md",
+            "skills/hardening/references/techniques.md",
+            "skills/hardening/references/reference-model.md",
+            "skills/hardening/references/design-review.md",
+            "skills/hardening/references/spec-diff.md",
             "agents/author.md",
             "agents/retrofitter.md",
             "agents/conformance.md",
@@ -1374,6 +1379,34 @@ one product only: `b10x upgrade ess`
         );
 
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+    }
+
+    /// A green suite is where hardening starts, so the two places an agent stands when it gets
+    /// there — the conformance agent's charter and the skill's mutation section — hand it the
+    /// catalogue. Without the link the catalogue is a file nobody finishing a coverage task reads.
+    #[test]
+    fn a_green_suite_is_handed_the_hardening_catalogue() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        let agent = std::fs::read_to_string(root.join("plugins/ess/agents/conformance.md"))
+            .expect("the conformance agent is readable");
+        assert!(
+            agent.contains("`ess:hardening`"),
+            "the conformance agent does not offer `ess:hardening`"
+        );
+        let skill =
+            std::fs::read_to_string(root.join("plugins/ess/skills/testing-conformance/SKILL.md"))
+                .expect("the testing-conformance skill is readable");
+        let mutation = skill
+            .split_once("## Before anything: does a green run mean anything?")
+            .and_then(|(_, rest)| rest.split_once("\n## ").map(|(section, _)| section))
+            .expect("the mutation section is present");
+        assert!(
+            mutation.contains("`ess:hardening`"),
+            "the mutation section does not link `ess:hardening`"
+        );
     }
 
     /// The committed critics carry the pin. This is the half of the check that would catch a fifth

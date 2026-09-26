@@ -56,6 +56,7 @@ validation refuses or a scenario fails, that refusal or failure is the work; rou
 | write a new specification, add an entity, validate, compile or project one | `ess:specifying` | `ess:author` |
 | give an existing codebase a specification it never had | `ess:retrofitting` | `ess:retrofitter` |
 | raise or audit what a conformance suite actually tests | `ess:testing-conformance` | `ess:conformance` |
+| harden a specification whose suite is green | `ess:hardening` | — |
 
 A skill that is not loaded yet in this session prints with `b10x skill ess:<skill>`.
 

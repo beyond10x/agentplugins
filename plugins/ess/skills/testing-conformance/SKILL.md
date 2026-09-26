@@ -40,6 +40,10 @@ The mechanism generalises, so learn to spot it by reading rather than by mutatin
 Do the mutation test once per mapping you rely on, and record in the commit that you did it and what
 failed. A scenario nobody has ever seen fail is a scenario that has never been tested.
 
+Mutation is one of eight hardening techniques. Once the suite is green, `ess:hardening` carries the
+rest — random command sequences against a reference model, caller replay, determinism, metamorphic
+relations, guard analysis, a spec diff in the gate and a design review — and the order to run them in.
+
 ## Ranking the skips
 
 **Never rank skips by construct.** Counting which ESS constructs appear in skipped scenarios and
@@ -273,3 +277,4 @@ run it once something answers it.
 ## Next
 
 - A scenario reveals a gap in the specification: `ess:specifying`.
+- The suite is green and the question is what it still misses: `ess:hardening`.

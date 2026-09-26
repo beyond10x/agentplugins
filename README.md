@@ -17,7 +17,7 @@ What each plugin ships:
 
 <!-- plugin-tree:start -->
 - [`ess`](plugins/ess/) · [docs](website/docs/plugins/ess.md)
-  - skills: [`init`](plugins/ess/skills/init/SKILL.md) · [`upgrade`](plugins/ess/skills/upgrade/SKILL.md) · [`retrofitting`](plugins/ess/skills/retrofitting/SKILL.md) · [`specifying`](plugins/ess/skills/specifying/SKILL.md) · [`testing-conformance`](plugins/ess/skills/testing-conformance/SKILL.md)
+  - skills: [`init`](plugins/ess/skills/init/SKILL.md) · [`upgrade`](plugins/ess/skills/upgrade/SKILL.md) · [`hardening`](plugins/ess/skills/hardening/SKILL.md) · [`retrofitting`](plugins/ess/skills/retrofitting/SKILL.md) · [`specifying`](plugins/ess/skills/specifying/SKILL.md) · [`testing-conformance`](plugins/ess/skills/testing-conformance/SKILL.md)
   - agents: [`author`](plugins/ess/agents/author.md) · [`conformance`](plugins/ess/agents/conformance.md) · [`retrofitter`](plugins/ess/agents/retrofitter.md)
 - [`aep`](plugins/aep/) · [docs](website/docs/plugins/aep.md)
   - skills: [`init`](plugins/aep/skills/init/SKILL.md) · [`upgrade`](plugins/aep/skills/upgrade/SKILL.md) · [`implementing`](plugins/aep/skills/implementing/SKILL.md) · [`migrating`](plugins/aep/skills/migrating/SKILL.md) · [`planning`](plugins/aep/skills/planning/SKILL.md)
