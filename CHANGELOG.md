@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.14.13] — 2026-09-26
+
+Hardening a specification after its suite is green.
+
+- `ess:hardening`: eight specification-hardening techniques for after a conformance suite is green —
+  mutation, random sequences against a reference model, caller replay, determinism, metamorphic
+  relations, guard analysis, spec diff in the gate and design review — in cheapest-first order with
+  the design review early, and the rule that a check nobody has seen fail is not evidence. Its
+  `references/` carry a procedure per technique, the reference-model pattern (to ship as `ess`
+  features, beyond10x/ess#114), a design-review brief and spec-diff classification. (#35)
+- `ess:conformance` offers the catalogue when a coverage task ends on a green suite, and
+  `ess:testing-conformance` links it from its mutation section.
+
 ## [0.14.12] — 2026-09-26
 
 Skills that start from what a repository already has, and plans that say what the other host needs.
