@@ -7,10 +7,12 @@ description: Start with worktree in this project — make sure the `worktree` CL
 
 ## 1. Have the CLI
 
-Run `worktree --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`worktree:upgrade` handles newer releases). If it is missing, install it with `b10x`:
+Run `worktree --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`worktree:upgrade` handles newer releases). If it is missing, install it with `b10x`.
+Plan for the host you run in (`--host claude` in Claude Code, `--host codex` in Codex):
 
 ```bash
-b10x init worktree --out ~/.local/state/b10x/plan.json
+mkdir -p ~/.local/state/b10x
+b10x init worktree --host claude --out ~/.local/state/b10x/plan.json
 ```
 
 It prints what it would do, including the install method: the prebuilt, checksummed release archive

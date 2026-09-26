@@ -7,10 +7,12 @@ description: Start with AEP in this project — make sure the `aep` CLI is avail
 
 ## 1. Have the CLI
 
-Run `aep --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`aep:upgrade` handles newer releases). If it is missing, install it with `b10x`:
+Run `aep --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`aep:upgrade` handles newer releases). If it is missing, install it with `b10x`.
+Plan for the host you run in (`--host claude` in Claude Code, `--host codex` in Codex):
 
 ```bash
-b10x init aep --out ~/.local/state/b10x/plan.json
+mkdir -p ~/.local/state/b10x
+b10x init aep --host claude --out ~/.local/state/b10x/plan.json
 ```
 
 It prints what it would do, including the install method: the prebuilt, checksummed release archive
@@ -20,7 +22,7 @@ they choose it, show the plan, and
 after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
 Planning models new data with ESS (`aep:planning` rule 7). If `ess --version` does not answer, offer
-it in the same step: `b10x init aep ess --out …` plans both.
+it in the same step: `b10x init aep,ess --host claude --out …` plans both, with the same `--host`.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 

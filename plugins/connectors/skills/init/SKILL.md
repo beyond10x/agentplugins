@@ -7,8 +7,16 @@ description: Start with Connectors in this project — make sure the `connectors
 
 ## 1. Have the CLI
 
-Run `connectors --version`. The plugin itself is set up with `b10x init connectors` (plan, confirm,
-`b10x setup apply`); the CLI is installed by hand as `connectors:integrating` describes.
+Run `connectors --version`. The plugin itself is set up with `b10x`: plan, confirm, then
+`b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`. Plan for the host you run in
+(`--host claude` in Claude Code, `--host codex` in Codex):
+
+```bash
+mkdir -p ~/.local/state/b10x
+b10x init connectors --host claude --out ~/.local/state/b10x/plan.json
+```
+
+The CLI is installed by hand as `connectors:integrating` describes.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 

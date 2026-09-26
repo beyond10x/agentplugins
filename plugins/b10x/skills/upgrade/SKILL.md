@@ -11,7 +11,7 @@ b10x upgrade --host claude --out ~/.local/state/b10x/plan.json
 
 Use `--host codex` in Codex. It checks each installed product — plugin against the marketplace, CLI on `PATH` against the newest
 release — plus earlier installs under retired names, and prints each difference with the action that
-fixes it. Nothing is changed yet. One product only: `b10x upgrade ess`. A CLI the repository pins
+fixes it. Nothing is changed yet. One product only: `b10x upgrade ess --host claude --out …`. A CLI the repository pins
 in `b10x.toml` stays at its pin: the plan names a newer release but does not install it
 (`b10x unpin <cli>` follows the newest again).
 
