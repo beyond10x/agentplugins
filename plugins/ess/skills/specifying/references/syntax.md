@@ -189,6 +189,9 @@ commands:
         when: pages > 0
         creates: library.lending.Copy
         instance: copy_id
+        # An invariant reads `pages`, so the creating outcome must set it (ESS-COMMAND-018).
+        sets:
+          pages: input.pages
         emits:
           - library.lending.CopyAdded
         payload:
