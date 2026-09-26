@@ -14,6 +14,7 @@ to raise or audit a conformance suite against a real implementation.
 | `ess:specifying` | write or extend a specification; `references/syntax.md` shows every section in one that validates | `author` |
 | `ess:retrofitting` | derive a specification for a system that has none | `retrofitter` |
 | `ess:testing-conformance` | raise or audit what a conformance suite tests | `conformance` |
+| `ess:hardening` | after a green suite, the eight techniques that ask what it cannot; `references/` holds each procedure, the reference-model pattern, a design-review brief and spec-diff classification | — |
 | `ess:upgrade` | check the plugin and CLI, offer the upgrade | — |
 
 ```text

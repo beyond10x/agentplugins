@@ -25,7 +25,7 @@ tools` checks the skills against the newest CLI releases. A change that breaks a
 |---|---|---|---|
 | `b10x` | `init` (guided onboarding), `upgrade` | `routing`, `authoring-plugins` | — |
 | `aep` | `init`, `upgrade` | `planning`, `migrating`, `implementing` (wave or drive mode) | `planning`: decomposer, four plan critics, plan reviewer, reverse engineer · `implementing`: story scoper, implementor, adversary, security reviewer |
-| `ess` | `init`, `upgrade` | `specifying`, `retrofitting`, `testing-conformance` | `specifying`: author · `retrofitting`: retrofitter · `testing-conformance`: conformance |
+| `ess` | `init`, `upgrade` | `specifying`, `retrofitting`, `testing-conformance`, `hardening` | `specifying`: author · `retrofitting`: retrofitter · `testing-conformance`: conformance |
 | `worktree` | `init`, `upgrade` | `managing-worktrees` | — |
 | `connectors` | `init`, `upgrade` | `integrating` | — |
 

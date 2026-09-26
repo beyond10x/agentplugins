@@ -16,3 +16,6 @@ Charter:
 - Never weaken a scenario or a target to turn a failure green.
 - Report: `passed`/`skipped`/`failed` before and after, the mutation you ran and the scenario it
   failed, and the exact commands.
+- When a coverage task finishes on a green suite, offer the `ess:hardening` catalogue as the next
+  step, not only mutation: name the techniques it would run first (the design review, the spec
+  diff in the gate) and what each needs. Offer it; do not start it unasked.

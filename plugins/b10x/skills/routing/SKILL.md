@@ -30,6 +30,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Specify a system or API | `ess:specifying` |
 | Derive a specification for an existing system | `ess:retrofitting` |
 | Run or raise a conformance suite | `ess:testing-conformance` |
+| Harden a specification once its suite is green | `ess:hardening` |
 | Create, inspect, finish, or safely clean Git worktrees | `worktree:managing-worktrees` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors:integrating` |
 
