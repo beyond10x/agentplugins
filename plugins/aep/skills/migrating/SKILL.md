@@ -102,7 +102,8 @@ values. That applies with or without a backlog; only the steps after it differ.
 **A backlog item that introduces a new noun gets its domain first.** The `aep:planning` rule 7
 holds during a migration too: where an item names an entity no ESS document declares, draft and
 validate the domain (`ess:specifying`) before writing the stories around it, and cite the file in
-their bodies. Without `ess` installed, run `b10x init ess` and ask before applying its plan. The
+their bodies. Without `ess` installed, run `b10x init ess --host claude --out ~/.local/state/b10x/plan.json`
+(`--host codex` in Codex) and ask before applying its plan. The
 classification table still lists the item; its stories are written after the domain validates.
 
 One artifact at a time, body supplied at creation:

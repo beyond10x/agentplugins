@@ -913,6 +913,86 @@ fn flat_spellings(root: &Path) -> Result<(), String> {
     ))
 }
 
+/// The `b10x` verbs that write a plan for one host set; `--host` defaults to every host.
+const PLAN_VERBS: &[&str] = &["b10x init", "b10x upgrade"];
+
+/// The lines of one document that spell a plan command without naming its host.
+///
+/// A command is a line of a fenced block or one inline-code span; prose that merely names the verb
+/// is not one, so a span has to start with the verb.
+fn hostless_plans(text: &str) -> Vec<usize> {
+    let mut fenced = false;
+    let mut found = Vec::new();
+    for (index, line) in text.lines().enumerate() {
+        if line.trim_start().starts_with("```") {
+            fenced = !fenced;
+            continue;
+        }
+        let spans: Vec<&str> = if fenced {
+            vec![line]
+        } else {
+            line.split('`').skip(1).step_by(2).collect()
+        };
+        let hostless = spans.iter().any(|span| {
+            let span = span.trim();
+            PLAN_VERBS.iter().any(|verb| {
+                span.strip_prefix(verb)
+                    .is_some_and(|rest| rest.is_empty() || rest.starts_with(' '))
+            }) && !span.contains("--host")
+        });
+        if hostless {
+            found.push(index + 1);
+        }
+    }
+    found
+}
+
+/// Every plan command a plugin prints names its host.
+///
+/// `b10x init` and `b10x upgrade` plan for every host when `--host` is absent, so a skill that
+/// prints one without it plans Codex from Claude Code and the reverse. `b10x:init` step 4 says how to
+/// pick the host; every other skill that prints a plan command has to say it too, and a list of
+/// those skills is the hand-maintained thing that misses the next one.
+fn plan_hosts(root: &Path) -> Result<(), String> {
+    let mut found = Vec::new();
+    let mut stack = vec![root.join("plugins")];
+    while let Some(directory) = stack.pop() {
+        let mut entries = std::fs::read_dir(&directory)
+            .map_err(|error| format!("reading {}: {error}", directory.display()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| format!("reading {}: {error}", directory.display()))?
+            .into_iter()
+            .map(|entry| entry.path())
+            .collect::<Vec<_>>();
+        entries.sort();
+        for path in entries {
+            if path.is_dir() {
+                stack.push(path);
+                continue;
+            }
+            if path.extension().and_then(std::ffi::OsStr::to_str) != Some("md") {
+                continue;
+            }
+            let text = std::fs::read_to_string(&path)
+                .map_err(|error| format!("reading {}: {error}", path.display()))?;
+            let relative = path.strip_prefix(root).unwrap_or(&path).to_string_lossy();
+            for line in hostless_plans(&text) {
+                found.push(format!("  {relative}:{line}"));
+            }
+        }
+    }
+    if found.is_empty() {
+        return Ok(());
+    }
+    found.sort();
+    Err(format!(
+        "{} plan command(s) in plugins name no `--host`, so they plan for every host; say which, \
+         as `b10x:init` step 4 does (`--host claude` in Claude Code, `--host codex` in Codex):\n{}",
+        found.len(),
+        found.join("\n")
+    ))
+}
+
 fn check(root: &Path) -> Result<(), String> {
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
@@ -924,6 +1004,7 @@ fn check(root: &Path) -> Result<(), String> {
     critic_pins(root)?;
     retired_names(root)?;
     flat_spellings(root)?;
+    plan_hosts(root)?;
     concept::check(
         root,
         &concept::Plugins {
@@ -1176,6 +1257,24 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The shapes the plan-host reader has to tell apart: a command in a block and inline, with
+    /// and without `--host`, and prose or a skill name that only mentions the verb.
+    #[test]
+    fn a_plan_command_without_a_host_is_named_by_line() {
+        let text = "\
+intro naming `b10x:init` and the `b10x` CLI
+```bash
+b10x init ess --out plan.json
+b10x init ess --host claude --out plan.json
+b10x upgrade --out plan.json
+```
+run `b10x init aep,ess --out …` or `b10x upgrade ess --host codex --out …`
+one product only: `b10x upgrade ess`
+`b10x initialise` is not a verb
+";
+        assert_eq!(hostless_plans(text), vec![3, 5, 7, 8]);
+    }
 
     #[test]
     fn the_committed_marketplace_is_valid() {

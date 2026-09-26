@@ -68,9 +68,51 @@ func recordRefusal(subject string, err error) {
 }
 ```
 
-Wire it with a named return and a `defer` so no call site changes. Verify the counts are identical
-with it on and off — an instrument that perturbs what it measures is not one. Then group the reasons
-and attack the largest block whose cause is not a missing ESS construct.
+Wire it with a named return and a `defer` so no call site changes.
+
+A `--target typescript` suite reads a refusal from the `cause` chain: the generated package's
+`README.md` says a target throws `ErrUnsupported`, or `new Error("...", { cause: ErrUnsupported })`
+so the reason can carry which command it was. The recorder is the same shape, wrapped around
+`executeCommand`, `queryView` and `establishEntity` (the entity setup, on a target that implements
+`EntitySetupTarget`):
+
+```ts
+import { appendFileSync } from "node:fs";
+import { ErrUnsupported } from "./index.js";
+
+function recordRefusal(subject: string, err: unknown): void {
+  if (!(err instanceof Error) || err.cause !== ErrUnsupported) {
+    return;
+  }
+  const path = process.env.CONFORMANCE_REFUSALS;
+  if (!path) {
+    return;
+  }
+  appendFileSync(path, `${subject}\t${err.message}\n`);
+}
+
+async function recorded<T>(subject: string, call: () => T | Promise<T>): Promise<T> {
+  try {
+    return await call();
+  } catch (err) {
+    recordRefusal(subject, err);
+    throw err;
+  }
+}
+
+// inside the target:
+//   executeCommand(request) { return recorded(request.command, () => this.execute(request)); }
+//   queryView(request)      { return recorded(request.view, () => this.query(request)); }
+//   establishEntity(request) { return recorded(request.entity, () => this.establish(request)); }
+```
+
+Rethrow unchanged, so the runner still reads the sentinel and the verdict does not move. A bare
+`throw ErrUnsupported` carries no reason and is not recorded; that is the generic refusal described
+below.
+
+Either way, verify the counts are identical with the recorder on and off — an instrument that
+perturbs what it measures is not one. Then group the reasons and attack the largest block whose
+cause is not a missing ESS construct.
 
 Refusal reasons are worth writing well for this reason alone: a target that refuses with a generic
 message destroys its own diagnosis. Every refusal should name what it could not spell.
