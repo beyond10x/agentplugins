@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.14.12] — 2026-09-26
+
+Skills that start from what a repository already has, and plans that say what the other host needs.
+
+- `ess:init` checks a specification that is already there first: it runs `ess specify validate` and
+  the repository's own conformance command, reports the counts, and recommends
+  `ess:testing-conformance` when the suite is green. (#32)
+- Every `b10x init` or `upgrade` command a plugin prints names `--host`, with the wording of
+  `b10x:init`; `agentplugins-check` refuses one that does not. (#32)
+- `ess:testing-conformance` shows a TypeScript refusal recorder (`err.cause === ErrUnsupported`)
+  beside the Go one. (#32)
+- The ESS syntax reference lists the structured predicate forms (`all`, `any`, `not`, `none`, map
+  operators, quantifiers, `.count`) that `when`, `invariants` and `filter` accept, no longer tells
+  authors to split "A or B" into two views, and names the forms `synthesize` still refuses.
+  (beyond10x/ess#92)
+- `b10x init`/`upgrade --host <one>` says what a plan for the other host would do when it holds
+  Beyond10x installs — action count and legacy, missing and marketplace changes — and prints
+  "Nothing to change for <host>." while that plan has changes. When the other host is current, one
+  line says so. (#33)
+
 ## [0.14.11] — 2026-09-26
 
 Keeping installs current, keeping the skills matched to each product release, and pinning a tooling
