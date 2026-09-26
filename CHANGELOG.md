@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.14.14] — 2026-09-26
+
+Skills verified against `ess` 0.34.0.
+
+- `verified.json` moves `ess` to 0.34.0 after `agentplugins-check tools` passed against it: 24 spelled
+  commands exist, and the syntax example validates and synthesizes 14 scenarios with 0 refusals.
+- The ESS syntax reference's lending example sets `pages` on the `AddCopy` creating outcome, which
+  `ess` 0.34.0 requires when an invariant reads the field (`ESS-COMMAND-018`, beyond10x/ess#112).
+
 ## [0.14.13] — 2026-09-26
 
 Hardening a specification after its suite is green.
