@@ -312,9 +312,31 @@ variants may be written as the source spells them.
 
 ## What `when` can and cannot say
 
-A predicate (`when`, `invariants`, a view's `filter`) is one comparison (`pages > 0`,
-`format == Hardcover`) or a bare fact path. `&&`, `||` and `in [...]` are refused, and a list's
-length cannot be tested. A view that should hold "state A or B" is two views, one per state.
+A predicate (`when`, `invariants`, a view's `filter`) has a compact form and a structured form, and
+`validate` accepts both in all three places. The full grammar is ESS's
+[predicate reference](https://beyond10x.github.io/docs/ess/reference/predicates).
+
+The compact form is one string: a comparison (`pages > 0`, `format == Hardcover`), a bare fact path
+(present and truthy), `defined(note)`, or `not` before any of those. `&&`, `||` and `in [...]`
+inside that string are refused; write a conjunction, a disjunction or a set in the structured form.
+
+| to say | structured form |
+|---|---|
+| A or B ("state A or B" is one view, not two) | `filter: {any: [state == Available, state == OnLoan]}` |
+| A and B | `when: {all: [pages > 0, format == Hardcover]}`; a bare list is an implicit `all` |
+| not A, none of A and B | `when: {not: pages <= 0}`, `when: {none: [format == Audio, pages > 900]}` |
+| a range, by operator | `when: {pages: {gte: 1, lte: 5000}}` — `eq`, `ne`, `lt`, `lte`, `gt`, `gte` |
+| one of a set | `when: {format: [Hardcover, Paperback]}`, or `{in: […]}`, `{any_of: […]}`, `{one_of: […]}` |
+| none of a set | `when: {format: {none_of: [Audio]}}`, or `{not_in: […]}` |
+| present or absent | `when: {note: {exists: false}}` (= `not defined(note)`), `{defined: true}`, `{truthy: true}` |
+| every or some element of a list | `forall: {in: tags, as: t, that: t != ""}`, `exists: {in: tags, as: t, that: …}` — no compact form |
+| a list's length | `tags.count >= 0` |
+
+`validate` accepting a form does not mean `ess verify conform synthesize` can witness it. Two
+refusals to expect: an invariant over a list field (`tags.count`, a `forall` over `tags`) validates
+and is then refused as reading what no view publishes, even with the field in a view; and a presence
+guard over a required input (`{defined: true}`, `{exists: false}`) is refused because no candidate
+input leaves the field out. Relay such a refusal verbatim rather than reshaping the rule around it.
 
 A `when` reads only the command's own input. A condition on another entity — "the branch must be
 open", "the customer is active" — is not an input guard. Express it as a transition of that entity (a

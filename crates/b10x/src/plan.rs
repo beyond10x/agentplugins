@@ -205,6 +205,21 @@ impl Plan {
     }
 }
 
+/// The line a converged plan ends with. Qualified with the planned hosts when a host outside the
+/// plan has changes pending, so it never reads as "everything is current" (#33).
+#[must_use]
+pub fn nothing_to_change(plan: &Plan) -> String {
+    let pending = plan.findings.iter().any(|finding| {
+        finding.level == Level::Warn && finding.host.is_some_and(|host| !plan.hosts.contains(&host))
+    });
+    if pending {
+        let hosts: Vec<&str> = plan.hosts.iter().map(|host| host.program()).collect();
+        format!("Nothing to change for {}.", hosts.join(" and "))
+    } else {
+        "Nothing to change.".to_owned()
+    }
+}
+
 /// Digest of an inventory.
 ///
 /// # Panics
@@ -340,18 +355,10 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
         (Host::Claude, inventory.claude.as_ref()),
         (Host::Codex, inventory.codex.as_ref()),
     ] {
-        if state.is_some_and(|state| holds_beyond10x(catalog, state))
-            && !context.hosts.contains(&host)
-        {
-            findings.push(Finding {
-                level: Level::Note,
-                host: Some(host),
-                subject: host.program().to_owned(),
-                detail: format!(
-                    "Beyond10x plugins are installed for `{}` too and this plan leaves them alone; `--host all` covers both",
-                    host.program()
-                ),
-            });
+        if let Some(state) = state.filter(|state| holds_beyond10x(catalog, state)) {
+            if !context.hosts.contains(&host) {
+                findings.push(elsewhere(context, host, state, &selected, inventory));
+            }
         }
     }
     if context.hosts.contains(&Host::Claude) && inventory.claude.is_some() {
@@ -381,6 +388,89 @@ pub fn plan(context: &Context<'_>, inventory: &Inventory) -> Plan {
         only: context.only,
         method: context.method,
         upgrade: context.upgrade,
+    }
+}
+
+/// The finding for a host outside the plan that holds Beyond10x: what a plan for it would do,
+/// planned read-only with the same rules and discarded (#33). A `Warn` when that plan changes
+/// something, which [`nothing_to_change`] reads; a `Note` when the host is current.
+fn elsewhere(
+    context: &Context<'_>,
+    host: Host,
+    state: &HostState,
+    selected: &BTreeSet<String>,
+    inventory: &Inventory,
+) -> Finding {
+    let mut findings = Vec::new();
+    let mut actions = Vec::new();
+    plan_host(context, host, state, selected, &mut findings, &mut actions);
+    if host == Host::Claude {
+        plan_settings(context, selected, inventory, &mut findings, &mut actions);
+    }
+    let program = host.program();
+    let count = actions.iter().filter(|action| action.changes()).count();
+    if count == 0 {
+        return Finding {
+            level: Level::Note,
+            host: Some(host),
+            subject: program.to_owned(),
+            detail: format!(
+                "Beyond10x plugins are installed for `{program}` too and are current for this selection"
+            ),
+        };
+    }
+    // What the discarded plan's changes are, in the words of its own findings.
+    let mut tally = [0usize; CHANGE_KINDS.len()];
+    for finding in findings.iter().filter(|f| f.level == Level::Change) {
+        tally[change_kind(&finding.detail)] += 1;
+    }
+    let parts: Vec<String> = CHANGE_KINDS
+        .iter()
+        .zip(tally)
+        .filter(|(_, n)| *n > 0)
+        .map(|(kind, n)| format!("{n} {kind}{}", if n == 1 { "" } else { "s" }))
+        .collect();
+    Finding {
+        level: Level::Warn,
+        host: Some(host),
+        subject: program.to_owned(),
+        detail: format!(
+            "Beyond10x plugins are installed for `{program}` too and this plan leaves them alone; \
+             a plan for `{program}` has {count} action{} ({}); `--host {program}` or `--host all` applies them",
+            if count == 1 { "" } else { "s" },
+            parts.join(", ")
+        ),
+    }
+}
+
+/// The kinds of change [`elsewhere`] counts, in the order it names them.
+const CHANGE_KINDS: [&str; 7] = [
+    "legacy install",
+    "missing plugin",
+    "outdated plugin",
+    "disabled plugin",
+    "unselected plugin",
+    "marketplace change",
+    "other change",
+];
+
+/// Which of [`CHANGE_KINDS`] a `Change` finding's detail is, by the words `plan_host` and
+/// `plan_settings` write.
+fn change_kind(detail: &str) -> usize {
+    if detail.starts_with("legacy install") {
+        0
+    } else if detail.starts_with("not installed; install") {
+        1
+    } else if detail.contains("; upgrade to ") {
+        2
+    } else if detail.starts_with("disabled") {
+        3
+    } else if detail.starts_with("its product is not selected") {
+        4
+    } else if detail.starts_with("marketplace `") || detail.starts_with("retired marketplace") {
+        5
+    } else {
+        6
     }
 }
 
@@ -1593,6 +1683,113 @@ mod tests {
             plan.findings
         );
         assert!(!commands(&plan).iter().any(|c| c.starts_with("codex")));
+    }
+
+    /// Claude with the base and `aep`, `ess`, `worktree` current, and their CLIs at the newest
+    /// release: an `init aep,ess,worktree --host claude` plan with nothing to do for Claude.
+    fn current_claude() -> Inventory {
+        let mut claude = HostState {
+            marketplaces: vec![market()],
+            ..HostState::default()
+        };
+        for (name, version) in [
+            ("b10x", "0.12.0"),
+            ("aep", "0.13.0"),
+            ("ess", "0.30.0"),
+            ("worktree", "0.6.0"),
+        ] {
+            let mut plugin = installed(name, "b10x", "user", None);
+            plugin.version = Some(version.to_owned());
+            claude.plugins.push(plugin);
+        }
+        let binaries = [("aep", "0.57.0"), ("ess", "0.30.0"), ("worktree", "0.7.0")]
+            .into_iter()
+            .map(|(name, version)| BinaryState {
+                name: name.to_owned(),
+                copies: vec![Copy {
+                    path: format!("/opt/b10x-home/.local/bin/{name}"),
+                    version: Some(version.to_owned()),
+                }],
+            })
+            .collect();
+        Inventory {
+            claude: Some(claude),
+            binaries,
+            ..Inventory::default()
+        }
+    }
+
+    fn other_host(plan: &Plan, host: Host) -> Vec<&Finding> {
+        plan.findings
+            .iter()
+            .filter(|f| f.host == Some(host))
+            .collect()
+    }
+
+    #[test]
+    fn init_for_one_host_says_what_a_plan_for_the_other_host_would_do() {
+        let mut inventory = current_claude();
+        inventory.codex = Some(legacy_codex());
+        let plan = run_only(&inventory, &["aep", "ess", "worktree"], None);
+        assert!(plan.converged(), "{:#?}", plan.actions);
+        let codex = other_host(&plan, Host::Codex);
+        assert_eq!(codex.len(), 1, "{codex:#?}");
+        assert_eq!(codex[0].level, Level::Warn);
+        assert_eq!(
+            codex[0].detail,
+            "Beyond10x plugins are installed for `codex` too and this plan leaves them alone; \
+             a plan for `codex` has 10 actions (4 legacy installs, 4 missing plugins, \
+             2 marketplace changes); `--host codex` or `--host all` applies them"
+        );
+        assert!(!commands(&plan).iter().any(|c| c.starts_with("codex")));
+        assert_eq!(nothing_to_change(&plan), "Nothing to change for claude.");
+    }
+
+    #[test]
+    fn init_for_one_host_notes_in_one_line_that_the_other_host_is_current() {
+        let mut inventory = current_claude();
+        inventory.codex = inventory.claude.clone();
+        let plan = run_only(&inventory, &["aep", "ess", "worktree"], None);
+        assert!(plan.converged(), "{:#?}", plan.actions);
+        let codex = other_host(&plan, Host::Codex);
+        assert_eq!(codex.len(), 1, "{codex:#?}");
+        assert_eq!(codex[0].level, Level::Note);
+        assert_eq!(
+            codex[0].detail,
+            "Beyond10x plugins are installed for `codex` too and are current for this selection"
+        );
+        assert_eq!(nothing_to_change(&plan), "Nothing to change.");
+    }
+
+    #[test]
+    fn init_without_beyond10x_on_the_other_host_names_no_other_host() {
+        let mut inventory = current_claude();
+        inventory.codex = Some(HostState::default());
+        let plan = run_only(&inventory, &["aep", "ess", "worktree"], None);
+        assert!(plan.converged(), "{:#?}", plan.actions);
+        assert!(
+            other_host(&plan, Host::Codex).is_empty(),
+            "{:#?}",
+            plan.findings
+        );
+        assert_eq!(nothing_to_change(&plan), "Nothing to change.");
+    }
+
+    #[test]
+    fn a_warning_on_a_planned_host_leaves_nothing_to_change_unqualified() {
+        let mut inventory = current_claude();
+        inventory.broken = vec![(Host::Codex, "codex plugin list failed".to_owned())];
+        let plan = run(
+            &inventory,
+            Some(&["aep", "ess", "worktree"]),
+            &[Host::Claude, Host::Codex],
+        );
+        assert!(plan.converged(), "{:#?}", plan.actions);
+        assert!(plan
+            .findings
+            .iter()
+            .any(|f| f.level == Level::Warn && f.host == Some(Host::Codex)));
+        assert_eq!(nothing_to_change(&plan), "Nothing to change.");
     }
 
     #[test]
