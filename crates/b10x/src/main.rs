@@ -528,7 +528,7 @@ fn print_plan(plan: &Plan) {
     }
     let changes: Vec<&plan::Action> = plan.actions.iter().filter(|a| a.changes()).collect();
     if changes.is_empty() {
-        println!("\nNothing to change.");
+        println!("\n{}", plan::nothing_to_change(plan));
     } else {
         println!("\nActions ({}):", changes.len());
         for (index, action) in changes.iter().enumerate() {
