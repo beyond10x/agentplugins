@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.14.15] — 2026-09-26
+
+`worktree:managing-worktrees` follows `worktree` 0.8.0; skills verified against `aep` 0.60.0, `ess`
+0.35.0 and `worktree` 0.8.0.
+
+- `managing-worktrees` is regenerated from `worktree skill` 0.8.0, keeping its name and three local
+  steps: `worktree archive` as recovery proof for work that must not be published, the
+  `worktree-hidden-state` and `worktree-local-refs` refusals, and the raw restore of an archive
+  (attributes disabled through `.git/info/attributes`; Git 2.55 `apply` crashes with
+  `--attr-source`).
+- `verified.json` moves `aep` to 0.60.0, `ess` to 0.35.0 and `worktree` to 0.8.0 after
+  `agentplugins-check tools` passed against them.
+
 ## [0.14.14] — 2026-09-26
 
 Skills verified against `ess` 0.34.0.
