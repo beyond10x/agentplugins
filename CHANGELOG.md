@@ -10,6 +10,8 @@ Commands: operator-only entry points for work that is started by hand.
   `agentplugins-check` enforces each part.
 - `worktree:cleanup` (`/worktree:cleanup`) reviews managed trees and removes only approved ids,
   through `worktree:managing-worktrees`.
+- `verified.json` moves `worktree` to 0.8.1 after `agentplugins-check tools` passed against it
+  (19 spelled commands).
 - `aep:wave` (`/aep:wave`) and `aep:drive` (`/aep:drive`) start `aep:implementing` in wave or drive
   mode. They are no longer retired names.
 - The `**Skill version**` line in `aep:implementing`, `aep:planning` and `aep:migrating` read
