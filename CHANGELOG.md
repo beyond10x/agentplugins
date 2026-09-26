@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.14.16] — 2026-09-26
+
+Commands: operator-only entry points for work that is started by hand.
+
+- R3 gains a third kind of skill, the command: a verb name, `disable-model-invocation: true`, at
+  most 20 lines of body, handing off to exactly one activity skill of its plugin, with an
+  `agents/openai.yaml` that sets `policy.allow_implicit_invocation: false` for Codex.
+  `agentplugins-check` enforces each part.
+- `worktree:cleanup` (`/worktree:cleanup`) reviews managed trees and removes only approved ids,
+  through `worktree:managing-worktrees`.
+- `aep:wave` (`/aep:wave`) and `aep:drive` (`/aep:drive`) start `aep:implementing` in wave or drive
+  mode. They are no longer retired names.
+- The `**Skill version**` line in `aep:implementing`, `aep:planning` and `aep:migrating` read
+  0.14.2; it now reads the plugin version, and the gate refuses a line that differs from
+  `.claude-plugin/plugin.json`.
+- `b10x:routing` lists the three commands.
+
 ## [0.14.15] — 2026-09-26
 
 `worktree:managing-worktrees` follows `worktree` 0.8.0; skills verified against `aep` 0.60.0, `ess`

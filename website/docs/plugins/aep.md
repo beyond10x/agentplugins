@@ -47,6 +47,14 @@ It provides:
 - an adversary role that checks the result against scope, evidence, and repository invariants;
 - the `implementing` skill, in drive mode: one governed `metaharness aep drive` run over a single story.
 
+Two commands start either mode by hand. Only you start them, never the model, and each hands off
+to `aep:implementing`:
+
+| command | what it does |
+|---|---|
+| `/aep:wave [story-id…]` | scopes the candidates, writes the wave page, proposes the wave and stops for your approval |
+| `/aep:drive <story-id>` | says what a driven run costs, starts one governed run, prints its run id and stops |
+
 This plugin builds on AEP's planning substrate. It does not replace the repository gate, invent lifecycle
 moves, or give implementors authority beyond their assigned unit.
 

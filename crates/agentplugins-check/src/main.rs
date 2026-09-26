@@ -404,16 +404,6 @@ const RETIRED: &[Retired] = &[
         wire_next: &[],
     },
     Retired {
-        old: "aep:wave",
-        new: "aep:implementing",
-        wire_next: &[],
-    },
-    Retired {
-        old: "aep:drive",
-        new: "aep:implementing",
-        wire_next: &[],
-    },
-    Retired {
         old: "aep:story-migration",
         new: "aep:migrating",
         wire_next: &[],

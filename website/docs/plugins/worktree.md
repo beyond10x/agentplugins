@@ -12,6 +12,7 @@ or audits old linked worktrees.
 |---|---|
 | `worktree:init` | install the `worktree` CLI, activate a workspace, check it |
 | `worktree:managing-worktrees` | create, lease, finish, inspect and clean worktrees |
+| `worktree:cleanup` | command: `/worktree:cleanup` reviews the managed trees, finishes and garbage-collects only the ids you approve, and reports what it kept and why |
 | `worktree:upgrade` | check the plugin and CLI, offer the upgrade |
 
 ```text
@@ -33,6 +34,11 @@ session leases, and publish wanted commits before finishing. Cleanup is review-b
 `worktree gc --repo <primary> --apply --id <reviewed-id>`. Dirty, locked, live, local-only,
 offline, unmanaged, and out-of-policy trees are retained. Work merged as rebased or cherry-picked
 copies is recoverable when an advertised ref carries every unique commit's exact patch.
+
+`/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by hand. It is a command:
+only you start it, never the model, and it hands off to `worktree:managing-worktrees` for every
+step — `inspect`, `archive` for work that must not be published, `finish`, `gc --dry-run --id`,
+then `gc --apply --id` for the ids you approved. It never forces a removal.
 
 `worktree inspect --repo <primary>` reports actual Git state, storage, ignored files, leases and
 retention blockers. It defaults to one repository; use `--workspace` to inspect the wider profile.

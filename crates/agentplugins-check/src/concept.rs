@@ -3,8 +3,13 @@
 //! after one had been agreed.
 //!
 //! - **R2** one plugin per product; plugin name = product id = the CLI it drives.
-//! - **R3** a skill is an activity named in `-ing` form, one or two words, never its plugin's name.
+//! - **R3** a skill is a lifecycle skill (`init`, `upgrade`), an activity named in `-ing` form, or
+//!   a command: a verb the operator alone starts (`disable-model-invocation: true`), at most
+//!   [`COMMAND_LINES`] lines, handing off to exactly one activity of its plugin. None is named after
+//!   its plugin.
 //! - **R4** an agent is owned by exactly one skill of its plugin, which lists it under `## Agents`.
+//! - **R5** a skill quotes no CLI version, and a `**Skill version X**` line names the version its
+//!   plugin's `.claude-plugin/plugin.json` carries.
 //! - **R7** every `<plugin>:<skill-or-agent>` id written in this repository resolves.
 //! - **R8** one README row, one plugin page and one sidebar entry per plugin; the README stays short,
 //!   besides a generated tree of every skill and agent.
@@ -147,6 +152,132 @@ pub fn activity(name: &str) -> bool {
         && words[0].ends_with("ing")
 }
 
+/// R3: whether a skill name is a command: one or two hyphen-joined lowercase words, the first a verb
+/// that does not end in `ing` (which would make it an activity).
+#[must_use]
+pub fn command_name(name: &str) -> bool {
+    let words: Vec<&str> = name.split('-').collect();
+    (1..=2).contains(&words.len())
+        && words
+            .iter()
+            .all(|word| !word.is_empty() && word.bytes().all(|b| b.is_ascii_lowercase()))
+        && !words[0].ends_with("ing")
+}
+
+/// The most lines a command's body may have (R3): past that it is carrying behaviour, which
+/// belongs in the activity skill it hands off to.
+const COMMAND_LINES: usize = 20;
+
+/// The body of a markdown file after its frontmatter, without leading or trailing blank lines.
+fn body(text: &str) -> &str {
+    let rest = text
+        .strip_prefix("---\n")
+        .and_then(|rest| rest.find("\n---").map(|end| &rest[end + 4..]))
+        .unwrap_or(text);
+    rest.trim()
+}
+
+/// Whether the frontmatter sets `key: true`.
+fn frontmatter_true(text: &str, key: &str) -> bool {
+    let Some(block) = text
+        .strip_prefix("---\n")
+        .and_then(|rest| rest.find("\n---").map(|end| &rest[..end]))
+    else {
+        return false;
+    };
+    block.lines().any(|line| {
+        line.strip_prefix(key)
+            .and_then(|rest| rest.strip_prefix(':'))
+            .is_some_and(|value| value.trim() == "true")
+    })
+}
+
+/// R3 over one command skill of `plugin`. `skills` are the plugin's skill folders and `activities`
+/// the subset that are activities; a command hands off to exactly one of those.
+///
+/// A command is started by the operator only (`disable-model-invocation: true`), so a model never
+/// picks it in place of the activity; it is short, so the behaviour stays in one place; and it
+/// names the activity it hands off to, so a rename of that activity breaks the gate, not the
+/// command.
+#[must_use]
+pub fn command(
+    plugin: &str,
+    folder: &str,
+    text: &str,
+    skills: &BTreeSet<String>,
+    activities: &BTreeSet<String>,
+) -> Vec<String> {
+    let mut problems = Vec::new();
+    if folder == plugin {
+        problems.push(format!("R3 `{plugin}:{folder}` is named after its plugin"));
+        return problems;
+    }
+    if !command_name(folder) {
+        problems.push(format!(
+            "R3 `{plugin}:{folder}` is neither an activity (one or two words, the first ending in `ing`) nor a command (one or two words, the first a verb)"
+        ));
+        return problems;
+    }
+    if !frontmatter_true(text, "disable-model-invocation") {
+        problems.push(format!(
+            "R3 command `{plugin}:{folder}` does not set `disable-model-invocation: true`; only the operator starts a command"
+        ));
+    }
+    let body = body(text);
+    let lines = body.lines().count();
+    if lines > COMMAND_LINES {
+        problems.push(format!(
+            "R3 command `{plugin}:{folder}` has {lines} lines of body; the most is {COMMAND_LINES}, and the procedure belongs in the activity it hands off to"
+        ));
+    }
+    let own: BTreeSet<String> = [plugin.to_owned()].into();
+    let mut handoffs = BTreeSet::new();
+    for (_, name) in body.lines().flat_map(|line| ids(line, &own)) {
+        if !skills.contains(&name) {
+            problems.push(format!(
+                "R3 command `{plugin}:{folder}` names `{plugin}:{name}`, which is no skill of `{plugin}`"
+            ));
+        } else if activities.contains(&name) {
+            handoffs.insert(name);
+        }
+    }
+    match handoffs.len() {
+        1 => {}
+        0 => problems.push(format!(
+            "R3 command `{plugin}:{folder}` hands off to no activity skill of `{plugin}`; name the one it hands off to as `{plugin}:<activity>`"
+        )),
+        n => problems.push(format!(
+            "R3 command `{plugin}:{folder}` names {n} activity skills ({}); a command hands off to exactly one",
+            handoffs.into_iter().collect::<Vec<_>>().join(", ")
+        )),
+    }
+    problems
+}
+
+/// R3: whether a skill's `agents/openai.yaml` makes it operator-only in Codex, which reads
+/// `policy.allow_implicit_invocation` rather than Claude Code's `disable-model-invocation`.
+#[must_use]
+pub fn codex_operator_only(yaml: Option<&str>) -> bool {
+    yaml.and_then(|text| serde_yaml::from_str::<serde_yaml::Value>(text).ok())
+        .and_then(|document| {
+            document
+                .get("policy")?
+                .get("allow_implicit_invocation")?
+                .as_bool()
+        })
+        == Some(false)
+}
+
+/// R5: the `**Skill version X**` line a skill may carry, with its 1-based line number.
+#[must_use]
+pub fn skill_version(text: &str) -> Option<(usize, String)> {
+    text.lines().enumerate().find_map(|(number, line)| {
+        let rest = line.split_once("**Skill version ")?.1;
+        let (version, _) = rest.split_once("**")?;
+        Some((number + 1, version.trim().to_owned()))
+    })
+}
+
 /// The agent names a skill lists under its `## Agents` heading, one `` - `name` `` bullet each.
 #[must_use]
 pub fn listed_agents(skill: &str) -> Vec<String> {
@@ -176,7 +307,13 @@ fn plugin(
 ) -> (BTreeSet<String>, BTreeSet<String>) {
     let directory = root.join("plugins").join(name);
     let mut skills = BTreeSet::new();
+    let mut activities = BTreeSet::new();
+    let mut commands = Vec::new();
     let mut owners: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let manifest = read(&directory.join(".claude-plugin/plugin.json"))
+        .ok()
+        .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok())
+        .and_then(|document| document.get("version")?.as_str().map(str::to_owned));
     for path in entries(&directory.join("skills")) {
         let Some(folder) = path.file_name().and_then(|n| n.to_str()).map(str::to_owned) else {
             continue;
@@ -185,23 +322,46 @@ fn plugin(
             problems.push(format!("R3 `{name}:{folder}` has no SKILL.md"));
             continue;
         };
-        if !LIFECYCLE.contains(&folder.as_str()) && !activity(&folder) {
-            problems.push(format!(
-                "R3 `{name}:{folder}` is not an activity name (one or two words, the first ending in `ing`)"
-            ));
-        }
-        if !LIFECYCLE.contains(&folder.as_str()) && folder == name {
-            problems.push(format!("R3 `{name}:{folder}` is named after its plugin"));
+        if activity(&folder) {
+            if folder == name {
+                problems.push(format!("R3 `{name}:{folder}` is named after its plugin"));
+            }
+            activities.insert(folder.clone());
+        } else if !LIFECYCLE.contains(&folder.as_str()) {
+            commands.push((folder.clone(), text.clone()));
         }
         if frontmatter_name(&text).as_deref() != Some(folder.as_str()) {
             problems.push(format!(
                 "R3 `{name}:{folder}` declares another `name:` in its frontmatter"
             ));
         }
+        if let Some((line, version)) = skill_version(&text) {
+            if manifest.as_deref() != Some(version.as_str()) {
+                problems.push(format!(
+                    "R5 plugins/{name}/skills/{folder}/SKILL.md:{line} says skill version {version}; `.claude-plugin/plugin.json` carries {}",
+                    manifest.as_deref().unwrap_or("no version")
+                ));
+            }
+        }
         for agent in listed_agents(&text) {
             owners.entry(agent).or_default().push(folder.clone());
         }
         skills.insert(folder);
+    }
+    for (folder, text) in &commands {
+        problems.extend(command(name, folder, text, &skills, &activities));
+        let yaml = read(
+            &directory
+                .join("skills")
+                .join(folder)
+                .join("agents/openai.yaml"),
+        )
+        .ok();
+        if command_name(folder) && folder != name && !codex_operator_only(yaml.as_deref()) {
+            problems.push(format!(
+                "R3 command `{name}:{folder}` has no `agents/openai.yaml` with `policy.allow_implicit_invocation: false`; Codex would let the model start it"
+            ));
+        }
     }
     for lifecycle in LIFECYCLE {
         if !skills.contains(*lifecycle) {
@@ -539,6 +699,7 @@ pub fn check(root: &Path, plugins: &Plugins) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fmt::Write as _;
 
     #[test]
     fn activity_names() {
@@ -564,6 +725,139 @@ mod tests {
         ] {
             assert!(!activity(bad), "{bad}");
         }
+    }
+
+    fn set(names: &[&str]) -> BTreeSet<String> {
+        names.iter().map(|s| (*s).to_owned()).collect()
+    }
+
+    fn command_text(flag: bool, body_lines: usize, handoff: &str) -> String {
+        let mut text = String::from("---\nname: cleanup\ndescription: Clean up.\n");
+        if flag {
+            text.push_str("disable-model-invocation: true\n");
+        }
+        text.push_str("argument-hint: \"[--repo <path>]\"\n---\n\n");
+        writeln!(text, "Read `{handoff}` and follow it.").unwrap();
+        for n in 1..body_lines {
+            writeln!(text, "- step {n}").unwrap();
+        }
+        text
+    }
+
+    fn worktree_command(folder: &str, text: &str) -> Vec<String> {
+        let skills = set(&["init", "upgrade", "managing-worktrees", folder]);
+        let activities = set(&["managing-worktrees"]);
+        command("worktree", folder, text, &skills, &activities)
+    }
+
+    #[test]
+    fn command_names_are_verbs_not_activities() {
+        for good in ["cleanup", "wave", "drive", "review-plan", "decompose"] {
+            assert!(command_name(good), "{good}");
+        }
+        for bad in [
+            "planning",
+            "managing-worktrees",
+            "Wave",
+            "",
+            "a-b-c",
+            "wave-",
+        ] {
+            assert!(!command_name(bad), "{bad}");
+        }
+    }
+
+    #[test]
+    fn a_valid_command_is_accepted() {
+        let text = command_text(true, 20, "worktree:managing-worktrees");
+        assert_eq!(worktree_command("cleanup", &text), Vec::<String>::new());
+    }
+
+    #[test]
+    fn a_command_without_disable_model_invocation_is_refused() {
+        let text = command_text(false, 5, "worktree:managing-worktrees");
+        let problems = worktree_command("cleanup", &text);
+        assert!(
+            problems.len() == 1 && problems[0].contains("disable-model-invocation: true"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_command_over_twenty_lines_is_refused() {
+        let text = command_text(true, 21, "worktree:managing-worktrees");
+        let problems = worktree_command("cleanup", &text);
+        assert!(
+            problems.len() == 1 && problems[0].contains("21 lines of body"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_command_naming_a_missing_skill_is_refused() {
+        let text = command_text(true, 5, "worktree:managing-trees");
+        let problems = worktree_command("cleanup", &text);
+        assert!(
+            problems
+                .iter()
+                .any(|p| p.contains("`worktree:managing-trees`, which is no skill")),
+            "{problems:?}"
+        );
+        assert!(
+            problems
+                .iter()
+                .any(|p| p.contains("hands off to no activity")),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_command_handing_off_to_a_lifecycle_skill_or_two_activities_is_refused() {
+        let text = command_text(true, 5, "worktree:init");
+        let problems = worktree_command("cleanup", &text);
+        assert!(
+            problems.len() == 1 && problems[0].contains("hands off to no activity"),
+            "{problems:?}"
+        );
+        let skills = set(&["init", "upgrade", "planning", "implementing", "wave"]);
+        let activities = set(&["planning", "implementing"]);
+        let text = command_text(true, 5, "aep:implementing` after `aep:planning");
+        let problems = command("aep", "wave", &text, &skills, &activities);
+        assert!(
+            problems.len() == 1 && problems[0].contains("2 activity skills"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_command_named_after_its_plugin_is_refused() {
+        let text = command_text(true, 5, "worktree:managing-worktrees")
+            .replace("name: cleanup", "name: worktree");
+        let problems = worktree_command("worktree", &text);
+        assert!(
+            problems.len() == 1 && problems[0].contains("named after its plugin"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_command_is_operator_only_in_codex_too() {
+        let off =
+            "interface:\n  display_name: \"X\"\npolicy:\n  allow_implicit_invocation: false\n";
+        assert!(codex_operator_only(Some(off)));
+        let on = off.replace("false", "true");
+        assert!(!codex_operator_only(Some(&on)));
+        assert!(!codex_operator_only(Some(
+            "interface:\n  display_name: \"X\"\n"
+        )));
+        assert!(!codex_operator_only(None));
+    }
+
+    #[test]
+    fn a_skill_version_line_is_read_with_its_line_number() {
+        let text = "---\nname: x\n---\n\n**Skill version 0.14.15** — the version\n";
+        assert_eq!(skill_version(text), Some((5, "0.14.15".to_owned())));
+        assert_eq!(skill_version("# no version line\n"), None);
     }
 
     #[test]
