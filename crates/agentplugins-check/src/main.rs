@@ -46,6 +46,10 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/plan-critic-parallel-safety.md",
             "skills/implementing/SKILL.md",
             "skills/implementing/references/drive.md",
+            "skills/wave/SKILL.md",
+            "skills/drive/SKILL.md",
+            "skills/review-plan/SKILL.md",
+            "skills/decompose/SKILL.md",
             "agents/story-scoper.md",
             "agents/implementor.md",
             "agents/adversary.md",
@@ -53,7 +57,13 @@ const PLUGINS: &[(&str, &[&str])] = &[
         ],
     ),
     ("connectors", &["skills/integrating/SKILL.md"]),
-    ("worktree", &["skills/managing-worktrees/SKILL.md"]),
+    (
+        "worktree",
+        &[
+            "skills/managing-worktrees/SKILL.md",
+            "skills/cleanup/SKILL.md",
+        ],
+    ),
     (
         "ess",
         &[

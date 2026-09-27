@@ -268,6 +268,118 @@ pub fn codex_operator_only(yaml: Option<&str>) -> bool {
         == Some(false)
 }
 
+/// The most lines an agent's body may have (R4): an agent is a thin Claude Code adapter over a
+/// role whose procedure lives in its owning skill, which Codex loads and Codex does not load
+/// `agents/`.
+const AGENT_LINES: usize = 20;
+
+/// R4 over one agent file of `plugin`, owned by the skill `owner` (if exactly one lists it).
+///
+/// The agent is thin: its body is at most [`AGENT_LINES`] lines and names its owning skill as
+/// `<plugin>:<owner>`, so the role's behaviour sits where both hosts read it. An agent that
+/// carries the procedure itself is the Claude-only copy that Codex never sees.
+#[must_use]
+pub fn agent(plugin: &str, stem: &str, text: &str, owner: Option<&str>) -> Vec<String> {
+    let mut problems = Vec::new();
+    let body = body(text);
+    let lines = body.lines().count();
+    if lines > AGENT_LINES {
+        problems.push(format!(
+            "R4 agent `{plugin}:{stem}` has {lines} lines of body; the most is {AGENT_LINES}: put the role's procedure in its owning skill (or its `references/`), which Codex loads, and keep the agent a thin adapter"
+        ));
+    }
+    if let Some(owner) = owner {
+        let own: BTreeSet<String> = [plugin.to_owned()].into();
+        if !body
+            .lines()
+            .flat_map(|line| ids(line, &own))
+            .any(|(_, name)| name == owner)
+        {
+            problems.push(format!(
+                "R4 agent `{plugin}:{stem}` does not name `{plugin}:{owner}`, the skill that owns it; name it, so the role is followed from the skill both hosts load"
+            ));
+        }
+    }
+    problems
+}
+
+/// Relative markdown links (`](path.md)`, optionally with a `#fragment`) in a text, in order.
+#[must_use]
+pub fn links(text: &str) -> Vec<String> {
+    text.split("](")
+        .skip(1)
+        .filter_map(|rest| rest.split_once(')').map(|(target, _)| target))
+        .map(|target| target.split('#').next().unwrap_or_default())
+        .filter(|target| {
+            Path::new(target)
+                .extension()
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("md"))
+                && !target.contains("://")
+                && !target.starts_with('/')
+        })
+        .map(str::to_owned)
+        .collect()
+}
+
+/// R3 and R4 as a plugin author reads them: the phrases every page that teaches the plugin
+/// structure must state, taken from the constants the checker enforces, so the teaching and the
+/// gate cannot drift apart. Returns the phrases `text` is missing.
+#[must_use]
+pub fn teaches(text: &str) -> Vec<String> {
+    [
+        "disable-model-invocation: true".to_owned(),
+        "allow_implicit_invocation: false".to_owned(),
+        format!("at most {COMMAND_LINES} lines"),
+        format!("at most {AGENT_LINES} lines"),
+    ]
+    .into_iter()
+    .collect::<BTreeSet<_>>()
+    .into_iter()
+    .filter(|phrase| !text.contains(phrase.as_str()))
+    .collect()
+}
+
+/// `b10x:routing` over every carried plugin's skills: each skill is reachable from the routing
+/// skill, and a table row about upgrading routes to no `init` skill (`init` sets a product up;
+/// `upgrade` checks it and offers the upgrade).
+#[must_use]
+pub fn routing(text: &str, skills: &BTreeMap<String, BTreeSet<String>>) -> Vec<String> {
+    let mut problems = Vec::new();
+    let plugins: BTreeSet<String> = skills.keys().cloned().collect();
+    let named: BTreeSet<(String, String)> =
+        text.lines().flat_map(|line| ids(line, &plugins)).collect();
+    for (plugin, members) in skills {
+        for skill in members {
+            if !named.contains(&(plugin.clone(), skill.clone())) {
+                problems.push(format!(
+                    "b10x:routing never names `{plugin}:{skill}`; every skill is reachable from the routing skill"
+                ));
+            }
+        }
+    }
+    for line in text.lines() {
+        let Some(request) = line
+            .strip_prefix('|')
+            .and_then(|rest| rest.split_once('|'))
+            .map(|(cell, _)| cell.to_ascii_lowercase())
+        else {
+            continue;
+        };
+        if !request.contains("upgrade") {
+            continue;
+        }
+        for (plugin, skill) in ids(line, &plugins) {
+            if skill == "init" {
+                problems.push(format!(
+                    "b10x:routing routes an upgrade request to `{plugin}:init`; upgrades go to `{plugin}:upgrade`: `{}`",
+                    line.trim()
+                ));
+            }
+        }
+    }
+    problems
+}
+
 /// R5: the `**Skill version X**` line a skill may carry, with its 1-based line number.
 #[must_use]
 pub fn skill_version(text: &str) -> Option<(usize, String)> {
@@ -297,6 +409,43 @@ pub fn listed_agents(skill: &str) -> Vec<String> {
         }
     }
     agents
+}
+
+/// R4 over one agent file of `plugin`: its name, its thinness, its links and its one owner.
+fn agent_file(
+    path: &Path,
+    name: &str,
+    stem: &str,
+    owners: &BTreeMap<String, Vec<String>>,
+    problems: &mut Vec<String>,
+) {
+    let text = read(path).unwrap_or_default();
+    if frontmatter_name(&text).as_deref() != Some(stem) {
+        problems.push(format!("R4 agent `{name}:{stem}` declares another `name:`"));
+    }
+    let owner = match owners.get(stem).map(Vec::as_slice) {
+        Some([owner]) => Some(owner.as_str()),
+        _ => None,
+    };
+    problems.extend(agent(name, stem, &text, owner));
+    for link in links(body(&text)) {
+        if !path.parent().unwrap_or(path).join(&link).is_file() {
+            problems.push(format!(
+                "R4 agent `{name}:{stem}` links `{link}`, which does not exist"
+            ));
+        }
+    }
+    match owners.get(stem).map(Vec::as_slice) {
+        None | Some([]) => problems.push(format!(
+            "R4 agent `{name}:{stem}` is owned by no skill; list it under `## Agents` in the skill that dispatches it"
+        )),
+        Some([_]) => {}
+        Some(many) => problems.push(format!(
+            "R4 agent `{name}:{stem}` is listed by {} skills ({}); exactly one owns it",
+            many.len(),
+            many.join(", ")
+        )),
+    }
 }
 
 /// Skills and agents of one carried plugin, with R3 and R4 applied.
@@ -379,21 +528,7 @@ fn plugin(
         let Some(stem) = path.file_stem().and_then(|n| n.to_str()).map(str::to_owned) else {
             continue;
         };
-        let text = read(&path).unwrap_or_default();
-        if frontmatter_name(&text).as_deref() != Some(stem.as_str()) {
-            problems.push(format!("R4 agent `{name}:{stem}` declares another `name:`"));
-        }
-        match owners.get(&stem).map(Vec::as_slice) {
-            None | Some([]) => problems.push(format!(
-                "R4 agent `{name}:{stem}` is owned by no skill; list it under `## Agents` in the skill that dispatches it"
-            )),
-            Some([_]) => {}
-            Some(many) => problems.push(format!(
-                "R4 agent `{name}:{stem}` is listed by {} skills ({}); exactly one owns it",
-                many.len(),
-                many.join(", ")
-            )),
-        }
+        agent_file(&path, name, &stem, &owners, problems);
         agents.insert(stem);
     }
     for (agent, skills_listing) in &owners {
@@ -683,6 +818,24 @@ pub fn check(root: &Path, plugins: &Plugins) -> Result<(), String> {
         );
         contents.insert(name.clone(), Contents { skills, agents });
     }
+    if plugins.carried.contains("b10x") {
+        let routes = "plugins/b10x/skills/routing/SKILL.md";
+        let skills: BTreeMap<String, BTreeSet<String>> = contents
+            .iter()
+            .map(|(name, plugin)| (name.clone(), plugin.skills.clone()))
+            .collect();
+        problems.extend(routing(&read(&root.join(routes))?, &skills));
+        for page in [
+            "plugins/b10x/skills/authoring-plugins/SKILL.md",
+            "website/docs/structure.md",
+        ] {
+            for phrase in teaches(&read(&root.join(page))?) {
+                problems.push(format!(
+                    "R3/R4 {page} does not state `{phrase}`, which the gate enforces; the page that teaches the structure states it"
+                ));
+            }
+        }
+    }
     references(root, plugins, &known, &mut problems);
     docs(root, plugins, &contents, &mut problems)?;
     if problems.is_empty() {
@@ -851,6 +1004,122 @@ mod tests {
             "interface:\n  display_name: \"X\"\n"
         )));
         assert!(!codex_operator_only(None));
+    }
+
+    fn agent_text(body_lines: usize, handoff: &str) -> String {
+        let mut text = String::from("---\nname: author\ndescription: Write.\n---\n\n");
+        writeln!(text, "Follow the `{handoff}` skill completely.").unwrap();
+        for n in 1..body_lines {
+            writeln!(text, "- charter {n}").unwrap();
+        }
+        text
+    }
+
+    #[test]
+    fn a_thin_agent_naming_its_owner_is_accepted() {
+        let text = agent_text(20, "ess:specifying");
+        assert_eq!(
+            agent("ess", "author", &text, Some("specifying")),
+            Vec::<String>::new()
+        );
+    }
+
+    #[test]
+    fn an_agent_carrying_its_procedure_is_refused() {
+        let text = agent_text(21, "ess:specifying");
+        let problems = agent("ess", "author", &text, Some("specifying"));
+        assert!(
+            problems.len() == 1 && problems[0].contains("21 lines of body"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn an_agent_that_does_not_name_its_owning_skill_is_refused() {
+        let text = agent_text(5, "ess:retrofitting");
+        let problems = agent("ess", "author", &text, Some("specifying"));
+        assert!(
+            problems.len() == 1 && problems[0].contains("does not name `ess:specifying`"),
+            "{problems:?}"
+        );
+        // An unowned agent is R4's other problem; it is not reported twice here.
+        assert_eq!(agent("ess", "author", &text, None), Vec::<String>::new());
+    }
+
+    #[test]
+    fn relative_markdown_links_are_read_and_urls_are_not() {
+        let text = "Read [it](../skills/planning/references/decomposer.md#top) and \
+                    [rubric](critic-rubric.md); not [site](https://x.dev/a.md) or [x](#anchor).";
+        assert_eq!(
+            links(text),
+            [
+                "../skills/planning/references/decomposer.md",
+                "critic-rubric.md"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_page_teaching_the_structure_states_every_enforced_limit() {
+        let good =
+            "a command sets `disable-model-invocation: true`, has at most 20 lines of body, \
+                    and its `agents/openai.yaml` sets `allow_implicit_invocation: false`; an agent \
+                    has at most 20 lines of body and names its owning skill";
+        assert_eq!(teaches(good), Vec::<String>::new());
+        let missing = teaches("a command is a thin skill that carries the command's behaviour");
+        assert_eq!(missing.len(), 3, "{missing:?}");
+        assert!(missing
+            .iter()
+            .any(|m| m.contains("disable-model-invocation: true")));
+        assert!(missing
+            .iter()
+            .any(|m| m.contains("allow_implicit_invocation: false")));
+        assert!(missing.iter().any(|m| m.contains("at most 20 lines")));
+    }
+
+    fn routed() -> BTreeMap<String, BTreeSet<String>> {
+        let mut skills = BTreeMap::new();
+        skills.insert("b10x".to_owned(), set(&["init", "upgrade", "routing"]));
+        skills.insert("ess".to_owned(), set(&["init", "upgrade", "specifying"]));
+        skills
+    }
+
+    const ROUTES: &str = "| Request | Route |\n|---|---|\n\
+        | Install the plugins | `b10x:init` |\n\
+        | Check for or apply an upgrade | `b10x:upgrade` |\n\
+        | Choose a plugin | `b10x:routing` |\n\
+        | Set up one product | `ess:init` |\n\
+        | Upgrade one product | `ess:upgrade` |\n\
+        | Specify a system | `ess:specifying` |\n";
+
+    #[test]
+    fn a_routing_table_reaching_every_skill_is_accepted() {
+        assert_eq!(routing(ROUTES, &routed()), Vec::<String>::new());
+    }
+
+    #[test]
+    fn an_upgrade_request_routed_to_init_is_refused() {
+        let text = ROUTES.replace(
+            "| Install the plugins | `b10x:init` |",
+            "| Install, upgrade or repair the plugins | `b10x:init` |",
+        );
+        let problems = routing(&text, &routed());
+        assert!(
+            problems.len() == 1
+                && problems[0].contains("`b10x:init`")
+                && problems[0].contains("upgrade"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_skill_the_routing_skill_never_names_is_refused() {
+        let text = ROUTES.replace("| Upgrade one product | `ess:upgrade` |\n", "");
+        let problems = routing(&text, &routed());
+        assert!(
+            problems.len() == 1 && problems[0].contains("`ess:upgrade`"),
+            "{problems:?}"
+        );
     }
 
     #[test]
