@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.14.16** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.14.17** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -436,7 +436,9 @@ guessing: `aep plan artifact list --format json` prints every artifact with its 
 | `aep:plan-critic-parallel-safety` | which two of these land on one file, and does the plan say so? |
 
 Name the agent type in full, with its plugin prefix, in your report. A built-in agent used where one
-of these exists is a deviation you report, not a substitution you make.
+of these exists is a deviation you report, not a substitution you make. In a host without
+subagents, run each critic yourself from its `references/<role>.md`, one at a time, finishing each
+verdict before starting the next, and say in the report that the four were not independent.
 
 **They run at once, and none of them sees another's findings.** That is the mechanism, not a
 scheduling convenience: four independent readings are worth more than four agents converging on the
@@ -571,10 +573,14 @@ Everything else is a question for the CLI.
 
 ## Agents
 
-- `decomposer` — decomposes one epic into draft stories that jointly cover it (§ 6).
-- `plan-critic-acceptance` — judges whether every drafted item can be checked (§ 7).
-- `plan-critic-design` — judges coupling, cycles and shared ownership in a drafted set (§ 7).
-- `plan-critic-scope` — judges a drafted set against the artifact it came from (§ 7).
-- `plan-critic-parallel-safety` — judges which drafted items would land on one file (§ 7).
-- `plan-reviewer` — audits the whole store for what `aep plan artifact validate` cannot see.
-- `reverse-engineer` — drafts the first plan for a repository that has none (§ 5).
+Each role's full procedure is `references/<role>.md` beside this skill; the agent file of the same
+name is a thin Claude Code adapter over it. In a host without subagents, such as Codex, run the role
+yourself from that file, in its own pass and within the tools it names.
+
+- `decomposer` — decomposes one epic into draft stories that jointly cover it (§ 6). ([procedure](references/decomposer.md))
+- `plan-critic-acceptance` — judges whether every drafted item can be checked (§ 7). ([procedure](references/plan-critic-acceptance.md))
+- `plan-critic-design` — judges coupling, cycles and shared ownership in a drafted set (§ 7). ([procedure](references/plan-critic-design.md))
+- `plan-critic-scope` — judges a drafted set against the artifact it came from (§ 7). ([procedure](references/plan-critic-scope.md))
+- `plan-critic-parallel-safety` — judges which drafted items would land on one file (§ 7). ([procedure](references/plan-critic-parallel-safety.md))
+- `plan-reviewer` — audits the whole store for what `aep plan artifact validate` cannot see. ([procedure](references/plan-reviewer.md))
+- `reverse-engineer` — drafts the first plan for a repository that has none (§ 5). ([procedure](references/reverse-engineer.md))

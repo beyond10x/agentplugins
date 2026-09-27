@@ -23,11 +23,18 @@ that a component works in both hosts.
 Represent every user-visible workflow as `skills/<capability>/SKILL.md`. Both hosts load this
 layout, its `references/`, `assets/`, and optional `scripts/` resources.
 
-- For a requested command, create a skill with the command's behavior. Claude Code exposes plugin
-  skills as slash shortcuts; Codex exposes them through skill selection and `$skill-name`.
-- For a requested specialist agent, put the complete procedure and success criteria in a shared
-  skill. Tell the skill to delegate when the host exposes subagents and to execute the same bounded
-  procedure directly otherwise.
+- For a requested command (an entry point only the operator starts), create a **command** skill:
+  a verb name (`cleanup`, `review-plan`); frontmatter `disable-model-invocation: true` and an
+  `argument-hint`; at most 20 lines of body; and exactly one hand-off, by `<plugin>:<skill>`, to
+  the activity skill of the same plugin that holds the behavior. Give it an `agents/openai.yaml`
+  that sets `policy.allow_implicit_invocation: false`, the Codex form of the same flag, so it is
+  operator-only in both hosts: Claude Code lists it as `/<plugin>:<name>`, Codex as `$<name>`,
+  and neither lets the model start it. Behavior never moves into the command.
+- For a requested specialist agent, put the complete procedure and success criteria in its owning
+  skill, as `references/<role>.md` beside it. Tell the skill to delegate when the host exposes
+  subagents and to run the same bounded procedure directly otherwise; Codex does not load
+  `agents/`. The agent file is a thin adapter: at most 20 lines of body, naming its owning skill
+  as `<plugin>:<skill>` and linking the procedure.
 - Add `commands/<name>.md` or `agents/<name>.md` only as a thin Claude Code optimization. Never put
   behavior exclusively in those files or claim that Codex loads them as plugin components.
 - Keep product names out of shared instructions unless a step genuinely differs by product. Put a
@@ -47,9 +54,9 @@ Prefer this shared layout:
 ├── skills/
 │   └── <capability>/
 │       ├── SKILL.md
-│       ├── agents/openai.yaml      # optional Codex presentation metadata
+│       ├── agents/openai.yaml      # Codex metadata; required for a command
 │       └── references/             # optional shared supporting material
-├── agents/                         # optional Claude adapter only
+├── agents/                         # optional thin Claude adapters over skill roles
 ├── commands/                       # optional Claude adapter only; prefer skills
 ├── hooks/                          # optional; only after host-by-host verification
 ├── .mcp.json                       # optional bundled MCP configuration

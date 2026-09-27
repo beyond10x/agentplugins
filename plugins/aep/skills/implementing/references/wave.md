@@ -248,7 +248,9 @@ nothing.
 **Name the `subagent_type` each dispatch will use, in full, with its plugin prefix.** A built-in
 agent used where a plugin agent exists is a deviation you report, not a substitution you make. One
 session ran 23 of 24 dispatches as `general-purpose` because the plugin's agents were missing from
-the copy it had loaded, and described that as having run the implementor.
+the copy it had loaded, and described that as having run the implementor. In a host without
+subagents, such as Codex, say so and run each role yourself from its `references/<role>.md`; that
+is the same procedure, not a substitution.
 
 **Fit it in whatever report budget the operator has set**, and treat that budget as a hard ceiling
 rather than a target. This is a proposal, not the plan: the plan is the page you just wrote, and one

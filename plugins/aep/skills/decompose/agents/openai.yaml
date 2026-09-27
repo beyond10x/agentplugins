@@ -1,0 +1,6 @@
+interface:
+  display_name: "Decompose an Epic"
+  short_description: "Draft the stories under one epic and run the plan-critic panel"
+  default_prompt: "Use $decompose to break the epic I name into draft stories, put them before the four plan critics, and report what is still open."
+policy:
+  allow_implicit_invocation: false

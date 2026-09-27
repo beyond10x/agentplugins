@@ -879,7 +879,14 @@ fn scope(root: &Path, changed: &[String]) -> Result<Vec<(String, String)>, Strin
         let mut surfaces: Vec<String> = document.subject.paths.clone();
         for reference in &document.subject.agents {
             let (plugin, name) = qualified(reference, "agent", &document.id)?;
-            surfaces.push(format!("plugins/{plugin}/agents/{name}.md"));
+            let agent = format!("plugins/{plugin}/agents/{name}.md");
+            // A thin agent's procedure is a file of its owning skill (R4); the agent's scope is
+            // that file too, or a case scoped to the agent alone never re-runs on a change to it.
+            let text = std::fs::read_to_string(root.join(&agent)).unwrap_or_default();
+            for link in crate::concept::links(&text) {
+                surfaces.push(normalized(&format!("plugins/{plugin}/agents/{link}")));
+            }
+            surfaces.push(agent);
         }
         for reference in &document.subject.skills {
             let (plugin, name) = qualified(reference, "skill", &document.id)?;
@@ -895,6 +902,21 @@ fn scope(root: &Path, changed: &[String]) -> Result<Vec<(String, String)>, Strin
         }
     }
     Ok(matched)
+}
+
+/// A repository-relative path with its `.` and `..` segments resolved lexically.
+fn normalized(path: &str) -> String {
+    let mut parts: Vec<&str> = Vec::new();
+    for part in path.split('/') {
+        match part {
+            "" | "." => {}
+            ".." => {
+                parts.pop();
+            }
+            other => parts.push(other),
+        }
+    }
+    parts.join("/")
 }
 
 /// The plugin directory an `arm: plugin` run of a case installs.
@@ -1389,6 +1411,24 @@ mod tests {
                     "plugins/aep".to_owned()
                 ),
             ]
+        );
+    }
+
+    /// An agent is a thin adapter over a role procedure its owning skill carries (R4), so a change
+    /// to that procedure is a change to the agent: it re-runs the cases that name the agent, even
+    /// one scoped to the agent alone.
+    #[test]
+    fn a_role_procedure_an_agent_links_is_in_that_agents_scope() {
+        let matched = scope(
+            &root(),
+            &["plugins/aep/skills/planning/references/decomposer.md".to_owned()],
+        )
+        .expect("the corpus scopes");
+        assert!(
+            matched
+                .iter()
+                .any(|(case, _)| case == "evals/decomposer-relation-census"),
+            "{matched:?}"
         );
     }
 

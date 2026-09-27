@@ -3,7 +3,7 @@ name: implementing
 description: Implement accepted AEP work, in one of two modes. A wave picks the stories that can be implemented at once, proposes the wave for approval, dispatches one implementor per story into its own worktree, sends each result to the adversary and merges what goes green. A drive hands one story to a governed `metaharness aep drive` run and reports the run id. Use when the operator asks to implement, build or deliver planned stories, to pick or start the next wave, to implement several stories in parallel or fan out across sub-agents, to drive a story or start a governed run, or asks why a wave's rules are instructions and a drive's are enforced. A wave proposes first and stops; a drive starts one run and reports; neither moves an artifact itself.
 ---
 
-**Skill version 0.14.16** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
+**Skill version 0.14.17** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
 
 # Implementing accepted work
 
@@ -31,7 +31,11 @@ The operator can also name the mode directly: `/aep:wave [story-id…]` (`aep:wa
 
 ## Agents
 
-- `story-scoper` — works out where one story lands and returns its Scope section; runs before a wave is proposed.
-- `implementor` — implements one unit: the failing test first, then the smallest change.
-- `adversary` — tries to break a unit that passes its own tests.
-- `security-reviewer` — independently checks that the unit's safety and correctness invariants hold.
+Each role's full procedure is `references/<role>.md` beside this skill; the agent file of the same
+name is a thin Claude Code adapter over it. In a host without subagents, such as Codex, run the role
+yourself from that file, in its own pass and within the tools it names.
+
+- `story-scoper` — works out where one story lands and returns its Scope section; runs before a wave is proposed. ([procedure](references/story-scoper.md))
+- `implementor` — implements one unit: the failing test first, then the smallest change. ([procedure](references/implementor.md))
+- `adversary` — tries to break a unit that passes its own tests. ([procedure](references/adversary.md))
+- `security-reviewer` — independently checks that the unit's safety and correctness invariants hold. ([procedure](references/security-reviewer.md))

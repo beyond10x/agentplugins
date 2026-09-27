@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.14.17] — 2026-09-27
+
+Codex parity for the AEP agents, two planning commands, and routing that reaches every skill.
+
+- The eleven `aep` agents are thin Claude Code adapters. Each role's procedure moved, unchanged
+  apart from its links and a three-line note on running it without subagents, to
+  `references/<role>.md` of the skill that owns it (`aep:planning` or `aep:implementing`), which
+  Codex loads. Both skills and the wave and panel dispatch rules say to run a role from that file
+  where the host has no subagents. R4 now refuses an agent with more than 20 lines of body, one
+  that does not name its owning skill, and a link it carries that does not resolve. An eval case scoped to an agent also re-runs when the procedure it links changes.
+- `aep:review-plan` (`/aep:review-plan`) and `aep:decompose` (`/aep:decompose`) are commands
+  handing off to `aep:planning`: the plan reviewer over the store, and the decomposer over one epic
+  followed by the critic panel.
+- `b10x:routing` sent upgrade requests to `b10x:init`; they go to `b10x:upgrade` and each
+  product's `upgrade`. The routing skill now names every skill of every plugin (`aep:migrating`
+  and the per-product `init` and `upgrade` were missing), and the gate refuses a skill it does
+  not reach and an upgrade row that routes to an `init` skill.
+- `b10x:authoring-plugins` describes the command kind (operator-only in both hosts, at most 20
+  lines, one hand-off, `agents/openai.yaml` with `allow_implicit_invocation: false`) and thin
+  agents over skill-owned roles. The gate refuses that skill or `website/docs/structure.md` when
+  either stops stating a limit the checker enforces.
+
 ## [0.14.16] — 2026-09-26
 
 Commands: operator-only entry points for work that is started by hand.

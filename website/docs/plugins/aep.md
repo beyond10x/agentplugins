@@ -33,6 +33,14 @@ Planning also refuses to decompose an epic or story that introduces an entity no
 declares. The domain is drafted and cited from the artifact first, and any relation that could not
 be read from code, an OpenAPI document or an existing artifact is marked unmapped, never guessed.
 
+Two commands start planning work by hand. Only you start them, never the model, and each hands off
+to `aep:planning`:
+
+| command | what it does |
+|---|---|
+| `/aep:review-plan [artifact-id…]` | runs the plan reviewer over the store (or the named artifacts), proposes moves and makes none |
+| `/aep:decompose <epic-id>` | runs the decomposer over one epic, then the four-critic panel, and reports what is still open |
+
 The plugin respects store ownership: machine-owned artifact metadata is changed through AEP, not
 by editing markdown frontmatter. A refusal from the lifecycle is a result to report, not a guard to
 route around.
@@ -54,6 +62,10 @@ to `aep:implementing`:
 |---|---|
 | `/aep:wave [story-id…]` | scopes the candidates, writes the wave page, proposes the wave and stops for your approval |
 | `/aep:drive <story-id>` | says what a driven run costs, starts one governed run, prints its run id and stops |
+
+Every role above, in both halves, is written once, as `references/<role>.md` of the skill that
+owns it. Claude Code runs it as a subagent through a thin `agents/<role>.md` adapter; Codex, which
+loads skills but not `agents/`, runs the same file directly.
 
 This plugin builds on AEP's planning substrate. It does not replace the repository gate, invent lifecycle
 moves, or give implementors authority beyond their assigned unit.

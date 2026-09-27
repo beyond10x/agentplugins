@@ -22,10 +22,14 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 
 | Request | Route |
 |---|---|
-| Install, upgrade or repair the Beyond10x plugins and their binaries | `b10x:init` |
+| Install or repair the Beyond10x plugins and their binaries | `b10x:init` |
+| Check whether the Beyond10x plugins and CLIs are current, or upgrade them | `b10x:upgrade` |
+| Set up one product and take its first step | `aep:init`, `ess:init`, `worktree:init`, `connectors:init` |
+| Check or upgrade one product's plugin and CLI | `aep:upgrade`, `ess:upgrade`, `worktree:upgrade`, `connectors:upgrade` |
 | Choose a plugin, understand the ecosystem, or find public documentation | `b10x:routing` (this skill) |
 | Create, update, review, or port an installable plugin | `b10x:authoring-plugins` |
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep:planning` |
+| Move an existing backlog into the AEP store without losing its sources | `aep:migrating` |
 | Scope and deliver accepted development work through a reviewed wave | `aep:implementing` |
 | Specify a system or API | `ess:specifying` |
 | Derive a specification for an existing system | `ess:retrofitting` |
@@ -34,13 +38,15 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Create, inspect, finish, or safely clean Git worktrees | `worktree:managing-worktrees` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors:integrating` |
 
-Three entry points are commands: only the operator starts them, and a model cannot invoke them.
+Five entry points are commands: only the operator starts them, and a model cannot invoke them.
 When a request matches one, route to the activity it hands off to and name the command to the operator.
 
 | Command | Hands off to |
 |---|---|
 | `/aep:wave [story-id…]` (`aep:wave`) | `aep:implementing`, wave mode |
 | `/aep:drive <story-id>` (`aep:drive`) | `aep:implementing`, drive mode |
+| `/aep:review-plan [artifact-id…]` (`aep:review-plan`) | `aep:planning`, `plan-reviewer` role |
+| `/aep:decompose <epic-id>` (`aep:decompose`) | `aep:planning`, `decomposer` role and the critic panel |
 | `/worktree:cleanup` (`worktree:cleanup`) | `worktree:managing-worktrees` |
 
 ## Preserve boundaries
