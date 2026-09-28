@@ -470,7 +470,9 @@ reading.
 
 | Outcome | Do |
 |---|---|
-| green | merge the unit's branch into the integration branch |
+| green, and its claim is `VERIFIED` (below) | merge the unit's branch into the integration branch |
+| green, and its claim is `NOT VERIFIED` | back to the implementor, with the baseline and treatment output — the suite passes and the unit does not do what it says |
+| green, and its claim is `INCONCLUSIVE` | it does not merge. Tighten the measurement once; if it is still inconclusive, it goes to a person |
 | **red, and no case has failed twice** | send it back to **the same implementor**, which still holds its context, with the findings |
 | **red, and a case failed again after being fixed** | a **fresh** implementor, handed the findings, the previous diff, and what has already been tried |
 | **red after two full attacks** | stop attacking. It goes to a person |
@@ -586,7 +588,7 @@ another correction round.
 A unit that leaves the wave is a **result**, not a failure to hide. A wave that reports only its
 successes has measured nothing.
 
-**Only `green` merges, and there is no fifth row.** The one you will be tempted to invent is *red on
+**Only a `green` unit whose claim is `VERIFIED` merges, and there is no other row.** The one you will be tempted to invent is *red on
 purpose* — an adversary's case that is correct, for a defect this unit is not going to fix, and
 deleting it feels like hiding the defect. It is not a row. It is one of these three:
 
@@ -603,6 +605,40 @@ red case takes it for everything. `cargo test` without `--no-fail-fast` stops at
 target, so a deliberate red does not add one known failure to the report — it deletes every result
 after it. A wave that merges three of those has not documented three defects; it has blinded the
 gate and called it honesty.
+
+### Before a green unit merges, verify what it claims
+
+A green suite says the tests the unit wrote pass. It does not say the unit does what its story
+asked. Before merging, check the claim itself, once, against the base.
+
+1. **Restate the claim so it can be false.** Take the story's acceptance statement and write it as
+   a condition, a measurement and a threshold: "`slugify("Ärger")` returns `aerger`", "`list` on the
+   333-artifact store finishes in under 0.1 s", "a second `move` to the same status exits 1". A
+   claim you cannot phrase that way ("the code is cleaner") is not verified here; say so and merge on
+   the suite alone.
+2. **Measure the base, then the unit, with the same command.** Run it on the integration branch
+   before the merge (the baseline) and on the unit's branch (the treatment): same input, same data,
+   same warm-up. Keep both outputs in the scratch directory the unit brief assigns, never under
+   `/tmp`.
+3. **Compare the raw outputs** — numbers, exit status, the response body — against the threshold,
+   and give exactly one verdict:
+
+| Verdict | When |
+|---|---|
+| `VERIFIED` | the treatment meets the threshold and the baseline does not, or the claim is new behaviour the baseline cannot show |
+| `NOT VERIFIED` | the treatment does not meet the threshold |
+| `INCONCLUSIVE` | the measurement cannot tell: noise wider than the difference, a command that did not reach the code, a confound you can name |
+
+Record the verdict against the story before you route it, naming both runs:
+
+```console
+$ aep plan artifact evidence story:credential-store --kind verification \
+    --source "<the command>" --ref "<baseline output path> vs <treatment output path>"
+```
+
+A clear `NOT VERIFIED` is a result: report it as one, with both outputs. (The baseline/treatment
+procedure and the three verdicts are adapted from `cursor-team-kit/skills/verify-this` in
+`github.com/cursor/plugins`, MIT.)
 
 ### Before you promote a finding, check the scenario is one somebody reaches
 
