@@ -1,0 +1,21 @@
+components:
+  - component: library-service
+    summary: Holds the collection and the members, and lends books to members.
+    owns:
+      domains:
+        - library.lending
+    accepts:
+      commands:
+        - library.lending.AddBook
+        - library.lending.RegisterMember
+        - library.lending.BorrowBook
+        - library.lending.ReturnBook
+        - library.lending.WithdrawBook
+    publishes:
+      events:
+        - library.lending.BookAdded
+        - library.lending.MemberRegistered
+        - library.lending.BookBorrowed
+        - library.lending.BookReturned
+        - library.lending.BookWithdrawn
+    reached_by: network

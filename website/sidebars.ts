@@ -5,6 +5,11 @@ const sidebars: SidebarsConfig = {
     'intro',
     'choose-a-plugin',
     'install',
+    {
+      type: 'category',
+      label: 'Tutorials',
+      items: ['tutorials/first-ess-specification'],
+    },
     'golden-path',
     'structure',
     {
