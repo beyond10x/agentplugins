@@ -19,6 +19,12 @@ something to *ask about*, not something to file.
 
 ## Read before you write
 
+0. **The store.** No `.engineering/project.yaml`: create it with `aep plan reverse init --protocols
+   <source> --profile <profile>` (values in `aep:planning` § 5). It writes an `aep.project/5`
+   project, `store: {git: {}}`, where each artifact file is the authority. A `project.yaml` whose
+   `version` is not `aep.project/5`: report the version and its upgrade (`aep:planning`, *The
+   store's version*) as the first line of your report, and write nothing to a `/2`–`/4` store,
+   which every planning verb refuses.
 1. **`aep plan reverse scan --format json`** from the repository root. This is your evidence and it
    is the only thing that produces citations. Everything below is read against it.
 2. **`aep plan reverse history --format json`**, when the repository is a Git working tree. It joins

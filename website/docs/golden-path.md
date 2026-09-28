@@ -63,7 +63,9 @@ $ aep plan reverse init --protocols 'git+https://github.com/beyond10x/aep#8b4342
 
 `reverse init` refuses the two things that break quietly later — an absolute path, and a `git+`
 source pinned to a branch rather than a commit — which is why the source above carries a full commit
-hash.
+hash. A current `aep` writes the project as `aep.project/5` (`store: {git: {}}`) and prints one more
+line saying so: the artifact files under `.engineering/planning/` are the store, and a move appends
+one line to the artifact's `transitions`.
 
 ```shell-session
 $ aep plan reverse scan
@@ -280,8 +282,8 @@ its story's body.
 ```
 
 The scopers are read-only, so run one per story and run them at once. The write-back is serial — the
-store's journal is append-only and parallel writers race — and it goes through the CLI like every
-other change to a body:
+store takes one writer at a time, and each write bumps the story's revision — and it goes through
+the CLI like every other change to a body:
 
 ```shell-session
 $ aep plan artifact body story:commercial-client-record --from record-body.md

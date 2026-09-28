@@ -167,11 +167,11 @@ Only the residue — what could not be made into a failing case. **You return th
 report. You do not write them to the planning store, and you run no `aep plan artifact` command at
 all.**
 
-The reason is mechanical, not stylistic. You work in a worktree, and the store's journal is
-append-only and committed. A record you write there is a second tail on a branch nobody merges, and
-when the coordinator's tree and yours both append, the textual merge produces a document whose
-revision no event supports — which the store's own validator reports as forgery. One agent, one
-surface; the store is the coordinator's surface and never yours.
+The reason is mechanical, not stylistic. You work in a worktree, on a branch. Every store write
+bumps the artifact's `revision:` line, so a record you write there and the coordinator's write to
+the same artifact conflict at merge, and a resolution that drops either side's move is refused by
+`aep plan artifact validate`. One agent, one surface; the store is the coordinator's surface and
+never yours.
 
 So the findings arrive as a table in your report, one row per finding, each carrying a `file:line`,
 one verdict and one origin:

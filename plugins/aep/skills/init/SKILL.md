@@ -35,8 +35,10 @@ aep plan artifact list
 ```
 
 A store answers with its artifacts. No store: `aep:planning` § 5 (*Starting from a repository that
-has no store*) says how a first one is created; an existing backlog in markdown moves in with
-`aep:migrating`.
+has no store*) says how a first one is created — `aep plan reverse init`, which writes an
+`aep.project/5` project with `store: {git: {}}`; an existing backlog in markdown moves in with
+`aep:migrating`. A store whose `.engineering/project.yaml` names another `version` is upgraded
+first: `aep:upgrade` (*An older planning store*).
 
 ## 3. Pick the work
 

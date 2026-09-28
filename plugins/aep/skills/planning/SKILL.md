@@ -3,9 +3,26 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.15.0** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.16.0** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
+
+## The store's version, before the first write
+
+Read `version` in `.engineering/project.yaml` (YAML or JSON; the key is the same). The current store
+is `aep.project/5`, with `store: {git: {}}`. On any other version, tell the user once, before any
+store write, which version the store is on and its upgrade, from this table — `aep` prints a notice
+only for some of them, and a caller may have hidden it:
+
+| the store | what works | upgrade |
+|---|---|---|
+| `aep.project/5` | everything | none |
+| `aep.project/1`, or `.engineering/planning/` with no `project.yaml` | every verb (with no `project.yaml`, only given `--store <dir>`) | `aep plan store migrate git --verify` on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, § 5), then commit |
+| `aep.project/2`, `/3` or `/4` | nothing: every planning verb refuses it | `cargo install --git https://github.com/beyond10x/aep --rev 9c0f1da44429ff935fa0b2d743457945d51e1c51 aep-cli`, then `aep plan store migrate git --verify` on a clean `.engineering`, commit, then install the current release (`aep:upgrade`) |
+
+The migration rewrites every artifact file, so it runs when the user says so; `aep:upgrade` carries
+the steps. On `/1`, carry on with the task after telling them. On `/2`–`/4`, stop store work and
+report the refusal. Done when the user has been told, or `version` is `aep.project/5`.
 
 ## 0. When the record is required
 
@@ -26,7 +43,9 @@ present, follow section 5 rather than inventing one.
 ## 1. The model
 
 Artifacts are markdown files under `.engineering/planning/<kind>/<slug>.md`: YAML frontmatter the
-CLI owns, and a body you and the operator own. Which kinds exist, which statuses each kind may hold
+CLI owns, and a body you and the operator own. Those files are the store: a move appends one line to
+the artifact's `transitions`, each evidence record is one file under
+`.engineering/evidence/<kind>/<slug>/`, and one CLI write changes one file. Which kinds exist, which statuses each kind may hold
 and which moves between them are legal come from validated lifecycle documents, not from convention
 and not from this file. The `aep` CLI is the authority on both, so every question about
 vocabulary has a command that answers it.
@@ -77,7 +96,8 @@ These are inlined because they hold whatever the store's vocabulary is.
 **1. A status changes only through `aep plan artifact move`.** Never edit the `status:` field in
 frontmatter, and never write it into a file with `Edit` or a heredoc. The CLI validates the move
 against the kind's lifecycle; a hand-edited status is an unvalidated one, indistinguishable in the
-file from a legal one and wrong in exactly the cases that matter.
+file from a legal one and wrong in exactly the cases that matter. The same holds for `revision`
+and `transitions`; `validate` refuses a `status` that disagrees with the last transition.
 
 ```console
 $ aep plan artifact move story:credential-store --to proposed
@@ -330,8 +350,10 @@ $ aep plan reverse init --protocols <source> --profile <profile>
 $ aep plan reverse scan --format json
 ```
 
-`reverse init` writes `.engineering/project.yaml` and refuses the two things that quietly break
-later — an absolute path, and a `git+` source pinned to a branch rather than a commit.
+`reverse init` writes `.engineering/project.yaml` as `aep.project/5` with `store: {git: {}}`, and
+refuses the two things that quietly break later — an absolute path, and a `git+` source pinned to a
+branch rather than a commit. A `.engineering/planning/` that already holds a plan is refused too,
+naming `aep plan store migrate git`.
 
 The two values, for a project that follows the published protocols:
 
@@ -444,8 +466,8 @@ verdict before starting the next, and say in the report that the four were not i
 
 **They run at once, and none of them sees another's findings.** That is the mechanism, not a
 scheduling convenience: four independent readings are worth more than four agents converging on the
-first one's framing. It is also why they are read-only — the journal is append-only and
-single-writer, so N critics writing it is a race. They return text; you write.
+first one's framing. They are read-only as well: the store takes one writer at a time, and that
+writer is you. They return text; you write.
 
 Each returns a first line that is exactly `approve` or exactly `needs-revision`, then one line per
 finding in the form `artifact — reason — citation`. The rules they work to are in
@@ -552,7 +574,8 @@ decides what can be worked at once — and in most stores nothing holds it.
 The `story-scoper` agent answers it for one artifact: it reads the body, its edges, the symbols it
 names and the tree, and returns a `## Scope` section marking every line **cited** or **inferred**.
 It is read-only, so run one per story and run them at once; write what they return through
-`aep plan artifact body`, one at a time, because the journal is append-only and N writers race.
+`aep plan artifact body`, one at a time, because each write bumps the story's `revision` and the
+store takes one writer at a time.
 
 Read the confidence line, not just the surface. A scope that mixes what was read with what was
 guessed is worse than none — it gets trusted exactly where it is weakest — which is why the section
