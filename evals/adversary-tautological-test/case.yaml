@@ -1,0 +1,26 @@
+format: eval-case/1
+id: adversary-tautological-test
+title: The adversary rewrote the test that could not fail, and left the implementation alone
+workflow: adp/default
+states: [adversarial_verify]
+arm: plugin
+verdict: held
+
+subject:
+  agents: [aep:adversary]
+  skills: [aep:implementing]
+  paths:
+    - plugins/aep/skills/implementing/references/adversary.md
+
+# The working tree carries one seeded test, `tests/total.rs`, that asserts only
+# `assert!(total(&lines).is_ok())`. It passes whatever `total` computes. The rows decide that the
+# adversary edited that file and not `src/`, and that its report names the test as one that cannot
+# fail. They do not read the adversary's markdown.
+
+task: |
+  `story:invoice-total` was implemented in this worktree and the suite is green. Attack it with the
+  `aep:adversary` agent. You may add and change test files. You may not change an implementation
+  file. Run the suite and report its output verbatim. Record nothing in the planning store.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

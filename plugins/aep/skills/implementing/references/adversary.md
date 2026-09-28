@@ -56,6 +56,7 @@ state and no refusal, in one commit, green at every step.
 | **The unit's own new contract** | a vector, fixture, schema or contract document this unit added or changed, read as the specification it claims to be and run against the code the same unit wrote | a failing case that drives the implementation from the document |
 | **The acceptance statement** | the change is green and still does not do what was asked | a failing case asserting the acceptance statement directly |
 | **Boundaries** | empty, one, many; zero, negative, max; the first and last element; the empty string | a failing case |
+| **A test that cannot fail** | a test the unit wrote that would still pass if every function it calls returned a default value — see the five shapes below | the test rewritten to assert a literal expected value or an observed effect, failing on the defect it was meant to catch |
 | **The mutant the suite misses** | change a constant, flip a comparison, drop a branch — if the suite stays green, the suite is not testing that line | a failing case that *would* catch the mutant |
 | **Contract drift** | a consumer was told something that is no longer true | a failing contract test |
 | **Properties** | an invariant the code rests on that holds for the examples and not in general | a property test with a fixed seed |
@@ -64,6 +65,27 @@ state and no refusal, in one commit, green at every step.
 
 Work down the table. A session that produced three judgement findings and no failing case has done
 the easy half.
+
+### Tests that cannot fail
+
+Ask of every test the unit added: would it still pass if every function it calls returned
+`Default::default()`, an empty collection or `Ok(())`? If it would, it observes no behaviour and
+cannot fail for a defect. It is cheaper to find than a mutant, so look before you mutate. Five
+shapes pass that way:
+
+| Shape | Looks like | Rewrite it to |
+|---|---|---|
+| no real assertion | `assert!(result.is_ok())`, `assert!(!v.is_empty())`, a test with no `assert` at all | `assert_eq!(slugify("Hello, World!"), "hello-world")` |
+| absence only | `assert!(calls.is_empty())`, `assert_eq!(errors.len(), 0)` | the same test also asserts the presence on the input that should produce one |
+| self-referential | `assert_eq!(parse(&s), parse(&s))`, `assert_eq!(url, build_url(&cfg))` where `build_url` is the code under test | an expected value written as a literal, or taken from the specification |
+| constant pin | `assert_eq!(MAX_RETRIES, 3)`, `assert!(PROMPT.contains("You are"))` | a test of the code that reads the constant, with one input that exercises it |
+| fixture asserts fixture | the assertion reads what the test built in its setup, and the subject never runs inside the test body | call the subject in the body and assert on what it returned or changed |
+
+A test of that kind is a finding even when the code is correct: it is the line of the suite that
+would stay green when the code is not. Rewrite it into one that fails on the defect it names, run it
+against a mutated copy to show that, and report the mutation. (The check and the five shapes are
+adapted from `pstack/skills/principle-test-behavior-not-implementation` in `github.com/cursor/plugins`,
+MIT.)
 
 ## Hard rules
 
