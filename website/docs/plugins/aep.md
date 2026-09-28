@@ -45,6 +45,11 @@ The plugin respects store ownership: machine-owned artifact metadata is changed 
 by editing markdown frontmatter. A refusal from the lifecycle is a result to report, not a guard to
 route around.
 
+The store is `aep.project/5`: each artifact file under `.engineering/planning/` is the authority, a
+move appends one line to its `transitions`, and each evidence record is one file under
+`.engineering/evidence/`. When a repository's store is on an older version, the planning and
+delivery skills say so before their first write and name the upgrade; `aep:upgrade` runs it.
+
 ## Delivery
 
 It provides:

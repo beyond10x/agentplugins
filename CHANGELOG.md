@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.16.0] — 2026-09-28
+
+The `ess`, `aep` and `worktree` plugins describe the newest CLI releases: ess 0.37.0, aep 0.63.1
+and worktree 0.8.2. `verified.json` pins all three.
+
+- `aep` describes the Git-native store, `aep.project/5`. The artifact files are the store, a move
+  appends to `transitions`, and each evidence record is one file under `.engineering/evidence/`.
+  `aep:planning` and `aep:implementing` read `.engineering/project.yaml` before the first write, and
+  tell the user once, with the exact upgrade, when the store is not `/5`: `/1` migrates with
+  `aep plan store migrate git --verify`, `/2`–`/4` through the pinned build named in
+  `aep:upgrade`. `aep:init`, adoption and the reverse engineer start new stores at `/5`. Reasons
+  that rested on the old append-only journal now rest on one writer and the `revision:` conflict.
+- `ess:hardening` uses `ess verify conform mutate`, with `--emit` and `--collect` for a project's
+  own runner, and the Go and TypeScript explorers. It no longer says the audit is unshipped. A
+  surviving mutant is answered by making the rule observable or filing a synthesis gap, never by
+  an authored scenario.
+- `ess:specifying` gains `references/later-formats.md`: fixtures, value expressions, the outcome
+  shapes (`unknown_instance:`, `deletes:`, `into:`, `accepts: nothing`, `preconditions:`),
+  `presence:`, `Json`, `prefix:`, `skip_absent`, case-insensitive guards, `when_subject_state:`
+  with its limits, and a per-holder limit ("at most five per member"). Each example validates and
+  synthesizes under ess 0.37.0. `syntax.md` gives the unknown-instance order, `instance:` on a
+  create and on a move, `params:` on a view, and the one-default rule for outcome `when`s.
+- `ess:retrofitting` maps a command that ignores in one state and refuses in another. `ess:init`
+  and `ess:upgrade` cover `ess specify toolchain` and an exact `requires: ess` pin.
+  `ess:testing-conformance` covers fixture providers and the suite versions the Go and TypeScript
+  runtimes accept.
+- The specification interview skips its questions when the request asks for a finished
+  specification. Without an AEP store it lists the decisions it took in the report.
+- `worktree:managing-worktrees` covers what `archive` includes and refuses, and how `gc` finishes an
+  interrupted removal. `worktree:init` covers `activate --install-agent-guidance`.
+- The `ess-pipeline` trial fixture sets the fields its invariant reads, which ess 0.37.0 requires
+  (`ESS-COMMAND-018`). The four ESS trials' baselines are re-recorded. `ess-new` now takes 38 tool
+  calls, not 12, because it models the per-member limit it used to leave unmapped; unmapped
+  markers fell from 7 to 4.
+
 ## [0.15.0] — 2026-09-28
 
 Eight methods from two public MIT skill collections, rewritten into the `aep`, `ess` and `b10x`

@@ -6,7 +6,8 @@ so the draft records decisions instead of gaps.
 
 Run it when a noun has no typed home yet and the request does not already say what the noun is,
 what it relates to, and how it changes state. Skip it when an OpenAPI document or existing code
-answers those — read the source instead.
+answers those — read the source instead. When the request asks for a finished specification, or
+nobody is there to answer, go straight to *Without an operator* below.
 
 ## The design tree
 
@@ -53,11 +54,17 @@ of the domain. Any decision still open is an `UNMAPPED:` marker, as the skill sa
 
 ## Without an operator
 
-In a non-interactive run nobody answers. Do not hold the interview. For each question you would have
-asked, take the recommended answer, write it into the specification, and record the question and
-the answer taken in an `approval-record` as the `aep:planning` skill's § 4 *When there is no
-operator* describes. A decision nobody could make — an ownership with no evidence either way — stays
-an `UNMAPPED:` marker rather than a recommended guess.
+In a non-interactive run, or when the request asks for a finished specification, do not hold the
+interview. For each question you would have asked, take the recommended answer and write it into the
+specification. Then record the question and the answer taken:
+
+- where the repository has an AEP store and `aep` is on `PATH`, as an `approval-record`, as the
+  `aep:planning` skill's § 4 *When there is no operator* describes;
+- otherwise, as a numbered list in your report — the question, the answer taken, and the file and
+  entity it changed — so the user can overrule each one.
+
+A decision nobody could make — an ownership with no evidence either way — stays an `UNMAPPED:`
+marker rather than a recommended guess.
 
 ---
 

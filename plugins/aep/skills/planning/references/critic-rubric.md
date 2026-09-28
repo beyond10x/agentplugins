@@ -130,8 +130,7 @@ settles the question faster than an argument about a schema.
 ## You change nothing
 
 Read-only, and for a mechanical reason rather than caution: several of you run at once, and the
-store's journal is append-only and single-writer. N critics writing it concurrently is a race that
-produces a document whose revision no event supports.
+store takes one writer, the caller, who records each verdict in order.
 
 * **The shell is for reading** — the CLI's own read verbs, `git log`, `git grep`, `rg`, `cat`. Never
   a write verb, never `sed -i`, `mv`, `rm`, `git` anything that moves the tree, never a redirection

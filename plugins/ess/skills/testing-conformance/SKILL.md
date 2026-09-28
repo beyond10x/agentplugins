@@ -49,7 +49,10 @@ target; the same scenario fails there once it also asserts that the `bookings` v
 `state: Cancelled` for the booking it cancelled. Add the observed-state assertion before running any
 mutation, because a mutation can only turn a scenario red when the scenario reads what changed.
 
-Mutation is one of eight hardening techniques. Once the suite is green, `ess:hardening` carries the
+Breaking the implementation by hand is the check here. `ess verify conform mutate` breaks the
+specification instead and scores every mutant's suite against your implementation through
+`--emit`/`--collect`; run it once the suite is green (`ess:hardening`, technique 1). Mutation is one
+of eight hardening techniques. Once the suite is green, `ess:hardening` carries the
 rest — random command sequences against a reference model, caller replay, determinism, metamorphic
 relations, guard analysis, a spec diff in the gate and a design review — and the order to run them in.
 
@@ -272,12 +275,22 @@ ess verify conform synthesize --path <specification> --target typescript --out <
 ```
 
 Generate the Go package **inside the implementation's own module** (`--out <impl>/conformance`) so
-its test can import it; a copy outside the module has no `go.mod` to import from. Numbers in a
-payload you return compare equal only as `float64`: an `int64` or a `json.Number` fails although
-the type check accepts it (beyond10x/ess#101, until fixed). The package's `README.md` lists the
-methods and the wiring test. A method you cannot answer returns
+its test can import it; a copy outside the module has no `go.mod` to import from. The package's
+`README.md` lists the methods and the wiring test. A method you cannot answer returns
 `ErrUnsupported` (a skip), never a made-up result. Keep a suite for a domain nobody has implemented;
 run it once something answers it.
+
+Three version facts decide whether these packages run a suite at all:
+
+- A command with `fixture_inputs:` needs the target to supply the values: implement
+  `FixtureValues` (Go) or `fixtureValues` (TypeScript). Without it every scenario using a fixture is
+  an explicit skip, so a fixture provider is the first thing to check when skips cluster there.
+- A specification using `deletes:` or `accepts: nothing` synthesizes `ess-conformance/22`/`23`, and
+  one using `presence:` synthesizes `/24`/`25`. The Go and TypeScript runners refuse
+  those suites by version (the Go runtime admits up to `/21`), so no implementation of yours can be
+  held to them yet. Report such a suite as not run, never as a pass.
+- Both packages also carry the random-sequence explorer (`explore`/`Explore`); `ess:hardening`
+  technique 2 says how to wire it.
 
 ## Agents
 

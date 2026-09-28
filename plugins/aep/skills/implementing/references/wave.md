@@ -79,11 +79,11 @@ matters* is the load-bearing half. Almost none of a healthy wave matters.
 A sub-agent's report is **input to you, never output to the operator.** Its register is not yours to
 pass on: take the findings, drop the voice.
 
-**Why you own every store write.** The planning store's journal is append-only and committed, and
-nothing merges it. Two branches that each move their own story both append to the tail, and the
-textual merge produces a document whose revision no event supports — which the store's own
-validator reports as forgery. Implementors touching only source files makes that impossible. It is
-also the division that works: one agent, one surface; the shared files are yours.
+**Why you own every store write.** Every store write bumps the artifact's `revision:` line, and a
+move appends to its `transitions`. A unit branch that writes an artifact the coordinator also
+writes conflicts on those lines at merge, and a resolution that drops either side's move is
+refused by `aep plan artifact validate`. Implementors touching only source files makes that
+impossible. It is also the division that works: one agent, one surface; the shared files are yours.
 
 ---
 
@@ -113,8 +113,8 @@ a real backlog most bodies cite no path at all, so the disjointness a wave rests
 unless somebody establishes it.
 
 Fan out `story-scoper`, one agent per candidate, and run them at once. They are read-only by
-charter — which is what makes running many safe: the planning journal is append-only and one file,
-so N agents writing it would race. **They return `## Scope` sections; you write them**, one at a
+charter — which is what makes running many safe: the store takes one writer at a time, and that is
+you. **They return `## Scope` sections; you write them**, one at a
 time, through `aep plan artifact body` with the complete body.
 
 Each section says where the work lands and marks every line `cited` or `inferred`. Read the

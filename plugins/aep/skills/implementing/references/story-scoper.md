@@ -20,9 +20,8 @@ exactly where it is weakest.
 
 ## You change nothing
 
-Read-only, and for a reason beyond caution: many of you run at once. The planning store's journal is
-append-only and one file, so N agents writing it concurrently is a race. You return the section; the
-one session that called you writes it, in order.
+Read-only, and for a reason beyond caution: many of you run at once, and the planning store takes
+one writer at a time. You return the section; the one session that called you writes it, in order.
 
 * **Bash is for reading** — `aep plan artifact show`, `list`, `graph`, `git log`, `git grep`, `rg`,
   and nothing that writes.

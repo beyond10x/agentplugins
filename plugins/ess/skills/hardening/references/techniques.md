@@ -15,6 +15,32 @@ ess specify compile --path <specification> --format json --out <ir.json>
 
 **Question:** would the suite notice if a declared rule broke?
 
+`ess verify conform mutate` derives one mutant per site in nine classes (`from-drop`,
+`transition-to`, `guard-boundary`, `sets-retarget`, `guard-negate`, `guard-connective`,
+`error-swap`, `emit-drop`, `order-flip`; `--class` selects), synthesizes each mutant's suite and
+scores it against an implementation of the unchanged specification. `--target` runs only the
+built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own implementation:
+
+1. `ess verify conform mutate --path <specification> --emit <dir>` writes `<dir>/baseline/suite.json`,
+   one `<dir>/<mutant-id>/suite.json` (with `ir.json`) per mutant and `<dir>/manifest.json`, and
+   runs nothing. `<dir>` must be new or empty.
+2. Run your conformance runner over every emitted suite and write its report as `report.json`
+   beside that suite (the generated Go and TypeScript packages take `ESS_REPORT_OUT=<file>`). This
+   step is done when every mutant directory holds a `report.json`; a missing one scores
+   `inconclusive`.
+3. `ess verify conform mutate --collect <dir> --report-out <mutation-report.json>` scores them into
+   `ess-mutation-report/1`: exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass
+   (`ESS-MUTATE-001`), no site (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants.
+   A `stillborn` mutant is one the model itself refuses; it says nothing about the suite.
+4. Answer each survivor by declaring what makes the rule observable — a view publishing the field a
+   `sets` entry writes, a `wrong_state:` outcome for a dropped `from` state — then re-run and see
+   it killed; or file a synthesis gap on beyond10x/ess. An authored scenario cannot answer a
+   survivor: its expectations are its author's, so it runs identically in every mutant's suite and
+   `mutate` runs none.
+
+**By hand**, where `mutate` has no class for the rule you need (a mutant of the implementation's
+own rule table, or a class outside the nine):
+
 1. From the IR, list one mutant per declared rule. The classes that find gaps:
 
    | class | example |
@@ -30,19 +56,33 @@ ess specify compile --path <specification> --format json --out <ir.json>
    suite is re-synthesized and run against the unchanged implementation — one at a time.
 3. Record, per mutant, the scenarios that failed. A mutant no scenario kills is a declared rule the
    suite does not pin down.
-4. For each survivor, decide: a missing scenario (author one, then re-run that mutant and see it
-   killed), a view that does not expose the field (see `ess:testing-conformance`, "does a green run
-   mean anything?"), or a generator gap (an issue on beyond10x/ess).
+4. For each survivor, decide: a view that does not expose the field (see `ess:testing-conformance`,
+   "does a green run mean anything?"), a generator gap (an issue on beyond10x/ess), or — for a
+   mutant of the implementation, not of the specification — a missing scenario (author one, then
+   re-run that mutant and see it killed).
 
 **Planted defect:** the audit is its own plant — but confirm the harness first with one mutant you
-know a scenario kills. If it survives, the harness is not applying mutants.
+know a scenario kills. If it survives, the harness is not applying mutants. With `mutate`, the
+baseline must pass first (`ESS-MUTATE-001` otherwise), which checks the runner.
 
-**Found:** 8 of 35 single-rule mutants passed every scenario; 6 were declared behaviour. After 6
-authored scenarios, 1 survived, and it rested on a value the spec did not declare.
+**Found** (by hand, before `mutate` shipped): 8 of 35 single-rule mutants passed every scenario; 6
+were declared behaviour. After 6 authored scenarios, 1 survived, and it rested on a value the spec
+did not declare.
 
 ## 2. Random command sequences against a reference model
 
 **Question:** does the implementation agree with the spec along paths nobody wrote?
+
+The generated Go and TypeScript packages carry this runner. Call it from a test beside the suite's:
+`explore(() => newTarget(), { seeds: 200, steps: 60 })` then `assertExplored(result)` in
+TypeScript, `essconform.Explore(…, essconform.ExploreOptions{Seeds: 200, Steps: 60})` then
+`essconform.AssertExplored(t, result, essconform.AssertOptions{})` in Go. It compares outcome,
+error, events, payloads, every parameterless view and every invariant after each step, polls
+`eventual` views, shrinks a failure, names its seed, and fails on a declared outcome no sequence
+reached. It models a subset; what it leaves out is listed in `excluded`, and passing with
+`allowExcluded` is a claim to report. Two guards that both hold are reported in `ambiguous`, a view
+or invariant over a field no command set in `undetermined`. Go on to the steps below only for what
+it excludes.
 
 1. Build the [reference model](reference-model.md) over the IR.
 2. Drive a seeded random walk: at each step pick an actor, a command and an input (valid, boundary

@@ -3,6 +3,7 @@
 A small lending library in three files, with every section a specification usually needs. It
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
+It is written in `format: ess/1`; [later-formats.md](later-formats.md) adds what formats up to `ess/15` say.
 
 ## `system.yaml`
 
@@ -54,7 +55,8 @@ naming:
 
 # Types: `newtype` over a primitive, `enum`, `struct` (with `fields`, optional `invariants`),
 # `union` (tagged: `tag:` plus `variants:` name → type). Primitives include Uuid, String, Integer,
-# Decimal, Boolean, Bytes, Timestamp, Duration; wrappers Optional<T>, List<T>, Map<K, V>.
+# Decimal, Boolean, Bytes, Timestamp, Duration, Binary64 (ess/2) and Json (ess/15); wrappers
+# Optional<T>, List<T>, Map<K, V>.
 types:
   - name: library.lending.BranchId
     kind: newtype
@@ -147,8 +149,11 @@ errors:
       - name: state
         type: library.lending.Copy.State
 
-# Commands: input, then outcomes. An outcome `creates` an entity or `moves` one through a
-# transition, `emits` events with a `payload` built from `input.<field>`, or returns an `error`.
+# Commands: input, then outcomes. An outcome `creates` an entity, `moves` one through a
+# transition or `updates` its fields, `emits` events with a `payload` built from `input.<field>`,
+# or returns an `error`. `instance:` on `creates:` names a field of an emitted event that carries
+# the new identity (`branch_id` of BranchOpened); on `moves:`/`updates:` it names the input field
+# holding the identity (`copy_id` of LendCopy). Either other way is `undeclared_reference`.
 commands:
   - name: library.lending.OpenBranch
     naming:
@@ -168,8 +173,8 @@ commands:
             name: input.name
         summary: The branch exists and holds no copies.
 
-  # Two outcomes of one command: all but one need a `when` over the command's input, or the result
-  # is not determined by the input and `validate` refuses it as `conflicting_declaration`. Error
+  # Two outcomes of one command: exactly one has no `when` (the default) and every other needs a `when`
+  # over the input. Two without a `when` is `conflicting_declaration`; every branch with a `when` is `non_exhaustive_branches`. Error
   # outcomes count; `wrong_state: true` outcomes do not (LendCopy below has two without a `when`).
   - name: library.lending.AddCopy
     naming:
@@ -205,7 +210,10 @@ commands:
         summary: The page count was not positive, and nothing was added.
 
   # A command that moves an entity: `wrong_state: true` answers from every state the transition does
-  # not start from, so the `from:` list lives in one place.
+  # not start from, so the `from:` list lives in one place. A `copy_id` no record carries gets, in
+  # order: the command's `unknown_instance:` outcome (ess/15, later-formats.md); else its not-found
+  # outcome, an `external: <reason text>` refusal whose `error:` carries a field typed `CopyId`; else this
+  # `wrong_state` outcome, which is what LendCopy answers here.
   - name: library.lending.LendCopy
     naming:
       wire: lend-copy
@@ -279,7 +287,9 @@ events:
       - name: copy_id
         type: library.lending.CopyId
 
-# Views: read models over an entity. `read_your_writes` or `eventual`; an optional `filter`.
+# Views: read models over an entity. `read_your_writes` or `eventual`; an optional `filter`. A view
+# the caller narrows takes `params: [{name: title, type: library.lending.Title}]` with
+# `filter: title == param.title` (the key is `params:`); the creating outcome must `sets:` the field.
 views:
   - name: library.lending.AvailableCopies
     source: library.lending.Copy
@@ -334,6 +344,8 @@ inside that string are refused; write a conjunction, a disjunction or a set in t
 | present or absent | `when: {note: {exists: false}}` (= `not defined(note)`), `{defined: true}`, `{truthy: true}` |
 | every or some element of a list | `forall: {in: tags, as: t, that: t != ""}`, `exists: {in: tags, as: t, that: …}` — no compact form |
 | a list's length | `tags.count >= 0` |
+| text starts with, ends with, contains (`ess/8`, case-sensitive) | `when: {title: {starts_with: "Draft: "}}`; `ends_with`, `contains` alike |
+| text equal to one of a set, ignoring ASCII case (`ess/15`) | `when: {title: {in_ignore_case: ["untitled", "tbd"]}}`; one literal is `equals_ignore_case` |
 
 `validate` accepting a form does not mean `ess verify conform synthesize` can witness it. Two
 refusals to expect: an invariant over a list field (`tags.count`, a `forall` over `tags`) validates
@@ -341,17 +353,20 @@ and is then refused as reading what no view publishes, even with the field in a 
 guard over a required input (`{defined: true}`, `{exists: false}`) is refused because no candidate
 input leaves the field out. Relay such a refusal verbatim rather than reshaping the rule around it.
 
-A `when` reads only the command's own input. A condition on another entity — "the branch must be
-open", "the customer is active" — is not an input guard. Express it as a transition of that entity (a
+A `when` reads only the command's own input. A value stored on the entity the command addresses is
+read by `when_subject:` beside it (next table). A condition on **another** entity — "the branch
+must be open", "the customer is active" — is neither. Express it as a transition of that entity (a
 command that `moves` it, answered by `wrong_state` from states it does not start from), or leave an
 `UNMAPPED:` marker naming the rule and report it; never invent an outcome the compiler cannot decide.
 
-Two cases trials hit:
+Four cases trials hit:
 
 | rule | how to write it |
 |---|---|
-| a value stored on the entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | not expressible: a `when` sees only the dispatch input. Mark it `UNMAPPED:` at the outcome, citing the source line. A guard over stored fields is proposed in ESS's [design note](https://github.com/beyond10x/ess/blob/main/docs/design/cross-record-and-stored-field-guards.md) |
+| a value stored on the addressed entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | `when_subject: {predicate: {all: [service == Express, weight_kg > 20]}}` on the refusing outcome (`ess/9`). It reads the entity's stored fields only, not `state`; a branch chosen by the held state is `when_subject_state:` ([later-formats.md](later-formats.md) shows it and its two limits); an open comparison needs a default branch, and a view must publish every guarded field |
+| a stored value compared with the request ("a return scanned with another title is refused") | `when_subject: {predicate: title != input.title}` (`ess/15`); the input side is always `input.<field>` on the right. ReturnCopy in [later-formats.md](later-formats.md) |
 | two records must not overlap ("a room cannot be booked twice for one hour") | make the contested unit an entity with its own lifecycle (a `Slot` that is `Free` or `Booked`); a second booking is then `wrong_state` on that slot. Overlap between arbitrary time ranges is not expressible; mark it `UNMAPPED:` |
+| a holder may hold at most N ("a member can have five packets out at once") | keep the count on the holder and address the holder: `packets_out: Integer` on `Member`, a borrow command that `updates:` the member with `sets: {packets_out: {increment: 1}}` (`ess/14`), refused by `when_subject: {predicate: packets_out >= 5}` (`ess/9`), and a return with `{increment: -1}`. One outcome changes one record, so the packet's own move to `OnLoan` is a second command the caller sends, and nothing ties the two. Validated form: [later-formats.md](later-formats.md) |
 
 **Compare two fields through one struct.** A right-hand side without a dot is a literal, so
 `ends_at > starts_at` compares `ends_at` with the text `"starts_at"` and `validate` refuses it.
