@@ -12,12 +12,12 @@ A case is four things and no others:
 | the expectations | `expectations.trace.yaml` | a `trace-spec/1` document: what the run must have looked like |
 | the transcript | `recorded/` | a recorded run, replayed through the checker for nothing |
 
-## The eight cases
+## The seventeen cases
 
 Every cell in the middle column is that case's `subject:` in full, read from its `case.yaml`, and
 those fields — not this table and not any prose elsewhere — are the source of truth for what the
-corpus covers: counted from them the eight cases name **7 of this repository's 11 agents** and
-**4 of its 8 skills**.
+corpus covers: counted from them the seventeen cases name **8 of this repository's 14 agents** and
+**6 of its 21 skills** (the 6 command skills are not counted).
 
 | Case | `subject:` agents and skills | The claim it holds the subject to |
 |---|---|---|
@@ -29,12 +29,22 @@ corpus covers: counted from them the eight cases name **7 of this repository's 1
 | `golden-path-end-to-end` | `aep:decomposer`, `aep:plan-critic-acceptance`, `aep:story-scoper`, `aep:planning`, `aep:implementing`, `aep:implementing` (and the path `website/docs/golden-path.md`) | the eight published steps in the published order, with the CLIs as the stores' only writers |
 | `adversary-tests-only` | `aep:adversary`, `aep:implementing` | tests were written, `src/` was not touched, and no `aep plan artifact` command ran |
 | `connectors-readiness` | `connectors:integrating` | diagnosis uses the CLI; help is allowed and Connector mutations are rejected |
+| `specifying-interview-headless` | `ess:specifying` | with no operator, no question was asked, the questions became `approval-record`s, and the drafted domain was validated |
+| `diagnosing-red-loop-first` | `aep:diagnosing` | a test command ran before the first write under `src/`, and the red and green runs became `test_result` evidence |
+| `adversary-tautological-test` | `aep:adversary`, `aep:implementing` | the seeded test that could not fail was rewritten, and `src/` was not touched |
+| `wave-claim-verdict` | `aep:implementing` | a green unit whose claim does not hold got a `verification` record and was not merged |
+| `story-scoper-safety-fact` | `aep:story-scoper`, `aep:implementing` | the returned Scope section carries a `Safety fact` line with its ladder step, and nothing was written |
+| `security-reviewer-safety-fact` | `aep:security-reviewer`, `aep:implementing` | a test for the safety fact was written and run, and `src/` was not touched |
+| `decomposer-expand-migrate-contract` | `aep:decomposer` | a codebase-wide rename became at least four stories linked by at least three `depends_on` edges |
+| `adversary-panel-one-family` | `aep:implementing`, `aep:adversary` | a panel asked for under one model family recorded one seat and said the panel was one reviewer |
+| `authoring-prohibition-only-rule` | `b10x:authoring-plugins` | a wording review read the seeded skill, edited nothing, and named the prohibition with a positive target |
 
-No case names the agents `aep:implementor`, `aep:plan-reviewer`, `aep:reverse-engineer` or
-`aep:security-reviewer`, nor the skills `aep:migrating`, `b10x:init`, `b10x:routing` or
-`b10x:authoring-plugins`; those eight are
-the remaining scope of
-`story:plugin-eval-cases` in `.engineering/planning`, and a change to one of them turns no row red.
+No case names the agents `aep:implementor`, `aep:plan-reviewer`, `aep:reverse-engineer`,
+`ess:author`, `ess:conformance` or `ess:retrofitter`, nor the activity skills `aep:migrating`,
+`b10x:routing`, `ess:retrofitting`, `ess:testing-conformance`, `ess:hardening` or
+`worktree:managing-worktrees`, nor any `init` or `upgrade` skill; a change to one of them turns no
+row red. The `aep` ones are the remaining scope of `story:plugin-eval-cases` in
+`.engineering/planning`.
 
 ### Connector command checks
 

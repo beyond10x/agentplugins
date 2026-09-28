@@ -1,0 +1,58 @@
+format: trace-spec/1
+id: eval-case/authoring-prohibition-only-rule
+title: The seeded file was read, nothing was written, and the prohibition got a positive rewrite
+
+expectations:
+
+  - id: the-skill-was-offered
+    statement: the plugin loaded and offered the authoring skill, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: b10x:authoring-plugins
+
+  - id: the-seeded-skill-was-read
+    statement: the review read the file it was reviewing
+    expect:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/plugins/demo/skills/tidying/SKILL.md'}
+        count: {at_least: 1}
+
+  - id: nothing-was-edited
+    statement: the review changed no file
+    expect:
+      tool.absent:
+        tools: [Write, Edit, NotebookEdit]
+
+  - id: the-prohibition-was-reported
+    statement: the report names the prohibition-only rule and gives a positive target for it
+    expect:
+      text.matches:
+        regex: '(?i)(prohibition|positive|target behaviou?r|what to do)'
+
+  - id: nothing-was-refused
+    statement: nothing the review tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the review did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 20}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0
