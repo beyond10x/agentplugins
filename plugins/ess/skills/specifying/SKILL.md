@@ -17,8 +17,9 @@ job: the domain is drafted first, so the noun has a typed home before stories ar
 When the request does not say what the noun is, what it relates to and how it changes state, and no
 source in the repository answers that, interview first: ask the open decisions in numbered rounds,
 each with the answer you would take, and draft once none is open. When the request asks for a
-finished specification, or no operator is there, that takes precedence: do not ask; take each
-recommended answer and list the decisions in your report.
+finished specification (it names the domain and asks for a result, such as "make sure it
+validates"), or no operator is there, that takes precedence: do not ask; take each recommended
+answer and list the decisions in your report.
 [references/interview.md](references/interview.md) is the procedure for both.
 
 Where an OpenAPI document already describes it, do not hand-write the domain. Draft it from the
@@ -278,8 +279,10 @@ strict v1 reader such as `infra-ir/1`, add an old-reader compatibility test; unk
 currently refused.
 
 Finish by running the repository's full gate, where it has one, and report the exact command and
-exit status. Where it has none, `ess specify validate` plus `ess verify conform synthesize` with 0
-refusals is the check; report both outputs.
+exit status. Where it has none, `ess specify validate` plus `ess verify conform synthesize` is the
+check: 0 refusals, or each refusal named in your report with its code where the model needs a
+construct synthesis cannot arrange (the per-holder limit in
+[references/later-formats.md](references/later-formats.md) is one). Report both outputs.
 
 ## Agents
 

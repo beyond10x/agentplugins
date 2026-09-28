@@ -274,13 +274,20 @@ ess verify conform synthesize --path <specification> --target go --out <dir>
 ess verify conform synthesize --path <specification> --target typescript --out <dir>
 ```
 
-Generate the Go package **inside the implementation's own module** (`--out <impl>/conformance`) so
-its test can import it; a copy outside the module has no `go.mod` to import from. The package's
+Generate the Go package **inside the implementation's own module**: `--out <module root>` writes
+`<module root>/essconform`, the import path its `README.md` shows (`<module>/essconform`). A copy
+outside the module has no `go.mod` to import from. The package's
 `README.md` lists the methods and the wiring test. A method you cannot answer returns
-`ErrUnsupported` (a skip), never a made-up result. Keep a suite for a domain nobody has implemented;
-run it once something answers it.
+`ErrUnsupported` (a skip), never a made-up result. A refused command still sets `Outcome` to the
+refusing outcome's name beside `Error`: the runner compares it for refusals too, whatever the
+generated comment on `CommandResult` says (beyond10x/ess#186).
+Keep a suite for a domain nobody has implemented; run it once something answers it.
 
-Three version facts decide whether these packages run a suite at all:
+Four version facts decide whether these packages run a suite at all:
+
+- Suites from `ess-conformance/8` on run only with `ESS_REPORT_FORMAT=2` set: without it `go test`
+  stops before the first scenario (`suite/8 through /21 require explicit ESS_REPORT_FORMAT=2 before
+  execution`). Set it in the command, `ESS_REPORT_FORMAT=2 go test ./...`, or in the CI job.
 
 - A command with `fixture_inputs:` needs the target to supply the values: implement
   `FixtureValues` (Go) or `fixtureValues` (TypeScript). Without it every scenario using a fixture is
