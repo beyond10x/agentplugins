@@ -1,0 +1,6 @@
+format: ess/15
+system: library
+version: v1
+
+domains:
+  - library.lending

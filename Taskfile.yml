@@ -42,7 +42,8 @@ tasks:
             fi
           done
         done
-      - rm -rf '{{.T}}'
+      # aep makes its protocol snapshots read-only; a sandbox that ran aep cannot be removed without this.
+      - if [ -d '{{.T}}' ]; then chmod -R u+w '{{.T}}'; fi; rm -rf '{{.T}}'
       - mkdir -p -m 700 '{{.TRIALS}}'
       - mkdir -p '{{.T}}/home/.local/bin' '{{.T}}/work' '{{.T}}/tools'
       - for t in claude codex go gofmt; do p="$(command -v $t)" && ln -sf "$(readlink -f "$p")" '{{.T}}/tools/'$t; done; true
