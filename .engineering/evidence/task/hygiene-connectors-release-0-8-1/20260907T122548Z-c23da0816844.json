@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-07T12:25:48Z",
+  "actor": "human:timo",
+  "artifact": "task:hygiene-connectors-release-0-8-1",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check and wave skill/plugin validation passed after routing wave cleanup through Worktree",
+    "reference": "~/.cache/hygiene-release-20260907-4tts5tr9/agentplugins-check.log"
+  }
+}

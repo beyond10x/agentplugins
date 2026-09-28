@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: story:review-outcome-recorded
 kind: story
 status: active
@@ -12,6 +12,9 @@ tags:
 relations:
 - decomposes: epic:ahead-of-the-alternative
 revision: 3
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 3, imported: true}
 ---
 # Story: The critic step and the wave record each review's outcome
 

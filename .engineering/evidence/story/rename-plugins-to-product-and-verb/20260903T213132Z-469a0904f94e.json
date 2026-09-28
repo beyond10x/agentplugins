@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-03T21:31:32Z",
+  "actor": "human:timo",
+  "artifact": "story:rename-plugins-to-product-and-verb",
+  "kind": "story",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check in worktree wt-ae8d913ca3c2 at 6a02795: exit 0, 26 tests; agentplugins-check valid 8 cases, 5 plugins"
+  }
+}

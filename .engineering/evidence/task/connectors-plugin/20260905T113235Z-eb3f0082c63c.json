@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-05T11:32:35Z",
+  "actor": "human:timo",
+  "artifact": "task:connectors-plugin",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Both hosts installed connectors@beyond10x from published commit 87930510bde690ae84b38203ddbee27cb576c805. Claude plugin details lists one connectors skill; fresh Codex skills/list returns enabled connectors:connectors. Both cached SKILL.md files hash to 7ad8df570d1d31efa1e4542bd80924e3ea8b61801e934fd93343fe2a01ba7896. Existing Codex plugins remain enabled. Full behavioural prompt evals and live external invocation remain unrecorded."
+  }
+}

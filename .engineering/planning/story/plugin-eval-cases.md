@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: story:plugin-eval-cases
 kind: story
 status: active
@@ -11,6 +11,9 @@ tags:
 relations:
 - decomposes: epic:ahead-of-the-alternative
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T23:06:38Z", actor: "human:timo", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 3, imported: true}
 ---
 # Story: Every agent and skill has an eval case beside it
 

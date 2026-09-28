@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: epic:ahead-of-the-alternative
 kind: epic
 status: active
@@ -10,6 +10,9 @@ tags:
 - bench
 - comparison
 revision: 3
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T23:06:40Z", actor: "human:timo", revision: 3, imported: true}
 ---
 # Epic: What the 2026-09-02 comparison left open, and the parts only this stack can do
 

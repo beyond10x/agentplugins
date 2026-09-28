@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-05T17:21:36Z",
+  "actor": "human:timo",
+  "artifact": "task:connectors-eval-release",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Website source lock 00e85b4 pins published AgentPlugins fbf0508 (0.8.0); Atlas snapshot dda04bb includes the published release. Website npm run gate passed: 349 routes, 1305 files, 22938 references. Atlas docs verify-portal passed: 23 locked public sources, 24 surfaces, 50 delivery records. Atlas docs verify-pages --root-only passed earlier. Workspace-wide docs reconcile --check remains refused by the pre-existing stale primary Docs System collector: agentide b10x-docs/v4 unsupported; no unrelated primary checkouts changed."
+  }
+}

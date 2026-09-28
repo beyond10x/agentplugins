@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: story:eval-ci-gates
 kind: story
 status: implemented
@@ -13,6 +13,10 @@ relations:
 - decomposes: epic:ahead-of-the-alternative
 - depends_on: story:plugin-eval-cases
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T23:06:36Z", actor: "human:timo", revision: 2, decided_on: {"recorded":{"test_result":1}}, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T23:06:36Z", actor: "human:timo", revision: 3, decided_on: {"recorded":{"test_result":1}}, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-02T23:06:36Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}, imported: true}
 ---
 # Story: CI validates the cases always and runs them live behind a label and a budget
 

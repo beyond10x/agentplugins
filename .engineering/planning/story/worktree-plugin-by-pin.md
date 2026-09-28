@@ -1,11 +1,13 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: story:worktree-plugin-by-pin
 kind: story
-status: draft
+status: archived
 title: The b10x catalog lists worktree by pin, not by copy
 summary: Rename the marketplace to b10x and replace the workspace-hygiene copy with a git-subdir entry pinned to a Worktree release, checked offline for shape and online for tag, commit, version and recency.
-revision: 1
+revision: 3
+transitions:
+- {from: "draft", to: "archived", at: "2026-09-28T07:49:41Z", actor: "human:timo", revision: 3}
 ---
 # Story: the b10x catalog lists worktree by pin, not by copy
 
@@ -26,3 +28,17 @@ runs on every pull request, `main` push and daily.
 - `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`
 - `crates/agentplugins-check/src/{main,remote,evals}.rs`, `.github/workflows/remote-plugins.yml`
 - `plugins/workspace-hygiene/` (removed), routing skill, wave skill, README, AGENTS.md, website
+
+## Resolution
+
+Not built; archived on 2026-09-28. The approach was reversed the day the story was drafted, and its
+goal is met by another mechanism.
+
+- Reversed: `beyond10x/worktree` commit `bec104b` (2026-09-24, "move the agent plugin to
+  agentplugins") removed `plugins/worktree`, its marketplace and its manifest test. Only tag 0.6.0
+  ever carried `plugins/`; 0.8.2, the newest, carries none, so there is no subdirectory to pin.
+  That commit makes this repository the owner of the worktree skill text.
+- Goal met: the skill can no longer lag the CLI unnoticed. `verified.json` pins `worktree` 0.8.2, and
+  `agentplugins-check tools` fails when a newer worktree release is out. It runs on every pull
+  request, `main` push and daily (`.github/workflows/tools.yml`, cron `17 5 * * *`).
+- The rename half is done: both marketplace files are named `b10x`.

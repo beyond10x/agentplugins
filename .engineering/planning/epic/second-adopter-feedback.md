@@ -1,11 +1,15 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: epic:second-adopter-feedback
 kind: epic
 status: implemented
 title: What the second adopter could not do from the front door
 summary: Install block, golden path, undecided relations named by the decomposer, a plan-time critic panel, and a domain-first rule — the 2026-09-02 adopter report, ranked by an independent review.
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T17:40:24Z", actor: "human:timo", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T17:40:24Z", actor: "human:timo", revision: 3, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-02T17:59:43Z", actor: "human:timo", revision: 4, imported: true}
 ---
 # Epic: What the second adopter could not do from the front door
 

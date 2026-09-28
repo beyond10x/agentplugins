@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-10T16:42:10Z",
+  "actor": "human:timo",
+  "artifact": "task:release-0-9-0-tool-tracking",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check on main at afb852e + 0.9.0 changes with ESS pinned 0.20.0"
+  }
+}

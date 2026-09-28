@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-05T17:19:37Z",
+  "actor": "human:timo",
+  "artifact": "task:connectors-eval-release",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Release 0.8.0: GitHub Gate and public documentation build passed in run 33980140386; the existing draft-edit command failed on unsupported --notes-from-tag. Published the verified draft with the Atlas App using --notes-file and --draft=false; API confirms b10x-bot[bot] author and draft=false. Fixed the workflow forward in 9bde554 and reran task check successfully (34 unit tests, 2 acceptance tests, 9 eval cases, 1 recorded replay).",
+    "reference": "https://github.com/beyond10x/agentplugins/releases/tag/0.8.0"
+  }
+}

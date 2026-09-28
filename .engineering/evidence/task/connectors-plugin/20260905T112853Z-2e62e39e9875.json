@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-05T11:28:53Z",
+  "actor": "human:timo",
+  "artifact": "task:connectors-plugin",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check: 29 tests pass; nine eval cases validate; one existing transcript replayed. Skill validators, Codex plugin validator, Claude plugin and marketplace validators pass. task site-build passes. connectors 0.6.0 inspect doctor reports a stale daemon socket; live invocation not attempted."
+  }
+}

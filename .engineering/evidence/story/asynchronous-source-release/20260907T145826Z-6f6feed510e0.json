@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-07T14:58:26Z",
+  "actor": "agent:org-async-20260907",
+  "artifact": "story:asynchronous-source-release",
+  "kind": "story",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check passed; actionlint and release DAG verification passed on the implemented tree"
+  }
+}
