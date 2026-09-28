@@ -535,7 +535,7 @@ mod tests {
     #[test]
     fn settings_keep_only_entries_the_catalog_cares_about() {
         let catalog = Catalog::embedded();
-        let text = r#"{"enabledPlugins":{"beyond10x@beyond10x":true,"ess-schema@beyond10x":false,"brain@org-brain":true,"worktree@b10x":true}}"#;
+        let text = r#"{"enabledPlugins":{"beyond10x@beyond10x":true,"ess-schema@beyond10x":false,"notes@another-marketplace":true,"worktree@b10x":true}}"#;
         let entries = parse_settings(
             text,
             "/p/.claude/settings.local.json",
