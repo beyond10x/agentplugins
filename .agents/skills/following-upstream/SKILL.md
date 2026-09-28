@@ -1,6 +1,6 @@
 ---
 name: following-upstream
-description: Bring this repository up to date with everything it takes from other repositories — the aep, ess, worktree, metaharness and connectors releases its plugins drive, the workflows pinned by commit, and the issues its skills work around. Use when asked to check for upstream releases, sync or refresh agentplugins, follow a new aep or ess release, or when the Tools check fails with "is newer than verified.json". Run it on a schedule.
+description: Bring this repository up to date with everything it takes from other repositories — the aep, ess, worktree, metaharness and connectors releases its plugins drive, the workflows pinned by commit, and the issues its skills work around. Use when asked to check for upstream releases, sync or refresh agentplugins, follow a new release of aep or ess, or when the Tools check fails with "is newer than verified.json". Run it on a schedule.
 ---
 
 # Following upstream
@@ -57,7 +57,7 @@ A store `protocols:` pin in `.engineering/project.yaml` moves to the new aep rel
 1. `cargo run --locked --bin agentplugins-check -- tools` — every spelled command against the newest
    releases, the ESS syntax example, and the ESS tutorial's specification, suite and `go test`.
 2. A trial round per [`improving-by-trial`](../improving-by-trial/SKILL.md): the ESS trials and
-   `ess-tutorial` for an ess release, `aep-backlog` and `aep-tutorial` for an aep release. A run
+   `ess-tutorial` for a new release of ess, `aep-backlog` and `aep-tutorial` for a new release of aep. A run
    worse than `trials/baseline.json` is triaged there; a defect in the other repository becomes a
    `trial-finding` issue there, and a workaround here that cites it.
 3. Then, and only then, `verified.json` moves to the new releases.
