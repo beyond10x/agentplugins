@@ -426,7 +426,8 @@ Up to N implementors in parallel, one per unit, each pointed at its own worktree
 * the test-first ordering, and that the red run goes in its report.
 
 When one returns, dispatch the adversary against that worktree. The adversary may add failing cases
-and may not edit the implementation.
+and may not edit the implementation. When the operator asks for a cross-family review, dispatch a
+panel instead, as [adversary-panel.md](adversary-panel.md) describes.
 
 **Write each unit's brief to a file and pass the path; do not retype it into a prompt.**
 [unit-brief.md](unit-brief.md) gives the shape: the repository's invariants

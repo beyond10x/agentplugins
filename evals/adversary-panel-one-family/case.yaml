@@ -1,0 +1,26 @@
+format: eval-case/1
+id: adversary-panel-one-family
+title: Asked for a cross-family panel where only one family is available, the wave said so and recorded one seat
+workflow: adp/default
+states: [adversarial_verify]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [aep:implementing]
+  agents: [aep:adversary]
+  paths:
+    - plugins/aep/skills/implementing/references/adversary-panel.md
+
+# The recorded harness serves one model family, so the decidable half of the panel is the one that
+# matters most in practice: it does not pretend a second family ran. One `review-result` is written
+# through the CLI, and the report states that the panel was one reviewer.
+
+task: |
+  The unit on branch `unit/invoice-total` is green. The operator asks: attack it with a
+  cross-family adversary panel before it merges. Use the `aep:implementing` skill, in wave mode,
+  and record each seat's report as the skill says. No operator is present; record each stop and
+  continue. Do not merge, push or tag.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

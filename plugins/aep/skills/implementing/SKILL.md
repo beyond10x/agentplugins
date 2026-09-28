@@ -37,5 +37,5 @@ yourself from that file, in its own pass and within the tools it names.
 
 - `story-scoper` — works out where one story lands and returns its Scope section; runs before a wave is proposed. ([procedure](references/story-scoper.md))
 - `implementor` — implements one unit: the failing test first, then the smallest change. ([procedure](references/implementor.md))
-- `adversary` — tries to break a unit that passes its own tests. ([procedure](references/adversary.md))
+- `adversary` — tries to break a unit that passes its own tests. ([procedure](references/adversary.md)) On request, several adversaries on different model families run as a panel. ([panel](references/adversary-panel.md))
 - `security-reviewer` — independently checks that the unit's safety and correctness invariants hold. ([procedure](references/security-reviewer.md))
