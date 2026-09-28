@@ -14,6 +14,12 @@ from generated artifacts and do not repair a failed import by inventing lifecycl
 A story or epic can introduce a noun before any specification exists. That is still this skill's
 job: the domain is drafted first, so the noun has a typed home before stories are written around it.
 
+When the request does not say what the noun is, what it relates to and how it changes state, and no
+source in the repository answers that, interview first: ask the open decisions in numbered rounds,
+each with the answer you would take, and draft once none is open.
+[references/interview.md](references/interview.md) is the procedure, including what to do when no
+operator is there to answer.
+
 Where an OpenAPI document already describes it, do not hand-write the domain. Draft it from the
 contract, and read the decisions the draft says it could not take:
 
@@ -162,8 +168,9 @@ would settle it. An entity no source names, added so that a command type-checks,
 even when it validates.
 
 A marker records the question; it does not ask it. In an interactive session, put the open markers
-to the user as questions at the end (Claude Code: `AskUserQuestion`), one per marker, and write the
-answers into the specification. Headless, or as the `author` agent, leave the markers and list them
+to the user as one interview round at the end ([references/interview.md](references/interview.md);
+Claude Code: `AskUserQuestion`), one question per marker, and write the answers into the
+specification. Headless, or as the `author` agent, leave the markers and list them
 in the report.
 
 **A second source document goes into one of three places.** The same system, as another domain,

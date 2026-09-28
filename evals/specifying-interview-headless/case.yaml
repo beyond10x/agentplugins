@@ -1,0 +1,31 @@
+format: eval-case/1
+id: specifying-interview-headless
+title: With no operator, the interview's questions became approval records and the domain validated
+workflow: adp/default
+states: [specify]
+arm: plugin
+verdict: held
+
+# Which repository files this case is a case about.
+subject:
+  skills: [ess:specifying]
+  paths:
+    - plugins/ess/skills/specifying/references/interview.md
+
+# The interview asks an operator. A recorded eval has none, so what can be decided from a transcript
+# is the headless half of `references/interview.md`: no question is put to anybody, each question the
+# run would have asked lands in the store as an `approval-record`, and the domain the answers produced
+# passes `ess specify validate`. The interactive half needs a person and is not judged here.
+
+task: |
+  No operator is present in this session; record each stop and continue.
+
+  `story:room-booking` in this checkout introduces the noun `Booking`, and no ESS document here
+  declares it. Model it first, as the planning skill's guardrail 7 says, using the `ess:specifying`
+  skill. The story says a booking is for one room and has a start and an end; it says nothing about
+  whether a booking can be cancelled or whether a room can hold two bookings at once.
+
+  Do not decompose the story and do not move any artifact.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

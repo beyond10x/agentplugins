@@ -212,7 +212,9 @@ stories around it. Draft the domain first — `aep plan reverse openapi --domain
 <openapi-doc>` where an OpenAPI document already describes it, otherwise the minimal document in the
 `ess:specifying` skill (`b10x skill ess:specifying` prints it) — run `ess specify validate --path <specification>`, and cite the file by path in the
 artifact body through `aep plan artifact body`. A noun with no typed home is the relation nobody can
-check later.
+check later. Where the artifact does not say what the noun is and nothing in the repository does
+either, the `ess:specifying` skill's interview (`references/interview.md` beside it) settles that
+before the draft.
 
 **A relation between two nouns is modelled the same way the nouns are: as a `relations:` entry on
 the entity, in the ESS document.** Not as a sentence in a story body, and not as a field somebody
