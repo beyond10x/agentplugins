@@ -1398,20 +1398,21 @@ mod tests {
             &["plugins/aep/skills/implementing/references/unit-brief.md".to_owned()],
         )
         .expect("the corpus scopes");
-        // The adversary's case, and the golden path — whose step 6 is the wave. Both are right.
-        assert_eq!(
-            matched,
-            vec![
-                (
-                    "evals/adversary-tests-only".to_owned(),
-                    "plugins/aep".to_owned()
-                ),
-                (
-                    "evals/golden-path-end-to-end".to_owned(),
-                    "plugins/aep".to_owned()
-                ),
-            ]
-        );
+        // Every case that names `aep:implementing` — the adversary's, the wave's, the scoper's and
+        // the security reviewer's — and the golden path, whose step 6 is the wave. All are right.
+        let expected: Vec<(String, String)> = [
+            "evals/adversary-panel-one-family",
+            "evals/adversary-tautological-test",
+            "evals/adversary-tests-only",
+            "evals/golden-path-end-to-end",
+            "evals/security-reviewer-safety-fact",
+            "evals/story-scoper-safety-fact",
+            "evals/wave-claim-verdict",
+        ]
+        .iter()
+        .map(|case| ((*case).to_owned(), "plugins/aep".to_owned()))
+        .collect();
+        assert_eq!(matched, expected);
     }
 
     /// An agent is a thin adapter over a role procedure its owning skill carries (R4), so a change

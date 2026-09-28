@@ -46,6 +46,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/plan-critic-parallel-safety.md",
             "skills/implementing/SKILL.md",
             "skills/implementing/references/drive.md",
+            "skills/diagnosing/SKILL.md",
             "skills/wave/SKILL.md",
             "skills/drive/SKILL.md",
             "skills/review-plan/SKILL.md",

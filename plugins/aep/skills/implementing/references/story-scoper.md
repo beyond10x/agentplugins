@@ -67,6 +67,8 @@ Derived <date> by `story-scoper`. Every line is **cited** (read from the story o
 - **Documents:** none
 - **Confidence:** high — the story names the defect site
 - **Would collide with:** any unit touching `aep-cli`'s planning surface
+- **Safety fact:** `ArtifactStatus::ALL` is read only by `planning.rs` and the lifecycle loader, so
+  adding a variant changes no other caller — step 2 (`git grep -n 'ArtifactStatus::ALL'`), unproven
 ```
 
 Rules for that section:
@@ -82,6 +84,14 @@ Rules for that section:
 5. **Never widen a scope to look thorough.** Three crates listed because each was mentioned once is
    a scope that forbids every wave and helps nobody. If one surface dominates, say so and put the
    rest under *also likely*.
+6. **`Safety fact` names the one fact the change is safe because of**, and how far you proved it:
+   1 stated, 2 pointed at a `file:line`, 3 walked the failing case step by step and it does not
+   reach, 4 ran a script or test against the real code, 5 reproduced it in the running system. A
+   read-only scoper stops at 2 or 3; write `unproven` beside anything below 4, so the implementor
+   and the security reviewer know which fact to prove. Look where a symbol search stops: a JSON
+   field an API returns, a database column, a wire format another language reads, a feature flag,
+   a caller three hops downstream. (Adapted from `pstack/skills/blast-radius` in
+   `github.com/cursor/plugins`, MIT.)
 
 ## Report
 

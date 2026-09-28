@@ -1,0 +1,67 @@
+format: trace-spec/1
+id: eval-case/story-scoper-safety-fact
+title: A Safety fact line with a step came back, and the store was not written
+
+expectations:
+
+  - id: the-agent-was-offered
+    statement: the plugin loaded and offered the story scoper, so a miss is not "it was not there"
+    expect:
+      env.agent_available:
+        agent: aep:story-scoper
+
+  - id: a-subagent-actually-ran
+    statement: the scoping went through a subagent rather than being done inline
+    expect:
+      subagent.spawned:
+        count: {at_least: 1}
+
+  - id: the-story-was-read
+    statement: the run read the story it was scoping
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +show +story:cache-evict-fast-path'}
+        count: {at_least: 1}
+
+  - id: the-scope-carries-a-safety-fact
+    statement: the returned section has a `Safety fact` line with a ladder step or `unproven`
+    expect:
+      text.matches:
+        regex: 'Safety fact:.*(step [1-5]|unproven)'
+
+  - id: no-scope-was-written
+    statement: the scoper ran none of the `scope --add` lines it returned
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +(scope|body|new|move)'}
+
+  - id: nothing-was-refused
+    statement: nothing the scoper tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the scoping did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 30}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

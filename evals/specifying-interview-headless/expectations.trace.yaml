@@ -1,0 +1,91 @@
+format: trace-spec/1
+id: eval-case/specifying-interview-headless
+title: The questions nobody could answer were recorded, not asked, and the domain validated
+
+expectations:
+
+  - id: the-skill-was-offered
+    statement: the plugin loaded and offered the specifying skill, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: ess:specifying
+
+  - id: nobody-was-asked
+    statement: the run put no question to an operator who is not there
+    expect:
+      tool.absent:
+        tool: AskUserQuestion
+
+  - id: the-questions-became-approval-records
+    statement: at least one question the interview would have asked was recorded as an `approval-record`
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +new +approval-record'}
+        count: {at_least: 1}
+
+  - id: a-domain-file-was-written
+    statement: a domain document was written, so the absence of a question above is a headless run and not a dead one
+    expect:
+      tool.called:
+        tools: [Write, Edit]
+        args:
+          file_path: {glob: '*.yaml'}
+        count: {at_least: 1}
+
+  - id: the-domain-was-validated-after-it-was-written
+    statement: '`ess specify validate` ran against a tree that already held the drafted domain'
+    expect:
+      order:
+        first:
+          tools: [Write, Edit]
+          args: {file_path: {glob: '*.yaml'}}
+        before:
+          tool: Bash
+          args: {command: {regex: 'ess +specify +validate'}}
+
+  - id: no-status-was-moved
+    statement: the run moved no artifact through its lifecycle
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +move'}
+
+  - id: the-scope-was-actually-tested
+    statement: the run read the story it was modelling, so the rows above were decided against the noun it introduces
+    severity: advisory
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +show +story:room-booking'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the interview did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 40}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

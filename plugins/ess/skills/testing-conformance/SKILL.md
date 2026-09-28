@@ -40,6 +40,15 @@ The mechanism generalises, so learn to spot it by reading rather than by mutatin
 Do the mutation test once per mapping you rely on, and record in the commit that you did it and what
 failed. A scenario nobody has ever seen fail is a scenario that has never been tested.
 
+**A cheaper check comes first: would the scenario pass against a target that does nothing?** Point
+the suite at a target whose every `ExecuteCommand` returns an accepted outcome with no state change
+and whose every `QueryView` returns an empty row. A scenario that passes there asserts only that a
+command was accepted, or only an absence, and cannot fail for a wrong mapping. For example, a
+`cancel_booking` scenario that checks the command's outcome is `accepted` passes against that
+target; the same scenario fails there once it also asserts that the `bookings` view shows
+`state: Cancelled` for the booking it cancelled. Add the observed-state assertion before running any
+mutation, because a mutation can only turn a scenario red when the scenario reads what changed.
+
 Mutation is one of eight hardening techniques. Once the suite is green, `ess:hardening` carries the
 rest — random command sequences against a reference model, caller replay, determinism, metamorphic
 relations, guard analysis, a spec diff in the gate and a design review — and the order to run them in.

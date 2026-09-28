@@ -1,0 +1,101 @@
+format: trace-spec/1
+id: eval-case/decomposer-expand-migrate-contract
+title: Expand first, at least two migrate batches, one contract, all linked by depends_on
+
+expectations:
+
+  - id: the-agent-was-offered
+    statement: the plugin loaded and offered the decomposer, so a miss is not "it was not there"
+    expect:
+      env.agent_available:
+        agent: aep:decomposer
+
+  - id: a-subagent-actually-ran
+    statement: the work went through a subagent rather than being done inline by the parent session
+    expect:
+      subagent.spawned:
+        count: {at_least: 1}
+
+  - id: stories-were-created
+    statement: at least four stories were created, which is the smallest expand, two migrate, contract set
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +new +story'}
+        count: {at_least: 4}
+
+  - id: the-stories-are-linked-by-depends-on
+    statement: at least three `depends_on` edges were written, one per migrate batch and one from the contract story
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(--relate +depends_on:|artifact +relate +\S+ +depends_on)'}
+        count: {at_least: 3}
+
+  - id: the-expand-story-came-first
+    statement: a story naming the expand step was created before any story naming a migrate batch
+    severity: advisory
+    expect:
+      order:
+        first:
+          tool: Bash
+          args: {command: {regex: 'artifact +new +story +\S*expand'}}
+        before:
+          tool: Bash
+          args: {command: {regex: 'artifact +new +story +\S*migrat'}}
+
+  - id: no-status-was-moved
+    statement: the decomposer moved no artifact through its lifecycle
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +move'}
+
+  - id: the-store-was-validated
+    statement: the agent ran the store's own validator before reporting
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +validate'}
+        count: {at_least: 1}
+
+  - id: the-scope-was-actually-tested
+    statement: the run searched the tree for the type it renames, so the batches were sized against real callers
+    severity: advisory
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(git grep|rg|grep).*Tenant'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing machine-owned was hand-written, so no guard had to refuse anything
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the decomposition did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 40}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

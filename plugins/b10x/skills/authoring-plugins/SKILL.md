@@ -42,6 +42,10 @@ layout, its `references/`, `assets/`, and optional `scripts/` resources.
 
 Use concise skill descriptions that state both the capability and its triggering requests. Keep
 large reference material beside the skill and tell the instructions exactly when to read it.
+Before writing or reviewing the text of any `SKILL.md`, procedure or `AGENTS.md`, read
+[references/writing.md](references/writing.md): triggers named once, steps ending on a checkable
+completion criterion, branch-only reference behind a pointer, target behaviour stated instead of a
+prohibition, and no sentence the model already obeys.
 
 ## 3. Create the package
 

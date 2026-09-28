@@ -1,0 +1,23 @@
+format: eval-case/1
+id: authoring-prohibition-only-rule
+title: A wording review of a seeded skill reported its prohibition-only rule and edited nothing
+workflow: adp/default
+states: [implement]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [b10x:authoring-plugins]
+  paths:
+    - plugins/b10x/skills/authoring-plugins/references/writing.md
+
+# The seeded skill carries one rule that is a bare prohibition ("Do not edit generated files.") and
+# one step with no completion criterion. The rows decide that the review read the file, wrote
+# nothing, and named the prohibition with a positive target.
+
+task: |
+  Review the wording of `plugins/demo/skills/tidying/SKILL.md` with the `b10x:authoring-plugins`
+  skill, as a reviewer: report each problem with the line and a rewrite. Do not edit any file.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

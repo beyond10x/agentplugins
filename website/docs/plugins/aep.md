@@ -63,6 +63,15 @@ to `aep:implementing`:
 | `/aep:wave [story-id…]` | scopes the candidates, writes the wave page, proposes the wave and stops for your approval |
 | `/aep:drive <story-id>` | says what a driven run costs, starts one governed run, prints its run id and stops |
 
+## Diagnosis
+
+The `diagnosing` skill handles a failing, flaky or slow behaviour. It builds one command that goes
+red on the reported symptom and has already been run, before any hypothesis. Then it ranks
+falsifiable hypotheses, probes one variable at a time, and writes the regression test at a seam
+that reproduces the real call pattern. The red and green runs are recorded as `test_result`
+evidence against the owning story. When no such seam exists, the missing seam is filed as a draft
+story.
+
 Every role above, in both halves, is written once, as `references/<role>.md` of the skill that
 owns it. Claude Code runs it as a subagent through a thin `agents/<role>.md` adapter; Codex, which
 loads skills but not `agents/`, runs the same file directly.

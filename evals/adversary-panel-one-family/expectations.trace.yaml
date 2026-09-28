@@ -1,0 +1,67 @@
+format: trace-spec/1
+id: eval-case/adversary-panel-one-family
+title: One seat ran, one review-result was recorded, and the report says the panel was one reviewer
+
+expectations:
+
+  - id: the-skill-was-offered
+    statement: the plugin loaded and offered the implementing skill, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: aep:implementing
+
+  - id: a-seat-ran
+    statement: the adversary ran as a subagent
+    expect:
+      subagent.spawned:
+        count: {at_least: 1}
+
+  - id: the-seat-was-recorded
+    statement: the seat's report became a `review-result` through `new --from`
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +new +review-result .*--from'}
+        count: {at_least: 1}
+
+  - id: the-report-says-one-family
+    statement: the final report states that only one model family was available, so the panel was one reviewer
+    expect:
+      text.matches:
+        regex: '(?i)(one (model )?family|single (model )?family|panel (of|was) one)'
+
+  - id: nothing-was-published
+    statement: no merge of the unit, no push and no tag
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'git +(push|tag|merge)'}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the panel did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 60}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

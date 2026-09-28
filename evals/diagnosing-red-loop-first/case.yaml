@@ -1,0 +1,22 @@
+format: eval-case/1
+id: diagnosing-red-loop-first
+title: The failing command ran before any source file was edited, and its run was recorded
+workflow: adp/default
+states: [implement]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [aep:diagnosing]
+
+# The skill's central order is decidable from a transcript: a command is run and fails before any
+# edit reaches the code under `src/`, and the run is recorded as `test_result` evidence. Whether the
+# hypotheses were well ranked is not, and no row pretends to judge it.
+
+task: |
+  `story:slugify-unicode` in this checkout reports that `slugify("Ärger im Büro")` returns
+  `"rger-im-bro"` instead of `"aerger-im-buero"`. Diagnose and fix it with the `aep:diagnosing`
+  skill. Record your evidence against that story. Do not move any artifact.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

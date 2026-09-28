@@ -1,0 +1,26 @@
+format: eval-case/1
+id: wave-claim-verdict
+title: A green unit whose claim does not hold was measured against the base and not merged
+workflow: adp/default
+states: [implement]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [aep:implementing]
+  paths:
+    - plugins/aep/skills/implementing/references/wave.md
+
+# The unit's suite is green and its story claims `list` finishes in under 0.1 s on the fixture
+# store. The unit's change does not make it faster. The rows decide that the claim was measured on
+# both branches, that a `verification` record reached the store, and that the unit's branch did not
+# merge.
+
+task: |
+  The wave page in this checkout lists one unit, `story:fast-list`, already implemented on branch
+  `unit/fast-list` with a green suite and a clean adversary pass recorded. Continue the wave from
+  routing that result with the `aep:implementing` skill, in wave mode. No operator is present;
+  record each stop and continue. Do not push, tag or release.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
