@@ -28,5 +28,6 @@ installed.
 
 New to ESS? [Your first ESS specification](./tutorials/first-ess-specification.md) takes you from an
 empty directory to a validated specification and a passing conformance suite, with an agent doing
-the writing. Otherwise [set up with one sentence](./install.md), [start with the front
+the writing, and [Your first governed plan](./tutorials/first-governed-plan.md) continues it with an
+AEP plan and one reviewed wave. Otherwise [set up with one sentence](./install.md), [start with the front
 door](./plugins/b10x.md) or [choose a specialist](./choose-a-plugin.md).
