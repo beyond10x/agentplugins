@@ -5,7 +5,7 @@ kind: story
 status: archived
 title: The b10x catalog lists worktree by pin, not by copy
 summary: Rename the marketplace to b10x and replace the workspace-hygiene copy with a git-subdir entry pinned to a Worktree release, checked offline for shape and online for tag, commit, version and recency.
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "archived", at: "2026-09-28T07:49:41Z", actor: "human:timo", revision: 3}
 ---
@@ -42,3 +42,13 @@ goal is met by another mechanism.
   `agentplugins-check tools` fails when a newer worktree release is out. It runs on every pull
   request, `main` push and daily (`.github/workflows/tools.yml`, cron `17 5 * * *`).
 - The rename half is done: both marketplace files are named `b10x`.
+
+## Decision
+
+2026-09-28, the operator: keep this story archived; do not build the pin again.
+
+This repository built the pin once: `cefcd53` (2026-09-24) listed `worktree` as a `git-subdir` entry
+at a Worktree tag and retired `workspace-hygiene`. `3c7d402` reversed it the same day ("every plugin
+here"): `plugins/worktree` is owned here, and structure rule R1 has the checker refuse any plugin
+source outside `./plugins`. Building the pin again would mean undoing R1 for `worktree` and
+re-adding `plugins/worktree` to the worktree repository.
