@@ -55,8 +55,8 @@ jobs:
       # and this workflow runs the version pinned below, which has neither. A grouped spelling here
       # would not teach a reader anything; it would fail to parse on the runner. Move both when the
       # pin moves.
-      AEP_VERSION: '0.44.0'
-      METAHARNESS_VERSION: '0.4.2'
+      AEP_VERSION: '0.64.0'
+      METAHARNESS_VERSION: '0.8.0'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -195,7 +195,7 @@ jobs:
           # stop at `unrecognized subcommand 'doctor'`; aep 0.45.0's `eval run` refuses a mismatch.
           install -d "$HOME/.local/bin"
           install -m 0755 "aep-${AEP_VERSION}-${target}/aep" "$HOME/.local/bin/aep"
-          cargo install --locked --git https://github.com/beyond10x/metaharness --tag "$METAHARNESS_VERSION" metaharness
+          cargo install --locked --git https://github.com/beyond10x/metaharness --tag "$METAHARNESS_VERSION" metaharness-cli
           aep --version
           metaharness --version
 
@@ -217,7 +217,7 @@ jobs:
             [[ -n "$case" ]] || continue
             echo "::group::$case"
             case_out="$RUNNER_TEMP/eval-out/${case#evals/}"
-            aep eval run \
+            metaharness aep drive eval run \
               --case "$case" \
               --arm plugin \
               --harness claude \

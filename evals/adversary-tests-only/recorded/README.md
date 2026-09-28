@@ -13,11 +13,11 @@ up with no change to the case.
 Live, paid, and refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep drive eval run \
+$ METAHARNESS_LIVE=1 metaharness aep drive eval run \
     --case evals/adversary-tests-only \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/aep-drive \
+    --plugin-dir plugins/aep \
     --cwd <the implementor's worktree, suite green, with the unit brief in it> \
     --budget-usd 5 \
     --observed-at <the date it was observed> \

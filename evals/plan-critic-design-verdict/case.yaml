@@ -51,7 +51,7 @@ subject:
 
 task: |
   Run the `aep:plan-critic-design` agent over the stories drafted under
-  `epic:commercial-clients`, and judge whether the drafted set is the right shape — cycles, a serialising chain, a split abstraction, an unrecorded dependency.
+  `epic:book-reservations`, and judge whether the drafted set is the right shape — cycles, a serialising chain, a split abstraction, an unrecorded dependency.
 
   Give the critic the story ids and the epic id, and nothing else.
 

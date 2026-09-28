@@ -51,7 +51,7 @@ subject:
 
 task: |
   Run the `aep:plan-critic-parallel-safety` agent over the stories drafted under
-  `epic:commercial-clients`, and judge which pair of drafted items lands on one surface, and whether the plan says so.
+  `epic:book-reservations`, and judge which pair of drafted items lands on one surface, and whether the plan says so.
 
   Give the critic the story ids and the epic id, and nothing else.
 
