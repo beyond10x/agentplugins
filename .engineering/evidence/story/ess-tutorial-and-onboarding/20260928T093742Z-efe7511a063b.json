@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-28T09:37:42Z",
+  "actor": "human:timo",
+  "artifact": "story:ess-tutorial-and-onboarding",
+  "kind": "story",
+  "revision": 13,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "trial ess-tutorial on ess 0.38.0: fresh agent given only the page, validate valid, 17 scenarios 0 refusals, go test 17 passed 0 failed; tools: tutorial spec, suite and go test pass (PR #47 Tools check)",
+    "reference": "https://github.com/beyond10x/agentplugins/pull/47"
+  }
+}

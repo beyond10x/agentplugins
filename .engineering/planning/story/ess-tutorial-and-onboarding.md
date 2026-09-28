@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:ess-tutorial-and-onboarding
 kind: story
-status: active
+status: implemented
 title: A public tutorial takes a developer from nothing to a conforming ESS specification; onboarding pages match b10x
 summary: New tutorials/first-ess-specification page recorded with real output, held to the newest CLIs by the checker and a trial; onboarding pages corrected; released as 0.17.0.
 relations:
@@ -26,10 +26,11 @@ scope:
   path: verified.json
 - confidence: cited
   path: website/docs
-revision: 12
+revision: 13
 transitions:
 - {from: "draft", to: "proposed", at: "2026-09-28T09:14:02Z", actor: "human:timo", revision: 11}
 - {from: "proposed", to: "active", at: "2026-09-28T09:14:02Z", actor: "human:timo", revision: 12}
+- {from: "active", to: "implemented", at: "2026-09-28T09:59:44Z", actor: "human:timo", revision: 13, decided_on: {"recorded":{"test_result":2}}}
 ---
 # Story: a public ESS tutorial, and onboarding pages that match b10x
 
