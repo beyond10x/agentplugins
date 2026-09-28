@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-28T03:31:37Z",
+  "actor": "human:timo",
+  "artifact": "story:worktree-plugin-integrated",
+  "kind": "story",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Tools: agentplugins-check tools, worktree 0.8.2, 19 commands (42f01b0)",
+    "reference": "https://github.com/beyond10x/agentplugins/actions/runs/36374062848"
+  }
+}
