@@ -46,7 +46,7 @@ It installs the `b10x` setup tool and asks what you want to do; answer *write sp
 lists every change before it makes one. If you prefer to run it
 yourself, with `b10x` already on your `PATH`:
 
-```console
+```shell-session
 $ b10x init ess --host claude --out plan.json
 ```
 
@@ -83,7 +83,7 @@ Apply after the user confirms this list: b10x setup apply --plan plan.json --yes
 marketplace; the lines above show the name yours registers, `beyond10x/agentplugins`.) Apply it
 after you have read the list:
 
-```console
+```shell-session
 $ b10x setup apply --plan plan.json --yes
 ```
 
@@ -590,7 +590,7 @@ views:
 
 ## 4. Validate it
 
-```console
+```shell-session
 $ ess specify validate --path spec
 ```
 
@@ -626,7 +626,7 @@ consequence: nothing takes the `lend` transition any more. Change it back, and `
 
 The same specification produces documentation and an OpenAPI description:
 
-```console
+```shell-session
 $ ess generate --kind openapi --path spec --out out
 $ ess generate --kind docs --path spec --out out
 ```
@@ -678,7 +678,7 @@ flowchart TB
 
 Generate the conformance suite as a Go package inside the implementation's module:
 
-```console
+```shell-session
 $ ess verify conform synthesize --path spec --target go --out impl
 ```
 
@@ -1068,7 +1068,7 @@ Run the suite. The runner needs `ESS_REPORT_FORMAT=2` and stops before the first
 it. This `conformance_test.go` sets it when it is missing; in your own test, set it the same way or
 on the command line.
 
-```console
+```shell-session
 $ cd impl
 $ ESS_REPORT_FORMAT=2 go test -v ./...
 ```
@@ -1110,7 +1110,7 @@ book that is already on loan:
 +	if b.State == Withdrawn {
 ```
 
-```console
+```shell-session
 $ ESS_REPORT_FORMAT=2 go test ./...
 ```
 
@@ -1144,7 +1144,7 @@ format: ess-inputs/2
 requires: ess 0.38.0
 ```
 
-```console
+```shell-session
 $ cd spec && ess specify toolchain which
 ```
 

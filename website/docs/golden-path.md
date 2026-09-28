@@ -28,7 +28,7 @@ nobody has decided, and what the plan does with that instead of guessing.
 Install the `aep` and `ess` plugins and their command-line tools with `b10x` (see
 [Install](./install.md)):
 
-```console
+```shell-session
 $ b10x init aep,ess --out plan.json
 $ b10x setup apply --plan plan.json --yes
 ```

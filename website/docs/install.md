@@ -33,7 +33,7 @@ The `aep`, `ess` and `worktree` plugins drive command-line tools they do not shi
 and `worktree`. `b10x` installs each at its newest release, from the release's prebuilt archive
 checked against its `SHA256SUMS`, or with `cargo`:
 
-```console
+```shell-session
 $ b10x init ess --out plan.json            # one product, or several: aep,ess,worktree
 $ b10x setup apply --plan plan.json --yes
 ```
@@ -49,7 +49,7 @@ front door itself needs none of the three.
 Drive mode hands one story to `metaharness aep drive run`. Metaharness is optional in the `aep`
 product, so `b10x init aep` does not install it; install it on its own:
 
-```console
+```shell-session
 $ b10x install metaharness
 $ metaharness aep drive run --help
 ```
