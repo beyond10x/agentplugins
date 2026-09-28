@@ -1,11 +1,15 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: epic:plugins-named-by-product-and-verb
 kind: epic
 status: implemented
 title: Plugins named by product and verb
 summary: Rename aep-planning to aep-plan, adp to aep-drive and ess-schema to ess-specify (skill specify), so every product plugin carries its product and its verb.
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-03T21:31:34Z", actor: "human:timo", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-03T21:31:34Z", actor: "human:timo", revision: 3, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-03T21:31:34Z", actor: "human:timo", revision: 4, imported: true}
 ---
 # Epic: Plugins named by product and verb
 

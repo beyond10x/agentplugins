@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: story:copy-paste-install-block
 kind: story
 status: implemented
@@ -7,6 +7,10 @@ title: One copy-paste install block on the install page and the README
 relations:
 - decomposes: epic:second-adopter-feedback
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T17:40:24Z", actor: "human:timo", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T17:40:24Z", actor: "human:timo", revision: 3, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-02T17:59:42Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}, imported: true}
 ---
 # Story: One copy-paste install block on the install page and the README
 

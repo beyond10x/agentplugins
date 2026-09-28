@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: task:release-0-9-2-connectors-skill-v1-line
 kind: task
 status: implemented
@@ -8,6 +8,10 @@ owner: claude-release-0-9-2
 relations:
 - informed_by: task:release-0-9-1-ess-0-22-1
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-15T17:03:05Z", actor: "human:timo", revision: 2, decided_on: {"recorded":{"test_result":1}}, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-15T17:03:05Z", actor: "human:timo", revision: 3, decided_on: {"recorded":{"test_result":1}}, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-15T17:03:05Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}, imported: true}
 ---
 ## Intent
 

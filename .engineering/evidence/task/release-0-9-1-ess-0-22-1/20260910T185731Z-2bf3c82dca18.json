@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-10T18:57:31Z",
+  "actor": "human:timo",
+  "artifact": "task:release-0-9-1-ess-0-22-1",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check exit 0 and task site-build exit 0 on the 0.9.1 tree; install.md ESS block verified against ess 0.22.1 assets (sha256 OK, prints ess 0.22.1)"
+  }
+}

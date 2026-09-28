@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: story:wave-skill-selects-with-the-waves-verb
 kind: story
 status: implemented
@@ -11,6 +11,10 @@ tags:
 relations:
 - decomposes: epic:ahead-of-the-alternative
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-02T23:06:36Z", actor: "human:timo", revision: 2, decided_on: {"recorded":{"test_result":1}}, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-02T23:06:36Z", actor: "human:timo", revision: 3, decided_on: {"recorded":{"test_result":1}}, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-02T23:06:36Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}, imported: true}
 ---
 # Story: The wave skill selects on `aep artifact waves` when the binary has it
 

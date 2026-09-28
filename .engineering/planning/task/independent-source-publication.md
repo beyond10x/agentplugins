@@ -1,5 +1,5 @@
 ---
-format: aep.planning-md/1
+format: aep.planning-md/3
 id: task:independent-source-publication
 kind: task
 status: implemented
@@ -7,6 +7,10 @@ title: Document source publication independent of Atlas
 relations:
 - informed_by: story:asynchronous-source-release
 revision: 4
+transitions:
+- {from: "draft", to: "proposed", at: "2026-09-10T13:54:21Z", actor: "agent:atlas-independent-publication", revision: 2, imported: true}
+- {from: "proposed", to: "active", at: "2026-09-10T13:54:21Z", actor: "agent:atlas-independent-publication", revision: 3, imported: true}
+- {from: "active", to: "implemented", at: "2026-09-10T13:54:21Z", actor: "agent:atlas-independent-publication", revision: 4, imported: true}
 ---
 ## Outcome
 

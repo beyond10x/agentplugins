@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-15T17:05:00Z",
+  "actor": "human:timo",
+  "artifact": "task:release-0-9-2-connectors-skill-v1-line",
+  "kind": "task",
+  "revision": 1,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check exit 0 (34 + 2 tests; valid: 9 eval case(s), 1 recorded transcript(s) replayed; valid: marketplace beyond10x, 6 focused plugin(s)) and task site-build exit 0 (docusaurus build SUCCESS), both on the 0.9.2 tree"
+  }
+}
