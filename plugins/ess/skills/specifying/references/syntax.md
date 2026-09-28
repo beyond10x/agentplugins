@@ -290,6 +290,8 @@ events:
 # Views: read models over an entity. `read_your_writes` or `eventual`; an optional `filter`. A view
 # the caller narrows takes `params: [{name: title, type: library.lending.Title}]` with
 # `filter: title == param.title` (the key is `params:`); the creating outcome must `sets:` the field.
+# Never narrow on the identity (`filter: id == param.id`): synthesis refuses every outcome that view
+# observes (ESS-SYNTH-005, "bound by nothing a scenario knows"). A read by id is the unfiltered view.
 views:
   - name: library.lending.AvailableCopies
     source: library.lending.Copy

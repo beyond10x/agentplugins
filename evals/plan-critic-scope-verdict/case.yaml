@@ -51,7 +51,7 @@ subject:
 
 task: |
   Run the `aep:plan-critic-scope` agent over the stories drafted under
-  `epic:commercial-clients`, and judge whether every promise the parent makes is claimed by something in the set, and whether anything in the set was not asked for.
+  `epic:book-reservations`, and judge whether every promise the parent makes is claimed by something in the set, and whether anything in the set was not asked for.
 
   Give the critic the story ids and the epic id, and nothing else.
 

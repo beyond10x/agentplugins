@@ -11,7 +11,7 @@ rows were fitted to, which measures the document and not the plugin.
 Live, paid, and refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep drive eval run \
+$ METAHARNESS_LIVE=1 metaharness aep drive eval run \
     --case evals/wave-claim-verdict \
     --arm plugin \
     --harness claude \

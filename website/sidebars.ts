@@ -8,7 +8,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Tutorials',
-      items: ['tutorials/first-ess-specification'],
+      items: ['tutorials/first-ess-specification', 'tutorials/first-governed-plan'],
     },
     'golden-path',
     'structure',

@@ -1,0 +1,25 @@
+name: aep-tutorial
+kind: aep-tutorial
+prompt: |
+  I'm following the tutorial in `tutorial.md`. This repository is the lending library from the ESS
+  tutorial it starts from, and step 1 (setup) is done. Work through steps 2 to 6 here as the page
+  describes: adopt a planning store, plan the reservation feature with the specification first,
+  have the four critics review the plan, accept the stories, and run the first wave through to the
+  merge. Where the page shows the questions and the answers it gave, take the same answers instead
+  of asking me; where it approves a wave, approve it the same way.
+
+  When you're done, tell me which story the wave implemented and what the adversary found, quote any
+  text on the page that confused you or did not match what you saw, and paste the last
+  `aep plan artifact validate` output, the last synthesis output and the last `go test` summary
+  verbatim.
+dir: library
+fixture: fixture
+setup:
+  - b10x init aep,ess --host claude --out plan.json
+  - b10x setup apply --plan plan.json --yes
+measures: [tool_calls, synthesis, outputs]
+outputs:
+  project: .engineering/project.yaml
+  epic: .engineering/planning/epic
+  reviews: .engineering/planning/review-result
+  suite: impl/essconform

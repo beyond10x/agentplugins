@@ -12,6 +12,7 @@ mod report;
 mod tools;
 mod trial;
 mod trials;
+mod upstream;
 
 /// The marketplace identity in every marketplace format.
 const MARKETPLACE: &str = "b10x";
@@ -1017,7 +1018,74 @@ fn plan_hosts(root: &Path) -> Result<(), String> {
     ))
 }
 
+/// Every `b10x.docs.yaml` URL under a surface's own `canonicalUrl` names a page in `website/docs/`.
+///
+/// The organization website builds every source together and refuses a broken link, so one stale
+/// URL here stops every publication, not only this repository's: from 2026-09-24 to 2026-09-28 the
+/// reference section still named `plugins/beyond10x/`, a page 0.14.0 renamed, and every Atlas
+/// "Publish unified documentation" run failed on it while the public site stayed four days old.
+fn docs_manifest_links(root: &Path) -> Result<(), String> {
+    let path = root.join("b10x.docs.yaml");
+    let text =
+        std::fs::read_to_string(&path).map_err(|error| format!("b10x.docs.yaml: {error}"))?;
+    let manifest: serde_yaml::Value =
+        serde_yaml::from_str(&text).map_err(|error| format!("b10x.docs.yaml: {error}"))?;
+    let docs = root.join("website/docs");
+    let mut missing = Vec::new();
+    let surfaces = manifest
+        .get("surfaces")
+        .and_then(serde_yaml::Value::as_sequence)
+        .map(Vec::as_slice)
+        .unwrap_or_default();
+    for surface in surfaces {
+        let Some(base) = surface
+            .get("canonicalUrl")
+            .and_then(serde_yaml::Value::as_str)
+        else {
+            continue;
+        };
+        let sections = surface
+            .get("sections")
+            .and_then(serde_yaml::Value::as_sequence)
+            .map(Vec::as_slice)
+            .unwrap_or_default();
+        for section in sections {
+            let Some(url) = section.get("url").and_then(serde_yaml::Value::as_str) else {
+                continue;
+            };
+            let Some(page) = url.strip_prefix(base) else {
+                continue;
+            };
+            let page = page.trim_matches('/');
+            if page.is_empty()
+                || docs.join(format!("{page}.md")).is_file()
+                || docs.join(page).join("index.md").is_file()
+            {
+                continue;
+            }
+            let line = text
+                .lines()
+                .position(|candidate| candidate.contains(url))
+                .map_or(0, |index| index + 1);
+            missing.push(format!(
+                "  b10x.docs.yaml:{line} links {url}, and website/docs/ has no {page}.md"
+            ));
+        }
+    }
+    if missing.is_empty() {
+        Ok(())
+    } else {
+        Err(format!(
+            "{} documentation link(s) name no page; the organization website build refuses a \
+             broken link:\n{}",
+            missing.len(),
+            missing.join("\n")
+        ))
+    }
+}
+
 fn check(root: &Path) -> Result<(), String> {
+    docs_manifest_links(root)?;
     marketplace(root, ".agents/plugins/marketplace.json")?;
     marketplace(root, ".claude-plugin/marketplace.json")?;
     catalog(root)?;
@@ -1079,6 +1147,9 @@ struct Cli {
 enum Top {
     /// The offline gate, then every spelled CLI command against the newest releases (network).
     Tools,
+    /// What moved in every repository this one depends on: releases with their changelog sections,
+    /// workflow pins and cited issues (network). Reports; fails only when it cannot read.
+    Upstream,
     /// Release checks.
     Release {
         #[command(subcommand)]
@@ -1203,6 +1274,7 @@ fn main() -> ExitCode {
     let result = match Cli::parse().command {
         None => check(&root),
         Some(Top::Tools) => check(&root).and_then(|()| tools::verify(&root)),
+        Some(Top::Upstream) => upstream::report(&root),
         Some(Top::Release {
             action: ReleaseAction::Verify { version },
         }) => check(&root).and_then(|()| verify_release(&root, &version)),
@@ -1562,6 +1634,43 @@ one product only: `b10x upgrade ess`
         );
         retired_names(&sandbox).expect("history, change records and transcripts keep their names");
 
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+    }
+
+    /// A section URL naming a page that does not exist fails; the committed manifest passes.
+    #[test]
+    fn a_docs_manifest_link_to_a_missing_page_fails_the_check() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("checker is under repository root");
+        docs_manifest_links(root).expect("the committed manifest's links resolve");
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-docs-links-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(sandbox.join("website/docs/plugins")).expect("writable");
+        std::fs::write(sandbox.join("website/docs/plugins/b10x.md"), "# b10x\n").expect("writable");
+        let base = "https://beyond10x.github.io/docs/agentplugins/";
+        let manifest = |page: &str| {
+            format!(
+                "surfaces:\n- canonicalUrl: {base}\n  sections:\n  - kind: reference\n    url: {base}{page}\n  - kind: source\n    url: https://github.com/beyond10x/agentplugins\n"
+            )
+        };
+        std::fs::write(sandbox.join("b10x.docs.yaml"), manifest("plugins/b10x/"))
+            .expect("writable");
+        docs_manifest_links(&sandbox).expect("an existing page resolves");
+        std::fs::write(
+            sandbox.join("b10x.docs.yaml"),
+            manifest("plugins/beyond10x/"),
+        )
+        .expect("writable");
+        let error = docs_manifest_links(&sandbox).expect_err("a renamed page must fail");
+        assert!(
+            error.contains("b10x.docs.yaml:5 links https://beyond10x.github.io/docs/agentplugins/plugins/beyond10x/"),
+            "{error}"
+        );
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
     }
 

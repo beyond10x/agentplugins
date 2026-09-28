@@ -1191,9 +1191,9 @@ specification or in the implementation.
 
 ## Next
 
-- **Plan work around it.** Once a new noun has a specification, AEP plans the stories that build it.
-  The [golden path](../golden-path.md) walks an agent from a feature idea to a critiqued plan; a
-  tutorial like this one for AEP follows.
+- **Plan work around it.** [Your first governed plan](./first-governed-plan.md) continues with this
+  library: AEP plans a new feature, four critics review the plan, and the first story is built in a
+  reviewed wave.
 - **Specify a system that already runs.** `ess:retrofitting` derives a specification from an OpenAPI
   document or from code, citing a source for every declaration.
 - **Go deeper into ESS.** The [ESS documentation](https://beyond10x.github.io/docs/ess/) covers the

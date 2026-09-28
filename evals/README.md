@@ -155,21 +155,24 @@ $ cargo run --quiet --locked --bin agentplugins-check
 Live, which costs money and is refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep drive eval run --corpus evals --workflow adp/default \
+$ METAHARNESS_LIVE=1 metaharness aep drive eval run --corpus evals --workflow adp/default \
     --arm plugin --harness claude --plugin-dir plugins/aep \
     --cwd <a working tree> --budget-usd 20 --assume-usd-per-run 5 \
     --observed-at <date> --redact --out <a directory outside this repository>
 ```
 
-Without `METAHARNESS_LIVE=1` the runner accepts the corpus and refuses to spawn, by name:
+Since aep 0.64.0 `aep drive eval run` only ingests a recorded run (`--stream`); a live run is
+metaharness's:
 
 ```console
 $ aep drive eval run --corpus evals --workflow adp/default --arm plugin --harness claude \
-    --out eval-out --observed-at 2026-09-03
-error: eval-out — 1 refusal(s):
-  EVAL-RUN-002 a spawn costs money and `METAHARNESS_LIVE=1` is not in this environment. Set it
-  deliberately, or pass `--stream FILE` to ingest a run that already happened, which spends nothing
+    --out eval-out --observed-at 2026-09-28
+error: live evaluation moved to `metaharness aep drive eval run`; use --stream for offline ingestion
 ```
+
+**Blocked on 2026-09-28:** metaharness 0.8.0 links aep 0.55.0 and refuses every case with
+`EVAL-RUN-017` when the `aep` on the path is 0.64.0 (beyond10x/metaharness#10;
+`dependency-blocker:metaharness-links-aep-0-55` in this repository's store).
 
 ## What a full live run costs
 

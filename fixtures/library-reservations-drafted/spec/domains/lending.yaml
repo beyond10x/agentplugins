@@ -1,0 +1,569 @@
+domain: library.lending
+
+summary: A small lending library. Books are added to the collection, members are registered, and a
+  member borrows a book and later returns it.
+
+naming:
+  wire: lending
+  display: Lending
+
+types:
+  - name: library.lending.BookId
+    kind: newtype
+    of: Uuid
+
+  - name: library.lending.MemberId
+    kind: newtype
+    of: Uuid
+
+conversions:
+  - from: Optional<library.lending.MemberId>
+    to: library.lending.MemberId
+    because: BookHeld is emitted only from OnLoanReserved, and ReserveBook, the one way into that
+      state, sets reserved_for_id; nothing clears it until the hold is collected or released.
+
+entities:
+  # One physical book. There is no loan record: while the book is on loan it records which member
+  # has it, and the record is cleared when the book comes back.
+  #
+  # A book on loan may carry one reservation at a time (OnLoanReserved), for one member. When a
+  # reserved book comes back it is held for that member (OnHold) instead of going on the shelf,
+  # until they borrow it or a librarian releases the hold. There is no reservation record either:
+  # reserved_for_id names the member from the reservation until the hold is collected or ended.
+  - name: library.lending.Book
+    identity:
+      name: book_id
+      type: library.lending.BookId
+    fields:
+      - name: title
+        type: String
+      - name: author
+        type: String
+      - name: borrower_id
+        type: Optional<library.lending.MemberId>
+      - name: reserved_for_id
+        type: Optional<library.lending.MemberId>
+    relations:
+      - name: borrower
+        kind: references
+        target: library.lending.Member
+        cardinality: one
+        via: borrower_id
+      - name: reserved_for
+        kind: references
+        target: library.lending.Member
+        cardinality: one
+        via: reserved_for_id
+    lifecycle:
+      initial: OnShelf
+      states: [OnShelf, OnLoan, OnLoanReserved, OnHold, Withdrawn]
+      terminal: [Withdrawn]
+      transitions:
+        - name: lend
+          from: [OnShelf]
+          to: OnLoan
+        - name: return
+          from: [OnLoan]
+          to: OnShelf
+        - name: reserve
+          from: [OnLoan]
+          to: OnLoanReserved
+        - name: cancel_reservation
+          from: [OnLoanReserved]
+          to: OnLoan
+        - name: return_to_hold
+          from: [OnLoanReserved]
+          to: OnHold
+        - name: collect
+          from: [OnHold]
+          to: OnLoan
+        - name: release_hold
+          from: [OnHold]
+          to: OnShelf
+        - name: withdraw
+          from: [OnShelf]
+          to: Withdrawn
+
+  # Members are registered and never leave.
+  - name: library.lending.Member
+    identity:
+      name: member_id
+      type: library.lending.MemberId
+    fields:
+      - name: name
+        type: String
+    lifecycle:
+      initial: Active
+      states: [Active]
+      terminal: [Active]
+
+actors:
+  - name: library.lending.Librarian
+    may:
+      - library.lending.AddBook
+      - library.lending.RegisterMember
+      - library.lending.BorrowBook
+      - library.lending.ReturnBook
+      - library.lending.WithdrawBook
+      - library.lending.ReserveBook
+      - library.lending.CancelReservation
+      - library.lending.CollectHold
+      - library.lending.ReleaseHold
+    naming:
+      display: Librarian
+
+errors:
+  - name: library.lending.BookStateConflict
+    summary: The book is not in a state this command acts from, so nothing changed.
+    fields:
+      - name: state
+        type: library.lending.Book.State
+
+  - name: library.lending.BookNotFound
+    summary: No book in the collection has this identity.
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+  - name: library.lending.BookHeldForAnotherMember
+    summary: The book is held for a different member, so it was not lent.
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+  - name: library.lending.MemberAlreadyHasBook
+    summary: The member has this book on loan already, so there is nothing to reserve.
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+commands:
+  - name: library.lending.AddBook
+    naming:
+      wire: add-book
+      display: Add a book
+    input:
+      - name: title
+        type: String
+      - name: author
+        type: String
+    outcomes:
+      - name: added
+        creates: library.lending.Book
+        instance: book_id
+        sets:
+          title: input.title
+          author: input.author
+          borrower_id: {cleared: true}
+        emits:
+          - library.lending.BookAdded
+        payload:
+          library.lending.BookAdded:
+            book_id: {generated: true}
+            title: input.title
+            author: input.author
+        summary: The book is in the collection, on the shelf.
+
+  - name: library.lending.RegisterMember
+    naming:
+      wire: register-member
+      display: Register a member
+    input:
+      - name: name
+        type: String
+    outcomes:
+      - name: registered
+        creates: library.lending.Member
+        instance: member_id
+        sets:
+          name: input.name
+        emits:
+          - library.lending.MemberRegistered
+        payload:
+          library.lending.MemberRegistered:
+            member_id: {generated: true}
+            name: input.name
+        summary: The member is registered and may borrow.
+
+  - name: library.lending.BorrowBook
+    naming:
+      wire: borrow-book
+      display: Borrow a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+    # The borrowing member must be a registered member. That is a condition on another entity
+    # (Member), which a command outcome cannot guard on. Decided: the implementation checks it;
+    # this specification does not, and no scenario covers it.
+    #
+    # Only a book on the shelf is borrowed here. A book on hold is lent through CollectHold: one
+    # command cannot both branch on the book's state and guard on who it is held for
+    # (ESS-COMMAND-004).
+    outcomes:
+      - name: borrowed
+        moves: library.lending.Book.lend
+        instance: book_id
+        sets:
+          borrower_id: input.member_id
+        emits:
+          - library.lending.BookBorrowed
+        payload:
+          library.lending.BookBorrowed:
+            book_id: input.book_id
+            member_id: input.member_id
+        summary: The book is on loan to the member.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is on loan, on hold or withdrawn, so it was not lent.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was lent.
+
+  # A return names only the book; the member who brings it back is not checked.
+  - name: library.lending.ReturnBook
+    naming:
+      wire: return-book
+      display: Return a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+    # A reserved book does not go back on the shelf: it is held for the member who reserved it.
+    outcomes:
+      - name: returned
+        when_subject_state: OnLoan
+        moves: library.lending.Book.return
+        instance: book_id
+        sets:
+          borrower_id: {cleared: true}
+        emits:
+          - library.lending.BookReturned
+        payload:
+          library.lending.BookReturned:
+            book_id: input.book_id
+        summary: The book is back on the shelf and no member has it.
+
+      - name: held
+        when_subject_state: OnLoanReserved
+        moves: library.lending.Book.return_to_hold
+        instance: book_id
+        sets:
+          borrower_id: {cleared: true}
+        emits:
+          - library.lending.BookHeld
+        payload:
+          library.lending.BookHeld:
+            book_id: input.book_id
+            member_id: {subject: reserved_for_id}
+        summary: The book is back, off the shelf, held for the member who reserved it.
+
+      - name: wrong-state
+        error: library.lending.BookStateConflict
+        summary: The book is not on loan, so nothing was returned.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was returned.
+
+  - name: library.lending.WithdrawBook
+    naming:
+      wire: withdraw-book
+      display: Withdraw a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+    outcomes:
+      - name: withdrawn
+        moves: library.lending.Book.withdraw
+        instance: book_id
+        emits:
+          - library.lending.BookWithdrawn
+        payload:
+          library.lending.BookWithdrawn:
+            book_id: input.book_id
+        summary: The book has left the collection for good.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is on loan or already withdrawn, so it was not withdrawn.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was withdrawn.
+
+  # A librarian reserves a book on loan for a member. Only a book on loan can be reserved (one on
+  # the shelf is simply borrowed), and only once at a time. Whether the member is registered is left
+  # to the implementation, as it is for BorrowBook.
+  - name: library.lending.ReserveBook
+    naming:
+      wire: reserve-book
+      display: Reserve a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+    outcomes:
+      - name: already-borrower
+        when_subject:
+          predicate: borrower_id == input.member_id
+        error: library.lending.MemberAlreadyHasBook
+        summary: The member has this book on loan, so it was not reserved.
+
+      - name: reserved
+        moves: library.lending.Book.reserve
+        instance: book_id
+        sets:
+          reserved_for_id: input.member_id
+        emits:
+          - library.lending.BookReserved
+        payload:
+          library.lending.BookReserved:
+            book_id: input.book_id
+            member_id: input.member_id
+        summary: The book is on loan and reserved for the member.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is on the shelf, already reserved, on hold or withdrawn, so it was not reserved.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was reserved.
+
+  - name: library.lending.CancelReservation
+    naming:
+      wire: cancel-reservation
+      display: Cancel a reservation
+    input:
+      - name: book_id
+        type: library.lending.BookId
+    outcomes:
+      - name: cancelled
+        moves: library.lending.Book.cancel_reservation
+        instance: book_id
+        sets:
+          reserved_for_id: {cleared: true}
+        emits:
+          - library.lending.ReservationCancelled
+        payload:
+          library.lending.ReservationCancelled:
+            book_id: input.book_id
+        summary: The book is still on loan and no longer reserved.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is not on loan with a reservation, so nothing was cancelled.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was cancelled.
+
+  # The member a book is held for borrows it; the hold is over. Anybody else is refused.
+  - name: library.lending.CollectHold
+    naming:
+      wire: collect-hold
+      display: Collect a held book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+    outcomes:
+      - name: held-for-another
+        when_subject:
+          predicate: reserved_for_id != input.member_id
+        error: library.lending.BookHeldForAnotherMember
+        summary: The book is held for a different member, so it was not lent.
+
+      - name: collected
+        moves: library.lending.Book.collect
+        instance: book_id
+        sets:
+          borrower_id: input.member_id
+          reserved_for_id: {cleared: true}
+        emits:
+          - library.lending.BookBorrowed
+        payload:
+          library.lending.BookBorrowed:
+            book_id: input.book_id
+            member_id: input.member_id
+        summary: The member the book was held for has it on loan, and the hold is over.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is not on hold, so it was not collected.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was collected.
+
+  # For a member who never collects: there is no clock here, so a hold ends only when a librarian
+  # releases it.
+  - name: library.lending.ReleaseHold
+    naming:
+      wire: release-hold
+      display: Release a hold
+    input:
+      - name: book_id
+        type: library.lending.BookId
+    outcomes:
+      - name: released
+        moves: library.lending.Book.release_hold
+        instance: book_id
+        sets:
+          reserved_for_id: {cleared: true}
+        emits:
+          - library.lending.HoldReleased
+        payload:
+          library.lending.HoldReleased:
+            book_id: input.book_id
+        summary: The book is back on the shelf and held for nobody.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is not on hold, so nothing was released.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was released.
+
+events:
+  - name: library.lending.BookAdded
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: author
+        type: String
+
+  - name: library.lending.MemberRegistered
+    fields:
+      - name: member_id
+        type: library.lending.MemberId
+      - name: name
+        type: String
+
+  - name: library.lending.BookBorrowed
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+
+  - name: library.lending.BookReturned
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+  - name: library.lending.BookWithdrawn
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+  - name: library.lending.BookReserved
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+
+  - name: library.lending.ReservationCancelled
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+  - name: library.lending.BookHeld
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+
+  - name: library.lending.HoldReleased
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+views:
+  # The whole collection, in every state, with who has each book.
+  - name: library.lending.Catalogue
+    source: library.lending.Book
+    consistency: read_your_writes
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: author
+        type: String
+      - name: state
+        type: library.lending.Book.State
+      - name: borrower_id
+        type: Optional<library.lending.MemberId>
+      - name: reserved_for_id
+        type: Optional<library.lending.MemberId>
+    naming:
+      wire: catalogue
+      display: Catalogue
+
+  - name: library.lending.Members
+    source: library.lending.Member
+    consistency: read_your_writes
+    fields:
+      - name: member_id
+        type: library.lending.MemberId
+      - name: name
+        type: String
+    naming:
+      wire: members
+      display: Members
+
+  # The loans in force: every book on loan, reserved or not, and the member who has it.
+  - name: library.lending.BooksOnLoan
+    source: library.lending.Book
+    consistency: read_your_writes
+    filter: {any: [state == OnLoan, state == OnLoanReserved]}
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: borrower_id
+        type: Optional<library.lending.MemberId>
+    naming:
+      wire: books-on-loan
+      display: Books on loan
+
+  # Books back from loan and waiting for the member who reserved them.
+  - name: library.lending.BooksOnHold
+    source: library.lending.Book
+    consistency: read_your_writes
+    filter: state == OnHold
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: reserved_for_id
+        type: Optional<library.lending.MemberId>
+    naming:
+      wire: books-on-hold
+      display: Books on hold

@@ -35,11 +35,11 @@ up with no change to the case.
 Live, paid, and refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep drive eval run \
+$ METAHARNESS_LIVE=1 metaharness aep drive eval run \
     --case evals/golden-path-end-to-end \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/aep-plan \
+    --plugin-dir plugins/aep \
     --plugin beyond10x/agentplugins@aep-drive@<this release> \
     --plugin beyond10x/ess@ess@<the ESS release> \
     --cwd <a fresh copy of the accounts service the page is written against> \

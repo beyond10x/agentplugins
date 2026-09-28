@@ -62,6 +62,9 @@ Retrofit-specific rules:
   response carries. An entity with `invariants` also needs a view holding every state, or the suite
   refuses the invariant checks (`ess:specifying`, conformance section). That view is structural,
   not a read the code has: say so in a comment. It is the one view a retrofit may add.
+  A read by identity (`GET /tools/{id}`) is not a view of its own: `filter: id == param.id` leaves
+  every outcome it observes unsynthesized (`ESS-SYNTH-005`). Declare the entity's view without that
+  filter and say in a comment that the service also reads it by id.
 - **A command the code accepts and ignores in every state it does not act from is `wrong_state:
   true` with `refuses: false`** and no error: the scenario then requires success and no change,
   which is the code's behaviour. Add no error the code never raises. A command has at most one

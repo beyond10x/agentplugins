@@ -60,6 +60,9 @@ surfaces:
   - kind: guide
     label: 'Tutorial: your first ESS specification'
     url: https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/
+  - kind: guide
+    label: 'Tutorial: your first governed plan'
+    url: https://beyond10x.github.io/docs/agentplugins/tutorials/first-governed-plan/
   - kind: reference
     label: Plugin reference
     url: https://beyond10x.github.io/docs/agentplugins/plugins/b10x/

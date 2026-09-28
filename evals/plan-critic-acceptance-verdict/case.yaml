@@ -51,7 +51,7 @@ subject:
 
 task: |
   Run the `aep:plan-critic-acceptance` agent over the stories drafted under
-  `epic:commercial-clients`, and judge whether every drafted acceptance statement names an observable outcome and the transition it turns on.
+  `epic:book-reservations`, and judge whether every drafted acceptance statement names an observable outcome and the transition it turns on.
 
   Give the critic the story ids and the epic id, and nothing else.
 

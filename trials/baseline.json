@@ -2,6 +2,19 @@
   "aep-backlog": {
     "tool_calls": 278
   },
+  "aep-tutorial": {
+    "tool_calls": 474,
+    "synthesis": {
+      "scenarios": 55,
+      "refusals": 0
+    },
+    "outputs": [
+      "epic",
+      "project",
+      "reviews",
+      "suite"
+    ]
+  },
   "ess-full-package": {
     "tool_calls": 53,
     "validate": "valid",

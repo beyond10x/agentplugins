@@ -1,0 +1,314 @@
+domain: library.lending
+
+summary: A small lending library. Books are added to the collection, members are registered, and a
+  member borrows a book and later returns it.
+
+naming:
+  wire: lending
+  display: Lending
+
+types:
+  - name: library.lending.BookId
+    kind: newtype
+    of: Uuid
+
+  - name: library.lending.MemberId
+    kind: newtype
+    of: Uuid
+
+entities:
+  # One physical book. There is no loan record: while the book is OnLoan it records which member
+  # has it, and the record is cleared when the book comes back.
+  - name: library.lending.Book
+    identity:
+      name: book_id
+      type: library.lending.BookId
+    fields:
+      - name: title
+        type: String
+      - name: author
+        type: String
+      - name: borrower_id
+        type: Optional<library.lending.MemberId>
+    relations:
+      - name: borrower
+        kind: references
+        target: library.lending.Member
+        cardinality: one
+        via: borrower_id
+    lifecycle:
+      initial: OnShelf
+      states: [OnShelf, OnLoan, Withdrawn]
+      terminal: [Withdrawn]
+      transitions:
+        - name: lend
+          from: [OnShelf]
+          to: OnLoan
+        - name: return
+          from: [OnLoan]
+          to: OnShelf
+        - name: withdraw
+          from: [OnShelf]
+          to: Withdrawn
+
+  # Members are registered and never leave.
+  - name: library.lending.Member
+    identity:
+      name: member_id
+      type: library.lending.MemberId
+    fields:
+      - name: name
+        type: String
+    lifecycle:
+      initial: Active
+      states: [Active]
+      terminal: [Active]
+
+actors:
+  - name: library.lending.Librarian
+    may:
+      - library.lending.AddBook
+      - library.lending.RegisterMember
+      - library.lending.BorrowBook
+      - library.lending.ReturnBook
+      - library.lending.WithdrawBook
+    naming:
+      display: Librarian
+
+errors:
+  - name: library.lending.BookStateConflict
+    summary: The book is not in a state this command acts from, so nothing changed.
+    fields:
+      - name: state
+        type: library.lending.Book.State
+
+  - name: library.lending.BookNotFound
+    summary: No book in the collection has this identity.
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+commands:
+  - name: library.lending.AddBook
+    naming:
+      wire: add-book
+      display: Add a book
+    input:
+      - name: title
+        type: String
+      - name: author
+        type: String
+    outcomes:
+      - name: added
+        creates: library.lending.Book
+        instance: book_id
+        sets:
+          title: input.title
+          author: input.author
+          borrower_id: {cleared: true}
+        emits:
+          - library.lending.BookAdded
+        payload:
+          library.lending.BookAdded:
+            book_id: {generated: true}
+            title: input.title
+            author: input.author
+        summary: The book is in the collection, on the shelf.
+
+  - name: library.lending.RegisterMember
+    naming:
+      wire: register-member
+      display: Register a member
+    input:
+      - name: name
+        type: String
+    outcomes:
+      - name: registered
+        creates: library.lending.Member
+        instance: member_id
+        sets:
+          name: input.name
+        emits:
+          - library.lending.MemberRegistered
+        payload:
+          library.lending.MemberRegistered:
+            member_id: {generated: true}
+            name: input.name
+        summary: The member is registered and may borrow.
+
+  - name: library.lending.BorrowBook
+    naming:
+      wire: borrow-book
+      display: Borrow a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+    # The borrowing member must be a registered member. That is a condition on another entity
+    # (Member), which a command outcome cannot guard on. Decided: the implementation checks it;
+    # this specification does not, and no scenario covers it.
+    outcomes:
+      - name: borrowed
+        moves: library.lending.Book.lend
+        instance: book_id
+        sets:
+          borrower_id: input.member_id
+        emits:
+          - library.lending.BookBorrowed
+        payload:
+          library.lending.BookBorrowed:
+            book_id: input.book_id
+            member_id: input.member_id
+        summary: The book is on loan to the member.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is on loan or withdrawn, so it was not lent.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was lent.
+
+  # A return names only the book; the member who brings it back is not checked.
+  - name: library.lending.ReturnBook
+    naming:
+      wire: return-book
+      display: Return a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+    outcomes:
+      - name: returned
+        moves: library.lending.Book.return
+        instance: book_id
+        sets:
+          borrower_id: {cleared: true}
+        emits:
+          - library.lending.BookReturned
+        payload:
+          library.lending.BookReturned:
+            book_id: input.book_id
+        summary: The book is back on the shelf and no member has it.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is not on loan, so nothing was returned.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was returned.
+
+  - name: library.lending.WithdrawBook
+    naming:
+      wire: withdraw-book
+      display: Withdraw a book
+    input:
+      - name: book_id
+        type: library.lending.BookId
+    outcomes:
+      - name: withdrawn
+        moves: library.lending.Book.withdraw
+        instance: book_id
+        emits:
+          - library.lending.BookWithdrawn
+        payload:
+          library.lending.BookWithdrawn:
+            book_id: input.book_id
+        summary: The book has left the collection for good.
+
+      - name: wrong-state
+        wrong_state: true
+        error: library.lending.BookStateConflict
+        summary: The book is on loan or already withdrawn, so it was not withdrawn.
+
+      - name: no-such-book
+        unknown_instance: true
+        error: library.lending.BookNotFound
+        summary: No book has this identity, so nothing was withdrawn.
+
+events:
+  - name: library.lending.BookAdded
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: author
+        type: String
+
+  - name: library.lending.MemberRegistered
+    fields:
+      - name: member_id
+        type: library.lending.MemberId
+      - name: name
+        type: String
+
+  - name: library.lending.BookBorrowed
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: member_id
+        type: library.lending.MemberId
+
+  - name: library.lending.BookReturned
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+  - name: library.lending.BookWithdrawn
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+
+views:
+  # The whole collection, in every state, with who has each book.
+  - name: library.lending.Catalogue
+    source: library.lending.Book
+    consistency: read_your_writes
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: author
+        type: String
+      - name: state
+        type: library.lending.Book.State
+      - name: borrower_id
+        type: Optional<library.lending.MemberId>
+    naming:
+      wire: catalogue
+      display: Catalogue
+
+  - name: library.lending.Members
+    source: library.lending.Member
+    consistency: read_your_writes
+    fields:
+      - name: member_id
+        type: library.lending.MemberId
+      - name: name
+        type: String
+    naming:
+      wire: members
+      display: Members
+
+  # The loans in force: every book on loan and the member who has it.
+  - name: library.lending.BooksOnLoan
+    source: library.lending.Book
+    consistency: read_your_writes
+    filter: state == OnLoan
+    fields:
+      - name: book_id
+        type: library.lending.BookId
+      - name: title
+        type: String
+      - name: borrower_id
+        type: Optional<library.lending.MemberId>
+    naming:
+      wire: books-on-loan
+      display: Books on loan

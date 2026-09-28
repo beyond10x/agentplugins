@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.18.0] — 2026-09-28
+
+A second tutorial continues the first: the ESS tutorial's library gets an AEP plan, four critics
+review it, and the first story is built in a reviewed wave. The skills are verified against aep
+0.64.0 and ess 0.39.0, and a new report and skill keep this repository in step with the releases
+it depends on.
+
+- New page: [Your first governed plan](website/docs/tutorials/first-governed-plan.md), recorded with
+  aep 0.64.0 and ess 0.39.0: adopt an `aep.project/5` store, model a new state in ESS before any
+  story is written (17 → 55 scenarios), six stories, four critic verdicts, a wave proposal, and one
+  story implemented, attacked by the adversary and merged. The `aep-tutorial` trial has a fresh
+  agent follow it.
+- `agentplugins-check upstream` reports what moved in every repository this one depends on: the
+  releases its plugins drive with their changelog sections, the `beyond10x/*` workflow pins, and
+  the issues its text cites. `.agents/skills/following-upstream` is the loop that acts on it.
+- `agentplugins-check` refuses a `b10x.docs.yaml` link that names no page. One such link
+  (`plugins/beyond10x/`, renamed in 0.14.0) failed every organization website publication from
+  2026-09-24 to 2026-09-28.
+- `verified.json` pins aep 0.64.0 and ess 0.39.0. `ess:retrofitting` and `syntax.md`: a read by
+  identity is the unfiltered view; `filter: id == param.id` leaves every outcome it observes
+  unsynthesized (beyond10x/ess#193). `ess:hardening` covers the concurrent explorer and
+  `ess verify conform check-history`.
+- `aep:planning` checks each critic's verdict line before recording it; the decomposer relates each
+  story to the epic's objective, which `development.standard` requires before a story is accepted.
+- Eval recording moved to `metaharness aep drive eval run` with aep 0.64.0; it is blocked until
+  metaharness links a current aep (beyond10x/metaharness#10). The four plan-critic cases have a
+  working tree, `fixtures/library-reservations-drafted`.
+- `task trial:sandbox` can recreate a sandbox that ran `aep`.
+
 ## [0.17.0] — 2026-09-28
 
 A tutorial takes a developer from an empty directory to a validated ESS specification and a Go

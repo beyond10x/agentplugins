@@ -13,12 +13,12 @@ up with no change to the case.
 Live, paid, and refused without both `METAHARNESS_LIVE=1` and a cap:
 
 ```console
-$ METAHARNESS_LIVE=1 aep drive eval run \
+$ METAHARNESS_LIVE=1 metaharness aep drive eval run \
     --case evals/plan-critic-acceptance-verdict \
     --arm plugin \
     --harness claude \
-    --plugin-dir plugins/aep-plan \
-    --cwd <a checkout with a drafted `epic:commercial-clients` in its store> \
+    --plugin-dir plugins/aep \
+    --cwd <a Git checkout of fixtures/library-reservations-drafted> \
     --budget-usd 5 \
     --observed-at <the date it was observed> \
     --redact \
@@ -34,6 +34,8 @@ recorded beside it — a transcript with no provenance is a file, not evidence.
 
 ## What it needs in the working tree
 
-A store holding `epic:commercial-clients` and at least two draft stories decomposed from it — the
-shape [the golden path](../../../website/docs/golden-path.md) § 3 produces. With fewer than two stories
+`fixtures/library-reservations-drafted`, copied out and committed as a Git repository: a store
+holding `epic:book-reservations` and the six draft stories decomposed from it, recorded from [Your
+first governed plan](../../../website/docs/tutorials/first-governed-plan.md) before its critics ran —
+the shape [the golden path](../../../website/docs/golden-path.md) § 3 produces. With fewer than two stories
 the panel step is skipped and the case measures nothing.

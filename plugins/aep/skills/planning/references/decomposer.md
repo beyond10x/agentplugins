@@ -155,6 +155,12 @@ $ aep plan artifact new story credential-store \
     --relate decomposes:epic:passkey-login
 ```
 
+Where the epic `serves` an objective (a `vision` artifact; `aep plan artifact show <epic>` lists
+it), add `--relate serves:<that objective>` to each story too. A store under
+`development.standard` refuses to move a story that serves no objective from `proposed` to
+`active` (`… is proposed and serves no objective`), so a story drafted without the edge cannot be
+accepted as written.
+
 Then write each story's complete body through
 `aep plan artifact body <story-id> --from <path|->`: the context, every `inferable` relation the story
 rests on with its citation, and **one acceptance statement** — a single sentence naming an

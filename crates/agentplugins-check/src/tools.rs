@@ -31,7 +31,7 @@ const DEPTH: usize = 4;
 pub const VERIFIED: &str = "verified.json";
 
 /// A key for an `x.y.z` version or tag.
-fn key(version: &str) -> Option<(u64, u64, u64)> {
+pub(crate) fn key(version: &str) -> Option<(u64, u64, u64)> {
     let mut parts = version.trim_start_matches('v').split('.');
     let triple = (
         parts.next()?.parse().ok()?,
@@ -74,7 +74,7 @@ pub fn unverified(cli: &str, newest: &str, verified: &str) -> Option<String> {
     })
 }
 
-fn run(program: &str, arguments: &[&str]) -> Result<String, String> {
+pub(crate) fn run(program: &str, arguments: &[&str]) -> Result<String, String> {
     let output = Command::new(program)
         .args(arguments)
         .output()
@@ -100,7 +100,7 @@ fn target() -> Result<&'static str, String> {
     }
 }
 
-fn latest(repository: &str) -> Result<String, String> {
+pub(crate) fn latest(repository: &str) -> Result<String, String> {
     let location = run(
         "curl",
         &[
