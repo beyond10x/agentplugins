@@ -38,7 +38,7 @@ that legitimately touch one file and do not say so is theirs.
    A cycle is a property of the graph, not of the ids you were handed.
 4. `aep plan artifact validate` — run it once. Anything it reports is not your finding (rubric).
 
-## The four defects, in descending order of what they cost
+## The five defects, in descending order of what they cost
 
 | Defect | How to see it | Why it costs |
 |---|---|---|
@@ -46,6 +46,7 @@ that legitimately touch one file and do not say so is theirs.
 | **A chain that serialises the set** | every item declares it needs the previous one, so the set is a queue | a decomposition whose items can only be done in one order bought nothing over one large item, and hid the size |
 | **A split abstraction** | two items whose bodies both describe half of one thing — one adds the field, the other reads it; one writes the interface, the other its only implementation | neither can be demonstrated alone, both will be blocked on the other, and the seam between them is where the design error will live |
 | **A hidden dependency** | one body's outcome cannot be described without naming another item's internals, and no edge says so | the dependency exists whether or not the plan admits it; unrecorded, it is discovered at the worst moment |
+| **A horizontal slice** | the set is cut by layer — one item for the schema, one for the API, one for the UI or the tests — so no single item can be demonstrated working end to end, and the outcome exists only once all of them land. A wide mechanical change drafted as expand, migrate batches and contract is not this defect: each of those items leaves the tree green | every item waits on every other one to be shown to work, the set is one large item cut into pieces that each look done, and the integration error lives in the seams between layers |
 
 **A dependency is not a defect. An unrecorded one is.** The fix for a real ordering constraint is an
 edge, not a rewrite, and your reason field should say which edge would say it — read the name from

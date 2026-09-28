@@ -120,6 +120,27 @@ A good decomposition satisfies three properties, in this order:
 * **No overlap.** Two stories that both claim the same outcome will both be marked done and one of
   them will be a lie.
 
+**Cut the work vertically.** Each story is a tracer bullet: a narrow path through every layer the
+outcome needs (schema, logic, interface, tests), demonstrable on its own, and small enough to be
+implemented in one fresh session. A story that is "the schema for all of it" and a sibling that is
+"the API for all of it" can only be shown working together, so neither is independently
+demonstrable. When the tree needs restructuring before the work is easy, draft that prefactoring as
+its own story first and give the others a `depends_on` edge to it.
+
+**A wide mechanical change is the exception.** Renaming a column or retyping a symbol used across
+the codebase breaks every caller at once, so no vertical slice can land green. Draft it as three
+kinds of story, linked with `depends_on`:
+
+1. **expand** — add the new form beside the old one, so nothing breaks;
+2. **migrate** — one story per batch of callers, sized by package or directory, each depending on
+   the expand story and each leaving the tree green because the old form still exists;
+3. **contract** — delete the old form, depending on every migrate story.
+
+Where even one batch cannot stay green alone, keep the sequence and add one final
+integrate-and-verify story that every batch blocks; say in its body that green is promised there
+and nowhere earlier. (Vertical slicing and expand–contract are adapted from
+`skills/engineering/to-tickets` in `github.com/mattpocock/skills`, MIT.)
+
 Prefer four clear stories to nine speculative ones. Joint coverage is measured against what the
 relation census left decided: an outcome that rests on a `requires-stakeholder-input` relation is
 not a gap in your decomposition, it is the blocker you filed, and your report says so.

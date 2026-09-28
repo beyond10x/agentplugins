@@ -1,0 +1,24 @@
+format: eval-case/1
+id: decomposer-expand-migrate-contract
+title: A codebase-wide rename was drafted as expand, migrate batches and contract, with depends_on edges
+workflow: adp/default
+states: [decompose]
+arm: plugin
+verdict: held
+
+subject:
+  agents: [aep:decomposer]
+  paths:
+    - plugins/aep/skills/planning/references/decomposer.md
+
+# `epic:rename-tenant-to-account` renames a type used in four crates. No vertical slice can land
+# green, so the decomposer's rule for a wide mechanical change applies. The rows count stories and
+# `depends_on` edges on the CLI calls; they do not read the decomposer's markdown.
+
+task: |
+  Decompose `epic:rename-tenant-to-account` with the `aep:decomposer` agent. The epic renames the
+  `Tenant` type to `Account` across every crate in this workspace. Create draft stories only; do not
+  move anything and do not touch an artifact you did not create.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
