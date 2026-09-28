@@ -1,0 +1,83 @@
+format: trace-spec/1
+id: eval-case/diagnosing-red-loop-first
+title: A red command preceded the fix, and both runs were recorded
+
+expectations:
+
+  - id: the-skill-was-offered
+    statement: the plugin loaded and offered the diagnosing skill, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: aep:diagnosing
+
+  - id: a-test-ran-before-the-fix
+    statement: the suite or a repro command ran before any write verb touched a path under `src/`
+    expect:
+      order:
+        first:
+          tool: Bash
+          args: {command: {regex: '(cargo (test|nextest)|pytest|npm (run )?test|go test|task check)'}}
+        before:
+          tools: [Write, Edit, NotebookEdit]
+          args: {file_path: {glob: '*/src/*'}}
+
+  - id: the-fix-was-made
+    statement: a write verb did touch `src/`, so the ordering above was decided against a run that fixed something
+    expect:
+      tool.called:
+        tools: [Write, Edit, NotebookEdit]
+        args:
+          file_path: {glob: '*/src/*'}
+        count: {at_least: 1}
+
+  - id: the-runs-were-recorded
+    statement: the red and the green run were each recorded as `test_result` evidence
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +evidence +story:slugify-unicode .*--kind +test_result'}
+        count: {at_least: 2}
+
+  - id: no-status-was-moved
+    statement: the run moved no artifact through its lifecycle
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +move'}
+
+  - id: nothing-was-written-to-tmp
+    statement: no write verb put a file under `/tmp`
+    expect:
+      tool.absent:
+        tools: [Write, Edit, NotebookEdit]
+        args:
+          file_path: {glob: '/tmp/*'}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the diagnosis did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 60}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

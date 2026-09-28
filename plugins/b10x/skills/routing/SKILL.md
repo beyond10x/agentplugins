@@ -31,6 +31,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep:planning` |
 | Move an existing backlog into the AEP store without losing its sources | `aep:migrating` |
 | Scope and deliver accepted development work through a reviewed wave | `aep:implementing` |
+| Diagnose a failing, flaky or slow behaviour through a red-capable loop | `aep:diagnosing` |
 | Specify a system or API | `ess:specifying` |
 | Derive a specification for an existing system | `ess:retrofitting` |
 | Run or raise a conformance suite | `ess:testing-conformance` |

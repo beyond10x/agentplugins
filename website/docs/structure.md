@@ -24,7 +24,7 @@ tools` checks the skills against the newest CLI releases. A change that breaks a
 | plugin | lifecycle | activities | commands | agents |
 |---|---|---|---|---|
 | `b10x` | `init` (guided onboarding), `upgrade` | `routing`, `authoring-plugins` | — | — |
-| `aep` | `init`, `upgrade` | `planning`, `migrating`, `implementing` (wave or drive mode) | `wave`, `drive` (both hand off to `implementing`) · `review-plan`, `decompose` (both hand off to `planning`) | `planning`: decomposer, four plan critics, plan reviewer, reverse engineer · `implementing`: story scoper, implementor, adversary, security reviewer (each procedure in its skill's `references/`) |
+| `aep` | `init`, `upgrade` | `planning`, `migrating`, `implementing` (wave or drive mode), `diagnosing` | `wave`, `drive` (both hand off to `implementing`) · `review-plan`, `decompose` (both hand off to `planning`) | `planning`: decomposer, four plan critics, plan reviewer, reverse engineer · `implementing`: story scoper, implementor, adversary, security reviewer (each procedure in its skill's `references/`) |
 | `ess` | `init`, `upgrade` | `specifying`, `retrofitting`, `testing-conformance`, `hardening` | — | `specifying`: author · `retrofitting`: retrofitter · `testing-conformance`: conformance |
 | `worktree` | `init`, `upgrade` | `managing-worktrees` | `cleanup` (hands off to `managing-worktrees`) | — |
 | `connectors` | `init`, `upgrade` | `integrating` | — | — |

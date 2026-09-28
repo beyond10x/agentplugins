@@ -14,7 +14,7 @@ directly when the work is already clear.
 | Plugin | Use it for | Includes |
 |---|---|---|
 | [`b10x`](./plugins/b10x.md) | Setup, upgrades and navigation | `init`, `upgrade`, `routing` and `authoring-plugins` skills, the `b10x` binary, drift check |
-| [`aep`](./plugins/aep.md) | Governed planning and delivery | `planning`, `migrating` and `implementing` skills; decomposer, plan critics, reverse engineer, story scoper, implementor, adversary, security reviewer |
+| [`aep`](./plugins/aep.md) | Governed planning and delivery | `planning`, `migrating`, `implementing` and `diagnosing` skills; decomposer, plan critics, reverse engineer, story scoper, implementor, adversary, security reviewer |
 | [`ess`](./plugins/ess.md) | Executable System Specifications | `specifying`, `retrofitting`, `testing-conformance` and `hardening` skills; author, conformance, retrofitter agents |
 | [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 
