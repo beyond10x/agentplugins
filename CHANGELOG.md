@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.15.0] — 2026-09-28
+
+Eight methods from two public MIT skill collections, rewritten into the `aep`, `ess` and `b10x`
+plugins, each with an eval case beside it.
+
+- `aep:diagnosing` is a new activity skill. It builds one command that goes red on the reported
+  symptom, and has already been run, before any hypothesis. Then it minimises, ranks falsifiable
+  hypotheses, probes one variable at a time and writes the regression test at a seam that
+  reproduces the real call pattern. The red and green runs are `test_result` evidence; a missing
+  seam is filed as a draft story. `b10x:routing` reaches it.
+- `ess:specifying` interviews before drafting a domain nobody has described
+  (`references/interview.md`): the open decisions in numbered rounds, each with the answer the
+  agent would take, facts looked up rather than asked. Headless, the questions become
+  `approval-record`s. `aep:planning` guardrail 7 points at it.
+- The adversary and `ess:testing-conformance` reject a test that would still pass if every
+  function it calls returned a default value, and name the five shapes that do.
+- A wave verifies a green unit's claim against the base before merging: one command on both
+  branches, one verdict of `VERIFIED`, `NOT VERIFIED` or `INCONCLUSIVE`, recorded as
+  `verification` evidence. Only `VERIFIED` merges.
+- The story scoper returns a `Safety fact` line with how far it was proved on a five-step ladder;
+  the security reviewer proves that fact with a test before calling a change safe.
+- The decomposer cuts stories as vertical slices and drafts a codebase-wide mechanical change as
+  expand, migrate batches and contract. The design critic's fifth defect is the horizontal slice.
+- On request, the adversary step runs as a cross-family panel (`references/adversary-panel.md`),
+  one `review-result` per seat; with one model family it is one reviewer and says so.
+- `b10x:authoring-plugins` carries five rules for writing what an agent reads
+  (`references/writing.md`).
+- `evals/` holds 17 cases; its README recounts coverage from the `subject:` fields.
+
+Sources: `github.com/mattpocock/skills` at `c55ee46` and `github.com/cursor/plugins` at `ecc249f`,
+both MIT. Each method is adapted in this repository's words; no text is copied verbatim.
+
 ## [0.14.17] — 2026-09-27
 
 Codex parity for the AEP agents, two planning commands, and routing that reaches every skill.
