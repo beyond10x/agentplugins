@@ -43,6 +43,10 @@ path to the directory that holds their repositories) rather than guessing it. Wi
 
 `worktree doctor --check` fails with `no active profile` until `activate` has run.
 
+Add `--install-agent-guidance` to `activate` only when the user asks for it: it writes a managed
+guidance block, pointing at `worktree:managing-worktrees`, into `~/.claude/CLAUDE.md` and
+`~/.codex/AGENTS.md`, and replaces only the text between its own markers.
+
 **A repository needs a remote before its trees can be cleaned up.** Cleanup proves that each
 commit reached a remote, so in a repository with no remote (`git remote` prints nothing) `create`
 works and every later `gc` refuses. Tell the user before they start work there.
