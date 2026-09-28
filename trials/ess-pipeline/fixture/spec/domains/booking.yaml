@@ -87,6 +87,11 @@ commands:
         when: hours > 0
         creates: rehearsal.booking.Booking
         instance: booking_id
+        sets:
+          band: input.band
+          room: input.room
+          starts_at: input.starts_at
+          hours: input.hours
         emits:
           - rehearsal.booking.RoomHeld
         payload:
