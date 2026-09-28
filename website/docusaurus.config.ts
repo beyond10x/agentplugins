@@ -57,12 +57,14 @@ const config: Config = {
         {title: 'Use it', items: [
           {label: 'Choose a plugin', to: '/docs/choose-a-plugin'},
           {label: 'Install the marketplace', to: '/docs/install'},
+          {label: 'Tutorial: your first ESS specification', to: '/docs/tutorials/first-ess-specification'},
         ]},
         {title: 'Plugins', items: [
           {label: 'b10x', to: '/docs/plugins/b10x'},
           {label: 'ESS', to: '/docs/plugins/ess'},
           {label: 'Worktree', to: '/docs/plugins/worktree'},
           {label: 'AEP', to: '/docs/plugins/aep'},
+          {label: 'Connectors', to: '/docs/plugins/connectors'},
         ]},
         {title: 'Project', items: [
           {label: 'GitHub repository', href: 'https://github.com/beyond10x/agentplugins'},

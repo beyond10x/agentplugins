@@ -27,78 +27,37 @@ in both hosts; every one lives in this repository. The CLIs come from their own 
 releases, prebuilt or with `cargo install`. The [Connectors guide](plugins/connectors.md) covers its
 separate CLI prerequisite.
 
-## Before you install: put `aep` on your `PATH`
+## The command-line tools
 
-The `aep` plugin is an instruction surface for a program it does not ship. It drives the
-`aep` CLI. Install it before the plugins so the first task does not stop at a missing command. The
-AEP version pinned below publishes native archives for x86-64 and ARM64 Linux and macOS, plus a
-`SHA256SUMS` file. Windows archives are not published.
+The `aep`, `ess` and `worktree` plugins drive command-line tools they do not ship: `aep`, `ess`
+and `worktree`. `b10x` installs each at its newest release, from the release's prebuilt archive
+checked against its `SHA256SUMS`, or with `cargo`:
 
-Select the native target once:
-
-```bash
-case "$(uname -s):$(uname -m)" in
-  Linux:x86_64)  B10X_TARGET=x86_64-unknown-linux-gnu ;;
-  Linux:aarch64) B10X_TARGET=aarch64-unknown-linux-gnu ;;
-  Darwin:x86_64) B10X_TARGET=x86_64-apple-darwin ;;
-  Darwin:arm64)   B10X_TARGET=aarch64-apple-darwin ;;
-  *) echo "unsupported platform: $(uname -s) $(uname -m)" >&2; exit 1 ;;
-esac
+```console
+$ b10x init ess --out plan.json            # one product, or several: aep,ess,worktree
+$ b10x setup apply --plan plan.json --yes
 ```
 
-Download AEP `0.55.0`, verify the selected archive against the release manifest, and install its
-canonical `aep` command:
+`b10x init` prints the plan and changes nothing; `b10x setup apply` carries it out after you have
+read it, and snapshots every file it changes first. Archives exist for x86-64 and ARM64 Linux and
+macOS; elsewhere `--method cargo` builds from the release tag. The
+[tutorial](tutorials/first-ess-specification.md) shows the output of both commands. The `b10x`
+front door itself needs none of the three.
 
-```bash
-B10X_AEP_VERSION=0.55.0
-B10X_AEP_ARCHIVE="aep-${B10X_AEP_VERSION}-${B10X_TARGET}.tar.gz"
-B10X_AEP_RELEASE="https://github.com/beyond10x/aep/releases/download/${B10X_AEP_VERSION}"
-curl --fail --location --remote-name "${B10X_AEP_RELEASE}/${B10X_AEP_ARCHIVE}"
-curl --fail --location --output AEP-SHA256SUMS "${B10X_AEP_RELEASE}/SHA256SUMS"
-if command -v sha256sum >/dev/null; then
-  grep "  ${B10X_AEP_ARCHIVE}$" AEP-SHA256SUMS | sha256sum --check -
-else
-  grep "  ${B10X_AEP_ARCHIVE}$" AEP-SHA256SUMS | shasum --algorithm 256 --check
-fi
-tar -xzf "${B10X_AEP_ARCHIVE}"
-mkdir -p "$HOME/.local/bin"
-install -m 0755 "aep-${B10X_AEP_VERSION}-${B10X_TARGET}/aep" "$HOME/.local/bin/aep"
+### The `aep:implementing` skill's drive mode also needs Metaharness
+
+Drive mode hands one story to `metaharness aep drive run`. Metaharness is optional in the `aep`
+product, so `b10x init aep` does not install it; install it on its own:
+
+```console
+$ b10x install metaharness
+$ metaharness aep drive run --help
 ```
 
-If `$HOME/.local/bin` is not already on your `PATH`, add it in your shell profile. Building from
-source remains a fallback: use the exact release tag with Cargo, never a moving branch.
+Metaharness links AEP as a library at the revision its own release pins, not the `aep` on your
+`PATH`. Wave mode, `aep:planning` and every other plugin need no Metaharness.
 
-Confirm it before installing anything:
-
-```bash
-aep --version
-```
-
-The expected line is `protocol 0.55.0`. (`aep` retains `protocol` as its version label for
-compatibility.) `command not found` means the affected plugin will install and then stop at its
-first CLI command. The `b10x` front door does not need the `aep` binary.
-
-### The `aep:implementing` skill also needs Metaharness
-
-AEP 0.55.0 refuses to run a model-backed step map itself and names `metaharness aep drive run` as
-the command that does. Metaharness `0.7.0` includes this host; tags through `0.6.5` predate it.
-This release provides source. With Rust 1.98 or newer, install the binary from its exact tag:
-
-```bash
-cargo install --locked --git https://github.com/beyond10x/metaharness \
-  --tag 0.7.0 metaharness-cli
-metaharness aep drive run --help
-```
-
-Metaharness does not call the `aep` binary installed above — it links AEP as a library at whatever
-`beyond10x/aep` git revision `crates/metaharness-aep/Cargo.toml` pins in the Metaharness tag you
-install (at `0.7.0` that revision is `a23176ae`, which `git describe --tags` in the AEP repository
-reports as `0.54.0-33-ga23176ae`, i.e. behind the `0.55.0` you put on `PATH`), so read that manifest
-for the Metaharness↔AEP pair rather than assuming the two versions match.
-
-Wave mode, `aep:planning` and every other plugin need no Metaharness.
-
-`b10x-harness`, the Beyond10x agent loop Metaharness's `b10x` adapter runs, is optional as well:
+`b10x-harness`, the agent loop Metaharness's `b10x` adapter runs, is optional as well:
 `b10x install b10x-harness` installs its newest release. It runs on Linux only, from a prebuilt
 archive where the release has one for the machine, otherwise built with `cargo`.
 
@@ -133,7 +92,7 @@ The same plugins remain available from the Plugins surface. The authoritative de
 Codex will find is
 [`.agents/plugins/marketplace.json`](https://github.com/beyond10x/agentplugins/blob/main/.agents/plugins/marketplace.json)
 in this repository; Codex reads it together with the selected plugin's `.codex-plugin/plugin.json`.
-The `aep` binary requirement above applies unchanged.
+The command-line tools above apply unchanged.
 
 ## Upgrading
 
@@ -151,8 +110,8 @@ repository rules still decide those boundaries.
 A repository can hold a CLI at one release instead of the newest:
 
 ```bash
-b10x pin ess 0.32.0   # exactly this release
-b10x pin aep 0.59     # the newest 0.59.x
+b10x pin ess 0.38.0   # exactly this release
+b10x pin aep 0.63     # the newest 0.63.x
 b10x unpin ess
 ```
 

@@ -9,6 +9,7 @@ const plugins = [
   ['ESS', 'Write, retrofit and conformance-test Executable System Specifications.', '/docs/plugins/ess'],
   ['AEP', 'Plan governed work, then scope and deliver it in waves with adversarial review.', '/docs/plugins/aep'],
   ['Worktree', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/worktree'],
+  ['Connectors', 'Set up providers and invoke governed integrations through the connectors CLI.', '/docs/plugins/connectors'],
 ];
 
 export default function Home(): ReactNode {
@@ -25,6 +26,7 @@ export default function Home(): ReactNode {
           <div className={styles.actions}>
             <Link className="button button--primary button--lg" to="/docs/choose-a-plugin">Choose a plugin</Link>
             <Link className="button button--secondary button--lg" to="/docs/install">Install</Link>
+            <Link className="button button--secondary button--lg" to="/docs/tutorials/first-ess-specification">Your first ESS specification</Link>
           </div>
         </header>
         <section className={styles.grid} aria-label="Available plugins">

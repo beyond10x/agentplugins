@@ -25,9 +25,18 @@ nobody has decided, and what the plan does with that instead of guessing.
 
 ## Prerequisites
 
-Install `aep` from the marketplace — see [Install](./install.md) — and the
-`ess` plugin from the [ESS repository](https://github.com/beyond10x/ess#point-your-agent-here),
-and have the `aep` CLI on your PATH. Step 3 also uses the `ess` CLI.
+Install the `aep` and `ess` plugins and their command-line tools with `b10x` (see
+[Install](./install.md)):
+
+```console
+$ b10x init aep,ess --out plan.json
+$ b10x setup apply --plan plan.json --yes
+```
+
+Step 3 models a new noun in ESS. If you have not written an ESS specification before, [Your first
+ESS specification](./tutorials/first-ess-specification.md) walks through one first.
+
+The recording on this page was made with these releases:
 
 ```shell-session
 $ aep --version
@@ -36,8 +45,8 @@ $ ess --version
 ess 0.5.1
 ```
 
-That build produced every output on this page. The binary prints `protocol` in `--version` and in
-its `--help` usage lines; the command you install and type is `aep`.
+That build produced every output on this page. It printed `protocol` in `--version` and in its
+`--help` usage lines; current releases print `aep`, the command you install and type.
 
 ## 1. Adopt the repository
 
