@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-28T03:36:59Z",
+  "actor": "human:timo",
+  "artifact": "story:worktree-plugin-integrated",
+  "kind": "story",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins 0.16.0 release workflow (42f01b0)",
+    "reference": "https://github.com/beyond10x/agentplugins/actions/runs/36374131183"
+  }
+}
