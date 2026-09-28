@@ -31,6 +31,8 @@ pub enum Kind {
     EssPipeline,
     /// Every ESS output, and an implementation held to the synthesized Go suite.
     EssFullPackage,
+    /// A fresh agent follows the public ESS tutorial, given only the page.
+    EssTutorial,
     /// AEP planning from an existing backlog.
     AepBacklog,
     /// Setting up `worktree` in a repository.
@@ -403,12 +405,30 @@ mod tests {
             "ess-retrofit",
             "ess-pipeline",
             "ess-full-package",
+            "ess-tutorial",
             "aep-backlog",
             "worktree-onboarding",
             "upgrade-seeded",
         ] {
             assert!(names.iter().any(|name| name == expected), "{expected}");
         }
+    }
+
+    /// The tutorial trial hands its agent a copy of the public page; a copy that differs would
+    /// measure a page nobody reads.
+    #[test]
+    fn the_tutorial_trial_carries_the_published_page() {
+        let root = repository();
+        let page =
+            std::fs::read_to_string(root.join("website/docs/tutorials/first-ess-specification.md"))
+                .expect("the tutorial page exists");
+        let copy =
+            std::fs::read_to_string(root.join(TRIALS).join("ess-tutorial/fixture/tutorial.md"))
+                .expect("the trial fixture carries the page");
+        assert!(
+            page == copy,
+            "trials/ess-tutorial/fixture/tutorial.md differs from the tutorial page; copy the page again"
+        );
     }
 
     #[test]

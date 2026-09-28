@@ -9,11 +9,15 @@ credentials and cannot enlarge the authority granted by the host, operator, or r
 
 Every published plugin is intentionally narrow:
 
-- Beyond10x routes work, links public resources, and creates portable plugins without copying the
-  specialist workflows.
-- AEP Plan governs planning artifacts and lifecycle-aware planning work.
-- AEP Drive coordinates accepted development work.
-- ESS Specify specifies, validates and projects executable system contracts.
+- `b10x` sets up the other plugins and their command-line tools, routes work, links public
+  resources, and creates portable plugins without copying the specialist workflows.
+- `aep` governs planning artifacts and lifecycle-aware planning work, and coordinates accepted
+  development work.
+- `ess` specifies, validates and projects executable system contracts, and holds implementations
+  to them.
+- `worktree` creates, leases and safely cleans isolated Git worktrees.
+- `connectors` sets up providers and invokes governed integrations; credentials stay with the
+  Connector.
 
 The repository gate checks that the two marketplace formats agree in their declared order, plugin
 and directory names match, required skills and agents exist, and no retired marketplace or

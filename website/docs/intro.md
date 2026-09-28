@@ -17,6 +17,7 @@ directly when the work is already clear.
 | [`aep`](./plugins/aep.md) | Governed planning and delivery | `planning`, `migrating`, `implementing` and `diagnosing` skills; decomposer, plan critics, reverse engineer, story scoper, implementor, adversary, security reviewer |
 | [`ess`](./plugins/ess.md) | Executable System Specifications | `specifying`, `retrofitting`, `testing-conformance` and `hardening` skills; author, conformance, retrofitter agents |
 | [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
+| [`connectors`](./plugins/connectors.md) | Integrations | the `integrating` skill for the `connectors` CLI: set up providers and invoke governed integrations |
 
 Every plugin starts with `/<plugin>:init` and checks itself with `/<plugin>:upgrade`; `/b10x:init`
 asks what you want to do and installs the matching plugins and CLIs.
@@ -25,5 +26,7 @@ The marketplace contains instructions, not credentials. A plugin does not acquir
 write a repository, contact a service, or bypass an approval boundary merely because it is
 installed.
 
-[Set up with one sentence](./install.md), [start with the front door](./plugins/b10x.md), [choose a specialist](./choose-a-plugin.md),
-or go directly to [installation](./install.md).
+New to ESS? [Your first ESS specification](./tutorials/first-ess-specification.md) takes you from an
+empty directory to a validated specification and a passing conformance suite, with an agent doing
+the writing. Otherwise [set up with one sentence](./install.md), [start with the front
+door](./plugins/b10x.md) or [choose a specialist](./choose-a-plugin.md).

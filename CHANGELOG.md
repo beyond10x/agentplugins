@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.17.0] — 2026-09-28
+
+A tutorial takes a developer from an empty directory to a validated ESS specification and a Go
+implementation that passes its conformance suite, with an agent doing the writing. The onboarding
+pages install through `b10x` and name the five plugins that ship. The skills are verified against
+ess 0.38.0.
+
+- New page: [Your first ESS specification](website/docs/tutorials/first-ess-specification.md).
+  `ess:specifying` interviews, writes a lending-library specification, and `ess` validates it,
+  refuses a planted mistake, generates docs and OpenAPI, and synthesizes a Go suite of 17
+  scenarios that the implementation passes and a planted bug fails. Every output is from a real
+  run. `agentplugins-check tools` validates the page's specification against the newest `ess` and
+  runs its suite, and the `ess-tutorial` trial has a fresh agent follow the page.
+- `install.md` installs every command-line tool through `b10x init` and `b10x setup apply`, and
+  Metaharness through `b10x install metaharness`; the hand install of AEP 0.55.0 is gone.
+  `choose-a-plugin.md`, `trust-and-scope.md`, the b10x reference, the golden path's prerequisites,
+  the landing page, the footer and `b10x:routing`'s resources name `b10x`, `aep`, `ess`,
+  `worktree` and `connectors`.
+- `agentplugins-check` refuses the retired display names "AEP Plan", "AEP Drive" and "ESS Specify".
+- `verified.json` pins ess 0.38.0. From the trial round: `ess:specifying` counts "make sure it
+  validates" as a request for a finished specification and allows a named refusal where synthesis
+  cannot arrange the model; `ess:testing-conformance` generates the Go package at the module root,
+  requires `ESS_REPORT_FORMAT=2`, and has a refused command set `Outcome` (beyond10x/ess#186).
+- This repository's planning store is `aep.project/5`.
+
 ## [0.16.0] — 2026-09-28
 
 The `ess`, `aep` and `worktree` plugins describe the newest CLI releases: ess 0.37.0, aep 0.63.1

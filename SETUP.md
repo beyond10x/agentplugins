@@ -41,3 +41,7 @@ says so. Change nothing the user did not confirm.
 3. **Continue with the product.** A plugin loads in the next session. To use it now, run
    `b10x skill <plugin>:init` (for example `b10x skill ess:init`) and follow the printed text;
    `b10x skill <plugin>` lists the rest.
+4. **Point a newcomer at the tutorial.** When the user chose to write specifications and has not
+   written one before, tell them about
+   https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/: it walks
+   one specification from an empty directory to a passing conformance suite.

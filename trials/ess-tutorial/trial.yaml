@@ -1,0 +1,25 @@
+name: ess-tutorial
+kind: ess-tutorial
+prompt: |
+  I'm new to ESS and I'm following the tutorial in `tutorial.md` here. Setup (step 1) is done. Work
+  through steps 2 to 8 in this directory as the page describes: write the specification in `spec/`,
+  validate it, generate its docs and OpenAPI into `out/`, synthesize the Go suite into `impl/`, write
+  the implementation there and run the suite. Where the page shows the questions and the answers it
+  gave, take the same answers instead of asking me. Do step 7's bug and undo it, then run
+  `ESS_REPORT_FORMAT=2 go test -v ./...` in `impl/` one last time.
+
+  When you're done, tell me how many scenarios passed, failed and were skipped, quote any text on the
+  page that confused you or did not match what you saw, and paste the last validation output, the
+  last synthesis output and the last `go test` summary verbatim.
+dir: library
+fixture: fixture
+setup:
+  - b10x init ess --host claude --out plan.json
+  - b10x setup apply --plan plan.json --yes
+measures: [tool_calls, validate, synthesis, outputs, go_test]
+outputs:
+  spec: spec/system.yaml
+  docs: out/docs
+  openapi: out/openapi
+  suite: impl/essconform
+  implementation: impl/go.mod

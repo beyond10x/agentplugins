@@ -192,9 +192,10 @@ entities:
           seeds.lending.PacketReturned: {member_id: input.member_id}
 ```
 
-The creating command (`Join`) sets `packets_out` from its input under `when: {packets_out: {gte: 0,
-lte: 5}}`. Synthesis arranges a member only through that `sets:` and does not repeat `BorrowPacket`,
-so with `packets_out: 0` fixed at creation the `at-limit` scenario is refused (`ESS-SYNTH-003`).
+The creating command (`Join`) sets `packets_out: 0`. Synthesis arranges a member only through that
+`sets:` and does not repeat `BorrowPacket`, so the `at-limit` scenario is refused (`ESS-SYNTH-003`).
+That refusal is the expected result: name it in your report. Do not give `Join` a starting count
+only so synthesis can reach the limit; no member joins holding packets.
 One outcome changes one record: a `Packet` moving to `OnLoan` is a second command the caller sends,
 and the specification cannot require both to happen together.
 

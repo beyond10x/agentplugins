@@ -450,6 +450,24 @@ const RETIRED: &[Retired] = &[
         new: "the b10x marketplace",
         wire_next: &[],
     },
+    // Display names of the retired plugins. Public pages kept them after the ids were swept,
+    // because the sweep matched only the hyphenated ids (found 2026-09-28 in trust-and-scope.md,
+    // choose-a-plugin.md and the b10x routing resources).
+    Retired {
+        old: "AEP Plan",
+        new: "aep@b10x",
+        wire_next: &[],
+    },
+    Retired {
+        old: "AEP Drive",
+        new: "aep@b10x",
+        wire_next: &[],
+    },
+    Retired {
+        old: "ESS Specify",
+        new: "ess@b10x",
+        wire_next: &[],
+    },
 ];
 
 /// Directories never walked looking for a retired name, wherever they sit.
@@ -1543,6 +1561,35 @@ one product only: `b10x upgrade ess`
             "the `aep-planning` plugin\n",
         );
         retired_names(&sandbox).expect("history, change records and transcripts keep their names");
+
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
+    }
+
+    /// A retired plugin's display name on a public page fails like its id, and a longer word that
+    /// begins with it (`AEP Planning`) does not.
+    #[test]
+    fn a_retired_display_name_on_a_page_fails_the_check() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-display-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let page = sandbox.join("website/docs/trust-and-scope.md");
+        std::fs::create_dir_all(page.parent().expect("a page has a directory"))
+            .expect("the sandbox is writable");
+        let name = ["ESS", "Specify"].join(" ");
+        std::fs::write(&page, format!("- {name} validates contracts.\n"))
+            .expect("the sandbox is writable");
+        let error = retired_names(&sandbox).expect_err("a retired display name must fail");
+        assert!(
+            error.contains("website/docs/trust-and-scope.md:1 names `ESS Specify`"),
+            "{error}"
+        );
+
+        let longer = ["AEP", "Planning"].join(" ");
+        std::fs::write(&page, format!("- {longer} is a topic, not a plugin.\n"))
+            .expect("the sandbox is writable");
+        retired_names(&sandbox).expect("a longer word is not the retired name");
 
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
     }
