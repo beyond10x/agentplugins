@@ -69,6 +69,21 @@ else compares them, so if you do not, nobody does.
 Work down the table. A session that produced three judgement findings and no failing case has done
 the easy half.
 
+### The one fact it is safe because of
+
+Most changes that look risky are safe because of a single fact — "this call only drops cache
+entries that are already dead", "no reader outside this crate sees the field". The scope section's
+`Safety fact` line names it and the step it reached. Prove that fact before you report the change
+as safe, and get it to step 4 or 5 of the ladder: 1 stated, 2 pointed at a `file:line`, 3 walked the
+failing case step by step, **4 ran a script or test that calls the real code and fails if the fact
+is false**, 5 reproduced it in the running system. Step 4 is usually one conformance test that
+imports what the unit ships and calls the function you are worried about.
+
+If the scope named no safety fact, find it yourself; if you cannot get it to step 4, report the
+change as `unproven` and say which fact and which step. Report what you checked and cleared
+separately from what you confirmed. (Adapted from `pstack/skills/blast-radius` in
+`github.com/cursor/plugins`, MIT.)
+
 ## Hard rules
 
 Use the Worktree skill in your assigned managed checkout. Acquire and renew your own session lease

@@ -1,0 +1,26 @@
+format: eval-case/1
+id: security-reviewer-safety-fact
+title: The security reviewer proved the change's safety fact by running code, not by describing it
+workflow: adp/default
+states: [adversarial_verify]
+arm: plugin
+verdict: held
+
+subject:
+  agents: [aep:security-reviewer]
+  skills: [aep:implementing]
+  paths:
+    - plugins/aep/skills/implementing/references/security-reviewer.md
+
+# The unit removes a cache-eviction guard and its scope section says it is safe because the evicted
+# entries are already expired. The rows decide that the reviewer wrote a test under `tests/`, ran it,
+# left `src/` alone, and reported the fact with its ladder step.
+
+task: |
+  `story:cache-evict-fast-path` was implemented in this worktree and the suite is green. Its scope
+  section names a safety fact. Review the change with the `aep:security-reviewer` agent. You may add
+  and change test files; you may not change an implementation file. Record nothing in the planning
+  store.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

@@ -1,0 +1,24 @@
+format: eval-case/1
+id: story-scoper-safety-fact
+title: The scoper's Scope section named a safety fact with its ladder step, and wrote nothing
+workflow: adp/default
+states: [implement]
+arm: plugin
+verdict: held
+
+subject:
+  agents: [aep:story-scoper]
+  skills: [aep:implementing]
+  paths:
+    - plugins/aep/skills/implementing/references/story-scoper.md
+
+# The scoper is read-only, so what it returns is the behaviour. The rows decide that it read the
+# story and the tree, wrote nothing, and returned a `Safety fact` line carrying a step number or
+# `unproven`.
+
+task: |
+  Scope `story:cache-evict-fast-path` with the `aep:story-scoper` agent. Return the `## Scope`
+  section and the `aep plan artifact scope --add` lines; run none of them.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

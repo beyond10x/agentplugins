@@ -1,0 +1,96 @@
+format: trace-spec/1
+id: eval-case/security-reviewer-safety-fact
+title: A test was written and run for the safety fact, and src/ was untouched
+
+expectations:
+
+  - id: the-agent-was-offered
+    statement: the plugin loaded and offered the security reviewer, so a miss is not "it was not there"
+    expect:
+      env.agent_available:
+        agent: aep:security-reviewer
+
+  - id: a-subagent-actually-ran
+    statement: the review went through a subagent rather than being improvised by the parent session
+    expect:
+      subagent.spawned:
+        count: {at_least: 1}
+
+  - id: a-test-was-written-for-the-fact
+    statement: a write verb touched a path under `tests/`, which is where step 4 of the ladder lands
+    expect:
+      tool.called:
+        tools: [Write, Edit]
+        args:
+          file_path: {glob: '*/tests/*'}
+        count: {at_least: 1}
+
+  - id: the-test-was-run
+    statement: the suite ran after the test was written
+    expect:
+      order:
+        first:
+          tools: [Write, Edit]
+          args: {file_path: {glob: '*/tests/*'}}
+        before:
+          tool: Bash
+          args: {command: {regex: 'cargo (test|nextest)'}}
+
+  - id: no-implementation-file-was-written
+    statement: no write verb touched a path under `src/`
+    expect:
+      tool.absent:
+        tools: [Write, Edit, NotebookEdit]
+        args:
+          file_path: {glob: '*/src/*'}
+
+  - id: the-report-names-the-fact-and-its-step
+    statement: the final report states the safety fact with a ladder step, or says it is unproven
+    severity: advisory
+    expect:
+      text.matches:
+        regex: '(?i)(safety fact|safe because).*(step [1-5]|unproven)'
+
+  - id: no-store-command-was-run
+    statement: the reviewer ran no `aep plan artifact` write
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'aep +plan +artifact +(new|move|body|evidence|set|relate)'}
+
+  - id: the-scope-was-actually-tested
+    statement: the run read the implementation under `src/`, so the write-absence above was decided against a tree that had one
+    severity: advisory
+    expect:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/src/*'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing the reviewer tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the review did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 60}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0
