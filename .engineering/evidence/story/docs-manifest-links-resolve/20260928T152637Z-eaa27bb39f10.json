@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-28T15:26:37Z",
+  "actor": "human:timo",
+  "artifact": "story:docs-manifest-links-resolve",
+  "kind": "story",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins 0.18.0 release workflow (cfd27df): gate, four b10x archives, SHA256SUMS 4/4 OK",
+    "reference": "https://github.com/beyond10x/agentplugins/actions/runs/36443168922"
+  }
+}

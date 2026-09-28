@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:aep-tutorial
 kind: story
-status: active
+status: implemented
 title: A public tutorial takes the ESS tutorial's library to a governed, critiqued plan and one implemented story with AEP
 summary: 'tutorials/first-governed-plan: adopt, a new noun modelled in ESS first, decompose, scope, critic panel, one wave; real output; held true by tools and a trial.'
 relations:
@@ -12,10 +12,11 @@ scope:
   path: trials/aep-tutorial
 - confidence: cited
   path: website/docs/tutorials
-revision: 5
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-09-28T13:12:54Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-09-28T13:12:54Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-09-28T15:54:13Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Story: a public AEP tutorial
 

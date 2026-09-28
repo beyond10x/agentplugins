@@ -2,16 +2,17 @@
 format: aep.planning-md/3
 id: story:docs-manifest-links-resolve
 kind: story
-status: active
+status: implemented
 title: agentplugins-check refuses a b10x.docs.yaml URL that names no page
 summary: Every https://beyond10x.github.io/docs/agentplugins/<path>/ in b10x.docs.yaml maps to website/docs/<path>.md.
 scope:
 - confidence: cited
   path: crates/agentplugins-check/src/main.rs
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-09-28T13:12:54Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-09-28T13:12:54Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-09-28T15:54:13Z", actor: "human:timo", revision: 5, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Story: the docs manifest links resolve
 
