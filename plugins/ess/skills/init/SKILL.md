@@ -41,6 +41,10 @@ then the repository's own conformance command, read from its `AGENTS.md` or its 
 (`Taskfile.yml`, `Makefile`, `package.json` scripts, the CI job that runs the suite). Run that
 command as the repository spells it; do not assemble a runner invocation of your own.
 
+Where `ess-inputs.yaml` says `requires: ess X.Y.Z`, that exact release runs, not the one on `PATH`:
+`ess` fetches it into a checksummed cache and hands over. `ess specify toolchain which`, run in
+that directory, prints which release ran and why; include its first line in the report.
+
 Report both results as the tools printed them: the validation line (`<system> v<n> — <n> file(s),
 valid`, or every refusal verbatim) and the suite's `passed`, `skipped` and `failed` counts with the
 command and its exit status. No conformance command found: say so, and name where you looked.

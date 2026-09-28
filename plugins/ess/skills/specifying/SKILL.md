@@ -16,9 +16,10 @@ job: the domain is drafted first, so the noun has a typed home before stories ar
 
 When the request does not say what the noun is, what it relates to and how it changes state, and no
 source in the repository answers that, interview first: ask the open decisions in numbered rounds,
-each with the answer you would take, and draft once none is open.
-[references/interview.md](references/interview.md) is the procedure, including what to do when no
-operator is there to answer.
+each with the answer you would take, and draft once none is open. When the request asks for a
+finished specification, or no operator is there, that takes precedence: do not ask; take each
+recommended answer and list the decisions in your report.
+[references/interview.md](references/interview.md) is the procedure for both.
 
 Where an OpenAPI document already describes it, do not hand-write the domain. Draft it from the
 contract, and read the decisions the draft says it could not take:
@@ -121,7 +122,9 @@ narrows that question without answering it. Where you cannot say which kind it i
 Grow it from there — types, commands, events, views, and a component that owns the domain — running
 `ess specify validate` after each addition rather than at the end. [references/syntax.md](references/syntax.md)
 shows every one of those sections in a small specification that validates; read it before writing
-the first command.
+the first command. [references/later-formats.md](references/later-formats.md) lists what formats up
+to `ess/15` add — a stored-field guard, a delete, a create into a state, an unknown-id answer, value
+expressions, wire presence — read it before marking a rule `UNMAPPED:` as not expressible.
 
 `--path` takes one ESS file or a directory. Without an `ess-inputs.yaml`, a directory is read as
 every YAML file below it — so generated output written inside it is read back as specification and
@@ -141,6 +144,14 @@ scenarios: []
 `specification` lists every authored file, relative to this file, and each must exist. `scenarios`
 lists authored scenario files, `[]` when there are none. `--path <directory>` then reads exactly
 that list. A directory with only `system.yaml` still validates, read whole.
+
+To pin the `ess` release the specification is maintained with, write `format: ess-inputs/2` and
+`requires: ess X.Y.Z` (exact) or `requires: ess X.Y` (a minor line). An older `ess` then refuses,
+a newer one warns, and `--strict-requires` makes the warning a refusal (the CI spelling). An exact
+pin makes every `ess` run below that manifest execute the pinned release from a checksummed cache:
+`ess specify toolchain install X.Y.Z --pin` installs it and writes the pin, and
+`ess specify toolchain which` prints which release runs here and why. Report that line whenever a
+refusal names a release.
 
 **A draft is a proposal, never a silent completion.** Every relation you could not read from code,
 an OpenAPI document or an existing artifact is written with an `UNMAPPED:` marker beside the place
@@ -167,7 +178,7 @@ type, a lifecycle state or an edge to make a document validate — leave the mar
 would settle it. An entity no source names, added so that a command type-checks, is an invention
 even when it validates.
 
-A marker records the question; it does not ask it. In an interactive session, put the open markers
+A marker records the question; it does not ask it. In an interactive session where the request did not ask for a finished specification, put the open markers
 to the user as one interview round at the end ([references/interview.md](references/interview.md);
 Claude Code: `AskUserQuestion`), one question per marker, and write the answers into the
 specification. Headless, or as the `author` agent, leave the markers and list them
@@ -233,7 +244,12 @@ An entity `invariant` is checked after every outcome that leaves the entity in s
 needs a view that holds instances in that state and publishes the fields the invariant reads.
 Without one, `synthesize` refuses the check (`no view of <entity> holds an instance in <State>`, or
 `<field> is published by no view of the entity`); a view over the entity with no `filter` that
-publishes those fields covers every state (the `Copies` view in the syntax reference). `--target go` or `--target typescript` writes the suite as a test
+publishes those fields and `state` covers every state (the `Copies` view in the syntax reference); a guard over a stored count is refused as `requires an immediate unfiltered identity/state/fact view` until the view publishes `state` too. A `note:`
+from `synthesize` is not a refusal but names a check the suite does not make: `observes the refused
+subject through what its views publish; no view publishes …` means a wrong-state refusal that
+changed those fields would pass, and a view publishing them closes it; `declares no not-found and
+no wrong_state outcome` means an unknown id has no declared answer (`unknown_instance:` in
+[references/later-formats.md](references/later-formats.md)). Relay every note with the refusals. `--target go` or `--target typescript` writes the suite as a test
 package your implementation runs; `ess:testing-conformance` says what to run it against.
 `run` holds a built-in reference implementation to it; `--target` lists the ones this binary
 carries. `evidence --from` reads the kind, the source and the instant out of the report and refuses

@@ -17,6 +17,10 @@ changed yet.
 - Otherwise show the actions in one list and ask once. After a clear yes:
   `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 - A new plugin version loads in a new session; until then `b10x skill ess:<skill>` prints the new text.
+- A project whose `ess-inputs.yaml` pins `requires: ess X.Y.Z` keeps running that release after the
+  upgrade. Moving the project is a separate change to its repository:
+  `ess specify toolchain install <new-version> --pin` rewrites the pin, and
+  `ess specify toolchain which` confirms the release that now runs there.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
 

@@ -49,18 +49,19 @@ every later technique is then run against the spec that will stay.
 1. **Design review** (8) — no tooling, one agent, the [brief](references/design-review.md).
 2. **Spec diff in the gate** (7) — one command and a [classification](references/spec-diff.md); it
    protects everything after it.
-3. **Mutation audit** (1) — reuses the suite you already have.
+3. **Mutation audit** (1) — `ess verify conform mutate`, run through your own suite runner.
 4. **Guard analysis** (6) — reads the IR only; no implementation runs.
-5. **Reference model and random sequences** (2) — the one piece of code the catalogue needs; build it
-   once.
-6. **Determinism** (4), **metamorphic relations** (5) and **caller replay** (3) — each reuses the
-   runner from step 5.
+5. **Random sequences** (2) — the explorer in the generated Go or TypeScript package; a reference
+   model of your own only where the explorer excludes what you need.
+6. **Determinism** (4) — the explorer twice with one seed. **Metamorphic relations** (5) and
+   **caller replay** (3) — a reference model you drive with your own traces.
 
 Stop where the cost exceeds what the spec is worth, and say which techniques were not run.
 
 ## What the IR is for
 
-Techniques 1–6 read the canonical IR, not the YAML:
+Anything you build for techniques 2–6 reads the canonical IR, not the YAML (`ess` and the explorer
+already do):
 
 ```console
 ess specify compile --path <specification> --format json --out <ir.json>
@@ -70,13 +71,18 @@ The IR is the resolved model: every name qualified, every guard in structured fo
 applied. A technique that reads the YAML re-implements resolution and disagrees with the compiler
 somewhere nobody looked.
 
-## The reference model
+## What `ess` ships for techniques 1 and 2
 
-Techniques 2, 3 and 5 rest on one small interpreter over the IR — about 150 lines — that answers,
-for any command in any state, what the spec says happens. `ess` does not ship it yet;
-[beyond10x/ess#114](https://github.com/beyond10x/ess/issues/114) proposes shipping the mutation audit
-and the sequence runner as `ess` features, and carries a draft for the TypeScript target. Until it
-ships, build it from the pattern: [references/reference-model.md](references/reference-model.md).
+- **Mutation audit:** `ess verify conform mutate` mutates the specification in nine
+  classes and writes `ess-mutation-report/1`. Against your own implementation, `--emit DIR` writes
+  the baseline's and every mutant's suite, your runner writes `report.json` beside each, and
+  `--collect DIR` scores them. [references/techniques.md](references/techniques.md) § 1.
+- **Reference model and random sequences:** the Go and TypeScript packages
+  `ess verify conform synthesize --target go|typescript` writes carry a seeded explorer
+  (`Explore`/`explore`) that walks your `Target` against a model interpreted from the IR, shrinks a
+  failure and fails on an unreached outcome. Use it for technique 2. Techniques 3 and 5 still need
+  a model you drive yourself, and so does a construct the explorer lists as `excluded`: build it from
+  [references/reference-model.md](references/reference-model.md).
 
 ## Reporting
 

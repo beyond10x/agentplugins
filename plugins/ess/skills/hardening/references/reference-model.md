@@ -4,12 +4,12 @@ Techniques 2, 3 and 5 compare an implementation with what the spec says happens.
 **reference model**: a small interpreter over the compiled IR that, given a state and a command,
 returns the outcome the spec declares. On one adopter it was about 150 lines of TypeScript.
 
-**Status.** `ess` does not ship this. [beyond10x/ess#114](https://github.com/beyond10x/ess/issues/114)
-proposes shipping the mutation audit and a seeded sequence runner built on this model as `ess`
-features, emitted beside the suite for `--target typescript` and `--target go` and driven through the
-same `Target` interface; the issue carries a draft (`explore.ts`) for the TypeScript target. Until it
-ships, write the model yourself from the pattern below, and check that issue before starting — once
-it ships, use what it emits instead.
+**Status.** The Go and TypeScript packages that
+`ess verify conform synthesize --target go|typescript` writes carry this model and a seeded
+sequence runner over it (`explore`/`Explore`, [techniques.md](techniques.md) § 2), bound to the
+suite's `spec_digest` through `ir.json`. Use that for technique 2. Write the model yourself from the
+pattern below when the runner's `excluded` list holds what you need, or for techniques 3 and 5,
+which drive the model with traces the explorer does not generate.
 
 ## Input
 
@@ -38,19 +38,25 @@ does not have.
 For `execute(command, input)`:
 
 1. **Pick the outcome.** Evaluate each outcome's `when:` predicate over the input — comparisons over
-   `input_field` and `literal` values, combined with and/or/not. Exactly one non-`wrong_state`
-   outcome must match; zero or two is a spec defect, report it rather than choosing.
-2. **Check the lifecycle.** For an outcome that `moves` an instance through a transition, look the
-   instance up by the outcome's `instance` field. Missing instance, or current state not in the
-   transition's `from`: answer with the command's `wrong_state` outcome instead, and **change
-   nothing** — no `sets`, no events. (That a `wrong_state` answer still applied `sets` was one of the
-   defects this found.)
+   `input_field` and `literal` values, combined with and/or/not — and a `when_subject` predicate
+   over the addressed instance's stored fields (with `input.<field>` operands from `ess/15`).
+   Exactly one non-`wrong_state` outcome must match; zero or two is a spec defect, report it rather
+   than choosing.
+2. **Check the lifecycle.** For an outcome that `moves`, `updates` or `deletes` an instance, look it
+   up by the outcome's `instance` field. A missing instance answers, in order, the command's
+   `unknown_instance:` outcome, its not-found outcome (an `external:` refusal whose `error:` carries
+   a field of the identity's type), or its `wrong_state` outcome. A current state not in the
+   transition's `from` answers `wrong_state`. Either way **change nothing** — no `sets`, no events.
+   (That a `wrong_state` answer still applied `sets` was one of the defects this found.)
 3. **Apply.**
-   - `creates`: a new identity (refuse to reuse one in `issued`), the lifecycle's `initial` state, the
-     fields the outcome sets.
+   - `creates`: a new identity (refuse to reuse one in `issued`), the `into:` state or else the
+     lifecycle's `initial`, the fields the outcome sets.
    - `moves`: set the state to the transition's `to`.
-   - `updates` / `sets`: write each field from its value expression (`input.<field>` or a literal).
-   - `error`: change nothing.
+   - `deletes`: remove the instance; its identity stays in `issued`.
+   - `updates` / `sets`: write each field from its value expression — `input.<field>`, a literal,
+     `{subject: f}` (the value before this step), `{increment: n}`, or `{generated: true}` (unknown
+     to the model: see Views).
+   - `error`, `preserves`, `accepts: nothing`: change nothing.
 4. **Emit.** For each event in `emits`, build its payload from the outcome's `payload` mapping.
 5. **Check invariants** of every instance the step touched, over its fields after the step.
 
