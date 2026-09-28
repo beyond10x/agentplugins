@@ -55,6 +55,26 @@
     },
     "unmapped": 3
   },
+  "ess-tutorial": {
+    "tool_calls": 35,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 17,
+      "refusals": 0
+    },
+    "outputs": [
+      "docs",
+      "implementation",
+      "openapi",
+      "spec",
+      "suite"
+    ],
+    "go_test": {
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
   "worktree-onboarding": {
     "tool_calls": 19
   }
