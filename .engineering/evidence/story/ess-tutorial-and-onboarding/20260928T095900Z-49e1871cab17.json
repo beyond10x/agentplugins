@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-28T09:59:00Z",
+  "actor": "human:timo",
+  "artifact": "story:ess-tutorial-and-onboarding",
+  "kind": "story",
+  "revision": 12,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins 0.17.0 release workflow (44bb0ee): gate, 4 b10x archives, SHA256SUMS 4/4 OK",
+    "reference": "https://github.com/beyond10x/agentplugins/actions/runs/36406424012"
+  }
+}
