@@ -506,6 +506,11 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
   the report that you made that edit.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
   `aep plan artifact relations` before you rely on it, the way you would any other vocabulary.
+* Check the first line before you record. It must be exactly `approve` or exactly
+  `needs-revision`, alone. A reply that opens with its reading notes or `approve — …` goes back to
+  that critic once, asking for the same report with the verdict alone on line 1; record what it
+  returns then, and say in your report which critic needed it. (Observed 2026-09-28: two of four
+  critics put the verdict elsewhere.)
 * Write them one at a time. Four critics return at once; the store takes one writer.
 * A later round is a **new** record, not an edit of the first. Two records that disagree are the
   history of a plan changing its mind, which is the thing worth having.
