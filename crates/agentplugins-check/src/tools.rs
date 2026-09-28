@@ -4,7 +4,9 @@
 //! R5), so the only thing that can drift is a product release renaming or removing a command the
 //! skills still spell. This check downloads each product's newest release — the prebuilt archive,
 //! checked against its `SHA256SUMS` — and runs `<cli> <subcommands> --help` for every command a
-//! code span or code block in that plugin spells. ESS's syntax example must also still validate.
+//! code span or code block in that plugin, or in a page under `website/docs/tutorials/`, spells.
+//! ESS's syntax example must also still validate, and the public tutorial's specification must
+//! validate, synthesize a Go suite with no refusals and pass it with its committed implementation.
 //! It runs on every pull request, every `main` push and daily; a red run is fixed by a skill edit.
 //!
 //! It also fails when a CLI's newest release is newer than `verified.json`, the release its skills
@@ -309,6 +311,95 @@ fn syntax(root: &Path, ess: &Path, scratch: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// The public tutorial's committed specification and Go implementation.
+pub const TUTORIAL: &str = "website/docs/tutorials/first-ess-specification";
+
+/// Tutorial pages, whose spelled commands are held to the newest releases like the skills'.
+pub const TUTORIALS: &str = "website/docs/tutorials";
+
+fn copy(from: &Path, to: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(to).map_err(|error| format!("{}: {error}", to.display()))?;
+    for entry in std::fs::read_dir(from).map_err(|error| format!("{}: {error}", from.display()))? {
+        let path = entry.map_err(|error| error.to_string())?.path();
+        let target = to.join(path.file_name().unwrap_or_default());
+        if path.is_dir() {
+            copy(&path, &target)?;
+        } else {
+            std::fs::copy(&path, &target)
+                .map_err(|error| format!("{}: {error}", path.display()))?;
+        }
+    }
+    Ok(())
+}
+
+/// Run in `dir` with `ESS_TOOLCHAIN_DELEGATED=1`, so a `requires:` pin in the tutorial's
+/// `ess-inputs.yaml` does not hand the command to the pinned release: the newest one is under test.
+fn run_in(dir: &Path, program: &str, arguments: &[&str]) -> Result<String, String> {
+    let output = Command::new(program)
+        .args(arguments)
+        .current_dir(dir)
+        .env("ESS_TOOLCHAIN_DELEGATED", "1")
+        .env("ESS_REPORT_FORMAT", "2")
+        .output()
+        .map_err(|error| format!("running {program}: {error}"))?;
+    let text = format!(
+        "{}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    if output.status.success() {
+        Ok(text)
+    } else {
+        Err(format!(
+            "{program} {} failed: {}",
+            arguments.join(" "),
+            text.trim()
+        ))
+    }
+}
+
+/// The tutorial, as a reader runs it: its specification validates and synthesizes a Go suite with
+/// no refusals, and its implementation passes that suite under `go test`.
+fn tutorial(root: &Path, ess: &Path, scratch: &Path) -> Result<(), String> {
+    let dir = scratch.join("tutorial");
+    copy(&root.join(TUTORIAL), &dir)?;
+    let ess = ess.to_string_lossy();
+    let fail = |step: &str, error: String| format!("{TUTORIAL}: {step}: {error}");
+    let validated = run_in(&dir, &ess, &["specify", "validate", "--path", "spec"])
+        .map_err(|error| fail("the specification no longer validates", error))?;
+    println!("tools `ess`: tutorial — {}", validated.trim());
+    let synthesized = run_in(
+        &dir,
+        &ess,
+        &[
+            "verify",
+            "conform",
+            "synthesize",
+            "--path",
+            "spec",
+            "--target",
+            "go",
+            "--out",
+            "impl",
+        ],
+    )
+    .map_err(|error| fail("synthesize failed", error))?;
+    if !synthesized.contains(" 0 refusal(s)") {
+        return Err(fail(
+            "the specification synthesizes with refusals",
+            synthesized.trim().to_owned(),
+        ));
+    }
+    println!("tools `ess`: tutorial — {}", synthesized.trim());
+    let tested = run_in(&dir.join("impl"), "go", &["test", "./..."])
+        .map_err(|error| fail("the implementation fails its suite", error))?;
+    println!(
+        "tools `ess`: tutorial — go test: {}",
+        tested.lines().next().unwrap_or_default().trim()
+    );
+    Ok(())
+}
+
 /// Check every plugin's spelled commands against its CLI's newest release.
 pub fn verify(root: &Path) -> Result<(), String> {
     let scratch =
@@ -326,7 +417,9 @@ pub fn verify(root: &Path) -> Result<(), String> {
                 problems.push(line);
             }
             let mut checked = 0;
-            for file in markdown(&root.join("plugins").join(plugin)) {
+            let mut files = markdown(&root.join("plugins").join(plugin));
+            files.extend(markdown(&root.join(TUTORIALS)));
+            for file in files {
                 let text = std::fs::read_to_string(&file).map_err(|error| error.to_string())?;
                 for path in spelled(&text, cli) {
                     checked += 1;
@@ -348,6 +441,7 @@ pub fn verify(root: &Path) -> Result<(), String> {
             println!("tools `{cli}` {tag}: {checked} spelled command(s) checked");
             if *cli == "ess" {
                 syntax(root, &binary, &scratch)?;
+                tutorial(root, &binary, &scratch)?;
             }
         }
         if problems.is_empty() {
