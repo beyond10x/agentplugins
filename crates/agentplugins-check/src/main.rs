@@ -12,6 +12,7 @@ mod report;
 mod tools;
 mod trial;
 mod trials;
+mod upstream;
 
 /// The marketplace identity in every marketplace format.
 const MARKETPLACE: &str = "b10x";
@@ -1146,6 +1147,9 @@ struct Cli {
 enum Top {
     /// The offline gate, then every spelled CLI command against the newest releases (network).
     Tools,
+    /// What moved in every repository this one depends on: releases with their changelog sections,
+    /// workflow pins and cited issues (network). Reports; fails only when it cannot read.
+    Upstream,
     /// Release checks.
     Release {
         #[command(subcommand)]
@@ -1270,6 +1274,7 @@ fn main() -> ExitCode {
     let result = match Cli::parse().command {
         None => check(&root),
         Some(Top::Tools) => check(&root).and_then(|()| tools::verify(&root)),
+        Some(Top::Upstream) => upstream::report(&root),
         Some(Top::Release {
             action: ReleaseAction::Verify { version },
         }) => check(&root).and_then(|()| verify_release(&root, &version)),
