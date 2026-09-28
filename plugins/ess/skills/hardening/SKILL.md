@@ -83,6 +83,13 @@ somewhere nobody looked.
   failure and fails on an unreached outcome. Use it for technique 2. Techniques 3 and 5 still need
   a model you drive yourself, and so does a construct the explorer lists as `excluded`: build it from
   [references/reference-model.md](references/reference-model.md).
+- **Several clients at once:** the same packages carry `ExploreConcurrent`/`exploreConcurrent`,
+  which drive 2–4 clients on a seeded clock, write `history-<seed>.json`, and call
+  `ess verify conform check-history --history <file>` to search for an order the specification's
+  model accepts. Exit 0 is linearizable, 1 a violation (with a shrunk history), 3 the search budget
+  ran out, which is never a pass. With `Inject`/`inject` it adds only the faults the specification
+  declares (`delivery: at_least_once`, `replays:`, `external:` branches). Use it for technique 2
+  wherever the service takes concurrent calls.
 
 ## Reporting
 
