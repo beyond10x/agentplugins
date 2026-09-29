@@ -40,6 +40,14 @@ The mechanism generalises, so learn to spot it by reading rather than by mutatin
 Do the mutation test once per mapping you rely on, and record in the commit that you did it and what
 failed. A scenario nobody has ever seen fail is a scenario that has never been tested.
 
+**A green suite does not prove the implementation's model.** It proves the fields its expectations
+read. If the implementation's entities, events or views were written by hand rather than generated
+(`ess:specifying`, "Implementation code comes from the specification"), a field no expectation
+names can have the wrong type, or be missing, and every scenario stays green. The same holds for
+guards: a synthesized scenario witnesses one value per `any_of`, so a guard over `[A, B]` is
+exercised with `A` and never with `B`. Cover the other values with the implementation's own tests,
+and prove each one can fail by breaking it once.
+
 **A cheaper check comes first: would the scenario pass against a target that does nothing?** Point
 the suite at a target whose every `ExecuteCommand` returns an accepted outcome with no state change
 and whose every `QueryView` returns an empty row. A scenario that passes there asserts only that a
