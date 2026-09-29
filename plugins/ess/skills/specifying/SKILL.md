@@ -227,6 +227,34 @@ The same typed IR must produce the same ordered files and bytes. Compare a regen
 tree with the committed tree before replacing anything. A stale committed file is drift; a file no
 projection owns is not authority.
 
+## Implementation code comes from the specification
+
+**Never hand-transcribe the model into code.** Entities, their states and transitions, command
+inputs, outcomes, events, errors and views are generated; the implementation fills in only what the
+specification cannot say:
+
+```console
+ess generate synthesize --path <specification> --target rust --out <directory>
+```
+
+The generated workspace carries one `…Behavior` trait per command and one `…Query` trait per view,
+each stubbed with a typed refusal. Implement those traits and nothing beside them. Commit the
+generated tree and hold it in the gate: regenerate into a temporary directory and fail on any
+difference, exactly as for projections above. When the specification changes, regenerate; the
+compiler then names every handler the change touched.
+
+A hand transcription drifts, and nothing catches it. One passed a 669-scenario conformance suite
+with every entity field unchecked: a scenario only reads the fields its expectations name, so a
+wrong field type or a missing field that no expectation reads stays green.
+
+**When `synthesize` refuses the specification,** the refusal names each position the target cannot
+represent. That is a gap in ESS, not a licence to transcribe: file it on beyond10x/ess with the
+refusal lines. Until the fix is released, a hand-written model is allowed only with a test that
+compares it against `ess specify compile --path <specification> --format json`: every entity's
+fields and their types, every lifecycle's states and transitions, every command's input, every
+event's and error's fields, every view's fields, and every actor's `may` list. Names alone are not
+enough. Replace the hand-written model with the generated one as soon as the release is out.
+
 ## Conformance is a record, not a claim
 
 In the planning store an `executable-system-specification` is `conforming` because a suite ran and
