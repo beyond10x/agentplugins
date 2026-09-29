@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.19.0] — 2026-09-29
+
+A new skill investigates what cannot be re-run: a production incident, an outage, or a question
+about a running system. `aep:diagnosing` builds a failing command first. `aep:investigating`
+keeps the evidence and cites where every fact came from.
+
+- New skill: `aep:investigating`, with ten techniques in `references/techniques.md`: capture
+  before remediation, a sourced UTC timeline, onset from state, peer differential, negative
+  claims, ship state, a hypothesis ledger, checking the check, complete reads, and the
+  post-incident report. Each technique names the failure it was written from. The investigation
+  is an `incident-report` artifact, observations are `health_observation` evidence, and each
+  follow-up is a draft story.
+- `aep:diagnosing` and `b10x:routing` send an incident that cannot be re-run to
+  `aep:investigating`.
+- No eval case covers the new skill yet; `evals/README.md` lists it with the uncovered ones.
+- `verified.json` still pins aep 0.64.0 and ess 0.39.0. aep 0.65.0 and ess 0.42.0 are not yet
+  re-verified: `agentplugins-check tools` reports `aep plan artifact divergences`, spelled in
+  `aep:planning`, as not a command of aep 0.65.0.
+
 ## [0.18.0] — 2026-09-28
 
 A second tutorial continues the first: the ESS tutorial's library gets an AEP plan, four critics

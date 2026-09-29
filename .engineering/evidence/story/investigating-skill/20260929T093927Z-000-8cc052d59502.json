@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-29T09:39:27Z",
+  "actor": "human:timo",
+  "artifact": "story:investigating-skill",
+  "kind": "story",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check",
+    "reference": "feat/aep-investigating"
+  }
+}
