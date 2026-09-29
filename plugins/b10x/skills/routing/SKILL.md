@@ -32,6 +32,7 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Move an existing backlog into the AEP store without losing its sources | `aep:migrating` |
 | Scope and deliver accepted development work through a reviewed wave | `aep:implementing` |
 | Diagnose a failing, flaky or slow behaviour through a red-capable loop | `aep:diagnosing` |
+| Investigate a production incident, an outage, an onset or a ship state from cited evidence | `aep:investigating` |
 | Specify a system or API | `ess:specifying` |
 | Derive a specification for an existing system | `ess:retrofitting` |
 | Run or raise a conformance suite | `ess:testing-conformance` |

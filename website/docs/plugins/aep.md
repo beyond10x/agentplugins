@@ -77,6 +77,15 @@ that reproduces the real call pattern. The red and green runs are recorded as `t
 evidence against the owning story. When no such seam exists, the missing seam is filed as a draft
 story.
 
+The `investigating` skill handles what cannot be re-run: a production incident, an outage, or a
+question about a running system such as "when did this start" or "is the fix deployed". It
+captures the process state before anyone restarts it, builds a UTC timeline where every row names
+its source, dates an onset from an instrument that can see a negative, and checks each anomaly
+against a healthy peer. Every claim is labelled verified or inferred. The investigation is an
+`incident-report` artifact, its observations are `health_observation` evidence, and each
+follow-up is a draft story. Ten techniques cover the work, from capture before remediation to the
+postmortem.
+
 Every role above, in both halves, is written once, as `references/<role>.md` of the skill that
 owns it. Claude Code runs it as a subagent through a thin `agents/<role>.md` adapter; Codex, which
 loads skills but not `agents/`, runs the same file directly.

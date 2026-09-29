@@ -17,7 +17,7 @@ A case is four things and no others:
 Every cell in the middle column is that case's `subject:` in full, read from its `case.yaml`, and
 those fields — not this table and not any prose elsewhere — are the source of truth for what the
 corpus covers: counted from them the seventeen cases name **8 of this repository's 14 agents** and
-**6 of its 21 skills** (the 6 command skills are not counted).
+**6 of its 22 skills** (the 6 command skills are not counted).
 
 | Case | `subject:` agents and skills | The claim it holds the subject to |
 |---|---|---|
@@ -40,7 +40,7 @@ corpus covers: counted from them the seventeen cases name **8 of this repository
 | `authoring-prohibition-only-rule` | `b10x:authoring-plugins` | a wording review read the seeded skill, edited nothing, and named the prohibition with a positive target |
 
 No case names the agents `aep:implementor`, `aep:plan-reviewer`, `aep:reverse-engineer`,
-`ess:author`, `ess:conformance` or `ess:retrofitter`, nor the activity skills `aep:migrating`,
+`ess:author`, `ess:conformance` or `ess:retrofitter`, nor the activity skills `aep:migrating`, `aep:investigating`,
 `b10x:routing`, `ess:retrofitting`, `ess:testing-conformance`, `ess:hardening` or
 `worktree:managing-worktrees`, nor any `init` or `upgrade` skill; a change to one of them turns no
 row red. The `aep` ones are the remaining scope of `story:plugin-eval-cases` in
