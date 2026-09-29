@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.19.1] — 2026-09-29
+
+The ess skills now say where implementation code comes from: the specification, through
+`ess generate synthesize`, and never a hand transcription. A hand-transcribed model passed a
+669-scenario conformance suite with every entity field unchecked.
+
+- `ess:specifying` gains "Implementation code comes from the specification": fill the generated
+  `…Behavior` and `…Query` obligations, commit the generated tree, and fail the gate when a
+  regeneration differs. When `synthesize` refuses a specification, file the refusal on
+  beyond10x/ess; until the fix ships, a hand-written model needs a test that compares it with the
+  compiled IR field by field.
+- `ess:testing-conformance`: a green suite proves only the fields its expectations read, and a
+  synthesized scenario witnesses one value per `any_of` guard.
+- `verified.json` does not move: `agentplugins-check tools` still reports aep 0.65.0 and ess 0.43.0
+  as newer than verified, and `aep plan artifact divergences` as not a command of aep 0.65.0. The
+  commands the new sections spell pass against ess 0.43.0.
+
 ## [0.19.0] — 2026-09-29
 
 A new skill investigates what cannot be re-run: a production incident, an outage, or a question
