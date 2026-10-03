@@ -30,6 +30,12 @@ After verification, preserve the small logs, reports, or deliverables needed for
 
 ## Finish and clean up
 
+An explicit cleanup request authorizes removal of eligible trees in the requested scope. Inspect
+that scope, review the dry-run results yourself, and proceed to exact-id apply without another
+approval prompt. A request only to inspect, review, or dry-run ends with the findings. Retain trees
+with unresolved ownership, recovery, lease, lock, or work-state blockers and report the reason;
+cleanup authorization does not waive those checks or authorize publishing someone else's work.
+
 1. Commit and publish every wanted change. A local-only commit is deliberately not cleanup-safe. Work merged as rebased or cherry-picked copies also qualifies when an advertised ref carries every unique commit's exact patch; GC reports that proof as `patch-equivalent`.
    When work must not be published, run `worktree archive <tree>` instead. It never modifies the tree; it writes `commits.bundle` (every commit no advertised ref holds), `dirty.patch` (tracked, untracked and ignored changes over HEAD) and a `worktree.archive/1` `manifest.json` below the state directory's `worktree/archives/<repository>/<id>/`, and verifies them. GC then accepts that archive as `archive` proof while HEAD and every file still match it exactly; any later commit or edit is refused as `archive-stale` until `worktree archive --replace <tree>` writes a new one. `--replace` moves the old archive aside and never deletes it. Every ignored file is archived, so remove this task's build output first (see *Bound disposable storage*); submodules, nested repositories, special files and paths containing a newline are refused as `archive-unsupported-entry`. GC apply returns an archived dirty tree to HEAD, removes it without force, and keeps the archive.
 2. Preserve required evidence and remove this task's disposable output as described above. Release your own lease, then run `worktree finish <tree>`. It refuses locked, unmanaged, live, or mid-operation Git worktrees, and dirty ones unless their archive holds exactly the current state.
