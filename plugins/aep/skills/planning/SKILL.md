@@ -69,15 +69,14 @@ or relations. Ask for them at the moment you need them:
 | What does this one artifact say, frontmatter and body? | `aep plan artifact show <id>` |
 | What has happened to it, oldest first? | `aep plan artifact history <id>` |
 | Why is it at this status — what did the store admit before each move? | `aep plan artifact explain <id>` |
-| What writes has one side of a hybrid plan taken that the other has not? | `aep plan artifact divergences` |
 | Which stories may be implemented at once, from their typed `scope` and `depends_on`? | `aep plan artifact waves [--kind k] [--status s] [--format json]` |
 | What did the latest review of an artifact find that the one before did not? | `aep plan artifact findings <id> [--from <review> --to <review>]` |
 | Per reviewer, what did their findings change and what did their verdicts cost? | `aep plan artifact review-value [--since <YYYY-MM-DD>]` |
 | Is the whole store still consistent? | `aep plan artifact validate` |
 
-That is every `aep plan artifact` verb that answers a question. The nine that are
-missing from it write — `new`, `move`, `relate`, `unrelate`, `body`, `set`, `scope`, `evidence`,
-`catch-up` — and guardrail 2 governs those. Run `aep plan artifact --help` when this table and the
+That is every `aep plan artifact` verb that answers a question. The eight that are
+missing from it write — `new`, `move`, `relate`, `unrelate`, `body`, `set`, `scope`, `evidence`
+— and guardrail 2 governs those. Run `aep plan artifact --help` when this table and the
 CLI disagree; the CLI is right.
 
 The reason is the reason this project exists. Lifecycle and relation documents are validated and

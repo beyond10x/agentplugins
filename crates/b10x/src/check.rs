@@ -398,15 +398,17 @@ mod tests {
             ))
         };
         let map = cache("0.30.0");
-        assert!(lines(
-            &catalog,
-            &plugins,
-            &found,
-            Some((1_000, &map)),
-            1_000 + 86_400,
-            &unpinned()
-        )
-        .is_empty());
+        assert_eq!(
+            lines(
+                &catalog,
+                &plugins,
+                &found,
+                Some((1_000, &map)),
+                1_000 + 86_400,
+                &unpinned()
+            ),
+            Vec::<String>::new()
+        );
     }
 
     #[test]

@@ -845,13 +845,13 @@ mod tests {
             failed: 0,
             skipped: 11,
         }));
-        assert!(worse(&full(), &full()).is_empty());
+        assert_eq!(worse(&full(), &full()), Vec::<String>::new());
         assert!(
             worse(&full(), &better).is_empty(),
             "{:?}",
             worse(&full(), &better)
         );
-        assert!(worse(&Measures::default(), &full()).is_empty());
+        assert_eq!(worse(&Measures::default(), &full()), Vec::<String>::new());
     }
 
     #[test]
