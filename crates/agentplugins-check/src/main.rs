@@ -1560,7 +1560,10 @@ one product only: `b10x upgrade ess`
             retired_hits("a\nplugins/aep-planning/x\n", planning, false),
             vec![2]
         );
-        assert!(retired_hits("plugins/aep/x\n", planning, false).is_empty());
+        assert_eq!(
+            retired_hits("plugins/aep/x\n", planning, false),
+            Vec::<usize>::new()
+        );
     }
 
     /// The marker excuses a line in a specification a transcript is replayed against, and nowhere

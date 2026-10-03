@@ -247,7 +247,10 @@ fff  b10x-harness-0.13.2-.tar.gz
             listed_targets(sums, "b10x-harness", "0.13.2"),
             "a leading v on the tag is not part of the archive name"
         );
-        assert!(listed_targets("", "b10x-harness", "0.13.2").is_empty());
+        assert_eq!(
+            listed_targets("", "b10x-harness", "0.13.2"),
+            BTreeSet::new()
+        );
         for target in listed_targets(sums, "b10x-harness", "0.13.2") {
             let name = archive_name("b10x-harness", "0.13.2", &target);
             assert_eq!(listed_digest(sums, &name), Some("aaa"));

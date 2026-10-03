@@ -1133,9 +1133,18 @@ mod tests {
     fn cli_versions_are_found_and_skill_versions_are_not() {
         assert_eq!(quoted_versions("at AEP 0.55.0 the verb"), ["aep 0.55.0"]);
         assert_eq!(quoted_versions("output of ESS `0.29.0`"), ["ess 0.29.0"]);
-        assert!(quoted_versions("**Skill version 0.13.1** — the version").is_empty());
-        assert!(quoted_versions("ess-cli 0.30.0 is not a quote of a CLI name").is_empty());
-        assert!(quoted_versions("aep plan artifact list").is_empty());
+        assert_eq!(
+            quoted_versions("**Skill version 0.13.1** — the version"),
+            Vec::<String>::new()
+        );
+        assert_eq!(
+            quoted_versions("ess-cli 0.30.0 is not a quote of a CLI name"),
+            Vec::<String>::new()
+        );
+        assert_eq!(
+            quoted_versions("aep plan artifact list"),
+            Vec::<String>::new()
+        );
     }
 
     #[test]

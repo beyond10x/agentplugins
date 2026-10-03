@@ -1115,7 +1115,10 @@ mod tests {
     fn a_case_whose_manifest_pins_nothing_repeats_nothing() {
         // A single-plugin stream is unambiguous and `aep` reads the treatment out of it, so a
         // replay that added arguments would be inventing the experiment.
-        assert!(treatment_args(&case_about(&["b10x"]), Vec::new()).is_empty());
+        assert_eq!(
+            treatment_args(&case_about(&["b10x"]), Vec::new()),
+            Vec::<String>::new()
+        );
     }
 
     #[test]

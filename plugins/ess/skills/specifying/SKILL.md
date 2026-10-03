@@ -237,8 +237,10 @@ specification cannot say:
 ess generate synthesize --path <specification> --target rust --out <directory>
 ```
 
-The generated workspace carries one `…Behavior` trait per command and one `…Query` trait per view,
-each stubbed with a typed refusal. Implement those traits and nothing beside them. Commit the
+Choose the implementation language before writing code: `--target rust` generates a Rust workspace;
+`--target go` generates a Go module. Both carry generated model types, `…Behavior` command contracts
+and `…Query` view contracts (traits in Rust, interfaces in Go). Read `PLAN.md` and `TARGET.md`, use
+the generated behavior where present, and implement the remaining ports and obligations. Commit the
 generated tree and hold it in the gate: regenerate into a temporary directory and fail on any
 difference, exactly as for projections above. When the specification changes, regenerate; the
 compiler then names every handler the change touched.
@@ -279,7 +281,10 @@ subject through what its views publish; no view publishes …` means a wrong-sta
 changed those fields would pass, and a view publishing them closes it; `declares no not-found and
 no wrong_state outcome` means an unknown id has no declared answer (`unknown_instance:` in
 [references/later-formats.md](references/later-formats.md)). Relay every note with the refusals. `--target go` or `--target typescript` writes the suite as a test
-package your implementation runs; `ess:testing-conformance` says what to run it against.
+package your implementation runs; `ess:testing-conformance` says what to run it against. The Go
+suite is written under `<out>/essconform` without a `go.mod`: generate it inside the implementation
+module, or give its enclosing directory a module and import it with a local replacement. Keep the
+generated suite unchanged.
 `run` holds a built-in reference implementation to it; `--target` lists the ones this binary
 carries. `evidence --from` reads the kind, the source and the instant out of the report and refuses
 a report of no scenarios or with no `spec_digest`. A report/2 (`--report-format 2`) is
