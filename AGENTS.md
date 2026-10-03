@@ -57,8 +57,12 @@ Commit and push through `b10x-gates bot --repo . -- <git-command>` as `b10x-bot[
 No credential or token machinery lives in this repository. A release is a bare annotated tag on
 `main` after `CHANGELOG.md`, the workspace version, every carried plugin manifest and every
 `**Skill version**` line agree; the
-release workflow reruns the gate and publishes the `b10x` archives, `SHA256SUMS` and `SETUP.md`,
-with the version's `CHANGELOG.md` section as the release notes.
+release workflow reruns the gate and retains the four `b10x` archives, `SHA256SUMS`, `SETUP.md`
+and the version's changelog notes in its `release-publication` artifact. Download that exact tag
+run's artifact, verify the checksums and archive contents, then publish the release and those six
+assets through `b10x-gates api` and `b10x-gates gh` as the organization bot. The workflow has
+read-only permissions and does not publish through the default Actions identity. Verify the
+published release's author, tag and assets before reporting completion.
 Source publication needs no Atlas checkout.
 
 <!-- b10x-docs-operations:start -->

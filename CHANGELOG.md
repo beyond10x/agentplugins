@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.19.2] — 2026-10-03
+
+- An explicit Worktree cleanup request authorizes exact eligible removals without a second
+  approval prompt. Inspection-only requests remain read-only; recovery and lease checks remain.
+- Restore the Rust 1.99 gate without weakening test assertions, and remove obsolete AEP command
+  inventory entries.
+- Verify the skills against AEP 0.68.0, ESS 0.52.0 and Worktree 0.8.2. Two isolated ESS
+  full-package trials produced all nine outputs and passed 24 and 15 scenarios without failures
+  or skips; the recorded trial evidence states the limits of those observations.
+- Clarify Rust and Go implementation synthesis and Go conformance package placement.
+- The release workflow prepares checksummed artifacts with read-only permissions; publication
+  uses the organization bot rather than the default Actions identity.
+
 ## [0.19.1] — 2026-09-29
 
 The ess skills now say where implementation code comes from: the specification, through
