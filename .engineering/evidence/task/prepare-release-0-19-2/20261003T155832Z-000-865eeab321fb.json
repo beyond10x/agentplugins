@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-03T15:58:32Z",
+  "actor": "human:timo",
+  "artifact": "task:prepare-release-0-19-2",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Rust 1.99 task check passed: 145 tests, plugin version alignment and offline eval gate"
+  }
+}
