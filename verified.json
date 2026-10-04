@@ -1,5 +1,8 @@
 {
   "aep": "0.68.0",
   "ess": "0.52.0",
-  "worktree": "0.8.2"
+  "worktree": "0.8.2",
+  "metaharness": "0.9.1",
+  "b10x-harness": "0.13.3",
+  "connectors": "0.25.1"
 }

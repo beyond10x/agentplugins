@@ -74,7 +74,14 @@
       "intent": "Connect external tools and providers",
       "summary": "Set up providers and invoke governed integrations through the connectors CLI.",
       "plugins": ["connectors"],
-      "binaries": []
+      "binaries": [
+        {
+          "name": "connectors",
+          "install": {
+            "cargo": { "repository": "beyond10x/connectors", "package": "connectors" }
+          }
+        }
+      ]
     }
   ],
   "retired_plugins": {
