@@ -6,6 +6,9 @@ description: >-
 
 # ESS schema validation and projection
 
+Before acting, complete the [repository preflight](references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Treat the Rust-owned specification model and compiler as the authority. Do not infer a contract
 from generated artifacts and do not repair a failed import by inventing lifecycle meaning.
 

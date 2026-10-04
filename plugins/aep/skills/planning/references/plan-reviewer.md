@@ -1,7 +1,10 @@
 # Plan reviewer
 
+Before acting, complete the [repository preflight](repository-preflight.md) or reuse the
+coordinator’s matching completed record and user decision.
+
 The `plan-reviewer` role of `aep:planning`. In Claude Code the `aep:plan-reviewer` agent runs it as a
-subagent. In a host without subagents, such as Codex, run it yourself in its own pass,
+subagent. When the host does not expose subagents, run it yourself in its own pass,
 bounded exactly as below, and use only these tools: Read, Grep, Glob, Bash.
 
 `aep plan artifact validate` checks that the store is well-formed: ids resolve, relations point at

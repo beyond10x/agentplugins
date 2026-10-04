@@ -6,8 +6,13 @@ description: Guided onboarding for Beyond10x — ask what the user wants to do (
 # Set up Beyond10x
 
 The `b10x` CLI decides; you converse. It reads what is installed on this host, which CLIs are on
-`PATH`, and what the `b10x` marketplace serves, and prints exact actions. You ask the user two
-questions, show one list of changes, and apply it only after they confirm.
+`PATH`, and what the `b10x` marketplace serves, and prints exact actions. Reuse stated product
+and installation preferences, show the concrete changes, and apply only authorized actions.
+
+For repository work involving AEP or ESS, complete the shared repository preflight through
+`aep:upgrade` or `ess:upgrade` before declaring setup current or offering upgrades. Use
+`b10x skill <plugin>:upgrade` when its text is not loaded; if unavailable, report that gap. Reuse
+the same product/session decision at the eventual activity handoff.
 
 Never run `claude plugin …` or `codex plugin …` yourself for this, and never edit plugin settings by
 hand: `b10x setup apply` snapshots every file it changes, and `b10x setup undo` restores them.
@@ -39,10 +44,13 @@ question tool when it has one (Claude Code: `AskUserQuestion` with `multiSelect:
 command -v cargo
 ```
 
-Ask: *How should the command-line tools be installed?* — **prebuilt** (the default: downloads the
+Inspect supported methods per catalogued CLI first. A source-only release (such as Connectors)
+requires Cargo; report an unavailable Rust toolchain explicitly instead of promising binary assets.
+Reuse any stated installation preference. Otherwise ask: *How should the command-line tools be
+installed?* — **prebuilt** (the default: downloads the
 release's checksummed archive; no Rust toolchain needed) or **cargo** (builds every crate from the
-release tag; offered only when `cargo` is on `PATH`). Without `cargo`, say prebuilt is used and skip
-the question.
+release tag; offered only when `cargo` is on `PATH`). Without `cargo`, use prebuilt only for CLIs
+that supply it and report source-only products as blocked on that prerequisite.
 
 ## 4. Plan and confirm
 
@@ -59,7 +67,8 @@ answer to step 3.
 It prints a summary and writes the plan to the file. List every change it names in one numbered
 list, one line each, and call out: CLIs it installs or replaces (which version, where), earlier
 installs it replaces, and anything under `warn` (a shadowed CLI copy, an edit to a committed file).
-Ask one yes/no question; anything but a clear yes changes nothing.
+Reuse authorization already given for these actions. Otherwise ask one yes/no question;
+without authorization, leave the plan unapplied.
 
 ## 5. Apply
 
@@ -67,7 +76,7 @@ Ask one yes/no question; anything but a clear yes changes nothing.
 b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 ```
 
-Pass `--yes` only after the user said yes to this exact list. It refuses a plan whose installed
+Pass `--yes` only when existing or newly given authorization covers this exact list. It refuses a plan whose installed
 state changed since it was made; plan again if it does. Relay the snapshot path, how many actions
 ran and whether it converged; on a failure, the failing line verbatim and `b10x setup undo`.
 

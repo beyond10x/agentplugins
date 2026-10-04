@@ -6,6 +6,9 @@ description: >-
 
 # ESS conformance coverage
 
+Before acting, complete the [repository preflight](../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 A conformance suite is a measurement instrument. This skill is about whether the instrument reads
 anything, and about raising what it reads without lying about it.
 
@@ -291,21 +294,21 @@ refusing outcome's name beside `Error`: the runner compares it for refusals too,
 generated comment on `CommandResult` says (beyond10x/ess#186).
 Keep a suite for a domain nobody has implemented; run it once something answers it.
 
-Four version facts decide whether these packages run a suite at all:
+Verify the generated package against the exact suite before claiming runner support:
 
-- Suites from `ess-conformance/8` on run only with `ESS_REPORT_FORMAT=2` set: without it `go test`
-  stops before the first scenario (`suite/8 through /21 require explicit ESS_REPORT_FORMAT=2 before
-  execution`). Set it in the command, `ESS_REPORT_FORMAT=2 go test ./...`, or in the CI job.
-
-- A command with `fixture_inputs:` needs the target to supply the values: implement
-  `FixtureValues` (Go) or `fixtureValues` (TypeScript). Without it every scenario using a fixture is
-  an explicit skip, so a fixture provider is the first thing to check when skips cluster there.
-- A specification using `deletes:` or `accepts: nothing` synthesizes `ess-conformance/22`/`23`, and
-  one using `presence:` synthesizes `/24`/`25`. The Go and TypeScript runners refuse
-  those suites by version (the Go runtime admits up to `/21`), so no implementation of yours can be
-  held to them yet. Report such a suite as not run, never as a pass.
-- Both packages also carry the random-sequence explorer (`explore`/`Explore`); `ess:hardening`
-  technique 2 says how to wire it.
+- Read the selected release’s runner contract and the generated package’s admission check.
+  Capture the producer version, suite format and report format together; source format alone
+  cannot establish runner compatibility. The verified compatibility snapshot is
+  [runner-capabilities.md](references/runner-capabilities.md). Read it when a runner refuses a
+  suite or the target uses deletion, absent input, presence or fixtures.
+- Run the generated Go package with `ESS_REPORT_FORMAT=2 go test ./...` from its owning module.
+  Use the generated TypeScript README’s runner command with the same report selection. Verify
+  that scenarios execute, then introduce a controlled wrong target response and require failure;
+  an accepted suite header alone is not execution evidence.
+- A command with `fixture_inputs:` needs `FixtureValues` (Go) or `fixtureValues` (TypeScript).
+  Missing fixture values produce explicit skips. Retain them in the reported counts.
+- Both packages carry the random-sequence explorer (`explore`/`Explore`); `ess:hardening`
+  technique 2 says how to wire it. Report an unsupported suite as not run, never as a pass.
 
 ## Agents
 

@@ -5,6 +5,9 @@ description: Start with ESS (Executable System Specifications) in this project �
 
 # Start with ESS
 
+Before acting, complete the [repository preflight](../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 ESS is a typed model of a system — entities, commands, events, views and the component that runs
 them — that validates, compiles, projects JSON Schema and OpenAPI, and synthesises conformance
 suites. The `ess` CLI is the authority; these skills tell you how to drive it.
@@ -23,7 +26,7 @@ It prints what it would do, including the install method: the prebuilt, checksum
 by default, or `cargo` (a source build) when the user asks for it and a Rust toolchain is on `PATH`.
 When both are possible, say which is planned and offer the other; re-run with `--method cargo` if
 they choose it, show the plan, and
-after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
+after authorization (including the preflight’s existing decision) run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 

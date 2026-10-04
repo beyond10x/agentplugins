@@ -3,9 +3,10 @@ name: implementing
 description: Implement accepted AEP work, in one of two modes. A wave picks the stories that can be implemented at once, proposes the wave for approval, dispatches one implementor per story into its own worktree, sends each result to the adversary and merges what goes green. A drive hands one story to a governed `metaharness aep drive` run and reports the run id. Use when the operator asks to implement, build or deliver planned stories, to pick or start the next wave, to implement several stories in parallel or fan out across sub-agents, to drive a story or start a governed run, or asks why a wave's rules are instructions and a drive's are enforced. A wave proposes first and stops; a drive starts one run and reports; neither moves an artifact itself.
 ---
 
-**Skill version 0.19.2** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
-
 # Implementing accepted work
+
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
 
 Planned work comes from the AEP store (`aep:planning`). This skill turns accepted stories into merged
 code, in one of two modes:
@@ -22,19 +23,6 @@ question that names both. Then read that mode's reference in full; this page onl
 The operator can also name the mode directly: `/aep:wave [story-id…]` (`aep:wave`) or
 `/aep:drive <story-id>` (`aep:drive`), two commands that load this skill in that mode.
 
-## The store's version, first
-
-Before reading or writing the store, read `version` in `.engineering/project.yaml`. On anything but
-`aep.project/5`, tell the user once, before any store write, which version it is and its upgrade;
-do not wait for `aep` to print a notice:
-
-| the store | upgrade |
-|---|---|
-| `aep.project/1`, or `.engineering/planning/` with no `project.yaml` | `aep plan store migrate git --verify` on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, `aep:planning` § 5), then commit. Every verb still works (with no `project.yaml`, only given `--store <dir>`); carry on |
-| `aep.project/2`, `/3` or `/4` | `cargo install --git https://github.com/beyond10x/aep --rev 9c0f1da44429ff935fa0b2d743457945d51e1c51 aep-cli`, then `aep plan store migrate git --verify` on a clean `.engineering`, commit, then install the current release (`aep:upgrade`). Every planning verb refuses the store: stop and report |
-
-`aep:upgrade` carries the steps; the user decides when the migration runs.
-
 ## Rules for both modes
 
 - Implement only stories the store shows as accepted; neither mode moves an artifact itself.
@@ -44,8 +32,11 @@ do not wait for `aep` to print a notice:
 
 ## Agents
 
+Delegate using the host’s available subagent tools; capability detection applies equally to Codex
+and Claude Code. Pass the completed preflight and user decision with every brief.
+
 Each role's full procedure is `references/<role>.md` beside this skill; the agent file of the same
-name is a thin Claude Code adapter over it. In a host without subagents, such as Codex, run the role
+name is a thin Claude Code adapter over it. When the host does not expose subagents, run the role
 yourself from that file, in its own pass and within the tools it names.
 
 - `story-scoper` — works out where one story lands and returns its Scope section; runs before a wave is proposed. ([procedure](references/story-scoper.md))

@@ -5,26 +5,19 @@ description: Check whether the ESS plugin and the `ess` CLI are current, and upg
 
 # Upgrade ESS
 
-```bash
-b10x upgrade ess --host claude --out ~/.local/state/b10x/plan.json
-```
+Before acting, complete the [repository preflight](../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
 
-Use `--host codex` in Codex. It compares the installed `ess` plugin with what the marketplace serves and the `ess` on `PATH` with
-the newest ESS release, and prints each difference with the action that fixes it. Nothing is
-changed yet.
+Read the [repository preflight](../specifying/references/repository-preflight.md) in full. It
+compares installed and effective releases, project pins, source families and generated formats
+before declaring anything current, and combines applicable upgrades in one session offer.
 
-- Nothing to change: say "ESS is current" with both versions, and stop.
-- Otherwise show the actions in one list and ask once. After a clear yes:
-  `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
-- A new plugin version loads in a new session; until then `b10x skill ess:<skill>` prints the new text.
-- A project whose `ess-inputs.yaml` pins `requires: ess X.Y.Z` keeps running that release after the
-  upgrade. Moving the project is a separate change to its repository:
-  `ess specify toolchain install <new-version> --pin` rewrites the pin, and
-  `ess specify toolchain which` confirms the release that now runs there.
+Apply only the accepted installation, source semantics, pin and regeneration changes. A source
+that still validates may still have an applicable format upgrade; a no-action installation plan
+is not a completed repository check. ESS has no general migration command.
 
-No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
+A new plugin version loads in a new session; `b10x skill ess:<skill>` prints the installed text.
+When `b10x` is missing, follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md.
 
-## Next
-
-- Continue the work that prompted the check: `ess:specifying`, `ess:retrofitting` or
-  `ess:testing-conformance`.
+Finish with the preflight’s effective-toolchain, validation, regeneration and conformance evidence,
+then continue the original task.

@@ -1,7 +1,10 @@
 # Scope critic
 
+Before acting, complete the [repository preflight](repository-preflight.md) or reuse the
+coordinator’s matching completed record and user decision.
+
 The `plan-critic-scope` role of `aep:planning`. In Claude Code the `aep:plan-critic-scope` agent runs it as a
-subagent. In a host without subagents, such as Codex, run it yourself in its own pass,
+subagent. When the host does not expose subagents, run it yourself in its own pass,
 bounded exactly as below, and use only these tools: Read, Grep, Glob, Bash.
 
 You are given a set of artifact ids and the artifact they were drafted from. Two questions, and they

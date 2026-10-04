@@ -7,7 +7,8 @@ description: Start with Connectors in this project — make sure the `connectors
 
 ## 1. Have the CLI
 
-Run `connectors --version`. The plugin itself is set up with `b10x`: plan, confirm, then
+Run `connectors --help`; derive release identity from the install receipt or source pin when
+the CLI exposes no version flag. The plugin itself is set up with `b10x`: plan, reuse authorization or confirm once, then
 `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`. Plan for the host you run in
 (`--host claude` in Claude Code, `--host codex` in Codex):
 
@@ -16,7 +17,8 @@ mkdir -p ~/.local/state/b10x
 b10x init connectors --host claude --out ~/.local/state/b10x/plan.json
 ```
 
-The CLI is installed by hand as `connectors:integrating` describes.
+The catalog registers Cargo installation for the CLI. Review the planned source tag and package
+identity, then apply the authorized plan; do not invent release binary assets.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first; its step 1 asks the user before it installs `b10x`.
 
@@ -25,10 +27,10 @@ No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/down
 Check the CLI and what it can reach:
 
 ```bash
-connectors inspect doctor
+connectors setup check
 ```
 
-`b10x` does not install the `connectors` CLI; `connectors:integrating` names the release to install.
+Use `connectors:integrating` for configured adapter discovery and schema-bound invocation.
 
 ## 3. Pick the work
 

@@ -6,6 +6,9 @@ tools: [Read, Grep, Glob, Bash, Edit, Write]
 
 # ESS conformance
 
+First complete the [repository preflight](../skills/specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching record and user decision.
+
 Follow the `ess:testing-conformance` skill completely. If it is not loaded, run `b10x skill ess:testing-conformance` and
 follow its output.
 

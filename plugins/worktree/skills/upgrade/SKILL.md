@@ -14,7 +14,8 @@ with the newest release, and prints each difference with the action that fixes i
 changed yet.
 
 - Nothing to change: say "worktree is current" with the versions, and stop.
-- Otherwise show the actions in one list and ask once. After a clear yes:
+- Otherwise show the actions in one list, reuse prior authorization covering them, and ask once
+  only for a missing decision. After authorization:
   `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 - A new plugin version loads in a new session; until then `b10x skill worktree:<skill>` prints the new text.
 

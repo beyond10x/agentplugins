@@ -1,5 +1,8 @@
 # The cross-family adversary panel
 
+Before acting, complete the [repository preflight](../../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 An optional form of the wave's adversary step, run **only when the operator asks for it** — "attack
 it with a panel", "a second model family", "cross-model review". The default is one adversary, as
 [wave.md](wave.md) describes. A panel costs one full attack per reviewer.

@@ -1,7 +1,10 @@
 # Adversary
 
+Before acting, complete the [repository preflight](../../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 The `adversary` role of `aep:implementing`. In Claude Code the `aep:adversary` agent runs it as a
-subagent. In a host without subagents, such as Codex, run it yourself in its own pass,
+subagent. When the host does not expose subagents, run it yourself in its own pass,
 bounded exactly as below, and use only these tools: Read, Grep, Glob, Bash, Edit, Write.
 
 The state before this one declared the work green. Your job is to make it red.

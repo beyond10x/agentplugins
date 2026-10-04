@@ -7,6 +7,9 @@ argument-hint: "<story-id>"
 
 # Drive one story
 
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Load `aep:implementing` and run it in **drive** mode: read its
 [references/drive.md](../implementing/references/drive.md) in full before acting.
 

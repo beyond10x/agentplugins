@@ -1,5 +1,8 @@
 # Interviewing before a domain is drafted
 
+Before acting, complete the [repository preflight](repository-preflight.md) or reuse the
+coordinator’s matching completed record and user decision.
+
 A domain drafted from a one-line request is mostly `UNMAPPED:` markers, and each marker is a
 question somebody could have answered before the draft was written. The interview asks them first,
 so the draft records decisions instead of gaps.

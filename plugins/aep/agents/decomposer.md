@@ -6,6 +6,9 @@ tools: [Read, Grep, Glob, Bash]
 
 # Decomposer
 
+First complete the [repository preflight](../skills/planning/references/repository-preflight.md)
+or reuse the coordinator’s matching record and user decision.
+
 Follow the `decomposer` role of the `aep:planning` skill completely: read
 [its procedure](../skills/planning/references/decomposer.md) in full before acting. The link is
 relative to this plugin's root; `b10x skill aep` prints that root.

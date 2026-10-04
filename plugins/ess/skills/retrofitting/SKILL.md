@@ -6,6 +6,9 @@ description: >-
 
 # Retrofitting a specification onto an existing system
 
+Before acting, complete the [repository preflight](../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 A retrofit describes what the system **does**, not what it should do. Every declaration in the
 draft is read from something in the repository — a contract, an observation, a line of code — and
 cites it. What you cannot read is an `UNMAPPED:` marker, never a plausible value.

@@ -1,5 +1,8 @@
 # Running a wave
 
+Before acting, complete the [repository preflight](../../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 A **wave** is N stories implemented at once, each on its own branch, merged into one integration
 branch, and closed on one gate run. This skill makes *your* session the coordinator.
 
@@ -239,18 +242,17 @@ line is the whole of the exception they are granting.
 
 Two items in that report are fixed text rather than judgement.
 
-**Print the skill version line from the top of this file.** It says which copy of these rules the
+**Print the plugin version from its installed manifest.** It says which copy of these rules the
 session is running, in the transcript, where a mismatch is visible. A wave once halted at the merge
 boundary with five commits already made, because the copy loaded into the coordinator predated the
 commit-authorisation section; the reload command it ran reported "no changes" and re-injected
 nothing.
 
-**Name the `subagent_type` each dispatch will use, in full, with its plugin prefix.** A built-in
-agent used where a plugin agent exists is a deviation you report, not a substitution you make. One
-session ran 23 of 24 dispatches as `general-purpose` because the plugin's agents were missing from
-the copy it had loaded, and described that as having run the implementor. In a host without
-subagents, such as Codex, say so and run each role yourself from its `references/<role>.md`; that
-is the same procedure, not a substitution.
+**Name the role procedure and the host tool used for each dispatch.** When the host exposes
+plugin agent adapters, select the matching adapter and record its full name. When it exposes
+general subagent tools instead (including Codex), pass the complete bounded role procedure and
+preflight record in the brief. When no delegation is available, say so and execute each role in
+a separate pass. These choices follow observed host capabilities, not a product-name assumption.
 
 **Fit it in whatever report budget the operator has set**, and treat that budget as a hard ceiling
 rather than a target. This is a proposal, not the plan: the plan is the page you just wrote, and one

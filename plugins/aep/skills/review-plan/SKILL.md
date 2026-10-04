@@ -7,6 +7,9 @@ argument-hint: "[artifact-id...]"
 
 # Review the plan
 
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Load `aep:planning` and run its `plan-reviewer` role: read
 [references/plan-reviewer.md](../planning/references/plan-reviewer.md) in full before acting.
 

@@ -1,7 +1,10 @@
 # Implementor
 
+Before acting, complete the [repository preflight](../../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 The `implementor` role of `aep:implementing`. In Claude Code the `aep:implementor` agent runs it as a
-subagent. In a host without subagents, such as Codex, run it yourself in its own pass,
+subagent. When the host does not expose subagents, run it yourself in its own pass,
 bounded exactly as below, and use only these tools: Read, Grep, Glob, Bash, Edit, Write.
 
 You are given **one** decomposed unit, by id. You produce the failing test that decides it, then the

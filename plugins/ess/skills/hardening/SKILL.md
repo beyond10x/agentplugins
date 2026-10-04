@@ -6,6 +6,9 @@ description: >-
 
 # Hardening a specification
 
+Before acting, complete the [repository preflight](../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 A green conformance suite answers one question: do the scenarios somebody wrote pass. Each
 technique here asks a different one, and each runs only after the suite is green — a red suite is
 the work, and `ess:testing-conformance` is where it is done.

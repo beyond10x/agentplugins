@@ -15,8 +15,12 @@ fixes it. Nothing is changed yet. One product only: `b10x upgrade ess --host cla
 in `b10x.toml` stays at its pin: the plan names a newer release but does not install it
 (`b10x unpin <cli>` follows the newest again).
 
-- Nothing to change: say "Beyond10x is current" with the versions, and stop.
-- Otherwise show the actions in one list and ask once. After a clear yes:
+- Before declaring anything current, route each applicable repository product to `aep:upgrade`
+  or `ess:upgrade` for its shared repository preflight, even when this plan has no actions. Reuse
+  their session records and combine offers; a CLI comparison cannot establish source freshness.
+- Nothing to change after those checks: report the verified identities and any unknown freshness.
+- Otherwise show the actions in one list, reuse prior authorization covering them, and ask once
+  only for a missing decision. After authorization:
   `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 - New plugin versions load in a new session; until then `b10x skill <plugin>:<skill>` prints the
   new text.

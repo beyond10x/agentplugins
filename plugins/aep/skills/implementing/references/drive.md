@@ -1,28 +1,18 @@
 # `/drive <story-id>`
 
+Before acting, complete the [repository preflight](../../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 An interactive session **instructs**; a driven run **decides**. This skill is the entry to the second
 one, and it does exactly four things: check the checkout, launch the driver over one story, print how
 to follow the run, and stop.
 
-## Read this before you start one
+## Establish the runner contract
 
-**The walk has never reached `complete`.** `aep`'s own `story:governed-dogfood-run` records two
-attempts against real stories of its own backlog: `W4-1/1` on 2026-08-21 stopped in
-`establish_verifiers` at $15.42, and `W4-2/1` stopped in `adversarial_verify` at $31.46. Neither
-reached the review step, and the story's own acceptance line — *a run that wedges is a recorded
-result* — is why they are written down rather than retried until they worked.
-
-What that means for the operator, stated before anything is launched rather than discovered at the
-stop:
-
-| | |
-|---|---|
-| what you get | a run that walks the map, records every state, and refuses every transition the engine will not permit — the enforcement an interactive session cannot have |
-| what you should expect | a **stop**, somewhere before `complete`, with a reason. That is the normal outcome today |
-| what it costs | real model spend per `llm` step. Both recorded runs cost more than $15 |
-| what closes the gap | `aep` `story:governed-dogfood-run`. Until it lands, a driven run is an experiment with a bounded cost, and saying otherwise would be selling it |
-
-Say this to the operator, in one line, before the launch — not after the stop.
+Read the installed Metaharness command help and its stable release notes before launch. Record
+the runner version, supported harness adapters and source-matched AEP executable. Historical
+dogfood stops are evidence about those runs, not a claim that current runs cannot complete.
+Report the actual selected map, budget and stopping conditions to the operator.
 
 ## 1. `aep doctor` first, and read it
 
@@ -43,9 +33,8 @@ is given and guesses none.
 
 ## 2. Point the driver at the story
 
-**`metaharness aep drive run --help` has to answer before anything else.** AEP hands every
-model-backed map to Metaharness and refuses it itself, naming this command. Metaharness
-`0.7.0` includes the verb; earlier tags through `0.6.5` predate it.
+**`metaharness aep drive run --help` has to answer before anything else.** AEP hands model-backed maps to Metaharness. Verify that this runner provides the command
+and the flags the selected map requires.
 `unrecognized subcommand 'aep'` means the installed
 Metaharness is older than the AEP that sent you here: say so, point at the install page's
 Metaharness block, and stop.
@@ -86,20 +75,20 @@ and that refusal is the answer, not a flag to find a way around.
 right default here: the stop is the point of the exercise.
 
 **Dry-run it first, free.** `--max-iterations 0` resolves the plan, allocates a run id and runs
-nothing — the whole pre-flight at no cost. Read what it prints, then remove the run directory it
-allocated before the real launch.
+nothing — the whole pre-flight at no cost. Read what it prints, then retain that preflight run’s identity and output before the real launch.
 
 ## 3. Where the nested launch happens, and what to do when it will not
 
-Each `llm` step of the map is a harness session that the **driver** spawns through
-`metaharness run claude`. The hermetic scratch home is metaharness's own: the child gets a
+Each `llm` step of the map is a harness session that the **driver** spawns using the map’s
+declared harness adapter. Discover supported adapters from the installed runner; do not assume
+that the current host or every step uses Claude Code. The hermetic scratch home is metaharness's own: the child gets a
 constructed environment and a scratch config home rather than this session's, so it does not inherit
 the identity, the credential handling or the tool surface of the session you are sitting in. That is
 imposed by the adapter, not assembled here, and it is the reason a driven run's writes are
 attributable to the run instead of to whoever was logged in.
 
-**Whether that spawn works from inside a Claude Code session is not settled.** So try it, and have
-one fallback:
+Check the selected host’s nesting capabilities before launch. Use the authorized adapter and
+retain its actual refusal if the environment cannot run it. One fallback:
 
 | | |
 |---|---|
@@ -119,12 +108,9 @@ $ metaharness aep drive status
 
 The AEP planning executable and the Metaharness runner are distinct tools. Pass the source-matched AEP executable with `--aep-binary`; do not substitute the Metaharness binary for planning commands. AEP still provides planning, command-only driving and offline evidence ingestion.
 
-**`aep drive` has no `watch` verb yet.** It is a proposed verb — `aep` `story:drive-watch-is-a-verb`,
-draft — so until it exists, print the script the `aep` repository documents instead:
-`scripts/drive-watch` in `beyond10x/aep`, which follows a run's states as they happen and switches
-to each new state's transcript by itself. Print the path, say it is a script in that repository and
-not a verb of the installed binary, and let the operator run it. Do not print a `watch` command that
-does not exist.
+Use `metaharness aep drive status --help` to select the supported status interface. Preserve run
+state and transcripts for follow-up; do not prescribe a historical repository script or invent a
+watch subcommand.
 
 ## Hard rules
 
@@ -148,6 +134,5 @@ does not exist.
 2. `aep doctor`'s output, or the failing lines and nothing else if it exited 1.
 3. The run id, the map that was selected, the budget passed, and which launch path was taken —
    nested, or printed for a terminal.
-4. Where the run is now: `metaharness aep drive status`, verbatim, and the `scripts/drive-watch` line for
-   following it.
+4. Where the run is now: `metaharness aep drive status`, verbatim, with the supported follow-up invocation.
 5. Any refusal, verbatim.

@@ -1,5 +1,8 @@
 # The eight techniques, step by step
 
+Before acting, complete the [repository preflight](../../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Each procedure ends the same way: plant the named defect, watch the technique fail on it, restore,
 run it green. The figures in each section are from one adopter's spec (3 domains, 7 entities, 31
 commands, a JavaScript implementation, a generated suite of 121 scenarios that all passed); they say

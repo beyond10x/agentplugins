@@ -7,11 +7,14 @@ argument-hint: "[story-id...]"
 
 # Start a wave
 
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Load `aep:implementing` and run it in **wave** mode: read its
 [references/wave.md](../implementing/references/wave.md) in full before acting.
 
 - Candidates: the story ids in `$ARGUMENTS`; with none, the stories the store shows as accepted.
 - Do stage 1 only: scope the candidates, write the wave page, print the stage-1 proposal with the
-  skill version line from `aep:implementing`, and stop for the operator's approval.
+  plugin version read from its installed manifest, and stop for the operator's approval.
 - Stage 2 starts only on that approval, exactly as the reference describes.
 - Move no artifact, and relay every refusal from `aep` or the gate unedited.

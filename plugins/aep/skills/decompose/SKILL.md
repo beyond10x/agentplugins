@@ -7,6 +7,9 @@ argument-hint: "<epic-id>"
 
 # Decompose an epic
 
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Load `aep:planning` and follow its § 6 and § 7 for the one epic in `$ARGUMENTS`. Read the
 `decomposer` role, [references/decomposer.md](../planning/references/decomposer.md), and the
 [critic rubric](../planning/references/critic-rubric.md) in full before acting.

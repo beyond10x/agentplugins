@@ -15,9 +15,13 @@ Route the request; do not reproduce a specialist plugin's full workflow.
    scope exist before implementation continues.
 3. Select one plugin from the routing table. Select several only when the task genuinely crosses
    their boundaries.
-4. If the selected plugin is installed, use its skill or agent. If it is unavailable, name the
+4. For AEP or ESS repository work, the selected skill's shared repository preflight runs before
+   the activity. Pass an existing completed record and user decision; do not repeat its offer.
+   For a current-or-upgrade question, route to `aep:upgrade` or `ess:upgrade` even if the global
+   installation plan has no actions.
+5. If the selected plugin is installed, use its skill or agent. If it is unavailable, name the
    plugin, link its reference page, and explain that its specialist instructions are not loaded.
-5. For a general ecosystem question, answer from
+6. For a general ecosystem question, answer from
    [references/resources.md](references/resources.md) without selecting a specialist.
 
 | Request | Route |

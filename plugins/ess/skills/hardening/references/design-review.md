@@ -1,5 +1,8 @@
 # Design review: a brief for an agent
 
+Before acting, complete the [repository preflight](../../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Technique 8. Dispatch one agent with the brief below, filled in. It found the most of any technique
 on the one adopter where all eight were run — 26 findings — so run it early.
 

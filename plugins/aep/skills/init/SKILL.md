@@ -5,6 +5,9 @@ description: Start with AEP in this project — make sure the `aep` CLI is avail
 
 # Start with AEP
 
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 ## 1. Have the CLI
 
 Run `aep --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`aep:upgrade` handles newer releases). If it is missing, install it with `b10x`.
@@ -19,7 +22,7 @@ It prints what it would do, including the install method: the prebuilt, checksum
 by default, or `cargo` (a source build) when the user asks for it and a Rust toolchain is on `PATH`.
 When both are possible, say which is planned and offer the other; re-run with `--method cargo` if
 they choose it, show the plan, and
-after they confirm run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
+after authorization (including the preflight’s existing decision) run `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 
 Planning models new data with ESS (`aep:planning` rule 7). If `ess --version` does not answer, offer
 it in the same step: `b10x init aep,ess --host claude --out …` plans both, with the same `--host`.
@@ -35,10 +38,10 @@ aep plan artifact list
 ```
 
 A store answers with its artifacts. No store: `aep:planning` § 5 (*Starting from a repository that
-has no store*) says how a first one is created — `aep plan reverse init`, which writes an
-`aep.project/5` project with `store: {git: {}}`; an existing backlog in markdown moves in with
-`aep:migrating`. A store whose `.engineering/project.yaml` names another `version` is upgraded
-first: `aep:upgrade` (*An older planning store*).
+has no store*) says how a first one is created — `aep plan reverse init`, which writes
+a project using the released default backend; an existing backlog in markdown moves in with
+`aep:migrating`. Existing stores first complete the shared repository preflight; retain their backend and follow
+the supported migration only when authorized.
 
 ## 3. Pick the work
 

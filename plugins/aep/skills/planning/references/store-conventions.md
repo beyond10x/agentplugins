@@ -1,5 +1,8 @@
 # Store conventions
 
+This reference describes the Git backend’s file layout. SQLite and PostgreSQL remain distinct
+selected backends; use the CLI for their records and preserve their database identity.
+
 What the on-disk store looks like, and which CLI operation changes each part. This file carries only
 what the CLI cannot answer at runtime — the vocabulary questions (kinds, statuses, legal moves,
 relations) all have commands, and those commands are the authority. See `SKILL.md` §2.

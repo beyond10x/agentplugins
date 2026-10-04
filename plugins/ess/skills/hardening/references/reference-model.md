@@ -1,5 +1,8 @@
 # The reference model: a pattern
 
+Before acting, complete the [repository preflight](../../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Techniques 2, 3 and 5 compare an implementation with what the spec says happens. That needs a
 **reference model**: a small interpreter over the compiled IR that, given a state and a command,
 returns the outcome the spec declares. On one adopter it was about 150 lines of TypeScript.

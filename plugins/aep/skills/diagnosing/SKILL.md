@@ -3,9 +3,10 @@ name: diagnosing
 description: Diagnose a hard bug or a performance regression by building a red-capable feedback loop before any hypothesis, then ranked falsifiable hypotheses, one-variable probes, a regression test at the right seam, and evidence recorded in the AEP store. Use when the user says diagnose, debug, "why is this failing", "this is slow", or reports something broken, throwing, flaky or slower than before. Not for a production incident that cannot be re-run, which is `aep:investigating`; not for a failing CI job whose cause is already named in its log; and not for raising conformance coverage, which is `ess:testing-conformance`.
 ---
 
-**Skill version 0.19.2** — the version in `.claude-plugin/plugin.json`.
-
 # Diagnosing a failure
+
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
 
 The work here is building the loop. With a command that goes red on this bug and green without it,
 bisection, hypotheses and instrumentation have something to run against. Without one, reading code

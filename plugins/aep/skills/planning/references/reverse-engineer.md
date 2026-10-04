@@ -1,7 +1,10 @@
 # Reverse engineer
 
+Before acting, complete the [repository preflight](repository-preflight.md) or reuse the
+coordinator’s matching completed record and user decision.
+
 The `reverse-engineer` role of `aep:planning`. In Claude Code the `aep:reverse-engineer` agent runs it as a
-subagent. In a host without subagents, such as Codex, run it yourself in its own pass,
+subagent. When the host does not expose subagents, run it yourself in its own pass,
 bounded exactly as below, and use only these tools: Read, Grep, Glob, Bash.
 
 You are given **one repository**. You produce the plan that repository would have had, if anybody
@@ -19,12 +22,9 @@ something to *ask about*, not something to file.
 
 ## Read before you write
 
-0. **The store.** No `.engineering/project.yaml`: create it with `aep plan reverse init --protocols
-   <source> --profile <profile>` (values in `aep:planning` § 5). It writes an `aep.project/5`
-   project, `store: {git: {}}`, where each artifact file is the authority. A `project.yaml` whose
-   `version` is not `aep.project/5`: report the version and its upgrade (`aep:planning`, *The
-   store's version*) as the first line of your report, and write nothing to a `/2`–`/4` store,
-   which every planning verb refuses.
+0. **The store.** Complete the repository preflight. Initialize only when neither a manifest nor
+   an existing selected store exists; use `aep:planning` § 5. Existing manifest-free stores follow
+   the supported migration path. Preserve backend selection and report any refused operation.
 1. **`aep plan reverse scan --format json`** from the repository root. This is your evidence and it
    is the only thing that produces citations. Everything below is read against it.
 2. **`aep plan reverse history --format json`**, when the repository is a Git working tree. It joins

@@ -3,9 +3,10 @@ name: migrating
 description: Migrate a repository's legacy work tracking — story trees, TODO.md, plan and issue documents — into the governed AEP planning store, without deleting or rewriting the sources. Use when the user asks to migrate, import, port or convert an existing backlog into AEP, when a repository is adopting AEP and already has work written down somewhere, or when a store has been adopted beside a legacy backlog nobody retired. Read it before creating the first artifact in a repository that already tracks work in markdown.
 ---
 
-**Skill version 0.19.2** — the version in `.claude-plugin/plugin.json`.
-
 # Migrating legacy tracking into the store
+
+Before acting, complete the [repository preflight](../planning/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
 
 ## 1. The failure this exists to prevent
 
@@ -95,15 +96,16 @@ things if it is not held to a rule.
 
 ### Step 4 — write
 
-**The store must exist first.** Where `.engineering/project.yaml` is missing, create it with
-`aep plan reverse init`; the `aep:planning` skill § 5 gives the `--protocols` and `--profile`
-values. That applies with or without a backlog; only the steps after it differ.
+**The store must exist first.** Use the completed repository preflight: initialize only when no
+selected store exists, using `aep:planning` § 5 for `--protocols` and `--profile`. An existing
+manifest-free store follows supported migration, never initialization. Preserve an existing
+backend, and continue writes only when the effective CLI admits it.
 
 **A backlog item that introduces a new noun gets its domain first.** The `aep:planning` rule 7
 holds during a migration too: where an item names an entity no ESS document declares, draft and
 validate the domain (`ess:specifying`) before writing the stories around it, and cite the file in
 their bodies. Without `ess` installed, run `b10x init ess --host claude --out ~/.local/state/b10x/plan.json`
-(`--host codex` in Codex) and ask before applying its plan. The
+(`--host codex` in Codex) and reuse the shared preflight decision before applying its plan. The
 classification table still lists the item; its stories are written after the domain validates.
 
 One artifact at a time, body supplied at creation:

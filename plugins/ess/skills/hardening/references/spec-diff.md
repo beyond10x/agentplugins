@@ -1,5 +1,8 @@
 # Spec diff in the gate: classifying changes
 
+Before acting, complete the [repository preflight](../../specifying/references/repository-preflight.md)
+or reuse the coordinator’s matching completed record and user decision.
+
 Technique 7. The gate compares the specification with the one at the last release tag, and fails
 on a breaking change nobody acknowledged.
 
