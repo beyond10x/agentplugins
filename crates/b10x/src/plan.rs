@@ -1885,6 +1885,46 @@ mod tests {
         assert_eq!(method_for(true, Some(Method::Cargo)), Some(Method::Cargo));
     }
 
+    #[test]
+    fn connectors_plans_a_cargo_install_without_release_assets() {
+        let catalog = Catalog::embedded();
+        let mut resolved = resolved();
+        resolved
+            .latest
+            .insert("beyond10x/connectors".into(), "v0.25.1".into());
+        let context = Context {
+            catalog: &catalog,
+            resolved: &resolved,
+            selection: Some(BTreeSet::from(["connectors".into()])),
+            hosts: vec![Host::Claude],
+            home: Path::new("/opt/b10x-home"),
+            only: true,
+            method: None,
+            target: Some(X86_LINUX.into()),
+            upgrade: false,
+        };
+        let inventory = Inventory {
+            cargo: true,
+            ..Inventory::default()
+        };
+        let planned = plan(&context, &inventory);
+        assert!(
+            planned.actions.iter().any(|action| matches!(action,
+                Action::InstallBinary { name, tag, method: Method::Cargo, install, .. }
+                    if name == "connectors" && tag == "v0.25.1"
+                        && install.archive.is_none()
+                        && install.cargo.as_ref().is_some_and(|cargo| cargo.package == "connectors")
+            )),
+            "{planned:#?}"
+        );
+        let no_cargo = plan(&context, &Inventory::default());
+        assert!(no_cargo
+            .findings
+            .iter()
+            .any(|finding| finding.detail.contains("cargo")
+                && finding.detail.contains("not on PATH")));
+    }
+
     /// Plan `aep` on `target` with an older `b10x-harness` installed, whose newest release carries
     /// an archive for x86-64 Linux only; `cargo_option` keeps or strips the catalog's cargo route.
     fn plan_harness(target: Option<&str>, cargo_option: bool) -> Plan {

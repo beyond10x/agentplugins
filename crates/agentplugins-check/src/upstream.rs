@@ -8,8 +8,8 @@
 //! Three kinds of dependency:
 //!
 //! - **Releases.** Each CLI a plugin drives, at the release this repository last verified or names:
-//!   `verified.json` for `aep`, `ess` and `worktree`, and the `*_VERSION` pins of
-//!   `.github/workflows/eval.yml` or a release named in a skill for the rest. A newer release gets
+//!   `verified.json` for every catalogued CLI, plus the `*_VERSION` pins of
+//!   `.github/workflows/eval.yml`. A newer release gets
 //!   its `CHANGELOG.md` sections from the pinned release (exclusive) to the newest (inclusive).
 //! - **Workflow pins.** Every `uses: beyond10x/<repo>/…@<commit>` against that repository's `main`.
 //! - **Cited issues.** Every `beyond10x/<repo>#<n>` in plugin or website text: a closed one is a
@@ -19,57 +19,6 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use crate::tools;
-
-/// A release this repository depends on, and where its pin is written.
-struct Tracked {
-    name: &'static str,
-    repository: &'static str,
-    pin: Pin,
-}
-
-enum Pin {
-    /// The CLI's entry in `verified.json`.
-    Verified,
-    /// The first `<prefix><version>` in this file.
-    Text {
-        file: &'static str,
-        prefix: &'static str,
-    },
-}
-
-const TRACKED: &[Tracked] = &[
-    Tracked {
-        name: "aep",
-        repository: "beyond10x/aep",
-        pin: Pin::Verified,
-    },
-    Tracked {
-        name: "ess",
-        repository: "beyond10x/ess",
-        pin: Pin::Verified,
-    },
-    Tracked {
-        name: "worktree",
-        repository: "beyond10x/worktree",
-        pin: Pin::Verified,
-    },
-    Tracked {
-        name: "metaharness",
-        repository: "beyond10x/metaharness",
-        pin: Pin::Text {
-            file: ".github/workflows/eval.yml",
-            prefix: "METAHARNESS_VERSION: '",
-        },
-    },
-    Tracked {
-        name: "connectors",
-        repository: "beyond10x/connectors",
-        pin: Pin::Text {
-            file: "plugins/connectors/skills/integrating/SKILL.md",
-            prefix: "[Connectors `",
-        },
-    },
-];
 
 /// The version string that starts right after `prefix` in `text`.
 #[must_use]
@@ -179,20 +128,45 @@ fn short(commit: &str) -> &str {
     commit.get(..7).unwrap_or(commit)
 }
 
+fn eval_pins(root: &Path) -> Result<usize, String> {
+    let eval = std::fs::read_to_string(root.join(".github/workflows/eval.yml"))
+        .map_err(|e| e.to_string())?;
+    let catalog = tools::catalog_tools(root)?;
+    let mut moved = 0;
+    for (cli, prefix) in [
+        ("aep", "AEP_VERSION: '"),
+        ("metaharness", "METAHARNESS_VERSION: '"),
+    ] {
+        let pinned =
+            pinned_in(&eval, prefix).ok_or_else(|| format!("eval.yml: missing {prefix}"))?;
+        let tool = catalog
+            .iter()
+            .find(|tool| tool.name == cli)
+            .ok_or_else(|| format!("catalog: missing {cli}"))?;
+        let newest = tools::latest(tool.repository())?;
+        let behind = tools::key(&newest) > tools::key(&pinned);
+        if behind {
+            moved += 1;
+        }
+        println!(
+            "- `eval.yml` {cli} {pinned}, newest {newest}{}",
+            if behind { " — **moved**" } else { "" }
+        );
+    }
+    Ok(moved)
+}
+
 /// Print the report; fail only when something cannot be read.
 pub fn report(root: &Path) -> Result<(), String> {
     let verified = tools::verified(root)?;
     let mut moved = 0;
     println!("# Upstream report\n\n## Releases\n");
-    for tracked in TRACKED {
-        let pinned = match &tracked.pin {
-            Pin::Verified => verified.get(tracked.name).cloned(),
-            Pin::Text { file, prefix } => std::fs::read_to_string(root.join(file))
-                .ok()
-                .and_then(|text| pinned_in(&text, prefix)),
-        }
-        .ok_or_else(|| format!("{}: no pinned release found", tracked.name))?;
-        let newest = tools::latest(tracked.repository)?;
+    for tracked in tools::catalog_tools(root)? {
+        let pinned = verified
+            .get(&tracked.name)
+            .cloned()
+            .ok_or_else(|| format!("{}: no verified release found", tracked.name))?;
+        let newest = tools::latest(tracked.repository())?;
         let behind = tools::key(&newest) > tools::key(&pinned);
         println!(
             "- `{}` pinned {pinned}, newest {newest}{}",
@@ -203,7 +177,7 @@ pub fn report(root: &Path) -> Result<(), String> {
             moved += 1;
             let url = format!(
                 "https://raw.githubusercontent.com/{}/{newest}/CHANGELOG.md",
-                tracked.repository
+                tracked.repository()
             );
             match fetch(&url) {
                 Ok(changelog) => {
@@ -217,6 +191,7 @@ pub fn report(root: &Path) -> Result<(), String> {
     }
 
     println!("\n## Workflow pins\n");
+    moved += eval_pins(root)?;
     let mut pins = BTreeSet::new();
     for workflow in files(&root.join(".github/workflows"), "yml") {
         let text = std::fs::read_to_string(&workflow).map_err(|error| error.to_string())?;
