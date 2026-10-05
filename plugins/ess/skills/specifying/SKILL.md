@@ -29,11 +29,22 @@ contract, and read the decisions the draft says it could not take:
 aep plan reverse openapi --domain <domain> <openapi-document> --out <file>
 ```
 
+**A new specification starts on the newest release and its newest format, never on `ess/1`.**
+Before the first file, check that the installed `ess` is the newest release (`ess --version`
+against `gh release list -R beyond10x/ess -L 1`; upgrade through the `ess:upgrade` skill when it
+is behind). Then write the newest `format:` that release implements; the example below uses `ess/20`. To
+read it from the binary, validate a header one past what you expect; the
+`unsupported_format_version` refusal lists every format the build implements (a listing command
+is beyond10x/ess#460). The `ess/1` in
+[references/syntax.md](references/syntax.md) shows the minimum header for each construct; it is
+not the header to start a document on. A higher format admits every lower one, and the document
+below validates unchanged under each.
+
 Otherwise write the smallest document that validates — two files, and nothing that is not required:
 
 ```yaml
 # system.yaml
-format: ess/1
+format: ess/20
 system: warehouse
 version: v1
 
