@@ -18,6 +18,7 @@ use crate::trials::{Definition, Measure};
 struct Shell {
     command: String,
     output: Option<String>,
+    failed: bool,
 }
 
 /// What the report reads from a stream-json run.
@@ -65,6 +66,7 @@ fn parse(text: &str) -> Run {
                             shells.push(Shell {
                                 command: input["command"].as_str().unwrap_or_default().to_owned(),
                                 output: None,
+                                failed: false,
                             });
                         }
                         Some("Write" | "Edit" | "MultiEdit") => {
@@ -82,6 +84,7 @@ fn parse(text: &str) -> Run {
                     let id = block["tool_use_id"].as_str().unwrap_or_default();
                     if let Some(&index) = by_id.get(id) {
                         shells[index].output = Some(result_text(&block["content"]));
+                        shells[index].failed = block["is_error"].as_bool().unwrap_or(false);
                     }
                 }
                 _ => {}
@@ -162,6 +165,13 @@ pub struct Measures {
         deserialize_with = "measured"
     )]
     pub go_test: Option<Option<GoTest>>,
+    /// The last `cargo test`; `null` when none ran or no result was observed.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "measured"
+    )]
+    pub cargo_test: Option<Option<GoTest>>,
 }
 
 /// A field that is present is measured, even when its value is `null` (the command never ran);
@@ -325,6 +335,86 @@ fn go_test(run: &Run) -> Option<GoTest> {
         .find_map(|shell| go_counts(shell.output.as_deref()?))
 }
 
+fn cargo_counts(output: &str) -> Option<GoTest> {
+    let mut counts = GoTest::default();
+    let mut found = false;
+    for line in output
+        .lines()
+        .filter_map(|line| line.trim().strip_prefix("test result: "))
+    {
+        let (_, summary) = line.split_once(". ")?;
+        let parts: Vec<_> = summary.split(';').collect();
+        let number = |index: usize| {
+            parts
+                .get(index)?
+                .split_whitespace()
+                .next()?
+                .parse::<u64>()
+                .ok()
+        };
+        counts.passed += number(0)?;
+        counts.failed += number(1)?;
+        counts.skipped += number(2)?;
+        found = true;
+    }
+    if output
+        .lines()
+        .any(|line| line.trim_start().starts_with("error:"))
+    {
+        counts.failed = counts.failed.max(1);
+        found = true;
+    }
+    found.then_some(counts)
+}
+
+fn cargo_test(run: &Run) -> Option<GoTest> {
+    run.shells
+        .iter()
+        .rev()
+        .find(|shell| runs_cargo_test(&shell.command))
+        .and_then(|shell| {
+            let counts = cargo_counts(shell.output.as_deref()?);
+            if shell.failed {
+                let mut counts = counts.unwrap_or_default();
+                counts.failed = counts.failed.max(1);
+                Some(counts)
+            } else {
+                counts
+            }
+        })
+}
+
+fn runs_cargo_test(command: &str) -> bool {
+    let words = shlex::split(command).unwrap_or_default();
+    words.iter().enumerate().any(|(index, word)| {
+        if word != "cargo" && !word.ends_with("/cargo") {
+            return false;
+        }
+        let start = words[..index]
+            .iter()
+            .rposition(|w| matches!(w.as_str(), "&&" | "||" | ";" | "|" | "then" | "do"))
+            .map_or(0, |separator| separator + 1);
+        if !words[start..index]
+            .iter()
+            .all(|w| w.contains('=') && !w.starts_with('-'))
+        {
+            return false;
+        }
+        let mut rest = words[index + 1..].iter();
+        while let Some(word) = rest.next() {
+            if word.starts_with('+') {
+                continue;
+            }
+            if word == "test" {
+                return !rest
+                    .any(|word| matches!(word.as_str(), "--no-run" | "--list" | "--help" | "-h"));
+            }
+            return false;
+        }
+        false
+    })
+}
+
 /// `UNMAPPED:` markers in the YAML files the run wrote inside the sandbox, as they are on disk.
 fn unmapped(run: &Run, sandbox: &Path, workdir: &Path) -> (u64, usize) {
     let mut markers = 0;
@@ -461,6 +551,19 @@ pub fn measure(
             },
         ));
     }
+    if wants(Measure::CargoTest) {
+        let counts = cargo_test(&run);
+        measures.cargo_test = Some(counts);
+        lines.push(counts.map_or_else(
+            || "cargo test: not run".to_owned(),
+            |c| {
+                format!(
+                    "cargo test: {} passed, {} failed, {} skipped",
+                    c.passed, c.failed, c.skipped
+                )
+            },
+        ));
+    }
     Ok(Report { measures, lines })
 }
 
@@ -502,6 +605,31 @@ pub fn worse(then: &Measures, now: &Measures) -> Vec<String> {
                 then.failed, now.failed
             )),
             Some(_) => {}
+        }
+    }
+    if let (Some(Some(then)), Some(now)) = (then.cargo_test, now.cargo_test) {
+        match now {
+            None => found.push("cargo test: ran before, now did not".to_owned()),
+            Some(now) => {
+                if now.failed > then.failed {
+                    found.push(format!(
+                        "cargo test: failures {} → {}",
+                        then.failed, now.failed
+                    ));
+                }
+                if now.passed < then.passed {
+                    found.push(format!(
+                        "cargo test: passes {} → {}",
+                        then.passed, now.passed
+                    ));
+                }
+                if now.skipped > then.skipped {
+                    found.push(format!(
+                        "cargo test: skipped {} → {}",
+                        then.skipped, now.skipped
+                    ));
+                }
+            }
         }
     }
     found
@@ -772,6 +900,80 @@ mod tests {
     }
 
     #[test]
+    fn cargo_results_measure_last_execution_and_fail_closed_on_missing_output() {
+        let sandbox = scratch("cargo");
+        let only = definition(&[Measure::CargoTest], &[]);
+        let success = bash("a", "cargo +stable test --locked --manifest-path impl/Cargo.toml", "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.1s\ntest result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.1s");
+        let initial = measure(&[INIT, &success].join("\n"), &sandbox, Some(&only)).unwrap();
+        assert_eq!(
+            initial.measures.cargo_test,
+            Some(Some(GoTest {
+                passed: 19,
+                failed: 0,
+                skipped: 1
+            }))
+        );
+        let failure = bash(
+            "b",
+            "cargo test",
+            "error: could not compile `example` due to 1 previous error",
+        );
+        let failed = measure(
+            &[INIT, &success, &failure].join("\n"),
+            &sandbox,
+            Some(&only),
+        )
+        .unwrap();
+        assert_eq!(
+            failed.measures.cargo_test,
+            Some(Some(GoTest {
+                passed: 0,
+                failed: 1,
+                skipped: 0
+            }))
+        );
+        assert_ne!(
+            worse(&initial.measures, &failed.measures),
+            Vec::<String>::new()
+        );
+        let missing = bash("c", "cargo test", "process interrupted");
+        let missing = measure(
+            &[INIT, &success, &missing].join("\n"),
+            &sandbox,
+            Some(&only),
+        )
+        .unwrap();
+        assert_eq!(missing.measures.cargo_test, Some(None));
+        assert!(worse(&initial.measures, &missing.measures)
+            .contains(&"cargo test: ran before, now did not".to_owned()));
+        for command in [
+            "cargo test --no-run",
+            "cargo test -- --list",
+            "echo cargo test",
+            "cargo test --help",
+        ] {
+            assert!(!runs_cargo_test(command));
+        }
+        std::fs::remove_dir_all(sandbox).unwrap();
+    }
+
+    #[test]
+    fn cargo_abnormal_exit_overrides_earlier_passing_target() {
+        let sandbox = scratch("cargo-abort");
+        let only = definition(&[Measure::CargoTest], &[]);
+        for output in [
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.1s\nerror: test failed, to rerun pass `--test aborts`\nprocess didn't exit successfully (signal: 6, SIGABRT: process abort signal)",
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.1s\nprocess interrupted",
+        ] {
+            let call = tool("a", "Bash", r#"{"command":"cargo test"}"#);
+            let result = serde_json::json!({"message":{"content":[{"type":"tool_result","tool_use_id":"a","is_error":true,"content":output}]}}).to_string();
+            let measured = measure(&[INIT, &call, &result].join("\n"), &sandbox, Some(&only)).unwrap();
+            assert!(measured.measures.cargo_test.flatten().is_none_or(|counts| counts.failed > 0), "abnormal exit reported successful counts: {:?}", measured.measures.cargo_test);
+        }
+        std::fs::remove_dir_all(sandbox).unwrap();
+    }
+
+    #[test]
     fn outputs_are_checked_on_disk_and_only_when_listed() {
         let sandbox = scratch("outputs");
         let out = sandbox.join("work/out");
@@ -815,6 +1017,7 @@ mod tests {
 
     fn full() -> Measures {
         Measures {
+            cargo_test: None,
             tool_calls: Some(40),
             validate: Some(Validate::Valid),
             synthesis: Some(Some(Synthesis {
@@ -857,6 +1060,7 @@ mod tests {
     #[test]
     fn every_listed_regression_is_worse() {
         let now = Measures {
+            cargo_test: None,
             tool_calls: Some(61),
             validate: Some(Validate::NotRun),
             synthesis: Some(Some(Synthesis {

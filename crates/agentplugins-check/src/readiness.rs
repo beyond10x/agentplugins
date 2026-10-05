@@ -80,7 +80,7 @@ fn check_text(text: &str) -> Result<(), String> {
         }
     }
     if !doctor {
-        return Err("doctor-ran: no connectors inspect doctor command was requested".to_owned());
+        return Err("doctor-ran: no connectors setup check command was requested".to_owned());
     }
     Ok(())
 }
@@ -170,9 +170,13 @@ fn inspect_words(words: &[String]) -> Result<bool, String> {
     }
     let mut index = 0;
     while let Some(arg) = args.get(index) {
-        if matches!(arg.as_str(), "-o" | "--output") {
+        if matches!(arg.as_str(), "-o" | "--output" | "--config" | "--state-dir") {
             index += 2;
-        } else if arg.starts_with("--output=") || (arg.starts_with("-o") && arg.len() > 2) {
+        } else if ["--output=", "--config=", "--state-dir="]
+            .iter()
+            .any(|prefix| arg.starts_with(prefix))
+            || (arg.starts_with("-o") && arg.len() > 2)
+        {
             index += 1;
         } else {
             break;
@@ -181,9 +185,9 @@ fn inspect_words(words: &[String]) -> Result<bool, String> {
     let area = args.get(index).map(String::as_str);
     let verb = args.get(index + 1).map(String::as_str);
     match (area, verb) {
-        (Some("inspect"), Some("doctor")) => Ok(true),
-        (Some("inspect"), Some("auth" | "providers"))
-        | (Some("operation"), Some("search" | "describe"))
+        (Some("setup"), Some("check")) => Ok(true),
+        (Some("adapters" | "connections"), Some("list" | "describe" | "status"))
+        | (Some("operations"), Some("list" | "describe"))
         | (Some("help"), _) => Ok(false),
         _ => {
             Err("diagnosis-did-not-mutate: non-diagnostic connectors command requested".to_owned())
@@ -195,6 +199,23 @@ fn inspect_words(words: &[String]) -> Result<bool, String> {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn current_readiness_uses_global_paths_and_rejects_obsolete_diagnosis() {
+        check_text(&stream(
+            "Bash",
+            "command",
+            &["connectors --config local.toml --state-dir state setup check"],
+        ))
+        .unwrap();
+        assert!(check_text(&stream("Bash", "command", &["connectors inspect doctor"])).is_err());
+        assert!(check_text(&stream(
+            "Bash",
+            "command",
+            &["connectors setup check --help"]
+        ))
+        .is_err());
+    }
 
     fn stream(tool: &str, field: &str, commands: &[&str]) -> String {
         commands.iter().enumerate().map(|(seq, command)| {
@@ -212,12 +233,12 @@ mod tests {
             for help in [
                 "connectors serve local --help",
                 "connectors setup connect -h",
-                "connectors --help operation invoke",
+                "connectors --help operations invoke",
             ] {
                 check_text(&stream(
                     tool,
                     field,
-                    &["connectors --output json inspect doctor", help],
+                    &["connectors --output json setup check", help],
                 ))
                 .unwrap();
             }
@@ -230,15 +251,15 @@ mod tests {
             for mutation in [
                 "connectors serve local",
                 "connectors setup connect slack",
-                "connectors operation invoke --operation test --connection local --description-ref test",
+                "connectors operations invoke --operation test --connection local --description-ref test",
                 "connectors serve local --help; connectors serve local",
                 "connectors serve local --help\nconnectors setup connect slack",
                 "connectors serve local --help && connectors serve local",
                 "connectors serve local | connectors serve local --help",
-                "connectors operation invoke --input-json '{\"text\":\"--help\"}'",
+                "connectors operations invoke --input-json '{\"text\":\"--help\"}'",
                 "connectors serve local -- --help",
             ] {
-                assert!(check_text(&stream(tool, field, &["connectors inspect doctor", mutation])).is_err(), "{tool}: {mutation}");
+                assert!(check_text(&stream(tool, field, &["connectors setup check", mutation])).is_err(), "{tool}: {mutation}");
             }
         }
     }
@@ -246,8 +267,8 @@ mod tests {
     #[test]
     fn help_and_quoted_doctor_text_are_not_doctor_evidence() {
         for command in [
-            "connectors inspect doctor --help",
-            "echo 'connectors inspect doctor'",
+            "connectors setup check --help",
+            "echo 'connectors setup check'",
             "connectors --version",
         ] {
             assert!(check_text(&stream("Bash", "command", &[command])).is_err());
@@ -257,9 +278,9 @@ mod tests {
     #[test]
     fn valid_shell_layouts_keep_literal_arguments() {
         for command in [
-            "connectors --version && connectors --output=json inspect doctor",
-            "connectors --output json \\\n inspect doctor --config '/path with spaces/config.toml'",
-            "/usr/local/bin/connectors inspect doctor # read-only",
+            "connectors --version && connectors --output=json setup check",
+            "connectors --output json \\\n setup check --config '/path with spaces/config.toml'",
+            "/usr/local/bin/connectors setup check # read-only",
         ] {
             check_text(&stream("exec_command", "cmd", &[command])).unwrap();
         }
@@ -268,15 +289,15 @@ mod tests {
     #[test]
     fn unreadable_or_dynamic_commands_do_not_pass() {
         for command in [
-            "connectors inspect doctor '",
-            "$PROGRAM inspect doctor",
+            "connectors setup check '",
+            "$PROGRAM setup check",
             "eval 'connectors serve local'",
             "echo $(connectors serve local)",
         ] {
             assert!(check_text(&stream(
                 "Bash",
                 "command",
-                &["connectors inspect doctor", command]
+                &["connectors setup check", command]
             ))
             .is_err());
         }
@@ -284,15 +305,15 @@ mod tests {
         assert!(check_text(&stream(
             "exec_command",
             "command",
-            &["connectors inspect doctor"]
+            &["connectors setup check"]
         ))
         .is_err());
     }
 
     #[test]
     fn native_host_records_use_the_same_contract() {
-        let claude = json!({"type":"assistant", "message":{"content":[{"type":"tool_use", "name":"Bash", "input":{"command":"connectors inspect doctor"}}]}});
-        let codex = json!({"type":"response_item", "payload":{"type":"function_call", "name":"exec_command", "arguments":json!({"cmd":"connectors inspect doctor"}).to_string()}});
+        let claude = json!({"type":"assistant", "message":{"content":[{"type":"tool_use", "name":"Bash", "input":{"command":"connectors setup check"}}]}});
+        let codex = json!({"type":"response_item", "payload":{"type":"function_call", "name":"exec_command", "arguments":json!({"cmd":"connectors setup check"}).to_string()}});
         check_text(&claude.to_string()).unwrap();
         check_text(&codex.to_string()).unwrap();
     }

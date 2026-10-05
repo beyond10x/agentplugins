@@ -3,7 +3,8 @@
 A small lending library in three files, with every section a specification usually needs. It
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
-It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats up to `ess/15` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
+Keep each domain’s first segment equal to `system` and update every qualified reference together.
+It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/22` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
 
 ## `system.yaml`
 
@@ -355,24 +356,24 @@ and is then refused as reading what no view publishes, even with the field in a 
 guard over a required input (`{defined: true}`, `{exists: false}`) is refused because no candidate
 input leaves the field out. Relay such a refusal verbatim rather than reshaping the rule around it.
 
-A `when` reads only the command's own input. A value stored on the entity the command addresses is
-read by `when_subject:` beside it (next table). A condition on **another** entity — "the branch
-must be open", "the customer is active" — is neither. Express it as a transition of that entity (a
-command that `moves` it, answered by `wrong_state` from states it does not start from), or leave an
-`UNMAPPED:` marker naming the rule and report it; never invent an outcome the compiler cannot decide.
+A `when` reads the command input; `when_subject:` reads the addressed row and, from `ess/18`,
+its stored lifecycle `state`. `when_related:` reads another entity, by typed identity from
+`ess/18` or by a row selector from `ess/22`. The current
+[related-record examples](current-features.md) validate and synthesize these forms. Validate each
+combination before declaring it supported: guard ordering and target lowering still have limits.
 
 Four cases trials hit:
 
 | rule | how to write it |
 |---|---|
-| a value stored on the addressed entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | `when_subject: {predicate: {all: [service == Express, weight_kg > 20]}}` on the refusing outcome (`ess/9`). It reads the entity's stored fields only, not `state`; a branch chosen by the held state is `when_subject_state:` ([later-formats.md](later-formats.md) shows it and its two limits); an open comparison needs a default branch, and a view must publish every guarded field |
+| a value stored on the addressed entity decides the outcome ("express parcels over 20 kg are refused at dispatch", with the weight given at create) | `when_subject: {predicate: {all: [service == Express, weight_kg > 20]}}` on the refusing outcome (`ess/9`). It reads the entity’s stored fields and, from `ess/18`, `state`; a branch selected solely by held state can use `when_subject_state:` ([later-formats.md](later-formats.md) shows it and its two limits); an open comparison needs a default branch, and a view must publish every guarded field |
 | a stored value compared with the request ("a return scanned with another title is refused") | `when_subject: {predicate: title != input.title}` (`ess/15`); the input side is always `input.<field>` on the right. ReturnCopy in [later-formats.md](later-formats.md) |
-| two records must not overlap ("a room cannot be booked twice for one hour") | make the contested unit an entity with its own lifecycle (a `Slot` that is `Free` or `Booked`); a second booking is then `wrong_state` on that slot. Overlap between arbitrary time ranges is not expressible; mark it `UNMAPPED:` |
-| a holder may hold at most N ("a member can have five packets out at once") | keep the count on the holder and address the holder: `packets_out: Integer` on `Member`, a borrow command that `updates:` the member with `sets: {packets_out: {increment: 1}}` (`ess/14`), refused by `when_subject: {predicate: packets_out >= 5}` (`ess/9`), and a return with `{increment: -1}`. One outcome changes one record, so the packet's own move to `OnLoan` is a second command the caller sends, and nothing ties the two. Validated form: [later-formats.md](later-formats.md) |
+| two records must not overlap ("a room cannot be booked twice for one hour") | make the contested unit an entity with its own lifecycle (a `Slot` that is `Free` or `Booked`); a second booking is then `wrong_state` on that slot. For arbitrary ranges, an `ess/22` related-row selector can express overlap using `starts_at < input.ends_at` and `ends_at > input.starts_at`; validate and inspect synthesis refusals for the exact predicates and arrangement |
+| a holder may hold at most N ("a member can have five packets out at once") | Address the packet and guard its borrow with `when_related: {entity: seeds.lending.Packet, where: {all: [borrower_id == input.member_id, state == Lent]}, count: {gte: 5}}` (`ess/22`). This counts actual loans and changes only the addressed packet. Validation can accept the rule while synthesis refuses its boundary arrangement; report the exact refusal. See [later-formats.md](later-formats.md) for the limits. |
 
-**Compare two fields through one struct.** A right-hand side without a dot is a literal, so
-`ends_at > starts_at` compares `ends_at` with the text `"starts_at"` and `validate` refuses it.
-Declare the two fields in one struct (`Window` with `starts_at` and `ends_at`, both `Timestamp`),
-take it as input, and guard on `window.ends_at > window.starts_at`; `synthesize` orders the two
-instants. `Duration` does not compare with a number (it is text), so a length is an `Integer` in a
-named unit (`duration_minutes > 0`).
+**Compare two typed facts.** From `ess/22`, a bare word on the right that names a field is
+a fact reference; `ends_at > starts_at` compares the two `Timestamp` facts as instants. An explicit
+`{fact: starts_at}` operand removes ambiguity. Earlier formats need a dotted typed path such as
+`window.ends_at > window.starts_at`. Constant offsets (`upper <= lower + 5`), UTF-8 byte counts
+(`label.utf8_bytes`) and `distinct` list keys also require `ess/22`. A `Duration` is not an
+Integer; name the unit for a numeric length (`duration_minutes > 0`).

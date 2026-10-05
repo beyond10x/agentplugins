@@ -2,6 +2,8 @@
 
 Agent plugins for Claude Code and Codex, from one marketplace: `b10x`.
 
+[Documentation](https://beyond10x.github.io/docs/agentplugins/) · [Setup guide](https://beyond10x.github.io/docs/agentplugins/install/)
+
 Add the marketplace once — Claude Code: `/plugin marketplace add beyond10x/agentplugins` ·
 Codex: `codex plugin marketplace add beyond10x/agentplugins` — then install what you need:
 
@@ -35,7 +37,7 @@ migrate older installs, tell it: *"Set up Beyond10x: follow
 https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md"*.
 
 New to ESS: [your first ESS specification](https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/),
-a tutorial from an empty directory to a passing conformance suite.
+a Rust tutorial from an empty directory to a passing conformance suite.
 
 More: [install guide](website/docs/install.md) · [evals](evals/README.md) ·
 [changelog](CHANGELOG.md) · [contributing](AGENTS.md)

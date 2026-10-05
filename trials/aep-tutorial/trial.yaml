@@ -8,18 +8,23 @@ prompt: |
   merge. Where the page shows the questions and the answers it gave, take the same answers instead
   of asking me; where it approves a wave, approve it the same way.
 
+  The current fixture is Rust: all implementation changes must be Rust. Synthesize with
+  `ess verify conform synthesize --path spec --target ir --out impl/suite.json`, then use
+  `cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture`. Report actual ESS
+  scenario results separately from the Cargo test count.
+
   When you're done, tell me which story the wave implemented and what the adversary found, quote any
   text on the page that confused you or did not match what you saw, and paste the last
-  `aep plan artifact validate` output, the last synthesis output and the last `go test` summary
+  `aep plan artifact validate` output, the last synthesis output and the last `cargo test` summary
   verbatim.
 dir: library
 fixture: fixture
 setup:
-  - b10x init aep,ess --host claude --out plan.json
+  - b10x init aep,ess,worktree --host claude --out plan.json
   - b10x setup apply --plan plan.json --yes
-measures: [tool_calls, synthesis, outputs]
+measures: [tool_calls, synthesis, outputs, cargo_test]
 outputs:
   project: .engineering/project.yaml
   epic: .engineering/planning/epic
   reviews: .engineering/planning/review-result
-  suite: impl/essconform
+  suite: impl/suite.json

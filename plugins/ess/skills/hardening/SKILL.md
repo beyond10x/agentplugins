@@ -35,9 +35,11 @@ restoring.
 
 Procedures, with the defect to plant for each: [references/techniques.md](references/techniques.md).
 
-Formal model checking (a TLA+ or Alloy export) is not in the catalogue. On a spec with 31 commands,
-random sequences reached every declared outcome, 59 of 59; reach for a model checker only when
-technique 2 reports declared outcomes it never reaches.
+For communicating finite-state peers, current ESS also has experimental `ess-protospec/1`
+validation, simulation, replay and bounded exploration. Read the
+[protocol example](../specifying/references/current-features.md) when transport ordering, timers
+or flush/close boundaries are the question. Model traces are not implementation evidence;
+missing observations and exhausted bounds stay inconclusive.
 
 ## The order
 
@@ -73,8 +75,8 @@ somewhere nobody looked.
 
 ## What `ess` ships for techniques 1 and 2
 
-- **Mutation audit:** `ess verify conform mutate` mutates the specification in nine
-  classes and writes `ess-mutation-report/1`. Against your own implementation, `--emit DIR` writes
+- **Mutation audit:** `ess verify conform mutate` mutates the specification in named
+  classes (including `sets-drop`, `outcome-order-flip`, comparison flips and `emit-swap`) and writes `ess-mutation-report/1`. Against your own implementation, `--emit DIR` writes
   the baseline's and every mutant's suite, your runner writes `report.json` beside each, and
   `--collect DIR` scores them. [references/techniques.md](references/techniques.md) § 1.
 - **Reference model and random sequences:** the Go and TypeScript packages
@@ -102,3 +104,10 @@ generator or validate gap) is an issue on beyond10x/ess, not a workaround here.
 
 - A finding changes the specification: `ess:specifying`.
 - A finding is a missing scenario or a skipped one: `ess:testing-conformance`.
+
+Current hardening details: `--component` scopes mutation emit/collect; declared
+`ess-known-failures/1` scenarios are counted separately instead of silently skipped. The explorer
+can draw Optional inputs and commands selected by stored state, follow `.count` boundaries and
+`example` values, and restart its target. Review exclusions from the actual generated runner.
+Compatibility is built into `ess verify diff --compatibility --fail-on breaking-or-unknown`;
+[spec-diff.md](references/spec-diff.md) specifies its exit-status and acknowledgement gate.

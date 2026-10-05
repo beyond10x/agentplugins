@@ -2,11 +2,13 @@
 format: aep.planning-md/3
 id: dependency-blocker:metaharness-links-aep-0-55
 kind: dependency-blocker
-status: open
+status: cleared
 title: metaharness links aep 0.55.0, so no eval case can be recorded beside aep 0.64.0
 relations:
 - blocks: story:plugin-eval-cases
-revision: 2
+revision: 3
+transitions:
+- {from: "open", to: "cleared", at: "2026-10-05T20:28:11Z", actor: "human:timo", revision: 3, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Blocker: metaharness links aep 0.55.0
 

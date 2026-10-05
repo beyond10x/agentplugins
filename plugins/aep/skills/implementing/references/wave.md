@@ -413,7 +413,7 @@ pointing at a symbol the other renamed, which no conflict marker shows you. It i
 needs no worktree and no build, and running it at integration time instead is running it after both
 agents' work is already spent.
 
-Move each story out of `draft` yourself, in the main tree, after adding whatever edge the store
+Move each story out of `draft` yourself, in the managed integration tree, after adding whatever edge the store
 requires. The implementors never touch it.
 
 ### Dispatch
@@ -498,6 +498,10 @@ for byte. It is an immutable kind, so the body arrives at creation through `new 
 after. Two things depend on the record existing: the outcome you write next names it, and the
 ledger below compares this pass against the one before it. A pass that was read and not recorded is
 a pass no later command can see.
+
+For any review whose findings block the CLI refuses to parse, send the exact refusal back to
+its author and request valid JSON or correctly quoted YAML with the same findings. Record the
+author's corrected response verbatim. Do not reserialize or repair the review yourself.
 
 **Record the outcome of each finding as you take its row.** The row you took *is* the outcome, so
 this costs one command and no judgement — and without it the review-result you wrote says what an

@@ -59,6 +59,8 @@ pub enum Measure {
     Outputs,
     /// Passed, failed and skipped tests of the last `go test`.
     GoTest,
+    /// Passed, failed and ignored tests of the last Rust test run.
+    CargoTest,
 }
 
 /// One `trials/<name>/trial.yaml`.

@@ -30,15 +30,29 @@ aep plan reverse openapi --domain <domain> <openapi-document> --out <file>
 ```
 
 **A new specification starts on the newest release and its newest format, never on `ess/1`.**
-Before the first file, check that the installed `ess` is the newest release (`ess --version`
-against `gh release list -R beyond10x/ess -L 1`; upgrade through the `ess:upgrade` skill when it
-is behind). Then write the newest `format:` that release implements; the example below uses `ess/22`. To
+Before the first file, compare `ess --version` with the newest release. Reuse the current run’s
+successful setup or upgrade plan from `b10x` when its release-resolution evidence names that release;
+matching installed output completes the check. If that evidence is absent, read the public latest
+release without requiring a login:
+
+```console
+curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
+```
+
+Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
+current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
+`format:` that release implements; the example below uses `ess/22`. To
 read it from the binary, validate a header one past what you expect; the
 `unsupported_format_version` refusal lists every format the build implements (a listing command
 is beyond10x/ess#460). The `ess/1` in
 [references/syntax.md](references/syntax.md) shows the minimum header for each construct; it is
 not the header to start a document on. A higher format admits every lower one, and the document
 below validates unchanged under each.
+
+Choose the system identifier first: every domain’s first segment must equal `system`. With
+`system: warehouse`, use `warehouse.shipment` and declarations such as
+`warehouse.shipment.Shipment`. When adapting an example, change that prefix consistently in
+domain names, declarations and references; `system: seedlib` cannot contain `seeds.lending`.
 
 Otherwise write the smallest document that validates — two files, and nothing that is not required:
 
@@ -240,9 +254,9 @@ projection owns is not authority.
 
 ## Implementation code comes from the specification
 
-**Never hand-transcribe the model into code.** Entities, their states and transitions, command
-inputs, outcomes, events, errors and views are generated; the implementation fills in only what the
-specification cannot say:
+For production implementation work, generate entities, states and transitions, command inputs,
+outcomes, events, errors and views from the model. The implementation fills in the remaining
+ports and obligations:
 
 ```console
 ess generate synthesize --path <specification> --target rust --out <directory>
@@ -256,13 +270,20 @@ generated tree and hold it in the gate: regenerate into a temporary directory an
 difference, exactly as for projections above. When the specification changes, regenerate; the
 compiler then names every handler the change touched.
 
-A hand transcription drifts, and nothing catches it. One passed a 669-scenario conformance suite
-with every entity field unchecked: a scenario only reads the fields its expectations name, so a
+An explicitly requested independent educational implementation, reference target or adapter over
+existing code has a different purpose: it supplies independent observations for conformance.
+Keep that implementation independent, run the generated suite over its real behavior, and show
+a planted defect failing before reporting a pass. The Rust tutorial is this case; it is not a
+production implementation-generation recipe. Existing application code being retrofitted also
+stays the system under test until a separate migration is requested.
+
+A hand transcription can drift beyond what the conformance scenarios observe. One passed a
+669-scenario conformance suite with every entity field unchecked: a scenario only reads the fields its expectations name, so a
 wrong field type or a missing field that no expectation reads stays green.
 
-**When `synthesize` refuses the specification,** the refusal names each position the target cannot
-represent. That is a gap in ESS, not a licence to transcribe: file it on beyond10x/ess with the
-refusal lines. Until the fix is released, a hand-written model is allowed only with a test that
+**When production generation refuses a specification,** the refusal names each position the
+target cannot represent. That is a gap in ESS, not a licence to transcribe: file it on
+beyond10x/ess with the refusal lines. Until the fix is released, a hand-written model is allowed only with a test that
 compares it against `ess specify compile --path <specification> --format json`: every entity's
 fields and their types, every lifecycle's states and transitions, every command's input, every
 event's and error's fields, every view's fields, and every actor's `may` list. Names alone are not
@@ -340,3 +361,9 @@ construct synthesis cannot arrange (the per-holder limit in
 - The specification validates and is reviewed: project it (`ess generate`) or synthesise a conformance suite, then `ess:testing-conformance`.
 - A system already exists and has no specification: `ess:retrofitting`.
 - `ess` missing or older than expected: `ess:upgrade`.
+
+For related-record rules, selected multi-record effects, transport/client generation, protocol
+verification or compatibility gates, read [references/current-features.md](references/current-features.md)
+and run its committed examples. It separates supported source constructs from synthesis and
+implementation-target limits, and keeps model-only protocol evidence distinct from observations
+of an implementation.

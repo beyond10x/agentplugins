@@ -51,6 +51,16 @@ For each entity, cite where it came from beside it:
 
 Retrofit-specific rules:
 
+- **A derived value needs its actual expression or an explicit gap.** `{generated: true}` can
+  describe an implementation-produced value beyond an identity, but asserts no relationship to
+  inputs or the clock. It does not specify `due_at = now + days × 24h`. If the current expression
+  vocabulary cannot express that calculation, mark the calculation `UNMAPPED:` with its source
+  line. A partial type/presence check must be reported as partial, even when all its scenarios
+  pass. The presence of a generated timestamp does not verify the due date.
+  Current `now` support is for command guards, including stored and related timestamp comparisons;
+  it is not a general clock source for `sets:` or a time-relative view filter. Report those exact
+  missing expressions, rather than claiming ESS has no clock-aware constructs.
+
 - **Lifecycles are read, not designed.** Take states from an enum, a status column or the
   transitions the handlers perform. A state the code never enters is not declared. A transition
   whose trigger you cannot find is `UNMAPPED:`.
@@ -65,12 +75,11 @@ Retrofit-specific rules:
   A read by identity (`GET /tools/{id}`) is not a view of its own: `filter: id == param.id` leaves
   every outcome it observes unsynthesized (`ESS-SYNTH-005`). Declare the entity's view without that
   filter and say in a comment that the service also reads it by id.
-- **A command the code accepts and ignores in every state it does not act from is `wrong_state:
-  true` with `refuses: false`** and no error: the scenario then requires success and no change,
-  which is the code's behaviour. Add no error the code never raises. A command has at most one
-  `wrong_state:` outcome, so when it ignores in one state and refuses in another, write no
-  `wrong_state:` at all (`format: ess/7` or later): guard each branch by the held state, and let
-  one effect-free error answer the rest.
+- **Choose the no-op shape from the actual state behavior.** If every state outside the command’s
+  transition is accepted without change, use one `wrong_state: true` outcome with `refuses: false`
+  and no error. If some states are ignored and others refused, use held-state branches instead
+  (`ess/7` or later): `preserves:` for a successful no-op and an effect-free error for the rest.
+  The following example is this mixed case and therefore declares no `wrong_state:` outcome.
 
   ```yaml
   - name: retired
@@ -117,9 +126,11 @@ Retrofit-specific rules:
   `InTransit`; state names must start upper-case.
 - **A rule the language cannot hold stays in the code, and is named.** A limit read from the
   addressed record's stored fields is `when_subject: {predicate: …}`, compared with the request as
-  `input.<field>` from `ess/15`; a constraint across records, or on another entity, is `UNMAPPED:`
-  with its source line ([syntax reference](../specifying/references/syntax.md), "What `when` can
-  and cannot say").
+  `input.<field>` from `ess/15`; another entity can be read with `when_related:` (`ess/18`), including selected row sets in
+  `ess/22`. `instances:` and `affects:` express selected record effects. Validate the exact
+  combination and record `UNMAPPED:` with its source line only for a rule or target the current
+  release actually refuses; [current examples](../specifying/references/current-features.md)
+  distinguish declaration, synthesis and implementation support.
 
 ## 3. Prove the draft describes the system
 

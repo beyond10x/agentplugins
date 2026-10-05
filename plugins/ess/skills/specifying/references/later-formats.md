@@ -139,65 +139,47 @@ different. Two limits observed on this library: comparing or grouping by
 `branch_id`, the `via:` of `Branch owns Copy`, left those scenarios unbuilt (`ESS-SYNTH-003`,
 `ESS-SYNTH-017`), so the examples use `title`.
 
-**A limit per holder** ("a member can have five packets out at once"). Keep the count on the entity
-
-the command addresses, and guard on it:
-
-```yaml
-entities:
-  - name: seeds.lending.Member
-    identity: {name: member_id, type: Uuid}
-    fields:
-      - {name: name, type: String}
-      - {name: packets_out, type: Integer}
-    invariants:
-      - packets_out >= 0
-      - packets_out <= 5
-    lifecycle:
-      initial: Active
-      states: [Active]
-      terminal: [Active]
-```
+**A limit per holder** ("a member can have five packets out at once"). When each packet records
+its borrower and lifecycle state, address that packet and count the rows already lent to the
+member (`ess/22`):
 
 ```yaml
-  - name: seeds.lending.BorrowPacket
-    input:
-      - {name: member_id, type: Uuid}
-    outcomes:
       - name: at-limit
-        when_subject:
-          predicate: packets_out >= 5
+        when_related:
+          entity: seeds.lending.Packet
+          where:
+            all:
+              - borrower_id == input.member_id
+              - state == Lent
+          count: {gte: 5}
         error: seeds.lending.LimitReached
       - name: borrowed
-        updates: seeds.lending.Member
-        instance: member_id
-        sets: {packets_out: {increment: 1}}
+        moves: seeds.lending.Packet.lend
+        instance: packet_id
+        sets: {borrower_id: input.member_id}
         emits: [seeds.lending.PacketBorrowed]
         payload:
-          seeds.lending.PacketBorrowed: {member_id: input.member_id}
-  - name: seeds.lending.ReturnPacket
-    input:
-      - {name: member_id, type: Uuid}
-    outcomes:
-      - name: nothing-out
-        when_subject:
-          predicate: packets_out <= 0
-        error: seeds.lending.NothingOut
-      - name: returned
-        updates: seeds.lending.Member
-        instance: member_id
-        sets: {packets_out: {increment: -1}}
-        emits: [seeds.lending.PacketReturned]
-        payload:
-          seeds.lending.PacketReturned: {member_id: input.member_id}
+          seeds.lending.PacketBorrowed:
+            packet_id: input.packet_id
+            member_id: input.member_id
 ```
 
-The creating command (`Join`) sets `packets_out: 0`. Synthesis arranges a member only through that
-`sets:` and does not repeat `BorrowPacket`, so the `at-limit` scenario is refused (`ESS-SYNTH-003`).
-That refusal is the expected result: name it in your report. Do not give `Join` a starting count
-only so synthesis can reach the limit; no member joins holding packets.
-One outcome changes one record: a `Packet` moving to `OnLoan` is a second command the caller sends,
-and the specification cannot require both to happen together.
+This models the limit without a separate counter. Declare the Packet fields, lifecycle, typed
+inputs, event, error and observable views around this excerpt. The seed-library trial validates
+this shape but synthesis refuses the at-limit arrangement with `ESS-SYNTH-001`; validation does
+not make the boundary executable. Retain that refusal and cover the intended boundary with an
+authored scenario against the real target. Do not promise a fixed refusal code for every model.
+
+A separate Member counter guarded by `when_subject` and changed by `{increment: 1}` is valid
+for a counter-only model, but does not also move a particular Packet. The current `affects`
+selector rejects selecting by the selected entity’s identity, and set effects reject
+`{increment: …}`. The validated set-effects example instead selects by stored `team` and writes
+literal fields; it is not a recipe for an atomic packet-plus-member-counter transaction.
+
+Current related-row support also distinguishes identity-addressed guards from row-set guards:
+several identity-addressed rows may be read, but mixing an identity-addressed member-existence
+guard with the packet row-set limit is refused. Name that missing registration check explicitly
+if the real domain requires it; do not claim that the limit verifies membership.
 
 **A branch chosen by the held state.** When one command succeeds from one state, does nothing in a
 second and refuses in the rest, guard each branch with `when_subject_state:` and let one
@@ -230,3 +212,30 @@ carries no error, event or `sets:` (`refusal_mutated_state`).
 A specification lowered to Entity Runtime is refused there, not at `validate`, for value
 expressions (`ValueExpressionUnsupported`), the `ess/15` outcome shapes (`OutcomeShapeUnsupported`)
 and the case-insensitive operators (`CaseFoldUnsupported`); keep those out of a model that must lower.
+
+## From `ess/16` through `ess/22`
+
+The source language and conformance-suite version are different contracts. Choose the source
+format for the construct; let synthesis select its required suite format. With current ESS:
+
+| format | additions |
+|---|---|
+| `ess/16` | related values; literal fallbacks; optional aggregate presence; `input_absent`; `existing_instance`; caller attributes; view paging; bounded retries; `instances` and `affects` |
+| `ess/17` | typed direct responses with `returns: true` |
+| `ess/18` | `when_related`; stored `state` in subject predicates; lists of subject states; binding delivery context |
+| `ess/19` | `payload` sources for declared error fields |
+| `ess/20` | related row lifecycle `state` in predicates |
+| `ess/21` | `one_time_response` non-disclosure contracts for required String response fields |
+| `ess/22` | explicit fact operands and constant offsets; UTF-8 byte lengths; instant comparison; `distinct` list keys; selected row guards/reads; Optional and two-hop related reads; several related rows; calendar windows; compensating external refusals; conditional aggregates and binding payload guards; per-outcome failure policy; lifecycle moves in `affects`; view grants; unit union variants; dotted input values |
+
+For related guards, selected effects, event transports, client generation, finite protocol models
+and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
+selected target: a source construct validating does not mean code generation or Entity Runtime
+can lower it. The current lowering report lists each unsupported construct by name.
+
+For a valid stored state bounded arrangement cannot reach, current ESS admits an explicit
+`--synthesis-seed <authored-file> <instance>` containing a typed setup row. The suite records seed
+provenance and selects `/42` or `/43`; the target must establish and validate that real row.
+A seed does not execute the authored document's timeline or replace a command's assertions. For a
+missing input candidate, first supply a truthful `example:`: the reservation fixture's distinct
+member identity restores the wrong-state scenario without changing the rule or injecting state.

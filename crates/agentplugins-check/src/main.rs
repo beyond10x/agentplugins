@@ -639,6 +639,9 @@ fn retired_names(root: &Path) -> Result<(), String> {
                 continue;
             };
             let relative = relative.to_string_lossy().replace('\\', "/");
+            if matches!(relative.as_str(), "website/build" | "website/.docusaurus") {
+                continue;
+            }
             let name = path
                 .file_name()
                 .and_then(std::ffi::OsStr::to_str)
@@ -834,6 +837,13 @@ fn flat_hits(text: &str, group: &Regrouped) -> Vec<(usize, &'static str, &'stati
                 let start = from + offset;
                 let end = start + tool.len();
                 from = end;
+                if *tool == "protocol" {
+                    let prefix = typed[..start].trim_end();
+                    if !prefix.is_empty() && !prefix.ends_with(['`', '$', ';', '|', '&', '\'', '"'])
+                    {
+                        continue;
+                    }
+                }
                 if start > 0 && (word_byte(bytes[start - 1]) || bytes[start - 1] == b'-') {
                     continue;
                 }
@@ -1638,6 +1648,14 @@ one product only: `b10x upgrade ess`
             "the `aep-planning` plugin\n",
         );
         retired_names(&sandbox).expect("history, change records and transcripts keep their names");
+        write("website/build/index.html", "install `ess-schema`\n");
+        write("website/.docusaurus/routes.js", "install `ess-schema`\n");
+        retired_names(&sandbox).expect("generated site output is not authored source");
+        write("website/docs/build/guide.md", "install `ess-schema`\n");
+        assert!(
+            retired_names(&sandbox).is_err(),
+            "a source directory named build is still checked"
+        );
 
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
     }
@@ -1785,6 +1803,17 @@ one product only: `b10x upgrade ess`
     #[test]
     fn the_flat_sweep_reads_a_typed_command_and_not_a_word() {
         let aep = &REGROUPED[0];
+        for text in [
+            "model-only protocol evidence",
+            "`ess specify protocol validate --path protocol.yaml`",
+            "```bash\ness specify protocol validate --path protocol.yaml\n```",
+        ] {
+            assert_eq!(flat_hits(text, aep), Vec::new(), "{text}");
+        }
+        assert_eq!(
+            flat_hits("true && protocol artifact list", aep),
+            vec![(1, "artifact", "plan")]
+        );
         assert_eq!(aep.tools, &["aep", "protocol"]);
         let ess = &REGROUPED[1];
         assert_eq!(ess.tools, &["ess"]);

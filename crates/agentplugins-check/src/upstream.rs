@@ -30,6 +30,10 @@ struct Tracked {
 enum Pin {
     /// The CLI's entry in `verified.json`.
     Verified,
+    Commit {
+        file: &'static str,
+        prefix: &'static str,
+    },
     /// The first `<prefix><version>` in this file.
     Text {
         file: &'static str,
@@ -54,6 +58,54 @@ const TRACKED: &[Tracked] = &[
         pin: Pin::Verified,
     },
     Tracked {
+        name: "eval AEP",
+        repository: "beyond10x/aep",
+        pin: Pin::Text {
+            file: ".github/workflows/eval.yml",
+            prefix: "AEP_VERSION: '",
+        },
+    },
+    Tracked {
+        name: "eval ESS",
+        repository: "beyond10x/ess",
+        pin: Pin::Text {
+            file: ".github/workflows/eval.yml",
+            prefix: "ESS_VERSION: '",
+        },
+    },
+    Tracked {
+        name: "eval Connectors",
+        repository: "beyond10x/connectors",
+        pin: Pin::Text {
+            file: ".github/workflows/eval.yml",
+            prefix: "CONNECTORS_VERSION: '",
+        },
+    },
+    Tracked {
+        name: "eval Worktree",
+        repository: "beyond10x/worktree",
+        pin: Pin::Text {
+            file: ".github/workflows/eval.yml",
+            prefix: "WORKTREE_VERSION: '",
+        },
+    },
+    Tracked {
+        name: "planning protocols",
+        repository: "beyond10x/aep",
+        pin: Pin::Commit {
+            file: ".engineering/project.yaml",
+            prefix: "protocols: git+https://github.com/beyond10x/aep#",
+        },
+    },
+    Tracked {
+        name: "website Docs System",
+        repository: "beyond10x/docs-system",
+        pin: Pin::Commit {
+            file: "website/package.json",
+            prefix: "git+https://github.com/beyond10x/docs-system.git#",
+        },
+    },
+    Tracked {
         name: "metaharness",
         repository: "beyond10x/metaharness",
         pin: Pin::Text {
@@ -74,7 +126,21 @@ const TRACKED: &[Tracked] = &[
 /// The version string that starts right after `prefix` in `text`.
 #[must_use]
 pub fn pinned_in(text: &str, prefix: &str) -> Option<String> {
-    let start = text.find(prefix)? + prefix.len();
+    let starts_identifier = prefix
+        .chars()
+        .next()
+        .is_some_and(|c| c.is_alphanumeric() || c == '_');
+    let start = text
+        .match_indices(prefix)
+        .find(|(index, _)| {
+            !starts_identifier
+                || text[..*index]
+                    .chars()
+                    .next_back()
+                    .is_none_or(|c| !c.is_alphanumeric() && c != '_' && c != '-')
+        })?
+        .0
+        + prefix.len();
     let version: String = text[start..]
         .chars()
         .take_while(|c| c.is_ascii_alphanumeric() || *c == '.' || *c == '-')
@@ -145,10 +211,19 @@ pub fn cited_issues(text: &str) -> BTreeSet<(String, u64)> {
 #[must_use]
 pub fn workflow_pins(text: &str) -> BTreeSet<(String, String)> {
     text.lines()
-        .filter_map(|line| line.trim().strip_prefix("uses: beyond10x/"))
+        .filter_map(|line| {
+            line.trim()
+                .trim_start_matches("- ")
+                .strip_prefix("uses: beyond10x/")
+        })
         .filter_map(|rest| {
             let repository = rest.split('/').next()?.to_owned();
-            let commit = rest.rsplit_once('@')?.1.trim().to_owned();
+            let commit = rest
+                .rsplit_once('@')?
+                .1
+                .split_whitespace()
+                .next()?
+                .to_owned();
             (commit.len() == 40).then_some((repository, commit))
         })
         .collect()
@@ -179,20 +254,52 @@ fn short(commit: &str) -> &str {
     commit.get(..7).unwrap_or(commit)
 }
 
-/// Print the report; fail only when something cannot be read.
-pub fn report(root: &Path) -> Result<(), String> {
+pub(crate) fn release_commit(repository: &str, tag: &str) -> Result<String, String> {
+    let output = tools::run(
+        "git",
+        &[
+            "ls-remote",
+            &format!("https://github.com/{repository}"),
+            &format!("refs/tags/{tag}"),
+            &format!("refs/tags/{tag}^{{}}"),
+        ],
+    )?;
+    output
+        .lines()
+        .last()
+        .and_then(|line| line.split_whitespace().next())
+        .map(str::to_owned)
+        .ok_or_else(|| format!("{repository}: release {tag} has no tag commit"))
+}
+
+fn report_releases(root: &Path) -> Result<usize, String> {
     let verified = tools::verified(root)?;
     let mut moved = 0;
     println!("# Upstream report\n\n## Releases\n");
     for tracked in TRACKED {
         let pinned = match &tracked.pin {
             Pin::Verified => verified.get(tracked.name).cloned(),
-            Pin::Text { file, prefix } => std::fs::read_to_string(root.join(file))
-                .ok()
-                .and_then(|text| pinned_in(&text, prefix)),
+            Pin::Text { file, prefix } | Pin::Commit { file, prefix } => {
+                std::fs::read_to_string(root.join(file))
+                    .ok()
+                    .and_then(|text| pinned_in(&text, prefix))
+            }
         }
         .ok_or_else(|| format!("{}: no pinned release found", tracked.name))?;
         let newest = tools::latest(tracked.repository)?;
+        if matches!(tracked.pin, Pin::Commit { .. }) {
+            let commit = release_commit(tracked.repository, &newest)?;
+            let behind = commit != pinned;
+            moved += usize::from(behind);
+            println!(
+                "- `{}` pinned {}, newest {newest} is {}{}",
+                tracked.name,
+                short(&pinned),
+                short(&commit),
+                if behind { " — **moved**" } else { "" }
+            );
+            continue;
+        }
         let behind = tools::key(&newest) > tools::key(&pinned);
         println!(
             "- `{}` pinned {pinned}, newest {newest}{}",
@@ -216,13 +323,26 @@ pub fn report(root: &Path) -> Result<(), String> {
         }
     }
 
+    Ok(moved)
+}
+
+/// Print the report; fail only when something cannot be read.
+pub fn report(root: &Path) -> Result<(), String> {
+    let mut moved = report_releases(root)?;
     println!("\n## Workflow pins\n");
     let mut pins = BTreeSet::new();
     for workflow in files(&root.join(".github/workflows"), "yml") {
         let text = std::fs::read_to_string(&workflow).map_err(|error| error.to_string())?;
-        pins.extend(workflow_pins(&text));
+        let generated = text.contains("Generated")
+            || text.contains("generated")
+                && workflow
+                    .file_name()
+                    .is_some_and(|name| name.to_string_lossy().starts_with("b10x-docs-"));
+        for (repository, commit) in workflow_pins(&text) {
+            pins.insert((repository, commit, generated));
+        }
     }
-    for (repository, commit) in pins {
+    for (repository, commit, generated) in pins {
         let head = tools::run(
             "git",
             &[
@@ -232,12 +352,17 @@ pub fn report(root: &Path) -> Result<(), String> {
             ],
         )?;
         let main = head.split_whitespace().next().unwrap_or_default();
+        let owner = if generated {
+            " (generated; Atlas reconciliation owns updates)"
+        } else {
+            " (repository maintained)"
+        };
         if main == commit {
-            println!("- `{repository}` pinned {}, main", short(&commit));
+            println!("- `{repository}` pinned {}, main{owner}", short(&commit));
         } else {
             moved += 1;
             println!(
-                "- `{repository}` pinned {}, main is {} — **moved**",
+                "- `{repository}` pinned {}, main is {} — **moved**{owner}",
                 short(&commit),
                 short(main)
             );
@@ -281,6 +406,29 @@ mod tests {
 
     #[test]
     fn a_pin_is_read_after_its_prefix() {
+        let workflow = "METAHARNESS_VERSION: '0.9.1'\nESS_VERSION: '0.53.0'\n";
+        assert_eq!(
+            pinned_in(workflow, "ESS_VERSION: '"),
+            Some("0.53.0".to_owned())
+        );
+        assert_eq!(
+            pinned_in("METAHARNESS_VERSION: '0.9.1'", "ESS_VERSION: '"),
+            None
+        );
+        assert_eq!(
+            pinned_in(
+                "protocols: git+https://github.com/beyond10x/aep#abcdef",
+                "protocols: git+https://github.com/beyond10x/aep#"
+            ),
+            Some("abcdef".to_owned())
+        );
+        assert_eq!(
+            pinned_in(
+                "\"git+https://github.com/beyond10x/docs-system.git#fedcba\"",
+                "git+https://github.com/beyond10x/docs-system.git#"
+            ),
+            Some("fedcba".to_owned())
+        );
         assert_eq!(
             pinned_in(
                 "x\n      METAHARNESS_VERSION: '0.8.0'\n",
@@ -307,6 +455,13 @@ mod tests {
 
     #[test]
     fn issues_and_workflow_pins_are_found() {
+        assert_eq!(
+            workflow_pins(
+                "- uses: beyond10x/gates/check@339b4b8462f19b4c9d3716e6a44ed2a3691eb9d8 # pinned"
+            )
+            .len(),
+            1
+        );
         let issues = cited_issues("see beyond10x/ess#186 and (beyond10x/aep#8), not beyond10x/ess, nor git+https://github.com/beyond10x/aep#8b4342a41fdd9143");
         assert_eq!(
             issues.into_iter().collect::<Vec<_>>(),

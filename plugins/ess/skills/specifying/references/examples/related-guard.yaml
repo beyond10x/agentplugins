@@ -1,0 +1,50 @@
+format: ess/22
+system: library
+version: v1
+domain: library.lending
+types:
+  - {name: library.lending.MemberId, kind: newtype, of: Uuid}
+entities:
+  - name: library.lending.Member
+    identity: {name: member_id, type: library.lending.MemberId}
+    fields: [{name: name, type: String}]
+    lifecycle: {initial: Active, states: [Active], terminal: [Active]}
+actors:
+  - name: library.lending.Librarian
+    may: [library.lending.Join, library.lending.CheckMember]
+events:
+  - name: library.lending.Joined
+    fields: [{name: member_id, type: library.lending.MemberId}, {name: name, type: String}]
+errors:
+  - name: library.lending.MemberNotFound
+    fields: []
+commands:
+  - name: library.lending.Join
+    input: [{name: name, type: String}]
+    outcomes:
+      - name: joined
+        creates: library.lending.Member
+        instance: member_id
+        sets: {name: input.name}
+        emits: [library.lending.Joined]
+        payload:
+          library.lending.Joined: {member_id: {generated: true}, name: input.name}
+  - name: library.lending.CheckMember
+    input: [{name: member_id, type: library.lending.MemberId}]
+    outcomes:
+      - name: unknown-member
+        when_related: {via: input.member_id, exists: false}
+        error: library.lending.MemberNotFound
+      - name: registered
+        accepts: nothing
+views:
+  - name: library.lending.Members
+    source: library.lending.Member
+    consistency: read_your_writes
+    fields: [{name: member_id, type: library.lending.MemberId}, {name: name, type: String}]
+components:
+  - component: library-service
+    owns: {domains: [library.lending]}
+    accepts: {commands: [library.lending.Join, library.lending.CheckMember]}
+    publishes: {events: [library.lending.Joined]}
+    reached_by: network

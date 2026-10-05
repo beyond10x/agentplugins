@@ -1081,7 +1081,7 @@ mod tests {
         let error =
             check_stream(&root(), Path::new("evals/connectors-readiness"), &stream).unwrap_err();
         assert!(error.contains("doctor-ran"), "{error}");
-        std::fs::write(&stream, r#"{"format":"metaharness.event/1","event":"tool.requested","name":"exec_command","input":{"cmd":"connectors inspect doctor && connectors serve local --help"}}"#).unwrap();
+        std::fs::write(&stream, r#"{"format":"metaharness.event/1","event":"tool.requested","name":"exec_command","input":{"cmd":"connectors setup check && connectors connections connect --help"}}"#).unwrap();
         check_stream(&root(), Path::new("evals/connectors-readiness"), &stream).unwrap();
         std::fs::remove_dir_all(&directory).unwrap();
     }

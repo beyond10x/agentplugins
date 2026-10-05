@@ -6,7 +6,7 @@ Use the narrowest link that answers the request.
 |---|---|
 | [Getting started](https://beyond10x.github.io/getting-started/) | Public entry point and adoption paths |
 | [Agent Plugins](https://beyond10x.github.io/docs/agentplugins/) | Marketplace overview, installation, and plugin selection |
-| [Your first ESS specification](https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/) | Tutorial: an agent writes a specification, `ess` validates it, a Go implementation passes its conformance suite |
+| [Your first ESS specification](https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/) | Tutorial: an agent writes a specification, `ess` validates it, a Rust implementation passes its conformance suite |
 | [Golden path](https://beyond10x.github.io/docs/agentplugins/golden-path/) | One worked run, from a feature idea to a critiqued plan, on a repository that already exists |
 | [b10x plugin](https://beyond10x.github.io/docs/agentplugins/plugins/b10x/) | Setup, this router and the portable plugin-creation workflow |
 | [aep plugin](https://beyond10x.github.io/docs/agentplugins/plugins/aep/) | Governed planning, delivery in waves or by the engine, and diagnosis |

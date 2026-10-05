@@ -6,7 +6,7 @@ to follow the run, and stop.
 
 ## Read this before you start one
 
-**The walk has never reached `complete`.** `aep`'s own `story:governed-dogfood-run` records two
+**The recorded dogfood attempts below did not reach `complete`.** `aep`'s own `story:governed-dogfood-run` records two
 attempts against real stories of its own backlog: `W4-1/1` on 2026-08-21 stopped in
 `establish_verifiers` at $15.42, and `W4-2/1` stopped in `adversarial_verify` at $31.46. Neither
 reached the review step, and the story's own acceptance line — *a run that wedges is a recorded
@@ -18,9 +18,9 @@ stop:
 | | |
 |---|---|
 | what you get | a run that walks the map, records every state, and refuses every transition the engine will not permit — the enforcement an interactive session cannot have |
-| what you should expect | a **stop**, somewhere before `complete`, with a reason. That is the normal outcome today |
+| what has been observed | two historical runs stopped before `complete`; they do not qualify later releases |
 | what it costs | real model spend per `llm` step. Both recorded runs cost more than $15 |
-| what closes the gap | `aep` `story:governed-dogfood-run`. Until it lands, a driven run is an experiment with a bounded cost, and saying otherwise would be selling it |
+| what establishes readiness | a completed run on the selected release, with its retained evidence; check the current dogfood record before promising that outcome |
 
 Say this to the operator, in one line, before the launch — not after the stop.
 
@@ -44,11 +44,14 @@ is given and guesses none.
 ## 2. Point the driver at the story
 
 **`metaharness aep drive run --help` has to answer before anything else.** AEP hands every
-model-backed map to Metaharness and refuses it itself, naming this command. Metaharness
-`0.7.0` includes the verb; earlier tags through `0.6.5` predate it.
+model-backed map to Metaharness and refuses it itself, naming this command.
 `unrecognized subcommand 'aep'` means the installed
 Metaharness is older than the AEP that sent you here: say so, point at the install page's
 Metaharness block, and stop.
+
+Read the selected Metaharness release's AEP dependency revision. The `--aep-binary` executable
+must come from that source; independently choosing the newest copy of each tool is insufficient.
+The eval runner also checks the child's planning executable on `PATH` and refuses a mismatch.
 
 `metaharness aep drive run` walks a **task document**, not a story id — the story is the contract and the task
 document is what a run needs to resolve a plan against it. It names the story in `derived_from:`,
@@ -67,16 +70,17 @@ select the one that fits; where two fit, it **refuses and names both**, and that
 operator to answer. Do not pick one to get the run started.
 
 ```console
-$ METAHARNESS_LIVE=1 metaharness aep drive run --project . --map <the map the project declares> \
+$ METAHARNESS_LIVE=1 metaharness aep drive run --project . --task <the reviewed task document> \
     --aep-binary <the AEP executable built from the runner's pinned source> \
     --plugin-dir <the plugin directory the run loads> \
     --pause-on-approval --budget-usd <what the operator said> --assume-usd-per-run <what the operator said>
 ```
 
-**`--budget-usd` and `--assume-usd-per-run` are not optional on a map with an `llm` step, and they
-are not yours to invent.** The cap is checked before every session spawn, because one applied
-afterwards is a receipt rather than a bound. Ask the operator for both numbers and pass what they
-said; a run launched on a guessed budget is a run whose ceiling nobody agreed to.
+For a capped map with an `llm` step, pass the operator's `--budget-usd` and
+`--assume-usd-per-run`. Ask only when the session has not supplied those values. The runner checks
+the cap before each session spawn. An explicitly authorized uncapped run uses `--uncapped-budget`
+and `--spend-authorization <reference>` instead; the reference identifies real operator
+authorization, and cannot be invented. Resume preserves the spending mode and authorization.
 
 **`METAHARNESS_LIVE=1` is the opt-in, and it goes on the command.** Without it a map with an `llm`
 step is refused before a run id is allocated — *a model session can cost money; opt in explicitly* —
@@ -91,8 +95,10 @@ allocated before the real launch.
 
 ## 3. Where the nested launch happens, and what to do when it will not
 
-Each `llm` step of the map is a harness session that the **driver** spawns through
-`metaharness run claude`. The hermetic scratch home is metaharness's own: the child gets a
+Each `llm` step of the map is a harness session the **driver** spawns using the map's selected
+adapter. Governed Codex steps use the command admission seam; `--codex-model` and
+`--codex-endpoint` selections persist across resume. A foreign endpoint runs without operator
+credentials. The hermetic scratch home is metaharness's own: the child gets a
 constructed environment and a scratch config home rather than this session's, so it does not inherit
 the identity, the credential handling or the tool surface of the session you are sitting in. That is
 imposed by the adapter, not assembled here, and it is the reason a driven run's writes are
@@ -116,6 +122,10 @@ $ metaharness aep drive status
 ```
 
 `status` reports what the store's last run is doing and who holds the lock. `metaharness aep drive resume <run>` continues a compatible paused run, retaining its budget and plugin inputs. A version or integrity refusal is binding.
+
+When reporting an adapter's outcome, read the terminal verdict and `stream.closed.process`
+separately. A native process exit, signal, or unknown status is an observation of process completion;
+it is not proof the task succeeded. Missing terminal evidence stays unknown.
 
 The AEP planning executable and the Metaharness runner are distinct tools. Pass the source-matched AEP executable with `--aep-binary`; do not substitute the Metaharness binary for planning commands. AEP still provides planning, command-only driving and offline evidence ingestion.
 
