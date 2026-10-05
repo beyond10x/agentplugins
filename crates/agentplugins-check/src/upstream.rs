@@ -126,7 +126,21 @@ const TRACKED: &[Tracked] = &[
 /// The version string that starts right after `prefix` in `text`.
 #[must_use]
 pub fn pinned_in(text: &str, prefix: &str) -> Option<String> {
-    let start = text.find(prefix)? + prefix.len();
+    let starts_identifier = prefix
+        .chars()
+        .next()
+        .is_some_and(|c| c.is_alphanumeric() || c == '_');
+    let start = text
+        .match_indices(prefix)
+        .find(|(index, _)| {
+            !starts_identifier
+                || text[..*index]
+                    .chars()
+                    .next_back()
+                    .is_none_or(|c| !c.is_alphanumeric() && c != '_' && c != '-')
+        })?
+        .0
+        + prefix.len();
     let version: String = text[start..]
         .chars()
         .take_while(|c| c.is_ascii_alphanumeric() || *c == '.' || *c == '-')
@@ -392,6 +406,29 @@ mod tests {
 
     #[test]
     fn a_pin_is_read_after_its_prefix() {
+        let workflow = "METAHARNESS_VERSION: '0.9.1'\nESS_VERSION: '0.53.0'\n";
+        assert_eq!(
+            pinned_in(workflow, "ESS_VERSION: '"),
+            Some("0.53.0".to_owned())
+        );
+        assert_eq!(
+            pinned_in("METAHARNESS_VERSION: '0.9.1'", "ESS_VERSION: '"),
+            None
+        );
+        assert_eq!(
+            pinned_in(
+                "protocols: git+https://github.com/beyond10x/aep#abcdef",
+                "protocols: git+https://github.com/beyond10x/aep#"
+            ),
+            Some("abcdef".to_owned())
+        );
+        assert_eq!(
+            pinned_in(
+                "\"git+https://github.com/beyond10x/docs-system.git#fedcba\"",
+                "git+https://github.com/beyond10x/docs-system.git#"
+            ),
+            Some("fedcba".to_owned())
+        );
         assert_eq!(
             pinned_in(
                 "x\n      METAHARNESS_VERSION: '0.8.0'\n",
