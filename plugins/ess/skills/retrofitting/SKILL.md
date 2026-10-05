@@ -117,9 +117,11 @@ Retrofit-specific rules:
   `InTransit`; state names must start upper-case.
 - **A rule the language cannot hold stays in the code, and is named.** A limit read from the
   addressed record's stored fields is `when_subject: {predicate: …}`, compared with the request as
-  `input.<field>` from `ess/15`; a constraint across records, or on another entity, is `UNMAPPED:`
-  with its source line ([syntax reference](../specifying/references/syntax.md), "What `when` can
-  and cannot say").
+  `input.<field>` from `ess/15`; another entity can be read with `when_related:` (`ess/18`), including selected row sets in
+  `ess/22`. `instances:` and `affects:` express selected record effects. Validate the exact
+  combination and record `UNMAPPED:` with its source line only for a rule or target the current
+  release actually refuses; [current examples](../specifying/references/current-features.md)
+  distinguish declaration, synthesis and implementation support.
 
 ## 3. Prove the draft describes the system
 

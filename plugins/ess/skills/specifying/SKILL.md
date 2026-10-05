@@ -340,3 +340,9 @@ construct synthesis cannot arrange (the per-holder limit in
 - The specification validates and is reviewed: project it (`ess generate`) or synthesise a conformance suite, then `ess:testing-conformance`.
 - A system already exists and has no specification: `ess:retrofitting`.
 - `ess` missing or older than expected: `ess:upgrade`.
+
+For related-record rules, selected multi-record effects, transport/client generation, protocol
+verification or compatibility gates, read [references/current-features.md](references/current-features.md)
+and run its committed examples. It separates supported source constructs from synthesis and
+implementation-target limits, and keeps model-only protocol evidence distinct from observations
+of an implementation.

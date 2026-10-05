@@ -8,20 +8,23 @@ prompt: |
   Then produce every output ESS offers from it, each in its own directory under `out/`:
   `out/schema` (JSON Schema), `out/openapi`, `out/asyncapi`, `out/docs`, `out/site`,
   `out/types-rust` (a Rust type library), `out/types-go` (a Go type library) and `out/conformance`
-  (the Go conformance suite).
+  (canonical conformance IR).
 
-  Then write a minimal in-memory Go implementation of the service in `impl/` that implements the
-  suite's `Target`, run `go test -v ./...` in `impl/`, and tell me how many scenarios passed, failed
-  and were skipped. Don't edit the generated suite to make it pass.
+  Then write a minimal in-memory Rust implementation in `impl/` with a native
+  `ess_conformance::target::ConformanceTarget` adapter over it. Synthesize canonical IR into
+  `impl/suite.json`; use `AdmittedSuite` and `Runner` to execute it. There is no conformance
+  `--target rust`. Pin the ESS Rust crates to the CLI release and commit Cargo.lock. Run
+  `cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture` and report actual ESS
+  scenario counts separately from Cargo test counts. All hand-written running code must be Rust.
 
   When you're done, list the skills and agents you used, quote any instruction text that confused
-  you, and paste the last validation output, the last synthesis output and the last `go test`
+  you, and paste the last validation output, the last synthesis output and the last `cargo test`
   summary verbatim.
 dir: service
 setup:
   - b10x init ess --host claude --out plan.json
   - b10x setup apply --plan plan.json --yes
-measures: [tool_calls, validate, synthesis, unmapped, outputs, go_test]
+measures: [tool_calls, validate, synthesis, unmapped, outputs, cargo_test]
 outputs:
   schema: out/schema
   openapi: out/openapi

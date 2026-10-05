@@ -145,9 +145,8 @@ commands:
         type: library.lending.BookId
       - name: member_id
         type: library.lending.MemberId
-    # The borrowing member must be a registered member. That is a condition on another entity
-    # (Member), which a command outcome cannot guard on. Decided: the implementation checks it;
-    # this specification does not, and no scenario covers it.
+    # This introductory model records the borrower identity without requiring registration.
+    # Related guards are demonstrated separately in the plugin current-features examples.
     outcomes:
       - name: borrowed
         moves: library.lending.Book.lend

@@ -1,57 +1,29 @@
-# Spec diff in the gate: classifying changes
+# Compatibility in the gate
 
-Technique 7. The gate compares the specification with the one at the last release tag, and fails
-on a breaking change nobody acknowledged.
+ESS 0.53.0 classifies semantic changes for **callers**, **readers** and **history**. Use the native
+classification instead of treating every added field or enum variant as automatically compatible:
+closed readers and required inputs make that assumption unsafe.
 
-## The diff
-
-`ess verify diff` compares two specification directories:
+Materialise the specification at the previous release into a scratch directory, then compare:
 
 ```console
-ess verify diff --from <release-spec-dir> --to <spec-dir> --format json
+ess verify diff --from <release-spec-dir> --to <spec-dir> --compatibility --format json
+ess verify diff --from <release-spec-dir> --to <spec-dir> --fail-on breaking-or-unknown --format json
 ```
 
-`--from` and `--to` are paths, so materialise the tagged revision first, for example
-`git archive <tag> <spec-dir> | tar -x -C <scratch>`. The `ess-diff` document lists `changes`, each
-with a stable `id` (`type/<name>/variant-removed/<variant>`), a `relation` (`expanded`, `narrowed`
-or `changed`) and the change itself.
+The first writes `ess-diff/14`, including each change's dimensions and compatibility. The second
+fails at exit 4 for an unacknowledged breaking or unknown change. Exit 1 is an input or
+acknowledgement refusal; it is not a compatible result. Repeat `--dimension callers`,
+`--dimension readers` or `--dimension history` only where the gate deliberately narrows its claim;
+the default checks all three.
 
-`ess` names each change and its relation; **it does not decide whether a change is breaking.** Until
-it does, classify with the rule below.
+A reviewed exception uses `--acknowledgements <file>` with an
+`ess-diff-acknowledgements/1` document naming exact change IDs and both endpoint digests. Read the
+current CLI's format before writing that document. Keep it committed with the review rationale.
+Do not carry it to another comparison: stale endpoint digests must refuse.
 
-## The rule
-
-**Additive** (not breaking):
-
-- an added item — a type, entity, field, command, outcome, event, view, actor
-- an added enum variant
-- an added lifecycle transition
-- an added grant (an actor `may` one more command)
-- an added `accepts` or `publishes` entry
-- a wording change — `summary`, `naming.display`, descriptions
-
-**Breaking:** everything else, and **anything whose `relation` is `narrowed`**, whatever its kind. A
-removal, a rename, a changed guard, a changed invariant, a changed type, a changed `wire` name — all
-breaking. When a change's kind is not on the additive list, it is breaking; the list grows by
-decision, not by argument.
-
-## Acknowledgement
-
-A breaking change passes the gate only when acknowledged, and an acknowledgement is a **committed
-file keyed to the release tag** — for example `spec-acknowledgements/<tag>.yaml` — listing each
-acknowledged change by its `id`, with one line saying why it is acceptable.
-
-The gate:
-
-1. materialises the spec at the last release tag;
-2. runs the diff;
-3. classifies each change by the rule;
-4. fails on any breaking change whose `id` is not in the acknowledgement file for that tag, naming
-   the `id`;
-5. fails on any acknowledged `id` that no longer appears in the diff — a stale acknowledgement
-   hides the next change with the same name.
-
-A new release tag starts an empty acknowledgement file; the previous tag's never carries over.
-
-**Plant a defect before trusting it:** on a branch, remove one enum variant. The gate must fail and
-name the `variant-removed` id; add that id to the acknowledgement file and it must pass.
+Before trusting the gate, compare a specification with itself and require exit 0. Then remove a
+command grant or an event field in a copy, compare against that copy, and require exit 4 naming
+the change. Restore the copy and verify exit 0. Retain the actual diff and exit statuses beside the
+release evidence. The [current-features example](../../specifying/references/current-features.md)
+provides a small validated control model.

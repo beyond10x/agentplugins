@@ -15,7 +15,7 @@ ess specify compile --path <specification> --format json --out <ir.json>
 
 **Question:** would the suite notice if a declared rule broke?
 
-`ess verify conform mutate` derives one mutant per site in nine classes (`from-drop`,
+`ess verify conform mutate` derives one mutant per site in named classes (`sets-drop`, `outcome-order-flip`, `emit-swap`, comparison flips, `from-drop`,
 `transition-to`, `guard-boundary`, `sets-retarget`, `guard-negate`, `guard-connective`,
 `error-swap`, `emit-drop`, `order-flip`; `--class` selects), synthesizes each mutant's suite and
 scores it against an implementation of the unchanged specification. `--target` runs only the
@@ -39,7 +39,7 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `mutate` runs none.
 
 **By hand**, where `mutate` has no class for the rule you need (a mutant of the implementation's
-own rule table, or a class outside the nine):
+own rule table, or a class outside the current mutator):
 
 1. From the IR, list one mutant per declared rule. The classes that find gaps:
 

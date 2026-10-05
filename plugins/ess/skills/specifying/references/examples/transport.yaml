@@ -1,0 +1,21 @@
+type: ess-transport/2
+specification:
+  system: library
+  version: v1
+  source_digest: sha256:5ed413df6eec3b76646a2c293c88cd9940c42c6099110d151ddd7ccb4d976d5e
+brokers:
+  - {id: events, protocol: nats, jetstream: true}
+channels:
+  - event: library.lending.Joined
+    broker: events
+    subject: library.joined
+    envelope: array
+    delivery: at_most_once
+    batch: {max_items: 100, max_delay_ms: 5000}
+streams:
+  - name: LIBRARY
+    broker: events
+    subjects: [library.joined]
+    storage: file
+    retention: limits
+    owner: external

@@ -1,25 +1,25 @@
 name: ess-tutorial
 kind: ess-tutorial
 prompt: |
-  I'm new to ESS and I'm following the tutorial in `tutorial.md` here. Setup (step 1) is done. Work
-  through steps 2 to 8 in this directory as the page describes: write the specification in `spec/`,
-  validate it, generate its docs and OpenAPI into `out/`, synthesize the Go suite into `impl/`, write
-  the implementation there and run the suite. Where the page shows the questions and the answers it
-  gave, take the same answers instead of asking me. Do step 7's bug and undo it, then run
-  `ESS_REPORT_FORMAT=2 go test -v ./...` in `impl/` one last time.
+  I'm following tutorial.md. Setup is done. Work through steps 2–8: write the lending spec in
+  spec/, validate it, generate docs and OpenAPI into out/, and synthesize canonical conformance IR
+  into impl/suite.json. Write the independent in-memory Rust library and native ConformanceTarget
+  adapter in impl/; pin ess-conformance and ess-primitives to the tutorial's ESS release, with a
+  Cargo.lock. Use the page's stated decisions without asking again. Running code must be Rust.
+  Demonstrate step 7's state-guard defect, restore it, then run
+  cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture one final time.
 
-  When you're done, tell me how many scenarios passed, failed and were skipped, quote any text on the
-  page that confused you or did not match what you saw, and paste the last validation output, the
-  last synthesis output and the last `go test` summary verbatim.
+  Report both Cargo test counts and actual ESS scenario counts (passed, failed, unsupported and
+  error). Quote any confusing text and paste the final validation, synthesis and cargo test output.
 dir: library
 fixture: fixture
 setup:
   - b10x init ess --host claude --out plan.json
   - b10x setup apply --plan plan.json --yes
-measures: [tool_calls, validate, synthesis, outputs, go_test]
+measures: [tool_calls, validate, synthesis, outputs, cargo_test]
 outputs:
   spec: spec/system.yaml
   docs: out/docs
   openapi: out/openapi
-  suite: impl/essconform
-  implementation: impl/go.mod
+  suite: impl/suite.json
+  implementation: impl/Cargo.toml

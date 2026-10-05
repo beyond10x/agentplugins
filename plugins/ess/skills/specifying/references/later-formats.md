@@ -196,8 +196,9 @@ The creating command (`Join`) sets `packets_out: 0`. Synthesis arranges a member
 `sets:` and does not repeat `BorrowPacket`, so the `at-limit` scenario is refused (`ESS-SYNTH-003`).
 That refusal is the expected result: name it in your report. Do not give `Join` a starting count
 only so synthesis can reach the limit; no member joins holding packets.
-One outcome changes one record: a `Packet` moving to `OnLoan` is a second command the caller sends,
-and the specification cannot require both to happen together.
+From `ess/16`, `affects:` changes selected records beside the addressed member; `ess/22` also
+allows their lifecycle moves. This expresses multi-record effects, but not transaction atomicity.
+See [current-features.md](current-features.md) for validated set-effect and related-guard examples.
 
 **A branch chosen by the held state.** When one command succeeds from one state, does nothing in a
 second and refuses in the rest, guard each branch with `when_subject_state:` and let one
@@ -230,3 +231,30 @@ carries no error, event or `sets:` (`refusal_mutated_state`).
 A specification lowered to Entity Runtime is refused there, not at `validate`, for value
 expressions (`ValueExpressionUnsupported`), the `ess/15` outcome shapes (`OutcomeShapeUnsupported`)
 and the case-insensitive operators (`CaseFoldUnsupported`); keep those out of a model that must lower.
+
+## From `ess/16` through `ess/22`
+
+The source language and conformance-suite version are different contracts. Choose the source
+format for the construct; let synthesis select its required suite format. With ESS 0.53.0:
+
+| format | additions |
+|---|---|
+| `ess/16` | related values; literal fallbacks; optional aggregate presence; `input_absent`; `existing_instance`; caller attributes; view paging; bounded retries; `instances` and `affects` |
+| `ess/17` | typed direct responses with `returns: true` |
+| `ess/18` | `when_related`; stored `state` in subject predicates; lists of subject states; binding delivery context |
+| `ess/19` | `payload` sources for declared error fields |
+| `ess/20` | related row lifecycle `state` in predicates |
+| `ess/21` | `one_time_response` non-disclosure contracts for required String response fields |
+| `ess/22` | explicit fact operands and constant offsets; UTF-8 byte lengths; instant comparison; `distinct` list keys; selected row guards/reads; Optional and two-hop related reads; several related rows; calendar windows; compensating external refusals; conditional aggregates and binding payload guards; per-outcome failure policy; lifecycle moves in `affects`; view grants; unit union variants; dotted input values |
+
+For related guards, selected effects, event transports, client generation, finite protocol models
+and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
+selected target: a source construct validating does not mean code generation or Entity Runtime
+can lower it. The current lowering report lists each unsupported construct by name.
+
+For a valid stored state bounded arrangement cannot reach, ESS 0.53.0 admits an explicit
+`--synthesis-seed <authored-file> <instance>` containing a typed setup row. The suite records seed
+provenance and selects `/42` or `/43`; the target must establish and validate that real row.
+A seed does not execute the authored document's timeline or replace a command's assertions. For a
+missing input candidate, first supply a truthful `example:`: the reservation fixture's distinct
+member identity restores the wrong-state scenario without changing the rule or injecting state.

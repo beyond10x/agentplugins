@@ -267,12 +267,13 @@ your implementation:
 
 | `--target` | what it is | on your own domain |
 |---|---|---|
-| `interpreted` | a placeholder for running the specification itself; it decides nothing yet | every scenario `unsupported`, run `failed` |
+| `interpreted` | executes the selected specification through ESS’s reference model; requires `--path` matching the suite | checks model consistency; unsupported constructs remain explicit |
 | `oracle-fixture` | a hand-written implementation of ESS's own `examples/oracle-fixture` | every scenario `error` |
 | `billing` | a hand-written implementation of ESS's own `examples/billing` | every scenario `error` |
 
-(Counts observed with a 21-scenario suite for a new domain.) They say nothing about your system, so
-never record such a report as evidence.
+A green interpreted run is evidence about the model and runner, not about your implementation.
+ESS 0.53.0 runs the committed related-guard example as 3 passed, 0 failed, 0 error and 0 unsupported.
+Use an adapter over your actual implementation for product conformance.
 
 To hold your implementation to the suite, generate it as a test package in the implementation's
 language and implement the package's `Target` interface over your service:
@@ -287,23 +288,24 @@ Generate the Go package **inside the implementation's own module**: `--out <modu
 outside the module has no `go.mod` to import from. The package's
 `README.md` lists the methods and the wiring test. A method you cannot answer returns
 `ErrUnsupported` (a skip), never a made-up result. A refused command still sets `Outcome` to the
-refusing outcome's name beside `Error`: the runner compares it for refusals too, whatever the
-generated comment on `CommandResult` says (beyond10x/ess#186).
+refusing outcome’s name beside `Error`: the runner compares both. Successful mutations return a
+backend-issued consistency token; a view honors `AtLeast(token)` before returning rows. An adapter
+that cannot meet freshness returns a failure, never a successful weaker read.
 Keep a suite for a domain nobody has implemented; run it once something answers it.
 
-Four version facts decide whether these packages run a suite at all:
+The current runner contract:
 
 - Suites from `ess-conformance/8` on run only with `ESS_REPORT_FORMAT=2` set: without it `go test`
-  stops before the first scenario (`suite/8 through /21 require explicit ESS_REPORT_FORMAT=2 before
-  execution`). Set it in the command, `ESS_REPORT_FORMAT=2 go test ./...`, or in the CI job.
+  stops before the first scenario with a report-format refusal. Set it in the command, `ESS_REPORT_FORMAT=2 go test ./...`, or in the CI job.
 
 - A command with `fixture_inputs:` needs the target to supply the values: implement
   `FixtureValues` (Go) or `fixtureValues` (TypeScript). Without it every scenario using a fixture is
   an explicit skip, so a fixture provider is the first thing to check when skips cluster there.
-- A specification using `deletes:` or `accepts: nothing` synthesizes `ess-conformance/22`/`23`, and
-  one using `presence:` synthesizes `/24`/`25`. The Go and TypeScript runners refuse
-  those suites by version (the Go runtime admits up to `/21`), so no implementation of yours can be
-  held to them yet. Report such a suite as not run, never as a pass.
+- Go and TypeScript have admitted `deletes:`, `accepts: nothing` and `presence:` suites
+  (`ess-conformance/22`–`/25`) since ESS 0.40.0. ESS 0.53.0 includes shared runtime coverage for
+  the newer expression, binding, aggregation and seed formats through `/43`. Generate with the
+  same release as the runner and inspect any target-specific refusal instead of carrying an old
+  suite-version ceiling.
 - Both packages also carry the random-sequence explorer (`explore`/`Explore`); `ess:hardening`
   technique 2 says how to wire it.
 
@@ -315,3 +317,9 @@ Four version facts decide whether these packages run a suite at all:
 
 - A scenario reveals a gap in the specification: `ess:specifying`.
 - The suite is green and the question is what it still misses: `ess:hardening`.
+
+For a Rust implementation, synthesize `--target ir --out <suite.json>` and use the native
+`ess_conformance::target::ConformanceTarget` with `AdmittedSuite` and `Runner`. Conformance
+synthesis has no `--target rust`; that target belongs to implementation generation. The current
+[Rust tutorial](https://github.com/beyond10x/agentplugins/tree/main/website/docs/tutorials/first-ess-specification)
+pins the runner crates and rejects empty, failed, unsupported and errored runs.
