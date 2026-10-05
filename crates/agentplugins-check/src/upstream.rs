@@ -74,6 +74,22 @@ const TRACKED: &[Tracked] = &[
         },
     },
     Tracked {
+        name: "eval Connectors",
+        repository: "beyond10x/connectors",
+        pin: Pin::Text {
+            file: ".github/workflows/eval.yml",
+            prefix: "CONNECTORS_VERSION: '",
+        },
+    },
+    Tracked {
+        name: "eval Worktree",
+        repository: "beyond10x/worktree",
+        pin: Pin::Text {
+            file: ".github/workflows/eval.yml",
+            prefix: "WORKTREE_VERSION: '",
+        },
+    },
+    Tracked {
         name: "planning protocols",
         repository: "beyond10x/aep",
         pin: Pin::Commit {
