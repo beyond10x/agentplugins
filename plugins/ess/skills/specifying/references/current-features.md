@@ -25,10 +25,21 @@ partial failure or effect ordering. Generated implementation targets and Entity 
 still refuse set effects; a valid model and generated scenarios do not certify those targets.
 
 The source language has related guards from `ess/18`, related lifecycle state from `/20`, and
-row-set selectors, Optional references and several related rows from `/22`. A current CLI can
-still refuse a particular combination: 0.53.0 rejects the lending tutorial's `when_related` beside
-`unknown_instance` or `wrong_state` as `conflicting_declaration`. Preserve the model's intended
-rule and report that refusal; do not silently remove a lifecycle check to combine guards.
+row-set selectors, Optional references and several related rows from `/22`. Guard combinations
+have narrower ordering rules in ESS 0.53.0:
+
+- An identity-addressed `when_related` beside `unknown_instance` is refused.
+- For `via: input.member_id`, an existence-only `exists: false` guard beside `wrong_state` is
+  refused. This is the combination tried against the introductory library tutorial.
+- In `ess/22`, `wrong_state` is admitted when at least one present-row predicate is declared and
+  every present-row predicate branch refuses. For example, a refusal guarded by
+  `when_related: {via: input.member_id, predicate: name == "blocked"}` beside the missing-member
+  refusal validates after removing the separate `unknown_instance` branch. The addressed
+  subject’s existence and held state answer before the present-row refusals.
+
+This is a documented distinction, not a blanket ban on related guards with lifecycle checks.
+Use only predicates the domain actually requires, then inspect synthesis independently of
+validation. Adding an invented refusal just to admit a combination changes the contract.
 
 ## Event transport and a Rust publisher
 

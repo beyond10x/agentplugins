@@ -179,8 +179,11 @@ Use `when_related` for a decision about another row, and `instances` or `affects
 record effects. `affects` can also move selected records in `ess/22`. These declarations do not
 by themselves promise atomic multi-record transactions. Validation, synthesis and code generation
 have different supported subsets; keep each refusal visible and distinguish generated suite
-coverage from implementation coverage. In ESS 0.53.0, the tutorial's combination of `when_related`
-with `unknown_instance` or `wrong_state` is refused as `conflicting_declaration`.
+coverage from implementation coverage. In ESS 0.53.0, an identity-addressed related guard beside `unknown_instance` is refused.
+An existence-only input-related guard beside `wrong_state` is also refused. With `ess/22`,
+`wrong_state` can coexist with related guards when at least one present-row predicate is
+declared and every such predicate branch refuses. These are distinct ordering cases; validate
+the exact declaration instead of treating all related lifecycle checks as unsupported.
 
 Next, [plan a library feature](./first-governed-plan.md), use `ess:retrofitting` for an existing
 service, or use `ess:hardening` to test what a green suite still misses.
