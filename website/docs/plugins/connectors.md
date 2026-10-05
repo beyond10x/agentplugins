@@ -4,61 +4,56 @@ title: Connectors
 
 # Connectors
 
-The `connectors` plugin provides one shared `integrating` skill for Claude Code and Codex. It
-guides provider setup, connection diagnostics, and the search → describe → invoke sequence for
-admitted integrations. It ships no binary, credentials, daemon, hooks, or automatic MCP connection.
-
-Install the standalone CLI from the
-[Connectors `v0.7.2` release](https://github.com/beyond10x/connectors/releases/tag/v0.7.2), the
-last release of the v1 line, and verify `connectors --version`. The skill targets the grouped
-commands in `0.7.x` and reads the installed binary's help before selecting options.
-`beyond10x/connectors`' default branch and its *Latest* release are the connectors_v2 lineage
-(`v0.8.0` and up), which is a different CLI — `setup`, `adapters`, `connections`, `operations`,
-`describe`, `invoke`, `serve` — per Atlas ADR 0051 on the `beyond10x/connectors` lineage
-(accepted 2026-09-15); this skill drives the v1 CLI, `0.7.x`, so the generic releases page and
-its *Latest* entry are not the CLI these instructions teach. Service setup and credentials are separate
-from plugin installation.
-
-Operation, connection and event commands default to local even when a hosted login is saved.
-Choose `--target hosted` explicitly for a hosted workflow and keep that target throughout
-search, describe and invoke. The operation contract defaults to v3 without automatic fallback.
-Bounded reads can run locally without a daemon; ongoing sessions and events still need one.
-When upgrading, verify the operations your application uses and replace the CLI and local daemon
-together. The skill also covers pagination, restriction metadata and explicit handling of
-rate-limit responses.
+The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
+Claude Code and Codex. It follows the current Connectors CLI, verified against
+[v0.28.0](https://github.com/beyond10x/connectors/releases/tag/v0.28.0).
 
 ## Install in either host
 
-Setup offers this plugin as optional. To add it by hand:
+`b10x` installs the plugin and its CLI together. Select your host and review the resulting plan:
 
 ```bash
-claude plugin marketplace add beyond10x/agentplugins
-claude plugin install connectors@b10x
+b10x init connectors --host claude --out ~/.local/state/b10x/plan.json
 ```
+
+Use `--host codex` in Codex. Apply an approved plan with:
 
 ```bash
-codex plugin marketplace add beyond10x/agentplugins
-codex plugin add connectors@b10x
+b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 ```
 
-[Setup](../install.md) replaces an older or pinned registration and keeps the other installed
-plugins. For development, both marketplace-add commands also accept the absolute path
-to a current local checkout containing both marketplace files.
+The current release has no prebuilt CLI assets. Setup builds the `connectors` Cargo package from
+its exact release tag with locked dependencies; v0.28.0 requires Rust 1.91 or newer. Adapter
+executables, configuration and credentials are separate prerequisites. The local runtime currently
+targets Linux. [Setup](../install.md) preserves other installed plugins and snapshots changes.
 
-Reload Claude Code's plugins with `/reload-plugins`, or start a new Codex thread. In Claude Code,
-invoke `/connectors:integrating`; in Codex select the `integrating` skill or invoke `$connectors:integrating`.
-Both manifests load the same `skills/integrating/SKILL.md` bytes. These layouts follow the
-[OpenAI plugin packaging contract](https://developers.openai.com/plugins/build/plugins) and
-[Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference).
+A new session loads the installed skills. In Claude Code invoke `/connectors:integrating`; in
+Codex select `integrating` or invoke `$connectors:integrating`. Both hosts load the same skill
+files. `b10x skill connectors:integrating` prints the current instructions without a reload.
 
 ## First use
 
-Ask: “Use connectors to inspect my local Connector readiness.” The skill checks CLI availability
-and runs `connectors --output json inspect doctor`. For an existing configured integration, ask
-it to find a particular operation; it searches admitted operations and reads a fresh description
-before using the returned Connection and description reference.
+Ask: “Use connectors to inspect my local Connector readiness.” The skill checks CLI availability,
+runs `connectors --output json setup check` and lists configured adapters. These checks do not
+authenticate, start services or prove that cached metadata is current.
 
-For onboarding, the operator enters credentials directly into the CLI's hidden prompt. The skill
-never reads secret values into the conversation. External writes require the user's authorization
-and any Connector approval evidence; installing the plugin supplies neither. Hosted MCP setup is
-an explicit workflow using `connectors serve mcp`, not an automatic install side effect.
+For an existing integration, it selects a configured adapter and connection, lists operations,
+and describes one before invocation. The returned schema identity and revision bind the call;
+its JSON input must match the described schema. Invocation rechecks admission and may start the
+supervised local owner/adapter. Missing capability or access is reported explicitly.
+
+For onboarding, the operator enters the credential document through protected terminal, file or
+stdin acquisition. The skill reads safe status, not secret values. External writes need the
+user's authorization and the adapter's admission, exact approval subject and protected proof.
+The current CLI has a separate explicit service interface; MCP runtime integration remains deferred.
+
+## Upgrade
+
+`b10x upgrade connectors --host claude --out ~/.local/state/b10x/plan.json` compares both the
+plugin and CLI with current releases. Use the corresponding host, inspect the plan and apply
+within the user's authorization. An unresolved release check is reported as unchecked.
+
+Moving from 0.7.x changes CLI and configuration contracts. Preserve the old state, inspect the
+consumer operations, then establish current connections through protected acquisition. No v1
+configuration or credential migration occurs automatically. After any upgrade, inspect help,
+check prerequisites and validate the operations the application actually needs.
