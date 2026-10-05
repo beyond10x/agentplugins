@@ -122,7 +122,55 @@ The synthesis summary is:
 
 `impl/src/lib.rs` implements the library independently of the suite. `impl/tests/conformance.rs`
 implements `ess_conformance::target::ConformanceTarget`, reads `suite.json`, admits it, and runs it
-through `Runner`. `Cargo.toml` and `Cargo.lock` select ESS's exact 0.53.0 Rust crates.
+through `Runner`. Use this standalone manifest (the `[workspace]` keeps the tutorial independent of an enclosing
+repository workspace):
+
+```toml title="impl/Cargo.toml"
+[package]
+name = "library-tutorial"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dev-dependencies]
+ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.53.0" }
+ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.53.0" }
+serde_json = "1"
+
+[profile.dev]
+debug = 0
+```
+
+The example includes its lockfile. If writing the example afresh, run
+`cargo generate-lockfile --manifest-path impl/Cargo.toml` before the locked test command.
+These crates come from the exact Git tag; a registry search or separate ESS checkout is unnecessary.
+
+The native integration harness uses this API, with `Target` implemented in the same test file:
+
+```rust
+use ess_conformance::{runner::Runner, scenario::ConformanceSuite, AdmittedSuite};
+
+#[test]
+fn conforms_to_generated_suite() {
+    let suite: ConformanceSuite = serde_json::from_str(include_str!("../suite.json")).unwrap();
+    assert!(!suite.scenarios.is_empty());
+    let admitted = AdmittedSuite::from_suite(&suite).unwrap();
+    let report = Runner::for_suite(admitted.suite())
+        .run_admitted(&admitted, &Target::default())
+        .into_report();
+    println!("conformance scenarios: {:?}", report.counts());
+    for failure in report.failures() {
+        eprintln!("{failure:#?}");
+    }
+    assert!(report.is_conformant());
+}
+```
+
+The complete adapter is in the example’s `impl/tests/conformance.rs`; it maps only the five
+commands and three views. Use `Node::Text` for string values and
+`OutcomeRef::new(req.command.clone(), outcome.parse().unwrap())` for a command-qualified outcome.
 
 Every scenario starts with an empty library. A mutation advances the store's revision; its answer
 carries that revision as an opaque consistency token. A view request demanding `AtLeast(token)`
@@ -130,7 +178,8 @@ checks that revision before reading the same synchronous store. An invalid or fu
 error, never permission to return a weaker read. Returning rows alone without a command token
 caused 14 of the original tutorial's 17 scenarios to fail under current ESS.
 
-The native runner's output is:
+The integration-test portion of Cargo’s output is below; Cargo also prints zero-test unit and
+documentation lanes for this example:
 
 ```text
 running 2 tests
@@ -154,7 +203,8 @@ In `impl/src/lib.rs`, change only `borrow`'s state guard:
 +        if book.state == "Withdrawn" {
 ```
 
-Run the same Cargo command. The scenario
+Change only `borrow`: `return_book` still requires `OnLoan`, and `withdraw` still requires
+`OnShelf`. Run the same Cargo command. The scenario
 `library.lending.Book/state/OnLoan/refuses/library.lending.BorrowBook` must fail: the library now
 answers `borrowed` where the model requires `wrong-state`. Restore the guard and rerun; all
 17 scenarios must pass again. A compile failure does not prove the suite catches the defect.

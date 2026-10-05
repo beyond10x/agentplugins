@@ -21,7 +21,10 @@ comment claiming registration is checked.
 `Invite` updates its addressed session and uses `affects` to change and end other sessions of the
 same team. `EndTeam` uses `instances` and reports `{count: changed}`. A selected move skips records
 outside its transition's source states. These constructs do not declare transaction atomicity,
-partial failure or effect ordering. Generated implementation targets and Entity Runtime lowering
+partial failure or effect ordering. Current `affects` selectors read stored fields, not the
+selected entity’s identity; set-effect values cannot read `{increment: …}`. The example selects
+by stored `team` and writes literal `on_hold`, not a per-holder counter.
+Generated implementation targets and Entity Runtime lowering
 still refuse set effects; a valid model and generated scenarios do not certify those targets.
 
 The source language has related guards from `ess/18`, related lifecycle state from `/20`, and

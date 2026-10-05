@@ -240,9 +240,9 @@ projection owns is not authority.
 
 ## Implementation code comes from the specification
 
-**Never hand-transcribe the model into code.** Entities, their states and transitions, command
-inputs, outcomes, events, errors and views are generated; the implementation fills in only what the
-specification cannot say:
+For production implementation work, generate entities, states and transitions, command inputs,
+outcomes, events, errors and views from the model. The implementation fills in the remaining
+ports and obligations:
 
 ```console
 ess generate synthesize --path <specification> --target rust --out <directory>
@@ -256,13 +256,20 @@ generated tree and hold it in the gate: regenerate into a temporary directory an
 difference, exactly as for projections above. When the specification changes, regenerate; the
 compiler then names every handler the change touched.
 
-A hand transcription drifts, and nothing catches it. One passed a 669-scenario conformance suite
-with every entity field unchecked: a scenario only reads the fields its expectations name, so a
+An explicitly requested independent educational implementation, reference target or adapter over
+existing code has a different purpose: it supplies independent observations for conformance.
+Keep that implementation independent, run the generated suite over its real behavior, and show
+a planted defect failing before reporting a pass. The Rust tutorial is this case; it is not a
+production implementation-generation recipe. Existing application code being retrofitted also
+stays the system under test until a separate migration is requested.
+
+A hand transcription can drift beyond what the conformance scenarios observe. One passed a
+669-scenario conformance suite with every entity field unchecked: a scenario only reads the fields its expectations name, so a
 wrong field type or a missing field that no expectation reads stays green.
 
-**When `synthesize` refuses the specification,** the refusal names each position the target cannot
-represent. That is a gap in ESS, not a licence to transcribe: file it on beyond10x/ess with the
-refusal lines. Until the fix is released, a hand-written model is allowed only with a test that
+**When production generation refuses a specification,** the refusal names each position the
+target cannot represent. That is a gap in ESS, not a licence to transcribe: file it on
+beyond10x/ess with the refusal lines. Until the fix is released, a hand-written model is allowed only with a test that
 compares it against `ess specify compile --path <specification> --format json`: every entity's
 fields and their types, every lifecycle's states and transitions, every command's input, every
 event's and error's fields, every view's fields, and every actor's `may` list. Names alone are not
