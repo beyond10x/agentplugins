@@ -22,6 +22,10 @@ release. It also unsets `ANTHROPIC_API_KEY`, `TMPDIR` and `TMPPREFIX`. A defined
 fixture it needs (a small service, a `TODO.md`, an OpenAPI document) under `work/`, and commit it
 there with `git` when the trial needs history or a remote.
 
+Setup refuses an existing sandbox: it may hold leased trees or the only recovery copy of trial
+work. Use a fresh `NAME` for a rerun, for example `task trial:run TRIAL=ess-tutorial NAME=ess-tutorial-rerun`,
+or complete the cleanup procedure below before reusing its name.
+
 To trial the released version instead, remove `home/.local/bin/b10x` and unset `B10X_MARKETPLACE`
 in `env`; the agent then follows `SETUP.md` from the release.
 
@@ -124,6 +128,11 @@ The numbers say what happened, not why. From `run.jsonl`, also collect:
 | waste | calls repeated, files read twice, commands that failed and were retried unchanged |
 | the outcome | the verbatim `validate` / `generate` / plan output it pasted |
 
+A zero process exit or a `success` result can still say the agent is waiting for background work.
+Confirm that the requested workflow actually finished. If necessary, resume the same isolated
+session after its task notification, preserve both transcripts and repeat the isolation check;
+do not accept a waiting message or permissive metric summary as completion.
+
 Before writing a finding into a skill, reproduce each claimed behaviour with the released CLI. A
 trial agent's explanation of a refusal is a hypothesis.
 
@@ -180,9 +189,18 @@ release is newer. Then:
 ## 7. Clean up
 
 `trial:run` deletes the credentials it copied. When the round is released, check that no
-credentials are left in any sandbox and remove the sandboxes:
+credentials are left in any sandbox. Retain its run logs and meaningful generated work. Inspect
+each sandbox's own Worktree registry and Git linked trees, with that sandbox's environment; never
+substitute the operator's registry. Follow the Worktree skill to archive unpublished work, end
+each owner's leases, finish trees and apply GC only to exact reviewed IDs. Adopt legacy linked
+trees through the CLI before retiring them. Copy recovery archives outside the sandbox and verify
+them before deleting their original container.
+
+Only after every linked tree is retired and recovery is retained may the sandbox itself be
+removed. AEP's read-only protocol snapshots may require making that exact sandbox writable first:
 
 ```console
 ls /var/tmp/b10x-trials-$USER/*/home/.claude/.credentials.json
+chmod -R u+w /var/tmp/b10x-trials-$USER/<name>
 rm -rf /var/tmp/b10x-trials-$USER/<name>
 ```

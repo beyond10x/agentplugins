@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-05T21:47:48Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-resources-release",
+  "kind": "task",
+  "revision": 6,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Agentplugins 0.20.0 local gates, isolated trials and independent adversarial verification",
+    "reference": "changes/0.20.0-verification.md"
+  }
+}

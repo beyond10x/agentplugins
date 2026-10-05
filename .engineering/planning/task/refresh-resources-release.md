@@ -6,7 +6,7 @@ status: active
 title: Refresh current CLI resources and release Agentplugins 0.20.0
 relations:
 - informed_by: task:prepare-release-0-19-2
-revision: 5
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 3}
@@ -36,12 +36,12 @@ Base: 30acac4. Integration branch: wave/current-resources. Integration tree id: 
 
 ## Progress
 
-Implementation units and independent reviews are integrated on wave/current-resources, published as bot PR #59. Maintained release pins are current: AEP 0.68.0, ESS 0.53.0, Worktree 0.8.2, Metaharness 0.9.1, Connectors v0.28.0, Docs System 0.7.0. Generated documentation workflow pins remain Atlas-owned.
+The integrated candidate updates AEP 0.68.0, ESS 0.53.0, Worktree 0.8.2, Metaharness 0.9.1, Connectors v0.28.0 and Docs System 0.7.0. The final upstream report confirms maintained release pins are current; two generated workflow pins remain owned by Atlas reconciliation. All executable additions are Rust. The current tutorials, runnable fixtures, CLI resources, installer source migration, verifier and eval prerequisites agree with those releases.
 
-The offline gate passes 155 tests; current-tool verification passes with the exact compiled Connectors release, native ESS tutorial and new capability examples. Site typecheck/build pass. CI Gate, Tools, documentation build and security pass at 29767c7; the first Gate attempt received no runner and timed out, and its bot retry passed. CI source-check feedback was corrected: ambiguous console fences became bash in both tutorials and fixtures. The exact pinned source checker now passes locally.
+Independent reviews reproduced and fixed command-parser and Cargo-result false greens. Native tutorial guard/freshness mutants and unsupported/error targets are rejected. The seeded marketplace upgrade first failed, then passed after source-switch planning was corrected; native Claude and Codex probes preserve plugin state. Exact Connectors source installation and 20 runtime help checks passed.
 
-All nine primary trial runs finished. Eight passed their full intended scope. The AEP tutorial completed reviewed planning and its first story, with 26 ESS scenarios Passed, 29 Unsupported explicitly deferred, and seven Cargo tests passing. Its missing Worktree setup caused a noncompliant host-worktree fallback. The fixture now installs Worktree, and a bounded rerun from the accepted plan is exercising managed coordinator/unit trees, leases, independent review, merge and recovery. That rerun is still active; do not claim the complete managed-wave trial has passed yet.
+Local final gate: 155 tests (98 checker unit, 2 integration, 55 installer); all 17 eval definitions validate and one recorded transcript replays. Tools verifies 213 AEP, 78 ESS, 36 Worktree, 13 Metaharness and 20 Connectors command spellings and runs the current ESS capability examples. Documentation typecheck/build pass. The exact CI documentation source checker passes 15 documents, five change records and 117 fences after correcting ambiguous tutorial language labels. Paid live CI evals were not run.
 
-Trial feedback corrected frozen-marketplace upgrade planning, source-only Connectors installation, Rust test measurement, tutorial partial-wave coverage and recovery guidance. The old Go baseline is retained and higher Rust tutorial cost is documented. The managed trial additionally exposed runner directory scope: Taskfile now allows only its own sandbox root through --add-dir; focused verification remains pending. Two adversarial verifier false greens were reproduced and fixed. Latest documentation dependencies retain 32 npm audit findings without an available direct-package fix.
+Nine primary trials and the bounded managed-wave rerun completed; actual results, retained old Go baseline and changed Rust baseline are recorded in changes/0.20.0-verification.md. The governed-plan trial implements only its first story, with 26 ESS scenarios passed and 29 explicitly pending for future stories. The corrected managed run passed 16 Cargo tests, nine deliberate mutants and isolation; both managed trees had their own leases, verified archive recovery and reviewed exact-ID GC. A separate permission probe passed. Setup refuses existing sandboxes. No claim of complete reservation-feature conformance or perfect model adherence is made; the report records a malformed-review serialization deviation and its instruction correction.
 
-Release target is 0.20.0. Final report, bounded trial, final bot source publication, green main/tag checks and six published assets remain before completion. Documentation publication is asynchronous; no downstream release or deployment is included.
+PR #59 publishes the source as the organization bot. Release 0.20.0 remains pending until the exact main tag, release checks, four platform archives, checksums, setup guide and GitHub Release are verified. Documentation publication is asynchronous. Latest documentation packages retain 32 npm audit findings (30 high, 2 low); no available direct-package fix is claimed.

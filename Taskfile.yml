@@ -28,6 +28,9 @@ tasks:
       vars: [NAME]
     vars:
       T: '{{.TRIALS}}/{{.NAME}}'
+    preconditions:
+      - sh: test ! -e '{{.T}}'
+        msg: "sandbox already exists; choose a new NAME or archive and retire its worktrees before removing it"
     cmds:
       # Claude Code also reads `.claude/settings*.json` in the directories above its working
       # directory; one there enables plugins in every sandbox below it.
@@ -42,8 +45,6 @@ tasks:
             fi
           done
         done
-      # aep makes its protocol snapshots read-only; a sandbox that ran aep cannot be removed without this.
-      - if [ -d '{{.T}}' ]; then chmod -R u+w '{{.T}}'; fi; rm -rf '{{.T}}'
       - mkdir -p -m 700 '{{.TRIALS}}'
       - mkdir -p '{{.T}}/home/.local/bin' '{{.T}}/work' '{{.T}}/tools'
       - for t in claude codex go gofmt; do p="$(command -v $t)" && ln -sf "$(readlink -f "$p")" '{{.T}}/tools/'$t; done; true

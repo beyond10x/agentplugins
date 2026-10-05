@@ -47,9 +47,10 @@ Add `--install-agent-guidance` to `activate` only when the user asks for it: it 
 guidance block, pointing at `worktree:managing-worktrees`, into `~/.claude/CLAUDE.md` and
 `~/.codex/AGENTS.md`, and replaces only the text between its own markers.
 
-**A repository needs a remote before its trees can be cleaned up.** Cleanup proves that each
-commit reached a remote, so in a repository with no remote (`git remote` prints nothing) `create`
-works and every later `gc` refuses. Tell the user before they start work there.
+**Cleanup needs recovery proof.** Publish commits to a remote, or preserve unpublished work with
+`worktree archive <tree>`. A repository without a remote can use a verified archive while its tree
+still matches it. Follow `worktree:managing-worktrees` to end owned leases, finish the tree and
+review exact GC IDs; a local merge alone is not recovery proof.
 
 ## 3. Pick the work
 
