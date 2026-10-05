@@ -18,6 +18,7 @@ use crate::trials::{Definition, Measure};
 struct Shell {
     command: String,
     output: Option<String>,
+    failed: bool,
 }
 
 /// What the report reads from a stream-json run.
@@ -65,6 +66,7 @@ fn parse(text: &str) -> Run {
                             shells.push(Shell {
                                 command: input["command"].as_str().unwrap_or_default().to_owned(),
                                 output: None,
+                                failed: false,
                             });
                         }
                         Some("Write" | "Edit" | "MultiEdit") => {
@@ -82,6 +84,7 @@ fn parse(text: &str) -> Run {
                     let id = block["tool_use_id"].as_str().unwrap_or_default();
                     if let Some(&index) = by_id.get(id) {
                         shells[index].output = Some(result_text(&block["content"]));
+                        shells[index].failed = block["is_error"].as_bool().unwrap_or(false);
                     }
                 }
                 _ => {}
@@ -354,8 +357,11 @@ fn cargo_counts(output: &str) -> Option<GoTest> {
         counts.skipped += number(2)?;
         found = true;
     }
-    if output.contains("error: could not compile") {
-        counts.failed += 1;
+    if output
+        .lines()
+        .any(|line| line.trim_start().starts_with("error:"))
+    {
+        counts.failed = counts.failed.max(1);
         found = true;
     }
     found.then_some(counts)
@@ -366,7 +372,16 @@ fn cargo_test(run: &Run) -> Option<GoTest> {
         .iter()
         .rev()
         .find(|shell| runs_cargo_test(&shell.command))
-        .and_then(|shell| cargo_counts(shell.output.as_deref()?))
+        .and_then(|shell| {
+            let counts = cargo_counts(shell.output.as_deref()?);
+            if shell.failed {
+                let mut counts = counts.unwrap_or_default();
+                counts.failed = counts.failed.max(1);
+                Some(counts)
+            } else {
+                counts
+            }
+        })
 }
 
 fn runs_cargo_test(command: &str) -> bool {
@@ -938,6 +953,22 @@ mod tests {
             "cargo test --help",
         ] {
             assert!(!runs_cargo_test(command));
+        }
+        std::fs::remove_dir_all(sandbox).unwrap();
+    }
+
+    #[test]
+    fn cargo_abnormal_exit_overrides_earlier_passing_target() {
+        let sandbox = scratch("cargo-abort");
+        let only = definition(&[Measure::CargoTest], &[]);
+        for output in [
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.1s\nerror: test failed, to rerun pass `--test aborts`\nprocess didn't exit successfully (signal: 6, SIGABRT: process abort signal)",
+            "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.1s\nprocess interrupted",
+        ] {
+            let call = tool("a", "Bash", r#"{"command":"cargo test"}"#);
+            let result = serde_json::json!({"message":{"content":[{"type":"tool_result","tool_use_id":"a","is_error":true,"content":output}]}}).to_string();
+            let measured = measure(&[INIT, &call, &result].join("\n"), &sandbox, Some(&only)).unwrap();
+            assert!(measured.measures.cargo_test.flatten().is_none_or(|counts| counts.failed > 0), "abnormal exit reported successful counts: {:?}", measured.measures.cargo_test);
         }
         std::fs::remove_dir_all(sandbox).unwrap();
     }

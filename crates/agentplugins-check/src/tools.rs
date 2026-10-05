@@ -207,7 +207,9 @@ fn invocations(text: &str, cli: &str) -> BTreeSet<(Vec<String>, BTreeSet<String>
     }
     let mut commands = BTreeSet::new();
     for snippet in code {
-        let words: Vec<&str> = snippet.split_whitespace().collect();
+        let tokens = shlex::split(&snippet)
+            .unwrap_or_else(|| snippet.split_whitespace().map(str::to_owned).collect());
+        let words: Vec<&str> = tokens.iter().map(String::as_str).collect();
         for (index, word) in words.iter().enumerate() {
             let starts =
                 index == 0 || matches!(words[index - 1], "&&" | "||" | "|" | ";" | "then" | "do");
@@ -215,10 +217,18 @@ fn invocations(text: &str, cli: &str) -> BTreeSet<(Vec<String>, BTreeSet<String>
                 continue;
             }
             let mut start = index + 1;
-            while words.get(start).is_some_and(|word| {
-                matches!(*word, "--config" | "--state-dir" | "--output" | "--store")
-            }) {
-                start += 2;
+            while let Some(word) = words.get(start) {
+                let global = matches!(
+                    word.split('=').next().unwrap_or(word),
+                    "--config" | "--state-dir" | "--output" | "--store" | "-o"
+                );
+                if global {
+                    start += if word.contains('=') { 1 } else { 2 };
+                } else if word.starts_with("-o") && word.len() > 2 {
+                    start += 1;
+                } else {
+                    break;
+                }
             }
             let path: Vec<String> = words
                 .get(start..)
@@ -860,6 +870,24 @@ mod tests {
 
     #[test]
     fn current_commands_include_global_options_and_continuations() {
+        for option in [
+            "--config=x",
+            "--config='/path with spaces/config.toml'",
+            "--config '/path with spaces/config.toml'",
+            "--state-dir=x",
+            "--output=json",
+            "--store=x",
+            "-ojson",
+            "-o json",
+        ] {
+            assert_eq!(
+                spelled(
+                    &format!("`connectors {option} inspect doctor`"),
+                    "connectors"
+                ),
+                BTreeSet::from([vec!["inspect".to_owned(), "doctor".to_owned()]])
+            );
+        }
         let found = invocations("```bash\nconnectors --config config.toml --state-dir state setup check \\\n --output json\n```", "connectors");
         assert_eq!(
             found,
