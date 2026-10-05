@@ -1,6 +1,6 @@
 # Compatibility in the gate
 
-ESS 0.53.0 classifies semantic changes for **callers**, **readers** and **history**. Use the native
+Current ESS classifies semantic changes for **callers**, **readers** and **history**. Use the native
 classification instead of treating every added field or enum variant as automatically compatible:
 closed readers and required inputs make that assumption unsafe.
 
