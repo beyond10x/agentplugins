@@ -3,7 +3,7 @@
 A small lending library in three files, with every section a specification usually needs. It
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
-It is written in `format: ess/1`; [later-formats.md](later-formats.md) adds what formats up to `ess/15` say.
+It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats up to `ess/15` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
 
 ## `system.yaml`
 
