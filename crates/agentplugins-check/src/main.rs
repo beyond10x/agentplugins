@@ -639,6 +639,9 @@ fn retired_names(root: &Path) -> Result<(), String> {
                 continue;
             };
             let relative = relative.to_string_lossy().replace('\\', "/");
+            if matches!(relative.as_str(), "website/build" | "website/.docusaurus") {
+                continue;
+            }
             let name = path
                 .file_name()
                 .and_then(std::ffi::OsStr::to_str)
@@ -1638,6 +1641,14 @@ one product only: `b10x upgrade ess`
             "the `aep-planning` plugin\n",
         );
         retired_names(&sandbox).expect("history, change records and transcripts keep their names");
+        write("website/build/index.html", "install `ess-schema`\n");
+        write("website/.docusaurus/routes.js", "install `ess-schema`\n");
+        retired_names(&sandbox).expect("generated site output is not authored source");
+        write("website/docs/build/guide.md", "install `ess-schema`\n");
+        assert!(
+            retired_names(&sandbox).is_err(),
+            "a source directory named build is still checked"
+        );
 
         std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
     }
