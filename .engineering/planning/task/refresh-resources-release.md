@@ -6,7 +6,7 @@ status: active
 title: Refresh current CLI resources and release Agentplugins 0.20.0
 relations:
 - informed_by: task:prepare-release-0-19-2
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 3}
@@ -36,4 +36,8 @@ Base: 30acac4. Integration branch: wave/current-resources. Integration tree id: 
 
 ## Progress
 
-Planning recorded; implementation pending. Release target 0.20.0 (current Connectors lineage and expanded verification coverage).
+Three implementation units are integrated: Connectors 92f498e (54 tests and exact v0.28.0 source installation with 20 runtime help checks); ESS 363ae4c plus a83926e (17 native scenarios, two Cargo tests, guard/freshness mutants rejected); verification 96fe417 plus e7f8860 (98 unit and 2 integration tests). Independent adversary found two verifier false-greens: equals globals hid commands and a crashed Cargo target followed a passing target. Both fixed and original adversarial probes now green. ESS independent probes rejected 17 unsupported, 17 errored and 14 failed scenarios; stale transport digest refused. No remaining blocking unit finding.
+
+Coordinator refreshed AEP/Metaharness matching release pair, ESS and Connectors/Worktree eval prerequisites and child PATH, planning protocol, shared Gates workflow, Docs System dependency and lockfile, current and historical public tutorials, maintenance guidance and release metadata. Generated Atlas files remain owner-managed. A seeded upgrade trial found stale local marketplace refresh could not discover the replacement AEP plugin; source-switch planning fix reproduced red and passed 55 b10x tests, independent review and rerun pending.
+
+The isolated nine-trial round is running. Worktree onboarding, ESS pipeline and ESS retrofit passed isolation and metrics; seeded upgrade's first run failed its actual task despite permissive metric summary and is being rerun. Its failure is preserved. Do not advance verification pins or declare release completion from trial metric exit codes alone. Release target remains 0.20.0.

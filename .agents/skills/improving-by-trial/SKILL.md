@@ -102,7 +102,8 @@ agentplugins-check trial-report <sandbox>/run.jsonl --trial <name> [--baseline t
 | `synthesis` | `N scenario(s) … M refusal(s)` in the last `ess verify conform synthesize` output |
 | `unmapped` | `UNMAPPED:` markers in the YAML files the run wrote, read from disk, not from its prose |
 | `outputs` | which of the definition's `outputs` exist (a directory counts when it is not empty) |
-| `go_test` | passed, failed and skipped tests of the last `go test` (`-v` or `-json`); a package that does not build counts as a failure |
+| `go_test` | historical Go trials: passed, failed and skipped tests of the last `go test` (`-v` or `-json`); a package that does not build counts as a failure |
+| `cargo_test` | current Rust trials: passed, failed and ignored tests from the last `cargo test`; the implementation also reports executed conformance scenarios |
 
 A trial reports the measures its definition lists; without `--trial`, an ad-hoc run gets every
 measure but `outputs`. With `--baseline` it exits 1 when a measure got worse than the trial's entry:
@@ -154,19 +155,23 @@ and the fix is in a release, not when the issue closes.
 
 Each round runs every trial in `trials/`: 4 ESS trials (`ess-new`, a new specification;
 `ess-retrofit`, an existing service; `ess-pipeline`, generation plus a synthesized suite;
-`ess-full-package`, every output plus a Go implementation held to the synthesized suite), and
-`aep-backlog`, `worktree-onboarding` and `upgrade-seeded`. Change the domains and fixtures each
+`ess-full-package`, every output plus a Rust implementation held to the suite), the current
+`ess-tutorial`, and `aep-backlog`, `aep-tutorial`, `worktree-onboarding` and `upgrade-seeded`.
+New executable fixtures use Rust. Change the domains and fixtures each
 round so the agents cannot copy the previous answer from the skills; a changed trial starts a new
 baseline entry.
 
 ### Every product release is re-verified
 
-`verified.json` names, per CLI (`aep`, `ess`, `worktree`), the release the skills were last
+`verified.json` names, per tracked CLI, the release the skills were last
 verified against. The daily `agentplugins-check tools` run fails with one line per CLI whose newest
 release is newer. Then:
 
 1. Run `agentplugins-check tools` and fix every command it reports.
-2. Run an ESS trial round (at least `ess-full-package`) against the new release.
+2. Run the affected product's isolated trials against the new release. An ESS update includes
+   `ess-full-package` and `ess-tutorial`; an AEP update includes `aep-backlog` and `aep-tutorial`.
+   A complete resource refresh runs the whole round. Preserve historical baseline entries and
+   record changed Rust trials under their actual measurement keys.
 3. Set the CLI to the new release in `verified.json` in the same pull request.
 
 ## 7. Clean up

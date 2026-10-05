@@ -1,0 +1,94 @@
+{
+  "aep-backlog": {
+    "tool_calls": 278
+  },
+  "aep-tutorial": {
+    "tool_calls": 474,
+    "synthesis": {
+      "scenarios": 55,
+      "refusals": 0
+    },
+    "outputs": [
+      "epic",
+      "project",
+      "reviews",
+      "suite"
+    ]
+  },
+  "ess-full-package": {
+    "tool_calls": 53,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 20,
+      "refusals": 0
+    },
+    "unmapped": 0,
+    "outputs": [
+      "asyncapi",
+      "conformance",
+      "docs",
+      "implementation",
+      "openapi",
+      "schema",
+      "site",
+      "types-go",
+      "types-rust"
+    ],
+    "go_test": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "ess-new": {
+    "tool_calls": 38,
+    "validate": "valid",
+    "unmapped": 4
+  },
+  "ess-pipeline": {
+    "tool_calls": 11,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 14,
+      "refusals": 0
+    },
+    "outputs": [
+      "conformance",
+      "docs",
+      "openapi",
+      "schema"
+    ]
+  },
+  "ess-retrofit": {
+    "tool_calls": 36,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 20,
+      "refusals": 0
+    },
+    "unmapped": 3
+  },
+  "ess-tutorial": {
+    "tool_calls": 35,
+    "validate": "valid",
+    "synthesis": {
+      "scenarios": 17,
+      "refusals": 0
+    },
+    "outputs": [
+      "docs",
+      "implementation",
+      "openapi",
+      "spec",
+      "suite"
+    ],
+    "go_test": {
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "worktree-onboarding": {
+    "tool_calls": 19
+  }
+}

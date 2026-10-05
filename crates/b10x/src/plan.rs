@@ -474,6 +474,19 @@ fn change_kind(detail: &str) -> usize {
     }
 }
 
+/// Compare equivalent GitHub locators without treating a different local checkout as current.
+fn same_marketplace_source(actual: &str, desired: &str) -> bool {
+    fn canonical(source: &str) -> &str {
+        let source = source.trim_end_matches('/').trim_end_matches(".git");
+        source
+            .strip_prefix("https://github.com/")
+            .or_else(|| source.strip_prefix("git@github.com:"))
+            .or_else(|| source.strip_prefix("ssh://git@github.com/"))
+            .unwrap_or(source)
+    }
+    canonical(actual) == canonical(desired)
+}
+
 /// Whether a host holds anything from Beyond10x: a current plugin, or a legacy one.
 fn holds_beyond10x(catalog: &Catalog, state: &HostState) -> bool {
     state.plugins.iter().any(|plugin| {
@@ -520,6 +533,30 @@ fn plan_host(
                 argv: argv(&[program, "plugin", "marketplace", "add", repository]),
                 cwd: None,
                 reason: format!("register marketplace `{name}`"),
+            });
+        }
+        Some(market) if !same_marketplace_source(&market.source, repository) => {
+            findings.push(finding(
+                Level::Change,
+                name,
+                format!(
+                    "marketplace `{name}` uses {}; switch to {repository}",
+                    market.source
+                ),
+            ));
+            if host == Host::Codex {
+                actions.push(Action::Command {
+                    host,
+                    argv: argv(&[program, "plugin", "marketplace", "remove", name]),
+                    cwd: None,
+                    reason: format!("replace marketplace `{name}` source"),
+                });
+            }
+            actions.push(Action::Command {
+                host,
+                argv: argv(&[program, "plugin", "marketplace", "add", repository]),
+                cwd: None,
+                reason: format!("register selected marketplace `{name}` source"),
             });
         }
         Some(market) if market.reference.is_some() => {
@@ -1433,6 +1470,46 @@ mod tests {
         };
         let plan = run(&inventory, Some(&[]), &[Host::Claude]);
         assert!(matches!(plan.actions[0], Action::Unpin { .. }));
+    }
+
+    #[test]
+    fn a_frozen_marketplace_is_replaced_before_plugin_upgrades() {
+        for host in [Host::Claude, Host::Codex] {
+            let state = HostState {
+                marketplaces: vec![Market {
+                    name: "b10x".to_owned(),
+                    source: "/opt/frozen-marketplace".to_owned(),
+                    reference: None,
+                    location: None,
+                }],
+                ..HostState::default()
+            };
+            let inventory = Inventory {
+                claude: (host == Host::Claude).then_some(state.clone()),
+                codex: (host == Host::Codex).then_some(state),
+                ..Inventory::default()
+            };
+            let plan = run(&inventory, Some(&["ess"]), &[host]);
+            let commands: Vec<_> = plan
+                .actions
+                .iter()
+                .filter_map(|action| match action {
+                    Action::Command { argv, .. } => Some(argv.join(" ")),
+                    _ => None,
+                })
+                .collect();
+            let register = commands
+                .iter()
+                .position(|command| command.ends_with("marketplace add beyond10x/agentplugins"));
+            let install = commands
+                .iter()
+                .position(|command| command.contains("b10x@b10x"));
+            assert!(register.is_some() && register < install, "{commands:?}");
+            assert!(!plan
+                .actions
+                .iter()
+                .any(|action| matches!(action, Action::Refresh { .. })));
+        }
     }
 
     #[test]

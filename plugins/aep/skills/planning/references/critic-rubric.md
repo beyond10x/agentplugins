@@ -93,7 +93,7 @@ of by re-reading two paragraphs.
   severity: blocker
   verdict: needs-revision
   origin: introduced
-  message: the acceptance names no state before the work, so it reads the same on an empty store as on a populated one
+  message: "the acceptance names no state before the work, so it reads the same on an empty store as on a populated one"
 ```
 
 | Field | What you put in it |
@@ -107,6 +107,8 @@ of by re-reading two paragraphs.
 
 The block is a YAML list, so on `approve` it is still there and it is `[]`. An absent block and an
 empty one are different facts, and only one of them says a critic ran.
+Quote string values containing colons, quotes or line breaks with valid escaping; a JSON array
+inside the same fence is also valid YAML. Do not return unquoted prose that the store cannot parse.
 
 The field names above are what the record's reader parses. When it and this table disagree, the
 reader is right: `aep plan artifact findings --format json` prints what it read back, and one run of it

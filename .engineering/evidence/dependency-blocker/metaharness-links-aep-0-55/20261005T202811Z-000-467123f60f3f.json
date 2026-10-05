@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-05T20:28:11Z",
+  "actor": "human:timo",
+  "artifact": "dependency-blocker:metaharness-links-aep-0-55",
+  "kind": "dependency-blocker",
+  "revision": 2,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Metaharness 0.9.1 published Cargo.toml links AEP 0.68.0; source-matched eval pair selected",
+    "reference": "https://github.com/beyond10x/metaharness/blob/0.9.1/crates/metaharness-aep/Cargo.toml"
+  }
+}

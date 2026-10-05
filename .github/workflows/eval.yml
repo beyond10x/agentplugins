@@ -50,13 +50,15 @@ jobs:
       EVAL_CASE_USD: '5'
       # Pinned. An eval whose runner moved between two runs measured two things.
       #
-      # Every `aep` call in this file is the flat spelling on purpose. AEP 0.52.0 grouped the first
-      # level into areas — `eval run` is `drive eval run` there, `artifact` is `plan artifact` —
-      # and this workflow runs the version pinned below, which has neither. A grouped spelling here
-      # would not teach a reader anything; it would fail to parse on the runner. Move both when the
-      # pin moves.
-      AEP_VERSION: '0.64.0'
-      METAHARNESS_VERSION: '0.8.0'
+      # This AEP release matches the library linked by Metaharness. Its child preflight refuses
+      # an installed planning executable from a different release.
+      AEP_VERSION: '0.68.0'
+      METAHARNESS_VERSION: '0.9.1'
+      ESS_VERSION: '0.53.0'
+      CONNECTORS_VERSION: 'v0.28.0'
+      WORKTREE_VERSION: '0.8.2'
+      # The version qualified by this Metaharness release's Claude adapter.
+      CLAUDE_VERSION: '2.1.259'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -175,9 +177,13 @@ jobs:
       # --- the pinned tools -----------------------------------------------------------------------
 
       # AEP is the exact x86-64 Linux archive attached to the pinned release, checked against that
-      # release's SHA256SUMS before it is installed. Metaharness does not yet publish a binary asset,
-      # so its exact tag remains the source-build fallback.
-      - name: Install the pinned aep and metaharness release binaries
+      # release's SHA256SUMS before it is installed. Metaharness uses its published archive too.
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: steps.scope.outputs.count != '0'
+        with:
+          node-version: '22'
+
+      - name: Install the pinned eval tools
         if: steps.scope.outputs.count != '0'
         run: |
           set -euo pipefail
@@ -195,9 +201,44 @@ jobs:
           # stop at `unrecognized subcommand 'doctor'`; aep 0.45.0's `eval run` refuses a mismatch.
           install -d "$HOME/.local/bin"
           install -m 0755 "aep-${AEP_VERSION}-${target}/aep" "$HOME/.local/bin/aep"
-          cargo install --locked --git https://github.com/beyond10x/metaharness --tag "$METAHARNESS_VERSION" metaharness-cli
+          archive="metaharness-${METAHARNESS_VERSION}-${target}.tar.gz"
+          release="https://github.com/beyond10x/metaharness/releases/download/${METAHARNESS_VERSION}"
+          curl --fail --location --remote-name "${release}/${archive}"
+          curl --fail --location --output METAHARNESS_SHA256SUMS "${release}/SHA256SUMS"
+          grep "  ${archive}$" METAHARNESS_SHA256SUMS | sha256sum --check -
+          tar -xzf "$archive"
+          install -m 0755 "metaharness-${METAHARNESS_VERSION}-${target}/metaharness" "$HOME/.cargo/bin/metaharness"
+          install -m 0755 "metaharness-${METAHARNESS_VERSION}-${target}/metaharness" "$HOME/.local/bin/metaharness"
+          archive="ess-${ESS_VERSION}-${target}.tar.gz"
+          release="https://github.com/beyond10x/ess/releases/download/${ESS_VERSION}"
+          curl --fail --location --remote-name "${release}/${archive}"
+          curl --fail --location --output ESS_SHA256SUMS "${release}/SHA256SUMS"
+          grep "  ${archive}$" ESS_SHA256SUMS | sha256sum --check -
+          tar -xzf "$archive"
+          install -m 0755 "ess-${ESS_VERSION}-${target}/ess" "$HOME/.local/bin/ess"
+          archive="worktree-${WORKTREE_VERSION}-${target}.tar.gz"
+          release="https://github.com/beyond10x/worktree/releases/download/${WORKTREE_VERSION}"
+          curl --fail --location --remote-name "${release}/${archive}"
+          curl --fail --location --output WORKTREE_SHA256SUMS "${release}/SHA256SUMS"
+          grep "  ${archive}$" WORKTREE_SHA256SUMS | sha256sum --check -
+          tar -xzf "$archive"
+          install -m 0755 "worktree-${WORKTREE_VERSION}-${target}/worktree" "$HOME/.local/bin/worktree"
+          npm install --global "@anthropic-ai/claude-code@${CLAUDE_VERSION}"
+          # The governed child receives a constructed PATH, without setup-node's toolcache.
+          ln -s "$(command -v node)" "$HOME/.local/bin/node"
+          ln -s "$(command -v claude)" "$HOME/.local/bin/claude"
+          for tool in cargo rustc rustup; do
+            ln -s "$HOME/.cargo/bin/$tool" "$HOME/.local/bin/$tool"
+          done
+          # Connectors currently publishes source only. Install its exact tag for readiness evals.
+          cargo install --locked --git https://github.com/beyond10x/connectors \
+            --tag "$CONNECTORS_VERSION" --root "$HOME/.local" connectors
           aep --version
           metaharness --version
+          "$HOME/.local/bin/ess" --version
+          claude --version
+          "$HOME/.local/bin/connectors" --version
+          "$HOME/.local/bin/worktree" --version
 
       # --- the run --------------------------------------------------------------------------------
 
@@ -248,7 +289,7 @@ jobs:
             echo
             echo "\`aep\` $AEP_VERSION · \`metaharness\` $METAHARNESS_VERSION · cap \$$EVAL_BUDGET_USD · ${{ steps.scope.outputs.count }} case(s)"
             echo
-            if aep eval matrix "$RUNNER_TEMP/eval-out"/* --format text > matrix.txt 2> matrix.err; then
+            if aep drive eval matrix "$RUNNER_TEMP/eval-out"/* --format text > matrix.txt 2> matrix.err; then
               echo '```'
               cat matrix.txt
               echo '```'

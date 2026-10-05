@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.20.0] — 2026-10-05
+
+- Refresh ESS resources for the current source language, related guards and selected effects,
+  transport clients, finite protocol checks and compatibility gates. Bundle executable examples
+  and distinguish supported declarations from implementation and synthesis limits.
+- Replace the current lending walkthrough and its fixtures with Rust, canonical suite IR and
+  the native ESS runner. All 17 scenarios pass with real consistency tokens and checked fresh
+  reads; deliberate lifecycle, token and view defects are rejected. Keep dated Go recordings as
+  historical evidence and provide a current governed-plan continuation.
+- Migrate Connectors guidance to v0.28.0: local setup, protected acquisition, exact operation
+  schemas and revisions, approval proofs and explicit service endpoints. `b10x` now installs and
+  upgrades its source-only CLI from the exact release tag (Rust 1.91 or newer). Existing 0.7.x
+  configuration and credentials require an explicit migration; this release does not convert them.
+- Repair upgrades from a frozen local marketplace by planning the selected source change before
+  plugin upgrades, with the existing snapshot and undo path preserved.
+- Match eval AEP 0.68.0 to Metaharness 0.9.1's embedded source. Install the actual eval prerequisites
+  and make their executables available on the governed child's PATH. Update the planning protocol,
+  shared Gates workflow and Docs System package pins.
+- Expand current-tool and upstream checks to maintained eval, protocol and package pins,
+  Metaharness and Connectors command contracts, command options and executable ESS examples.
+  Report source-only verification separately from executed binaries. Exclude generated website
+  output from source checks without hiding authored documents.
+- Measure Rust trials with Cargo summaries, preserving abnormal process failures and incomplete
+  runs. Close false-green cases involving equals-style global options and a crashed test process
+  after an earlier passing target.
+- Refresh setup, routing, delivery and maintenance instructions. Source releases finish after
+  their own checks and artifact publication; downstream documentation publication is asynchronous.
+
 ## [0.19.2] — 2026-10-03
 
 - An explicit Worktree cleanup request authorizes exact eligible removals without a second

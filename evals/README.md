@@ -1,7 +1,8 @@
 # The eval corpus
 
 One directory per case, and a directory holding a `case.yaml` **is** a case — nothing registers one
-anywhere. `task check` enumerates this tree; `aep drive eval run --corpus evals` runs it.
+anywhere. `task check` enumerates this tree; `metaharness aep drive eval run --corpus evals`
+runs a selected live arm, with its required budget and explicit live opt-in.
 
 A case is four things and no others:
 
@@ -54,7 +55,7 @@ AEP's trace format cannot union `Bash`/`command` with `exec_command`/`cmd`, and 
 decide whether `--help` belongs to the same command as a mutation. The checker reads both host
 shapes and parses shell syntax without executing transcript text.
 
-The normal replay and live CI paths run both checks. After a manual `aep drive eval run`, check
+The normal replay and live CI paths run both checks. After a manual `metaharness aep drive eval run`, check
 each emitted stream and its adjacent trace report with:
 
 ```bash
@@ -62,18 +63,19 @@ cargo run --quiet --locked --bin agentplugins-check -- \
   evals check-stream evals/connectors-readiness /path/to/run.events.jsonl
 ```
 
-Running only `aep drive eval run` evaluates the common trace predicates, not the extra command
+Running only `metaharness aep drive eval run` evaluates the common trace predicates, not the extra command
 contract. Native Claude stream-json and Codex rollout call shapes are also understood by the
 command checker. This bounded diagnostic case requires direct commands with literal arguments;
 dynamic shell expansion, shell wrappers, and code-mode calls need a decoded trace and are refused.
 Tests under `readiness.rs` use synthetic records to exercise the checker, not to claim a live
 plugin run. The plugin's operating instructions do not impose this eval-only restriction.
 
-## `recorded/` is empty, and that is stated rather than implied
+## Recorded coverage
 
-**No transcript in this corpus was recorded, and none was synthesized.** Each `recorded/README.md`
-carries the exact live command that would produce its case's stream, the budget it runs under, and
-what the working tree has to hold for the case to measure anything.
+The golden-path case carries one live recording from 2026-09-03; its adjacent manifest and README
+state the observed versions and result. The other cases have no committed recording. Each
+`recorded/README.md` explains the live command, budget and prerequisite state. An empty recording
+directory is a coverage gap, not evidence that its behaviour passed.
 
 Nothing here is hand-written, and the difference from `aep/conformance/eval/` is deliberate. That
 corpus commits transcripts written by hand against the event stream, says so at length, and uses them

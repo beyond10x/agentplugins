@@ -31,8 +31,12 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 - Retired names appear only where the gate allows them (`CHANGELOG.md`, `changes/`,
   `.engineering/`, `catalog.json`, `crates/b10x/`, the checker's own table).
 - Anything executable is Rust.
-- Every `aep`, `ess` and `worktree` release is re-verified before `verified.json` moves to it:
-  `agentplugins-check tools`, then an ESS trial round ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
+- Every tracked CLI release is re-verified before `verified.json` moves to it:
+  `agentplugins-check tools`, then the affected isolated trials ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
+  Record executed binaries separately from exact released source-contract checks. Connectors
+  currently publishes source only; Metaharness and the eval's AEP executable must be source-matched.
+- The runnable ESS tutorial and new executable examples are Rust. Keep its specification, target,
+  public guide and trial fixture together; `tools` regenerates the suite and runs the target.
 - Trial findings for another repository become an issue there, labelled `trial-finding` by the
   bot; the skill here documents the workaround until the fix is released ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
 
@@ -41,7 +45,7 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 ```console
 task check          # fmt, clippy, tests, agentplugins-check (includes the trial definitions)
 task site-build     # when website/ changes
-cargo run --locked --bin agentplugins-check -- tools    # network: every spelled command exists in the newest aep, ess, worktree
+cargo run --locked --bin agentplugins-check -- tools    # network: current CLI contracts and executable ESS examples
 cargo run --locked --bin agentplugins-check -- upstream # network: what moved upstream (releases and changelogs, workflow pins, cited issues)
 ```
 

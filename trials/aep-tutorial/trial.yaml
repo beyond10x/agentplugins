@@ -20,7 +20,7 @@ prompt: |
 dir: library
 fixture: fixture
 setup:
-  - b10x init aep,ess --host claude --out plan.json
+  - b10x init aep,ess,worktree --host claude --out plan.json
   - b10x setup apply --plan plan.json --yes
 measures: [tool_calls, synthesis, outputs, cargo_test]
 outputs:

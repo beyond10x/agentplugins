@@ -99,13 +99,15 @@ The wave coordinates an interactive session: its rules are instructions the coor
 follows. `drive` hands one story to the reference driver, where the step map's bounds are decided by
 the engine rather than obeyed by an agent.
 
-Driven runs are not finished work on the `aep` side. The walk has not yet reached `complete` —
-`aep`'s `story:governed-dogfood-run` records two attempts that stopped before the review step — so
-drive mode says so before it launches anything, prints the run id and how to follow it, and
-moves no artifact itself.
+The recorded dogfood attempts stopped before the review step. Those historical observations do
+not qualify later releases: drive mode checks the current evidence before claiming readiness,
+prints the run id and how to follow it, and moves no artifact itself.
 
-Drive mode needs a Metaharness build that carries `metaharness aep drive`: AEP 0.55.0 refuses
-a model-backed map itself and names that command. [Install](../install.md) names the build to use.
+Drive mode uses `metaharness aep drive` with a planning executable matching the AEP source linked
+by that runner. [Install](../install.md) explains the pairing. Governed Codex steps preserve model
+and endpoint selection across resume. Capped runs use the operator's budget; uncapped mode requires
+an explicit spending authorization reference. Native process completion and the task's terminal
+verdict are reported separately.
 
 `b10x` treats both `metaharness` and `b10x-harness`, the Beyond10x agent loop that Metaharness's
 `b10x` adapter runs, as optional CLIs of this plugin: it reports them, and `b10x install <cli>` adds

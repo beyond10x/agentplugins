@@ -3,7 +3,7 @@ name: migrating
 description: Migrate a repository's legacy work tracking — story trees, TODO.md, plan and issue documents — into the governed AEP planning store, without deleting or rewriting the sources. Use when the user asks to migrate, import, port or convert an existing backlog into AEP, when a repository is adopting AEP and already has work written down somewhere, or when a store has been adopted beside a legacy backlog nobody retired. Read it before creating the first artifact in a repository that already tracks work in markdown.
 ---
 
-**Skill version 0.19.2** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.20.0** — the version in `.claude-plugin/plugin.json`.
 
 # Migrating legacy tracking into the store
 
@@ -103,8 +103,10 @@ values. That applies with or without a backlog; only the steps after it differ.
 holds during a migration too: where an item names an entity no ESS document declares, draft and
 validate the domain (`ess:specifying`) before writing the stories around it, and cite the file in
 their bodies. Without `ess` installed, run `b10x init ess --host claude --out ~/.local/state/b10x/plan.json`
-(`--host codex` in Codex) and ask before applying its plan. The
-classification table still lists the item; its stories are written after the domain validates.
+(`--host codex` in Codex). Apply the concrete plan when the session already authorizes that setup;
+otherwise ask for the missing authorization. An instruction to proceed without questions does
+not make a missing specification valid: if setup cannot proceed, record that blocker and retain
+the classification, but do not draft those stories until their domain validates.
 
 One artifact at a time, body supplied at creation:
 

@@ -44,7 +44,7 @@ or replace the standalone toolchain.
 
 ## Using configured integrations
 
-Use **`connectors`** to set up providers, diagnose readiness, and search, describe, and invoke
+Use **`connectors`** to set up providers, diagnose readiness, and list, describe, and invoke
 admitted operations through the standalone `connectors` CLI. Both hosts load the same skill;
 credentials and grants remain owned by the Connector. See [installation](plugins/connectors.md).
 
