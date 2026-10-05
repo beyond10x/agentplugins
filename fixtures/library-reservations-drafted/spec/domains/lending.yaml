@@ -311,6 +311,8 @@ commands:
         type: library.lending.BookId
       - name: member_id
         type: library.lending.MemberId
+        # Supply a distinct candidate so wrong-state synthesis can refute the borrower guard.
+        example: "00000000-0000-4000-8000-000000000003"
     outcomes:
       - name: already-borrower
         when_subject:
