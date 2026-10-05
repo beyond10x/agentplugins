@@ -1,6 +1,6 @@
 # Current capabilities and runnable examples
 
-Use this reference for ESS 0.53.0's related records, set effects, event transports, protocol models
+Use this reference for the current ESS release's related records, set effects, event transports, protocol models
 or compatibility gates. Paths below are relative to this reference directory; run with a scratch
 output directory outside the specification inputs. Source examples are committed beside this file.
 
@@ -13,7 +13,7 @@ ess specify validate --path examples/set-effects.yaml
 ess verify conform synthesize --path examples/set-effects.yaml --out set-suite.json
 ```
 
-These examples synthesize 3 and 14 scenarios respectively, with zero refusals on 0.53.0.
+These examples synthesize 3 and 14 scenarios respectively, with zero refusals on the verified release.
 `CheckMember` uses `when_related: {via: input.member_id, exists: false}`; synthesis arranges the
 present member and decoys, and separately asks with a missing identity. This is stronger than a
 comment claiming registration is checked.
@@ -26,7 +26,7 @@ still refuse set effects; a valid model and generated scenarios do not certify t
 
 The source language has related guards from `ess/18`, related lifecycle state from `/20`, and
 row-set selectors, Optional references and several related rows from `/22`. Guard combinations
-have narrower ordering rules in ESS 0.53.0:
+have narrower ordering rules in the current ESS release:
 
 - An identity-addressed `when_related` beside `unknown_instance` is refused.
 - For `via: input.member_id`, an existence-only `exists: false` guard beside `wrong_state` is
@@ -59,7 +59,7 @@ promise an application can infer from JetStream alone.
 
 ## Finite protocol checks
 
-The terminal-response example is adapted from ESS 0.53.0's `examples/protocols`. It separates
+The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.53.0/examples/protocols). It separates
 queueing the response, observing transport flush, closing and receiving the response.
 
 ```console

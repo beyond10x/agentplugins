@@ -35,7 +35,7 @@ restoring.
 
 Procedures, with the defect to plant for each: [references/techniques.md](references/techniques.md).
 
-For communicating finite-state peers, ESS 0.53.0 also has experimental `ess-protospec/1`
+For communicating finite-state peers, current ESS also has experimental `ess-protospec/1`
 validation, simulation, replay and bounded exploration. Read the
 [protocol example](../specifying/references/current-features.md) when transport ordering, timers
 or flush/close boundaries are the question. Model traces are not implementation evidence;

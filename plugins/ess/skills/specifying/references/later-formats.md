@@ -235,7 +235,7 @@ and the case-insensitive operators (`CaseFoldUnsupported`); keep those out of a 
 ## From `ess/16` through `ess/22`
 
 The source language and conformance-suite version are different contracts. Choose the source
-format for the construct; let synthesis select its required suite format. With ESS 0.53.0:
+format for the construct; let synthesis select its required suite format. With current ESS:
 
 | format | additions |
 |---|---|
@@ -252,7 +252,7 @@ and compatibility gates, read and run [current-features.md](current-features.md)
 selected target: a source construct validating does not mean code generation or Entity Runtime
 can lower it. The current lowering report lists each unsupported construct by name.
 
-For a valid stored state bounded arrangement cannot reach, ESS 0.53.0 admits an explicit
+For a valid stored state bounded arrangement cannot reach, current ESS admits an explicit
 `--synthesis-seed <authored-file> <instance>` containing a typed setup row. The suite records seed
 provenance and selects `/42` or `/43`; the target must establish and validate that real row.
 A seed does not execute the authored document's timeline or replace a command's assertions. For a

@@ -272,7 +272,7 @@ your implementation:
 | `billing` | a hand-written implementation of ESS's own `examples/billing` | every scenario `error` |
 
 A green interpreted run is evidence about the model and runner, not about your implementation.
-ESS 0.53.0 runs the committed related-guard example as 3 passed, 0 failed, 0 error and 0 unsupported.
+Current ESS runs the committed related-guard example as 3 passed, 0 failed, 0 error and 0 unsupported.
 Use an adapter over your actual implementation for product conformance.
 
 To hold your implementation to the suite, generate it as a test package in the implementation's
@@ -302,7 +302,7 @@ The current runner contract:
   `FixtureValues` (Go) or `fixtureValues` (TypeScript). Without it every scenario using a fixture is
   an explicit skip, so a fixture provider is the first thing to check when skips cluster there.
 - Go and TypeScript have admitted `deletes:`, `accepts: nothing` and `presence:` suites
-  (`ess-conformance/22`–`/25`) since ESS 0.40.0. ESS 0.53.0 includes shared runtime coverage for
+  (`ess-conformance/22`–`/25`). Current ESS also includes shared runtime coverage for
   the newer expression, binding, aggregation and seed formats through `/43`. Generate with the
   same release as the runner and inspect any target-specific refusal instead of carrying an old
   suite-version ceiling.
