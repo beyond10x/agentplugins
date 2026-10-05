@@ -2,14 +2,15 @@
 format: aep.planning-md/3
 id: task:refresh-resources-release
 kind: task
-status: active
+status: implemented
 title: Refresh current CLI resources and release Agentplugins 0.20.0
 relations:
 - informed_by: task:prepare-release-0-19-2
-revision: 7
+revision: 10
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-05T22:09:00Z", actor: "human:timo", revision: 10, decided_on: {"recorded":{"test_result":2}}, executor: "agent:agentplugins-release-020", correlation: "release-agentplugins-020"}
 ---
 ## Context
 
@@ -36,12 +37,12 @@ Base: 30acac4. Integration branch: wave/current-resources. Integration tree id: 
 
 ## Progress
 
-The integrated candidate updates AEP 0.68.0, ESS 0.53.0, Worktree 0.8.2, Metaharness 0.9.1, Connectors v0.28.0 and Docs System 0.7.0. The final upstream report confirms maintained release pins are current; two generated workflow pins remain owned by Atlas reconciliation. All executable additions are Rust. The current tutorials, runnable fixtures, CLI resources, installer source migration, verifier and eval prerequisites agree with those releases.
+Completed the resource refresh and source release. PR #59 merged as 2420704264dbcbcffe4bf5338d54bd722af23f50 through b10x-bot[bot]; its tree exactly equals the tested bot candidate fe26c80e058cd34b416ee4b70143a7a6e73f1edc. All required main checks, latest-tool verification, site build and documentation source checks passed.
 
-Independent reviews reproduced and fixed command-parser and Cargo-result false greens. Native tutorial guard/freshness mutants and unsupported/error targets are rejected. The seeded marketplace upgrade first failed, then passed after source-switch planning was corrected; native Claude and Codex probes preserve plugin state. Exact Connectors source installation and 20 runtime help checks passed.
+Bot-owned annotated tag 0.20.0 is 6c7ac2ab75a52d62cffea166fac2390308c20efd and resolves to that exact main commit. Release workflow 37379526813 passed its gate, all four platform builds and publication preparation. The tag receipt was also published as signed local evidence.
 
-Local final gate: 155 tests (98 checker unit, 2 integration, 55 installer); all 17 eval definitions validate and one recorded transcript replays. Tools verifies 213 AEP, 78 ESS, 36 Worktree, 13 Metaharness and 20 Connectors command spellings and runs the current ESS capability examples. Documentation typecheck/build pass. The exact CI documentation source checker passes 15 documents, five change records and 117 fences after correcting ambiguous tutorial language labels. Paid live CI evals were not run.
+GitHub Release 404127516 was published by b10x-bot[bot] at 2026-10-05T22:06:58Z: https://github.com/beyond10x/agentplugins/releases/tag/0.20.0. Its six assets are the Linux x86_64/aarch64 and macOS x86_64/aarch64 b10x archives, SHA256SUMS and SETUP.md. Local checks verified all archive checksums, exact contents, architecture and license; the Linux binary reports b10x 0.20.0 and its embedded setup guide is present. All six public assets were downloaded again and compared byte-for-byte with the exact workflow artifact. The anonymous latest-release SETUP.md URL also matches. This is a verified source release, not merely a queued tag.
 
-Nine primary trials and the bounded managed-wave rerun completed; actual results, retained old Go baseline and changed Rust baseline are recorded in changes/0.20.0-verification.md. The governed-plan trial implements only its first story, with 26 ESS scenarios passed and 29 explicitly pending for future stories. The corrected managed run passed 16 Cargo tests, nine deliberate mutants and isolation; both managed trees had their own leases, verified archive recovery and reviewed exact-ID GC. A separate permission probe passed. Setup refuses existing sandboxes. No claim of complete reservation-feature conformance or perfect model adherence is made; the report records a malformed-review serialization deviation and its instruction correction.
+Verification details and limits are retained in changes/0.20.0-verification.md: 155 tests, current released CLI contracts, nine primary trials plus the corrected managed-wave follow-up, independent adversarial evidence, changed Rust baseline costs and a recorded review-serialization instruction deviation. Trial recovery bundles and logs are retained privately, and their managed trees were retired through the Worktree CLI. Source worktree cleanup follows publication of this record. The primary checkout was not changed.
 
-PR #59 publishes the source as the organization bot. Release 0.20.0 remains pending until the exact main tag, release checks, four platform archives, checksums, setup guide and GitHub Release are verified. Documentation publication is asynchronous. Latest documentation packages retain 32 npm audit findings (30 high, 2 low); no available direct-package fix is claimed.
+Documentation publication remains asynchronous and was not verified. Two generated documentation workflow pins remain owned by Atlas reconciliation. The newest documentation packages still report 32 npm audit findings without an available direct-package fix. No downstream release, deployment or consumer pin promotion was performed.

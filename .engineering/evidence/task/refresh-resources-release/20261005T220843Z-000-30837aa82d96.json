@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-05T22:08:43Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-resources-release",
+  "kind": "task",
+  "revision": 8,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Verified tag, successful release workflow 37379526813, six published assets and public download checksums",
+    "reference": "https://github.com/beyond10x/agentplugins/releases/tag/0.20.0"
+  }
+}
