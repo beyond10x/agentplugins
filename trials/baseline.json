@@ -1,6 +1,6 @@
 {
   "aep-backlog": {
-    "tool_calls": 278
+    "tool_calls": 268
   },
   "aep-tutorial": {
     "tool_calls": 474,
@@ -16,10 +16,10 @@
     ]
   },
   "ess-full-package": {
-    "tool_calls": 53,
+    "tool_calls": 78,
     "validate": "valid",
     "synthesis": {
-      "scenarios": 20,
+      "scenarios": 26,
       "refusals": 0
     },
     "unmapped": 0,
@@ -34,19 +34,19 @@
       "types-go",
       "types-rust"
     ],
-    "go_test": {
-      "passed": 20,
+    "cargo_test": {
+      "passed": 4,
       "failed": 0,
       "skipped": 0
     }
   },
   "ess-new": {
-    "tool_calls": 38,
+    "tool_calls": 18,
     "validate": "valid",
-    "unmapped": 4
+    "unmapped": 0
   },
   "ess-pipeline": {
-    "tool_calls": 11,
+    "tool_calls": 12,
     "validate": "valid",
     "synthesis": {
       "scenarios": 14,
@@ -60,16 +60,16 @@
     ]
   },
   "ess-retrofit": {
-    "tool_calls": 36,
+    "tool_calls": 30,
     "validate": "valid",
     "synthesis": {
-      "scenarios": 20,
+      "scenarios": 22,
       "refusals": 0
     },
-    "unmapped": 3
+    "unmapped": 4
   },
   "ess-tutorial": {
-    "tool_calls": 35,
+    "tool_calls": 70,
     "validate": "valid",
     "synthesis": {
       "scenarios": 17,
@@ -82,13 +82,16 @@
       "spec",
       "suite"
     ],
-    "go_test": {
-      "passed": 17,
+    "cargo_test": {
+      "passed": 4,
       "failed": 0,
       "skipped": 0
     }
   },
+  "upgrade-seeded": {
+    "tool_calls": 9
+  },
   "worktree-onboarding": {
-    "tool_calls": 19
+    "tool_calls": 18
   }
 }
