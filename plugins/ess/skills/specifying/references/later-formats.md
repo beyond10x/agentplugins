@@ -139,66 +139,47 @@ different. Two limits observed on this library: comparing or grouping by
 `branch_id`, the `via:` of `Branch owns Copy`, left those scenarios unbuilt (`ESS-SYNTH-003`,
 `ESS-SYNTH-017`), so the examples use `title`.
 
-**A limit per holder** ("a member can have five packets out at once"). Keep the count on the entity
-
-the command addresses, and guard on it:
-
-```yaml
-entities:
-  - name: seeds.lending.Member
-    identity: {name: member_id, type: Uuid}
-    fields:
-      - {name: name, type: String}
-      - {name: packets_out, type: Integer}
-    invariants:
-      - packets_out >= 0
-      - packets_out <= 5
-    lifecycle:
-      initial: Active
-      states: [Active]
-      terminal: [Active]
-```
+**A limit per holder** ("a member can have five packets out at once"). When each packet records
+its borrower and lifecycle state, address that packet and count the rows already lent to the
+member (`ess/22`):
 
 ```yaml
-  - name: seeds.lending.BorrowPacket
-    input:
-      - {name: member_id, type: Uuid}
-    outcomes:
       - name: at-limit
-        when_subject:
-          predicate: packets_out >= 5
+        when_related:
+          entity: seeds.lending.Packet
+          where:
+            all:
+              - borrower_id == input.member_id
+              - state == Lent
+          count: {gte: 5}
         error: seeds.lending.LimitReached
       - name: borrowed
-        updates: seeds.lending.Member
-        instance: member_id
-        sets: {packets_out: {increment: 1}}
+        moves: seeds.lending.Packet.lend
+        instance: packet_id
+        sets: {borrower_id: input.member_id}
         emits: [seeds.lending.PacketBorrowed]
         payload:
-          seeds.lending.PacketBorrowed: {member_id: input.member_id}
-  - name: seeds.lending.ReturnPacket
-    input:
-      - {name: member_id, type: Uuid}
-    outcomes:
-      - name: nothing-out
-        when_subject:
-          predicate: packets_out <= 0
-        error: seeds.lending.NothingOut
-      - name: returned
-        updates: seeds.lending.Member
-        instance: member_id
-        sets: {packets_out: {increment: -1}}
-        emits: [seeds.lending.PacketReturned]
-        payload:
-          seeds.lending.PacketReturned: {member_id: input.member_id}
+          seeds.lending.PacketBorrowed:
+            packet_id: input.packet_id
+            member_id: input.member_id
 ```
 
-The creating command (`Join`) sets `packets_out: 0`. Synthesis arranges a member only through that
-`sets:` and does not repeat `BorrowPacket`, so the `at-limit` scenario is refused (`ESS-SYNTH-003`).
-That refusal is the expected result: name it in your report. Do not give `Join` a starting count
-only so synthesis can reach the limit; no member joins holding packets.
-From `ess/16`, `affects:` changes selected records beside the addressed member; `ess/22` also
-allows their lifecycle moves. This expresses multi-record effects, but not transaction atomicity.
-See [current-features.md](current-features.md) for validated set-effect and related-guard examples.
+This models the limit without a separate counter. Declare the Packet fields, lifecycle, typed
+inputs, event, error and observable views around this excerpt. The seed-library trial validates
+this shape but synthesis refuses the at-limit arrangement with `ESS-SYNTH-001`; validation does
+not make the boundary executable. Retain that refusal and cover the intended boundary with an
+authored scenario against the real target. Do not promise a fixed refusal code for every model.
+
+A separate Member counter guarded by `when_subject` and changed by `{increment: 1}` is valid
+for a counter-only model, but does not also move a particular Packet. The current `affects`
+selector rejects selecting by the selected entity’s identity, and set effects reject
+`{increment: …}`. The validated set-effects example instead selects by stored `team` and writes
+literal fields; it is not a recipe for an atomic packet-plus-member-counter transaction.
+
+Current related-row support also distinguishes identity-addressed guards from row-set guards:
+several identity-addressed rows may be read, but mixing an identity-addressed member-existence
+guard with the packet row-set limit is refused. Name that missing registration check explicitly
+if the real domain requires it; do not claim that the limit verifies membership.
 
 **A branch chosen by the held state.** When one command succeeds from one state, does nothing in a
 second and refuses in the rest, guard each branch with `when_subject_state:` and let one
