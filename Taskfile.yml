@@ -91,7 +91,7 @@ tasks:
       - defer: rm -f '{{.T}}/home/.claude/.credentials.json'
       - |
         (. '{{.T}}/env' && dir="$(cat '{{.T}}/workdir')" && mkdir -p "{{.T}}/work/$dir" && cd "{{.T}}/work/$dir" &&
-         timeout 2400 claude -p "$(cat '{{.T}}/prompt.txt')" --permission-mode acceptEdits \
+         timeout 2400 claude -p "$(cat '{{.T}}/prompt.txt')" --permission-mode acceptEdits --add-dir '{{.T}}' \
            --allowedTools 'Bash(b10x:*)' 'Bash(ess:*)' 'Bash(aep:*)' 'Bash(worktree:*)' 'Bash(git:*)' 'Bash(go:*)' 'Bash(cargo:*)' \
              'Bash(gh release list:*)' 'Bash(gh release view:*)' \
              'Bash(mkdir:*)' 'Bash(ls:*)' 'Bash(cat:*)' 'Bash(find:*)' 'Bash(curl:*)' 'Bash(tar:*)' \

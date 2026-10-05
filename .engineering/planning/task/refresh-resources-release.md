@@ -6,7 +6,7 @@ status: active
 title: Refresh current CLI resources and release Agentplugins 0.20.0
 relations:
 - informed_by: task:prepare-release-0-19-2
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-05T20:23:43Z", actor: "human:timo", revision: 3}
@@ -36,8 +36,12 @@ Base: 30acac4. Integration branch: wave/current-resources. Integration tree id: 
 
 ## Progress
 
-Three implementation units are integrated: Connectors 92f498e (54 tests and exact v0.28.0 source installation with 20 runtime help checks); ESS 363ae4c plus a83926e (17 native scenarios, two Cargo tests, guard/freshness mutants rejected); verification 96fe417 plus e7f8860 (98 unit and 2 integration tests). Independent adversary found two verifier false-greens: equals globals hid commands and a crashed Cargo target followed a passing target. Both fixed and original adversarial probes now green. ESS independent probes rejected 17 unsupported, 17 errored and 14 failed scenarios; stale transport digest refused. No remaining blocking unit finding.
+Implementation units and independent reviews are integrated on wave/current-resources, published as bot PR #59. Maintained release pins are current: AEP 0.68.0, ESS 0.53.0, Worktree 0.8.2, Metaharness 0.9.1, Connectors v0.28.0, Docs System 0.7.0. Generated documentation workflow pins remain Atlas-owned.
 
-Coordinator refreshed AEP/Metaharness matching release pair, ESS and Connectors/Worktree eval prerequisites and child PATH, planning protocol, shared Gates workflow, Docs System dependency and lockfile, current and historical public tutorials, maintenance guidance and release metadata. Generated Atlas files remain owner-managed. A seeded upgrade trial found stale local marketplace refresh could not discover the replacement AEP plugin; source-switch planning fix reproduced red and passed 55 b10x tests, independent review and rerun pending.
+The offline gate passes 155 tests; current-tool verification passes with the exact compiled Connectors release, native ESS tutorial and new capability examples. Site typecheck/build pass. CI Gate, Tools, documentation build and security pass at 29767c7; the first Gate attempt received no runner and timed out, and its bot retry passed. CI source-check feedback was corrected: ambiguous console fences became bash in both tutorials and fixtures. The exact pinned source checker now passes locally.
 
-The isolated nine-trial round is running. Worktree onboarding, ESS pipeline and ESS retrofit passed isolation and metrics; seeded upgrade's first run failed its actual task despite permissive metric summary and is being rerun. Its failure is preserved. Do not advance verification pins or declare release completion from trial metric exit codes alone. Release target remains 0.20.0.
+All nine primary trial runs finished. Eight passed their full intended scope. The AEP tutorial completed reviewed planning and its first story, with 26 ESS scenarios Passed, 29 Unsupported explicitly deferred, and seven Cargo tests passing. Its missing Worktree setup caused a noncompliant host-worktree fallback. The fixture now installs Worktree, and a bounded rerun from the accepted plan is exercising managed coordinator/unit trees, leases, independent review, merge and recovery. That rerun is still active; do not claim the complete managed-wave trial has passed yet.
+
+Trial feedback corrected frozen-marketplace upgrade planning, source-only Connectors installation, Rust test measurement, tutorial partial-wave coverage and recovery guidance. The old Go baseline is retained and higher Rust tutorial cost is documented. The managed trial additionally exposed runner directory scope: Taskfile now allows only its own sandbox root through --add-dir; focused verification remains pending. Two adversarial verifier false greens were reproduced and fixed. Latest documentation dependencies retain 32 npm audit findings without an available direct-package fix.
+
+Release target is 0.20.0. Final report, bounded trial, final bot source publication, green main/tag checks and six published assets remain before completion. Documentation publication is asynchronous; no downstream release or deployment is included.

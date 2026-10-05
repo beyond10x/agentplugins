@@ -53,6 +53,9 @@ task trial:run NAME=<name> PROMPT='<the user sentence>' [DIR=<subdirectory of wo
 The task copies the operator's credentials in (mode 600), runs `claude -p` with the sandbox's
 `env`, `--strict-mcp-config` (no MCP server, including the account's claude.ai connectors) and
 stream-json output into `run.jsonl`, and deletes the credentials when it finishes. The sandbox
+root is passed as `--add-dir`, so managed worktrees below its isolated home are accessible as
+working directories without granting access to the operator's home.
+The sandbox
 `PATH` has `cargo` and `go`, and `go` is an allowed tool, so a trial can build and test an
 implementation.
 

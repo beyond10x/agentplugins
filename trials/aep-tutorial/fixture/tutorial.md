@@ -30,15 +30,18 @@ costs as historical evidence.
 
 Use your host in place of `claude` if necessary:
 
-```console
+```bash
 b10x init aep,ess,worktree --host claude --out plan.json
 b10x setup apply --plan plan.json --yes
 ```
 
 Review the plan before applying it, then restart the host so it loads the installed plugins.
+Confirm that the Worktree plugin and `worktree` CLI are available before starting a wave. If
+either is missing, finish setup first; the host's built-in worktree isolation does not provide
+the managed leases and recovery records required by this workflow.
 Confirm the starting point:
 
-```console
+```bash
 ess specify validate --path spec
 ess verify conform synthesize --path spec --target ir --out impl/suite.json
 cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture
@@ -62,7 +65,7 @@ protocol source, then derives artifacts from the repository. Ask it to cite evid
 behaviour. In this example the declared borrowing conformance covers book lifecycle and views;
 registered-member enforcement is a separate gap, not an assertion that the starting suite proves.
 
-```console
+```bash
 aep plan artifact list
 aep plan artifact validate
 ```
@@ -99,16 +102,20 @@ Record unsupported semantics and unresolved questions in the store instead of gu
 
 The agent may use separate commands for collecting a hold and borrowing a shelf book. The exact
 command and guard structure must be supported by the released ESS validator and synthesis path.
-In ESS 0.53, an existence-only input-related guard cannot accompany `wrong_state`, and related
-guards cannot accompany `unknown_instance`. Some present-row predicate refusals can accompany
+In ESS 0.53, an existence-only input-related guard cannot accompany `wrong_state`, and
+identity-addressed related guards cannot accompany `unknown_instance`. Some present-row predicate refusals can accompany
 `wrong_state` in `ess/22`; see the ESS tutorial's qualified examples. Keep the intended rule
 visible; do not remove lifecycle assertions or invent predicates to obtain a green synthesis.
+The reservation's member must differ from the borrower. Give `ReserveBook.member_id` a distinct
+valid `example:` value when synthesizing this model; otherwise the generated second-reservation
+probe can select the borrower and fail to reach the intended refusal. This supplies a witness
+for the actual rule rather than removing the borrower guard.
 
 ## 4. Review the plan and its evidence
 
 Regenerate the canonical suite:
 
-```console
+```bash
 ess specify validate --path spec
 ess verify conform synthesize --path spec --target ir --out impl/suite.json
 aep plan artifact validate
@@ -120,6 +127,15 @@ resolutions belong in review records; an approval word alone does not describe w
 The unimplemented feature should produce a visible coverage gap or failure in the baseline target.
 Preserve that evidence before changing the implementation.
 
+Plan the partial-wave gate before implementation. Name the scenarios owed by the selected story
+and the baseline scenarios it must preserve; require all of them to pass. If later stories own
+unimplemented scenarios, retain an explicit reviewed list of those IDs and report their actual
+statuses separately. Unexpected failures or unsupported results must fail the gate. Review every
+change to that list, and remove it when the feature is complete. A passing partial-wave gate is
+not complete conformance; retain the full suite's actual report. Adding a view can initially make
+existing scenarios unsupported because the runner observes the declared views; repair the adapter
+instead of dropping those baseline obligations.
+
 ## 5. Accept the stories and propose a wave
 
 ```text
@@ -128,13 +144,14 @@ and propose the first wave with aep:implementing. Name the stories, evidence, ma
 and model budget required. Stop for my approval of that concrete wave.
 ```
 
-```console
+```bash
 aep plan artifact waves --kind story --status active
 ```
 
 Stories touching the same Rust files usually run in different waves. If the command reports no
 scope, have the agent scope the stories before selecting a wave. Each story must serve the
-appropriate objective and satisfy the store's lifecycle requirements.
+store's objective where one exists, and satisfy its configured lifecycle requirements. If the
+adopted store has no objective, record that gap rather than inventing a required lifecycle guard.
 
 ## 6. Implement the approved wave
 
@@ -149,7 +166,7 @@ record the evidence and remaining work, and stop before a second wave or publica
 The implementor works in an isolated tree. The adversary checks the result independently, including
 whether the suite would catch a broken implementation. Compare before and after at the same seam:
 
-```console
+```bash
 cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture
 aep plan artifact validate
 aep plan artifact board --kind story
@@ -158,6 +175,10 @@ aep plan artifact board --kind story
 A completed wave records executed scenario counts, remaining skips or refusals, the adversary's
 findings and fixes, and the merge gate. Worktree cleanup needs published recovery proof or an
 archive; local merge alone does not make a managed checkout disposable.
+For a local tutorial without a remote, preserve each completed tree with `worktree archive <tree>`.
+Have each owner end their own lease, then use `worktree finish <tree>` and inspect
+`worktree gc --dry-run`; apply cleanup
+only to the exact reviewed ID. Follow the Worktree skill if a lease or recovery check refuses.
 
 ## Keep going
 

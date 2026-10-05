@@ -27,6 +27,8 @@
   after an earlier passing target.
 - Refresh setup, routing, delivery and maintenance instructions. Source releases finish after
   their own checks and artifact publication; downstream documentation publication is asynchronous.
+- Make governed-plan trials install Worktree and allow their own sandbox's managed trees. Explain
+  named partial-wave obligations, remaining conformance gaps and archive recovery in the tutorial.
 
 ## [0.19.2] — 2026-10-03
 

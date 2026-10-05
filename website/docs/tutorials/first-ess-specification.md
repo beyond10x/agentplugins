@@ -25,7 +25,7 @@ Ask your agent to follow the release's
 [SETUP.md](https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md) and select ESS.
 With `b10x` already installed:
 
-```console
+```bash
 b10x init ess --host claude --out plan.json
 b10x setup apply --plan plan.json --yes
 ```
@@ -83,7 +83,7 @@ optional borrower field. The three views expose enough state for the suite to ch
 
 ## 4. Validate
 
-```console
+```bash
 ess specify validate --path spec
 ```
 
@@ -95,7 +95,7 @@ Validation checks the declarations. It does not establish that an implementation
 
 ## 5. Generate the public contract
 
-```console
+```bash
 ess generate --kind docs --path spec --out out
 ess generate --kind openapi --path spec --out out
 ess specify graph --path spec --format mermaid
@@ -109,7 +109,7 @@ Regenerate these when the specification changes.
 The Rust runner consumes canonical suite IR. The CLI's conformance package targets are `go` and
 `typescript`; **there is no `--target rust` for conformance synthesis**. Generate the IR instead:
 
-```console
+```bash
 ess verify conform synthesize --path spec --target ir --out impl/suite.json
 cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture
 ```
@@ -213,7 +213,7 @@ answers `borrowed` where the model requires `wrong-state`. Restore the guard and
 
 Make validation, regeneration and the native runner part of your build:
 
-```console
+```bash
 ess specify validate --path spec
 ess verify conform synthesize --path spec --target ir --out impl/suite.json
 cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture

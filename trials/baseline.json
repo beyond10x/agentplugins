@@ -3,7 +3,7 @@
     "tool_calls": 268
   },
   "aep-tutorial": {
-    "tool_calls": 474,
+    "tool_calls": 453,
     "synthesis": {
       "scenarios": 55,
       "refusals": 0
@@ -13,7 +13,12 @@
       "project",
       "reviews",
       "suite"
-    ]
+    ],
+    "cargo_test": {
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    }
   },
   "ess-full-package": {
     "tool_calls": 78,
