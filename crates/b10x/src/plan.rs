@@ -1203,6 +1203,7 @@ mod tests {
                 ("beyond10x/worktree".to_owned(), "0.7.0".to_owned()),
                 ("beyond10x/metaharness".to_owned(), "0.7.0".to_owned()),
                 ("beyond10x/harness".to_owned(), "0.13.2".to_owned()),
+                ("beyond10x/connectors".to_owned(), "v0.28.0".to_owned()),
             ]),
             archive_targets: BTreeMap::from([
                 ("aep".to_owned(), every_target()),
@@ -1862,6 +1863,78 @@ mod tests {
             "beyond10x still serves aep installs"
         );
         assert!(plan.next.iter().any(|line| line.starts_with("/ess:init")));
+    }
+
+    #[test]
+    fn connectors_installs_and_upgrades_from_its_source_only_release() {
+        for installed in [None, Some("0.7.2"), Some("0.27.0")] {
+            let inventory = Inventory {
+                claude: Some(HostState::default()),
+                cargo: true,
+                binaries: installed.map_or_else(Vec::new, |version| {
+                    vec![BinaryState {
+                        name: "connectors".to_owned(),
+                        copies: vec![Copy {
+                            path: "/opt/b10x-home/.local/bin/connectors".to_owned(),
+                            version: Some(version.to_owned()),
+                        }],
+                    }]
+                }),
+                ..Inventory::default()
+            };
+            let plan = run_only(&inventory, &["connectors"], Some(Method::Prebuilt));
+            let action = plan.actions.iter().find(|action| {
+                matches!(action,
+                Action::InstallBinary { name, .. } if name == "connectors")
+            });
+            let Some(Action::InstallBinary {
+                tag,
+                method,
+                install,
+                directory,
+                ..
+            }) = action
+            else {
+                panic!("Connectors must install its CLI: {:#?}", plan.findings);
+            };
+            assert_eq!(tag, "v0.28.0");
+            assert_eq!(*method, Method::Cargo);
+            assert!(install.archive.is_none());
+            let cargo = install.cargo.as_ref().unwrap();
+            assert_eq!(cargo.repository, "beyond10x/connectors");
+            assert_eq!(cargo.package, "connectors");
+            assert_eq!(
+                directory,
+                if installed.is_some() {
+                    "/opt/b10x-home/.local/bin"
+                } else {
+                    "/opt/b10x-home/.cargo/bin"
+                }
+            );
+        }
+    }
+
+    #[test]
+    fn current_connectors_is_checked_without_reinstallation() {
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            binaries: vec![BinaryState {
+                name: "connectors".to_owned(),
+                copies: vec![Copy {
+                    path: "/opt/b10x-home/.local/bin/connectors".to_owned(),
+                    version: Some("0.28.0".to_owned()),
+                }],
+            }],
+            ..Inventory::default()
+        };
+        let plan = run_only(&inventory, &["connectors"], None);
+        assert!(plan
+            .findings
+            .iter()
+            .any(|finding| finding.subject == "connectors" && finding.level == Level::Ok));
+        assert!(!plan.actions.iter().any(
+            |action| matches!(action, Action::InstallBinary { name, .. } if name == "connectors")
+        ));
     }
 
     #[test]
