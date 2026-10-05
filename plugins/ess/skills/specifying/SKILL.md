@@ -30,15 +30,29 @@ aep plan reverse openapi --domain <domain> <openapi-document> --out <file>
 ```
 
 **A new specification starts on the newest release and its newest format, never on `ess/1`.**
-Before the first file, check that the installed `ess` is the newest release (`ess --version`
-against `gh release list -R beyond10x/ess -L 1`; upgrade through the `ess:upgrade` skill when it
-is behind). Then write the newest `format:` that release implements; the example below uses `ess/22`. To
+Before the first file, compare `ess --version` with the newest release. Reuse the current run’s
+successful `b10x init` or `b10x upgrade` release-resolution evidence when it names that release;
+matching installed output completes the check. If that evidence is absent, read the public latest
+release without requiring a login:
+
+```console
+curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
+```
+
+Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
+current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
+`format:` that release implements; the example below uses `ess/22`. To
 read it from the binary, validate a header one past what you expect; the
 `unsupported_format_version` refusal lists every format the build implements (a listing command
 is beyond10x/ess#460). The `ess/1` in
 [references/syntax.md](references/syntax.md) shows the minimum header for each construct; it is
 not the header to start a document on. A higher format admits every lower one, and the document
 below validates unchanged under each.
+
+Choose the system identifier first: every domain’s first segment must equal `system`. With
+`system: warehouse`, use `warehouse.shipment` and declarations such as
+`warehouse.shipment.Shipment`. When adapting an example, change that prefix consistently in
+domain names, declarations and references; `system: seedlib` cannot contain `seeds.lending`.
 
 Otherwise write the smallest document that validates — two files, and nothing that is not required:
 
