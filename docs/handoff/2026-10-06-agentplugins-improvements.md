@@ -1,6 +1,6 @@
 # Hand-over: agentplugins-improvements, 2026-10-06
 
-Dispatch DSP-20261006-12 (decision DEC-20261006-06) closes this session.
+This file closes the agentplugins-improvements session.
 
 ## Shipped
 
@@ -32,4 +32,4 @@ Dispatch DSP-20261006-12 (decision DEC-20261006-06) closes this session.
 ## Notes for the operator's machine
 
 - All five plugins are installed from the local checkout through `B10X_MARKETPLACE`, in both Claude Code and Codex. A plain `b10x setup apply` without that variable reports "not converged" and would switch the marketplace back to GitHub.
-- Twelve beyond10x repositories built into a shared `~/.cache/b10x-target`. DEC-20261006-02 moves the nine non-archived ones to in-tree builds through their owners.
+- Twelve beyond10x repositories built into a shared `~/.cache/b10x-target`. The nine non-archived ones move to in-tree builds through their owners.
