@@ -746,18 +746,22 @@ The order is not interchangeable:
    with it.
 2. **Publish the wanted commits before retiring their checkouts.** A merged local branch alone
    does not supply current remote recovery proof. Reuse publication authorization already given;
-   if publication is not authorized, retain the tree and record that blocker and its next owner.
-3. **Remove each unit's disposable build output and scratch by exact path**, from the triple you wrote in
+   if publication is not authorized, step 4's `--archive` keeps the commits in a local archive
+   that GC accepts as recovery proof. Record the archive path it prints in the wave page.
+3. **Remove each unit's scratch outside its tree by exact path**, from the triple you wrote in
    the wave page when you made them. This is the step that gets missed, because it is the one `git`
    knows nothing about. First confirm the agents and their child processes have stopped and the
    evidence from step 1 is preserved; retain anything whose reproducibility or ownership is unclear.
    One wave here left a **16 GB** build directory standing on a disk already at 93%,
    every worktree it belonged to long since removed, and nothing found it until somebody went
    looking for free space. Scratch is the same failure one size down — 579 MB, 95 MB, 17 MB in
-   another wave, in three directories nobody had a list of.
+   another wave, in three directories nobody had a list of. The build directory inside each tree
+   is step 4's: never delete it by name, because agents write records into `target/` too.
 4. **Release your own lease, then finish and review managed cleanup.** Confirm each returned
-   agent released its own lease; never clear another session's lease. Run `worktree finish <path>`,
-   then `worktree gc --repo <primary> --dry-run --id <managed-id>`. Apply only the exact ids from
+   agent released its own lease; never clear another session's lease. Run
+   `worktree finish --discard-cache --archive <path>`: it deletes only the build cache it
+   recognises by structure, archives everything else the tree holds that no advertised ref
+   recovers, and finishes. Then `worktree gc --repo <primary> --dry-run --id <managed-id>`. Apply only the exact ids from
    that review with `worktree gc --repo <primary> --apply --id <managed-id>`. Follow the Worktree
    skill's reconciliation procedure for interrupted lifecycle state. Include the integration
    checkout after its wanted commits have been published.

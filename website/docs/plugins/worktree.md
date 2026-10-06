@@ -36,6 +36,13 @@ out-of-policy trees are retained, and so are dirty and local-only trees unless `
 holds their exact current state. Work merged as rebased or cherry-picked copies is recoverable when
 an advertised ref carries every unique commit's exact patch.
 
+Agents end their work with `worktree finish --discard-cache --archive <tree>` (worktree 0.9.0 or
+later). It deletes only ignored build cache recognised by structure (Cargo profiles in a tagged
+target, `node_modules` below a tracked lockfile, a virtual environment beside a tracked Python
+manifest, tagged tool caches), archives everything else the tree holds that no remote ref
+recovers, and finishes. A directory's name never makes it cache: records written into `target/`
+are kept. `worktree discard-cache --dry-run` shows the classification without deleting anything.
+
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by hand. It is a command:
 only you start it, never the model, and it hands off to `worktree:managing-worktrees` for every
 step — `inspect`, `archive` for work that must not be published, `finish`, `gc --dry-run --id`,

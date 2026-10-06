@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.20.1] — 2026-10-06
+
+- Track Worktree 0.9.0. `worktree:managing-worktrees` ends work with
+  `worktree finish --discard-cache --archive <tree>`: it deletes only ignored build cache the CLI
+  recognises by structure, archives everything else no remote ref recovers, and finishes. The skill
+  no longer asks agents to prove they own a build directory before deleting it, which left 105
+  trees (49.0 GB) unfinished on one machine, and it forbids deleting a build directory by name,
+  because agents write records into `target/`.
+- A sub-agent that creates a tree finishes it before it returns or returns its id and path; the
+  parent finishes every returned tree. In 14 days of transcripts, 105 of 153 sub-agent sessions
+  created a tree and never finished it.
+- AEP wave teardown uses the same command: unpublished wave commits go into a local archive instead
+  of keeping the tree, and only scratch outside the tree is removed by exact path.
+- The governed-plan tutorial and the Worktree plugin page describe the new finish.
+
 ## [0.20.0] — 2026-10-05
 
 - Refresh ESS resources for the current source language, related guards and selected effects,
