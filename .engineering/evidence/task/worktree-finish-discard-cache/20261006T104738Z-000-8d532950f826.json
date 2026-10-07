@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-06T10:47:38Z",
+  "actor": "human:timo",
+  "artifact": "task:worktree-finish-discard-cache",
+  "kind": "task",
+  "revision": 2,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "Release workflow on tag 0.20.1 (task check)",
+    "reference": "https://github.com/beyond10x/agentplugins/actions/runs/37449630075"
+  }
+}

@@ -287,7 +287,9 @@ Generate the Go package **inside the implementation's own module**: `--out <modu
 `<module root>/essconform`, the import path its `README.md` shows (`<module>/essconform`). A copy
 outside the module has no `go.mod` to import from. The package's
 `README.md` lists the methods and the wiring test. A method you cannot answer returns
-`ErrUnsupported` (a skip), never a made-up result. A refused command still sets `Outcome` to the
+`ErrUnsupported`, never a made-up result. From entity setup or a clock reading the runner counts
+that as `skipped`; from an observation such as `ObserveInvocations` it records `unsupported`, a
+verdict of its own that is not a pass (the Rust runner fails conformance on it). A refused command still sets `Outcome` to the
 refusing outcome’s name beside `Error`: the runner compares both. Successful mutations return a
 backend-issued consistency token; a view honors `AtLeast(token)` before returning rows. An adapter
 that cannot meet freshness returns a failure, never a successful weaker read.
@@ -303,9 +305,19 @@ The current runner contract:
   an explicit skip, so a fixture provider is the first thing to check when skips cluster there.
 - Go and TypeScript have admitted `deletes:`, `accepts: nothing` and `presence:` suites
   (`ess-conformance/22`–`/25`). Current ESS also includes shared runtime coverage for
-  the newer expression, binding, aggregation and seed formats through `/43`. Generate with the
+  the newer expression, binding, aggregation and seed formats through `/45`. Generate with the
   same release as the runner and inspect any target-specific refusal instead of carrying an old
   suite-version ceiling.
+- From `ess-conformance/44`, an act that claims one event N times needs N occurrences, and claims
+  are matched to occurrences as a set in the Rust, Go and TypeScript runners: a target that emits
+  an event once where the scenario claims it twice fails, and the order the claims are written in
+  never decides the verdict.
+- Regenerate the suite after every ESS upgrade, and read the diff. A release can add steps under
+  unchanged scenario ids: row-set branches now arrange decoys before and after the selected rows,
+  so a target that keeps only the newest or oldest record per compared value fails. It can also
+  stop writing a scenario the model answers otherwise and name the refusal instead
+  (`ESS-SYNTH-003`, `ESS-SYNTH-004`); a count that falls that way is a fiction leaving, not lost
+  coverage.
 - Both packages also carry the random-sequence explorer (`explore`/`Explore`); `ess:hardening`
   technique 2 says how to wire it.
 

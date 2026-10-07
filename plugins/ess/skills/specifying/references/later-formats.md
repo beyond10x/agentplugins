@@ -209,14 +209,22 @@ Two limits, both `conflicting_declaration`: `when_subject_state:` goes only on a
 branch), and a command that uses it declares no `wrong_state:` outcome. A `preserves:` branch
 carries no error, event or `sets:` (`refusal_mutated_state`).
 
+A held-state branch with no input guard claims every request in its states, an `external:` one
+included. Where it claims an external branch in every state that branch is taken from, synthesis
+writes no scenario for the external branch (`ESS-SYNTH-003`) or for the states reached only
+through it (`ESS-SYNTH-004`), and names the guards. To keep the scenario, give the held-state
+branch an input guard the external case does not meet.
+
 A specification lowered to Entity Runtime is refused there, not at `validate`, for value
 expressions (`ValueExpressionUnsupported`), the `ess/15` outcome shapes (`OutcomeShapeUnsupported`)
 and the case-insensitive operators (`CaseFoldUnsupported`); keep those out of a model that must lower.
 
-## From `ess/16` through `ess/22`
+## From `ess/16` through `ess/23`
 
 The source language and conformance-suite version are different contracts. Choose the source
-format for the construct; let synthesis select its required suite format. With current ESS:
+format for the construct; let synthesis select its required suite format.
+`ess specify formats --since ess/15` prints what the installed build says each format added.
+With current ESS:
 
 | format | additions |
 |---|---|
@@ -227,11 +235,126 @@ format for the construct; let synthesis select its required suite format. With c
 | `ess/20` | related row lifecycle `state` in predicates |
 | `ess/21` | `one_time_response` non-disclosure contracts for required String response fields |
 | `ess/22` | explicit fact operands and constant offsets; UTF-8 byte lengths; instant comparison; `distinct` list keys; selected row guards/reads; Optional and two-hop related reads; several related rows; calendar windows; compensating external refusals; conditional aggregates and binding payload guards; per-outcome failure policy; lifecycle moves in `affects`; view grants; unit union variants; dotted input values |
+| `ess/23` | identity re-key by `updates:`; the held state as a value, `{subject: state}`; bulk `deletes:` with `instances:` and `deletes:` in `affects`; typed enum variant attributes; one record per input-list element with `affects: each:`; a `when_subject` predicate refusal asserts the whole record unchanged; row-set selectors on updates, deletes and upserts, scoped by a member of a struct identity |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
 selected target: a source construct validating does not mean code generation or Entity Runtime
 can lower it. The current lowering report lists each unsupported construct by name.
+
+In every format an `affects:` entry selects its rows with `where:` or, from `ess/23`, writes them
+with `each:`; an entry with neither is refused as `missing_declaration`.
+
+## `ess/23`
+
+[examples/shelves.yaml](examples/shelves.yaml) uses each construct below, validates, and
+synthesizes 16 scenarios with 0 refusals; the `interpreted` target passes all 16. The excerpts are
+from it.
+
+**A renamed identity.** An `updates:` whose `sets:` writes the entity's identity moves the record:
+it comes to rest under the identity written, every other field is carried over, and the old
+identity names nothing. The command must declare its collision answer as a `when_related:`
+refusal on the written input, or `validate` refuses the outcome as `missing_declaration`:
+
+```yaml
+      - name: taken
+        when_related:
+          entity: demo.shelves.Shelf
+          where: code == input.new_code
+          exists: true
+        error: demo.shelves.CodeTaken
+      - name: recoded
+        updates: demo.shelves.Shelf
+        instance: code
+        sets: {code: input.new_code}
+        emits: [demo.shelves.ShelfRecoded]
+        payload:
+          demo.shelves.ShelfRecoded: {code: input.code, new_code: input.new_code}
+```
+
+The identity write is refused beside `compensates:`, in a create-or-update pair, on an entity a
+declared relation carries, and on a struct identity. Generated Rust renames the row; generated Go
+refuses the write (`this target cannot move a record to another identity`), and so do the Web and
+Clap targets (`MissingRepresentation`) and Entity Runtime (`IdentityChangeUnsupported`).
+
+**One record per input element.** `each:` names an input list and `instance:` the member that
+addresses a record; a held record is updated and a missing one created in the lifecycle's
+`initial` state. A declared `distinct:` must keep that member distinct:
+
+```yaml
+      - name: duplicated
+        when: {not: {distinct: {in: arrivals, as: a, by: a.copy_id}}}
+        error: demo.shelves.DuplicateArrival
+      - name: shelved
+        updates: demo.shelves.Shelf
+        instance: code
+        sets: {label: input.label}
+        emits: [demo.shelves.CopiesShelved]
+        payload:
+          demo.shelves.CopiesShelved: {code: input.code}
+        affects:
+          - entity: demo.shelves.Copy
+            each: {in: input.arrivals, as: arrival}
+            instance: arrival.copy_id
+            sets: {shelf: input.label, format: arrival.format}
+```
+
+`each:` needs a subject and is refused beside `where:`, `moves:` or `deletes:`.
+
+**Every row a filter selects, removed.** `deletes:` takes `instances:` and counts the rows with
+`{count: changed}`; an `affects:` entry may also declare `deletes: <Entity>` over an entity of the
+outcome's own domain, also beside a `deletes:` subject:
+
+```yaml
+      - name: cleared
+        deletes: demo.shelves.Copy
+        instances: {where: shelf == input.shelf}
+        emits: [demo.shelves.ShelfCleared]
+        payload:
+          demo.shelves.ShelfCleared: {shelf: input.shelf, removed: {count: changed}}
+```
+
+**Facts a closed set carries.** An enum declares `attributes:` in the `{name, type}` shape of
+`fields:`, and each variant fills them with typed literals. A guard, invariant or view filter reads
+`<fact>.<attribute>`, lowered to membership over the variants that satisfy it:
+
+```yaml
+  - name: demo.shelves.Format
+    kind: enum
+    attributes:
+      - {name: loanable, type: Boolean}
+    variants:
+      - {name: Hardcover, attributes: {loanable: true}}
+      - {name: Paperback, attributes: {loanable: true}}
+      - {name: Reference, attributes: {loanable: false}}
+```
+
+```yaml
+      - name: not-loanable
+        when_subject:
+          predicate: format.loanable == false
+        error: demo.shelves.NotLoanable
+```
+
+Projections carry `x-ess-attributes`, and the types-only Rust, Go and TypeScript outputs an
+accessor per attribute. Reading an attribute as a value in `sets:` is refused, and
+`ess verify diff` reports an attribute change as unclassified.
+
+**The state the record held.** `{subject: state}` reads the lifecycle state before the outcome,
+in an error payload, an event payload or `sets:`:
+
+```yaml
+      - name: wrong-state
+        wrong_state: true
+        error: demo.shelves.CopyStateConflict
+        payload:
+          demo.shelves.CopyStateConflict: {current: {subject: state}}
+```
+
+Generated Rust and Go implementations, and Entity Runtime, refuse `instances:` and `affects:`
+(`this target cannot change the rows a filter selects`); `each:` is refused by every code target
+and Entity Runtime. Validate and synthesize against the specification, then check the target you
+actually ship with its own generation command.
 
 For a valid stored state bounded arrangement cannot reach, current ESS admits an explicit
 `--synthesis-seed <authored-file> <instance>` containing a typed setup row. The suite records seed

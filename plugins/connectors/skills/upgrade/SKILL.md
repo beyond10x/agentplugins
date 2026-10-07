@@ -12,7 +12,7 @@ b10x upgrade connectors --host claude --out ~/.local/state/b10x/plan.json
 Use `--host codex` in Codex. The plan compares the installed plugin with the marketplace and
 the CLI on `PATH` with the newest Connectors release. It changes nothing yet. Current releases
 have no prebuilt assets, so installation uses Cargo package `connectors` at the exact release tag
-with locked dependencies; `v0.28.0` requires Rust 1.91 or newer.
+with locked dependencies; `v0.31.0` requires Rust 1.91 or newer.
 
 1. Inspect every finding. Report unresolved release lookups, pins and toolchain failures as such;
    an empty action list alone does not establish that Connectors is current. If every version was
@@ -24,7 +24,9 @@ with locked dependencies; `v0.28.0` requires Rust 1.91 or newer.
    not requested: `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`.
 4. Verify `connectors --version`, help and `connectors --output json setup check`. Validate the
    consumer operations authorized by the task; version/help checks alone do not prove their
-   compatibility. A new plugin version loads in a new session; until then
+   compatibility. From a release before `v0.31.0`, a command within 60 s of the last one before
+   the upgrade may answer `metadata_unavailable` once; repeat it after 60 s before treating that
+   as a failure. A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.

@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.21.0] — 2026-10-07
+
+- Track ESS 0.55.0 (from 0.53.0). New specifications start on `ess/23`, and `ess:specifying`
+  reads the newest format from `ess specify formats` instead of validating a header one past it
+  (beyond10x/ess#460). `later-formats.md` covers `ess/23`: an `updates:` that re-keys a record,
+  `{subject: state}`, bulk `deletes: instances:`, enum variant attributes, per-element
+  `affects: each:` and row-set selectors, each with the targets that still refuse it; the new
+  `shelves.yaml` example is validated, synthesized and interpreted by `agentplugins-check tools`.
+  The skills explain `ess generate --check`, validation `completeness`, the `ESS-ENTITY-019`,
+  `ESS-COMMAND-019`, `ESS-SPEC-012` and `ESS-SPEC-017` diagnostics, the `type_mismatch` refusal
+  of a membership operand naming an input, the `generate_optional_<t>` port method, suite formats
+  `ess-conformance/44` and `/45`, `ESS-SYNTH-003`/`004`, and mutation report `/4`. The Rust
+  tutorial, the governed-plan tutorial and their trial fixtures require ESS 0.55.0 and its crates.
+  `ess:testing-conformance` no longer calls `ErrUnsupported` a skip: the runner records
+  `unsupported`, which is not a pass, except for entity setup and clock readings.
+- `verified.json` tracks ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0 after
+  `agentplugins-check tools` and the `ess-full-package`, `ess-tutorial` and `worktree-onboarding`
+  trials; their baselines are the runs of 2026-10-07.
+- Track Worktree 0.10.0. `worktree:managing-worktrees` and the Worktree plugin page describe
+  `worktree sweep --all-profiles`, the daily timer that discards the build cache of idle trees and
+  archives expired or finished ones without removing any. `worktree:init` no longer suggests the
+  downloaded profile may be committed into a repository, names the headless workspace root as the
+  repository's parent directory, and states plainly that a `worktree --version` answer means the
+  CLI is installed: the `worktree-onboarding` trial quoted all three as confusing. The gc step
+  says what an id-less run assesses in one sentence.
+- Track Connectors v0.31.0 (from v0.28.0). `connectors:integrating` follows a refusal's
+  `next_action`, including the new `revalidate_connection` for expired evidence with an intact
+  credential, quotes `service_reason`, reports `retry_after_seconds` and leaves a `429` write
+  `unknown`, and lists operations by datasource family. Its setup reference covers
+  `oauth2_client_credentials` profiles, revalidation after an adapter configuration change
+  (`create_connection` when identity changed), `insufficient_scope`, and handing one connection to
+  an operator-pinned consumer with `connections launch`. `connectors:upgrade` explains the single
+  `metadata_unavailable` answer after upgrading to v0.31.0.
+- The design and parallel-safety plan critics trace every acceptance line's reads to the item in
+  the set that produces them, and raise a finding when no `depends_on` edge orders the reader
+  after its producer. A panel had approved a set where one story read a store its sibling created.
+- The live eval installs ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0.
+
 ## [0.20.1] — 2026-10-06
 
 - Track Worktree 0.9.0. `worktree:managing-worktrees` ends work with

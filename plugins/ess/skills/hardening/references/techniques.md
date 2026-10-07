@@ -29,7 +29,8 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    step is done when every mutant directory holds a `report.json`; a missing one scores
    `inconclusive`.
 3. `ess verify conform mutate --collect <dir> --report-out <mutation-report.json>` scores them into
-   `ess-mutation-report/1`: exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass
+   `ess-mutation-report/3` (`/4` for a component, a known-failures declaration or unavailable
+   sites): exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass
    (`ESS-MUTATE-001`), no site (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants.
    A `stillborn` mutant is one the model itself refuses; it says nothing about the suite.
 4. Answer each survivor by declaring what makes the rule observable — a view publishing the field a

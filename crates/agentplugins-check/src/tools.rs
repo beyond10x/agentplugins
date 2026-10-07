@@ -749,7 +749,7 @@ fn examples(root: &Path, ess: &Path, scratch: &Path) -> Result<(), String> {
 }
 
 fn conformance_examples(dir: &Path, ess: &Path, scratch: &Path) -> Result<(), String> {
-    for name in ["related-guard", "set-effects"] {
+    for name in ["related-guard", "set-effects", "shelves"] {
         let path = dir.join(format!("{name}.yaml"));
         let suite = scratch.join(format!("{name}-suite.json"));
         run(

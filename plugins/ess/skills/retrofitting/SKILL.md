@@ -119,6 +119,11 @@ Retrofit-specific rules:
   | writes a stored value plus one, or echoes the stored value | `{increment: 1}`, `{subject: <field>}` (`ess/14`) |
   | sends a JSON key under another spelling, a key starting `_`, an opaque JSON body | `naming: {wire: <key>}` on the field, the name `_key` as is, `Json` (`ess/15`) |
   | compares text ignoring case | `equals_ignore_case` / `in_ignore_case` (`ess/15`, ASCII only; Unicode folding in the code is a disagreement to report) |
+  | renames a record's key in place (`UPDATE … SET name = $new`) | `updates:` whose `sets:` writes the identity, with a `when_related:` refusal for a taken key (`ess/23`) |
+  | deletes every row a query matches | `deletes:` with `instances: {where: …}` and `{count: changed}` (`ess/23`) |
+  | upserts one row per element of a request list | `affects:` with `each:` and `instance:` over a `distinct:` member (`ess/23`) |
+  | keeps a fixed table of facts per enum value | enum `attributes:`, read in guards as `<field>.<attribute>` (`ess/23`) |
+  | reports the current status in an error body | `{subject: state}` in the error payload (`ess/23`) |
 - **An entity the code gives no status still needs a lifecycle.** The language requires one, so
   declare a single state that is both `initial` and `terminal` (`Stocked`), and say in a comment
   that it is structural, not read from the code. That is the one state a retrofit may name.
@@ -127,7 +132,8 @@ Retrofit-specific rules:
 - **A rule the language cannot hold stays in the code, and is named.** A limit read from the
   addressed record's stored fields is `when_subject: {predicate: …}`, compared with the request as
   `input.<field>` from `ess/15`; another entity can be read with `when_related:` (`ess/18`), including selected row sets in
-  `ess/22`. `instances:` and `affects:` express selected record effects. Validate the exact
+  `ess/22`. `instances:` and `affects:` express selected record effects, and `affects: each:`
+  per-element ones from `ess/23`. Validate the exact
   combination and record `UNMAPPED:` with its source line only for a rule or target the current
   release actually refuses; [current examples](../specifying/references/current-features.md)
   distinguish declaration, synthesis and implementation support.

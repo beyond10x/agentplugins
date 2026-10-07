@@ -7,7 +7,7 @@ description: Start with worktree in this project — make sure the `worktree` CL
 
 ## 1. Have the CLI
 
-Run `worktree --version`. If it answers, go to step 2: `b10x:init` just installed it, or it was already there (`worktree:upgrade` handles newer releases). If it is missing, install it with `b10x`.
+Run `worktree --version`. If it prints a version, the CLI is installed (by `b10x:init` or earlier); go to step 2, and use `worktree:upgrade` later for newer releases. If it is missing, install it with `b10x`.
 Plan for the host you run in (`--host claude` in Claude Code, `--host codex` in Codex):
 
 ```bash
@@ -35,11 +35,11 @@ worktree activate --profile ~/.config/worktree/default.toml --workspace <workspa
 worktree doctor --check
 ```
 
-`activate` copies the profile into `~/.config/worktree/config.toml`, so the template file may stay
-where it is or be committed into a repository the user shares with others; `--help` calls it a
-"committed" template, but any local file works. Ask the user for the workspace root (an absolute
-path to the directory that holds their repositories) rather than guessing it. With nobody to ask
-(a headless run), use the directory that holds the current repository and say so in the report.
+`activate` copies the profile into `~/.config/worktree/config.toml`. The downloaded file stays a
+local file under `~/.config/worktree/`; do not commit it into the user's repository. Ask the user
+for the workspace root (an absolute path to the directory that holds their repositories) rather
+than guessing it. With nobody to ask (a headless run), use the parent directory of the current
+repository's root (for `/src/app`, that is `/src`) and say so in the report.
 
 `worktree doctor --check` fails with `no active profile` until `activate` has run.
 
