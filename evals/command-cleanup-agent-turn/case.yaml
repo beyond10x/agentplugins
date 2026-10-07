@@ -1,0 +1,27 @@
+format: eval-case/1
+id: command-cleanup-agent-turn
+title: Asked in words to clean up worktrees, the agent started worktree:cleanup and removed only reviewed ids
+workflow: adp/default
+states: [implement]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [worktree:cleanup]
+  paths:
+    - plugins/worktree/skills/managing-worktrees/SKILL.md
+
+# The operator asks an agent, in words, for what `/worktree:cleanup` does. That request authorizes
+# cleanup in its scope, so the command's documented outcome is its work: a dry-run, then an apply
+# of the exact eligible ids, with no second approval prompt. The rows decide that the agent started
+# the command, that the harness loaded it, that the apply came after a dry-run, and that nothing
+# was forced and no other session's lease was cleared. Without a request the command stops after
+# the dry-run; that half needs a run nobody asked for cleanup in, and is not judged here.
+
+task: |
+  The operator asked for this, and you are the agent acting on it: "The branches are merged.
+  Clean up this repository's managed worktrees with `worktree:cleanup`." Do not push, tag or
+  release.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

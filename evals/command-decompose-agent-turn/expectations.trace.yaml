@@ -1,0 +1,118 @@
+format: trace-spec/1
+id: eval-case/command-decompose-agent-turn
+title: The agent started the decompose command, it loaded, and drafts reached the store unmoved
+
+# One of five cases that start a command from an agent turn; `command-wave-agent-turn` explains
+# the first three rows. This command's work is the draft: it has no approval stop, and the rows
+# after the first three are that work and the one limit it keeps, that nothing moves.
+
+expectations:
+
+  - id: the-command-was-offered
+    statement: the plugin loaded and offered the decompose command, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: aep:decompose
+
+  - id: the-agent-started-the-command
+    statement: the agent acting on the operator's request called the Skill tool for `aep:decompose`
+    expect:
+      tool.called:
+        tool: Skill
+        args:
+          skill: {regex: '^aep:decompose$'}
+        count: {at_least: 1}
+
+  - id: the-command-was-not-refused-at-invocation
+    statement: the harness loaded the command for the agent instead of refusing it, so the work below is the command's own
+    # A refused call's result records no success at all, which `aep` reads as undecidable; here
+    # that is the refusal this row exists to catch, so it counts as a gap.
+    on_unknown: gap
+    expect:
+      skill.completed:
+        skill: aep:decompose
+        count: {at_least: 1}
+
+  - id: the-decomposer-was-dispatched
+    statement: the command dispatched the plugin's decomposer, by its full name
+    expect:
+      tool.called:
+        tools: [Agent, Task]
+        args:
+          subagent_type: {regex: '^aep:decomposer$'}
+        count: {at_least: 1}
+
+  - id: stories-were-drafted-through-the-cli
+    statement: draft stories reached the store through the CLI, so the move-absence below is a decision and not an empty run
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +new +story'}
+        count: {at_least: 1}
+
+  - id: no-status-was-moved
+    statement: draft only, so no artifact moved through its lifecycle
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move'}
+
+  - id: the-panel-was-convened
+    statement: the plan critics were dispatched over the drafts, as the command's hand-off says
+    # Advisory: the planning skill skips the panel, and says so, when fewer than two artifacts sit
+    # under the epic, which is the run's count to make.
+    severity: advisory
+    expect:
+      tool.called:
+        tools: [Agent, Task]
+        args:
+          subagent_type: {regex: '^aep:plan-critic-acceptance$|^aep:plan-critic-design$|^aep:plan-critic-scope$|^aep:plan-critic-parallel-safety$'}
+        count: {at_least: 1}
+
+  - id: the-store-was-validated
+    statement: the store's own validator ran before the report
+    severity: advisory
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +validate'}
+        count: {at_least: 1}
+
+  - id: the-scope-was-actually-tested
+    statement: the run read the decomposer reference the command hands off to, so the rows above judged the decomposition and not a guess at it
+    severity: advisory
+    expect:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/skills/planning/references/decomposer.md'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the decomposition did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 60}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

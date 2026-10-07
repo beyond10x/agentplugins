@@ -40,8 +40,9 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Create, inspect, finish, or safely clean Git worktrees | `worktree:managing-worktrees` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors:integrating` |
 
-Five entry points are commands: only the operator starts them, and a model cannot invoke them.
-When a request matches one, route to the activity it hands off to and name the command to the operator.
+Five entry points are commands: the operator starts one by name, or an agent starts it on the
+operator's request, and any approval it needs is a step in its body or the activity it hands off
+to. When a request matches one, start the command.
 
 | Command | Hands off to |
 |---|---|

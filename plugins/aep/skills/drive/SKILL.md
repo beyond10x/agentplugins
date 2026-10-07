@@ -1,7 +1,6 @@
 ---
 name: drive
-description: Start one governed AEP run over a single story, started by the operator as /aep:drive <story-id>. Hands off to aep:implementing in drive mode.
-disable-model-invocation: true
+description: Start one governed AEP run over a single story, as /aep:drive <story-id> or when the operator asks an agent to drive a story. Hands off to aep:implementing in drive mode.
 argument-hint: "<story-id>"
 ---
 

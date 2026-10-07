@@ -4,9 +4,10 @@
 //!
 //! - **R2** one plugin per product; plugin name = product id = the CLI it drives.
 //! - **R3** a skill is a lifecycle skill (`init`, `upgrade`), an activity named in `-ing` form, or
-//!   a command: a verb the operator alone starts (`disable-model-invocation: true`), at most
-//!   [`COMMAND_LINES`] lines, handing off to exactly one activity of its plugin. None is named after
-//!   its plugin.
+//!   a command: a verb the operator, or an agent on the operator's request, starts, at most
+//!   [`COMMAND_LINES`] lines, handing off to exactly one activity of its plugin. A skill kept
+//!   operator-only sets both hosts' flags and says why in an `Operator-only:` sentence of its
+//!   description. None is named after its plugin.
 //! - **R4** an agent is owned by exactly one skill of its plugin, which lists it under `## Agents`.
 //! - **R5** a skill quotes no CLI version, and a `**Skill version X**` line names the version its
 //!   plugin's `.claude-plugin/plugin.json` carries.
@@ -195,8 +196,9 @@ fn frontmatter_true(text: &str, key: &str) -> bool {
 /// R3 over one command skill of `plugin`. `skills` are the plugin's skill folders and `activities`
 /// the subset that are activities; a command hands off to exactly one of those.
 ///
-/// A command is started by the operator only (`disable-model-invocation: true`), so a model never
-/// picks it in place of the activity; it is short, so the behaviour stays in one place; and it
+/// A command is started by the operator, or by an agent acting on the operator's request, and any
+/// approval it needs is a step it hands off to (whether it may be kept operator-only is
+/// [`invocation`]'s, for every skill); it is short, so the behaviour stays in one place; and it
 /// names the activity it hands off to, so a rename of that activity breaks the gate, not the
 /// command.
 #[must_use]
@@ -217,11 +219,6 @@ pub fn command(
             "R3 `{plugin}:{folder}` is neither an activity (one or two words, the first ending in `ing`) nor a command (one or two words, the first a verb)"
         ));
         return problems;
-    }
-    if !frontmatter_true(text, "disable-model-invocation") {
-        problems.push(format!(
-            "R3 command `{plugin}:{folder}` does not set `disable-model-invocation: true`; only the operator starts a command"
-        ));
     }
     let body = body(text);
     let lines = body.lines().count();
@@ -250,6 +247,125 @@ pub fn command(
             "R3 command `{plugin}:{folder}` names {n} activity skills ({}); a command hands off to exactly one",
             handoffs.into_iter().collect::<Vec<_>>().join(", ")
         )),
+    }
+    problems
+}
+
+/// The frontmatter key with which Claude Code keeps a skill from the model (R3).
+const CLAUDE_FLAG: &str = "disable-model-invocation";
+
+/// The `policy` key with which Codex keeps a skill from the model (R3), in `agents/openai.yaml`.
+const CODEX_FLAG: &str = "allow_implicit_invocation";
+
+/// How the sentence of an operator-only skill's description that gives its reason starts (R3).
+const OPERATOR_ONLY: &str = "Operator-only:";
+
+/// The `description` a skill's frontmatter declares, as one line of text.
+///
+/// Read as YAML where the block is YAML, so a quoted or folded description is read as the host
+/// reads it; otherwise from its line, as [`frontmatter_name`] reads a name. A plain description
+/// carrying `: ` (`Operator-only: …` is one) makes the block invalid YAML that the hosts load
+/// anyway, and the line is then what they show.
+#[must_use]
+pub fn description(text: &str) -> Option<String> {
+    let block = text
+        .strip_prefix("---\n")
+        .and_then(|rest| rest.find("\n---").map(|end| &rest[..end]))?;
+    if let Ok(document) = serde_yaml::from_str::<serde_yaml::Value>(block) {
+        if let Some(value) = document
+            .get("description")
+            .and_then(serde_yaml::Value::as_str)
+        {
+            return Some(value.trim().to_owned());
+        }
+    }
+    block.lines().find_map(|line| {
+        let value = line.strip_prefix("description:")?.trim();
+        let unquoted = value
+            .strip_prefix('"')
+            .and_then(|rest| rest.strip_suffix('"'))
+            .or_else(|| {
+                value
+                    .strip_prefix('\'')
+                    .and_then(|rest| rest.strip_suffix('\''))
+            })
+            .unwrap_or(value);
+        Some(unquoted.trim().to_owned()).filter(|value| !value.is_empty())
+    })
+}
+
+/// The reason an operator-only skill gives: what follows `Operator-only:` in the sentence of its
+/// description that starts with it, if that says anything.
+#[must_use]
+pub fn operator_only_reason(description: &str) -> Option<&str> {
+    description
+        .match_indices(OPERATOR_ONLY)
+        .filter(|(start, _)| {
+            *start == 0
+                || description[..*start]
+                    .strip_suffix(' ')
+                    .is_some_and(|before| before.ends_with(['.', '!', '?']))
+        })
+        .find_map(|(start, _)| {
+            let rest = &description[start + OPERATOR_ONLY.len()..];
+            let end = rest
+                .match_indices(['.', '!', '?'])
+                .map(|(index, _)| index)
+                .find(|index| rest[index + 1..].is_empty() || rest[index + 1..].starts_with(' '))
+                .unwrap_or(rest.len());
+            Some(rest[..end].trim()).filter(|reason| !reason.is_empty())
+        })
+}
+
+/// R3 over one skill of `plugin`, with its `agents/openai.yaml` if it has one.
+///
+/// Any skill, a command included, may be started by an agent acting on the operator's request:
+/// the approval it needs is a step in its body or in the activity it hands off to, where an agent
+/// that started it meets the stop. A skill kept operator-only sets both hosts' flags —
+/// `disable-model-invocation: true` in `SKILL.md`, `policy.allow_implicit_invocation: false` in
+/// `agents/openai.yaml` — and gives the reason in a sentence of its description starting
+/// `Operator-only:`, so an agent refused at invocation reads why and what is left to it. One flag
+/// alone leaves the two hosts disagreeing, and either flag without the reason, or the reason
+/// without both flags, leaves the reader and the hosts disagreeing.
+#[must_use]
+pub fn invocation(plugin: &str, folder: &str, text: &str, yaml: Option<&str>) -> Vec<String> {
+    let claude = frontmatter_true(text, CLAUDE_FLAG);
+    let codex = codex_operator_only(yaml);
+    let reason = description(text)
+        .as_deref()
+        .and_then(operator_only_reason)
+        .is_some();
+    if !(claude || codex || reason) {
+        return Vec::new();
+    }
+    let mut present = Vec::new();
+    if claude {
+        present.push(format!("`{CLAUDE_FLAG}: true`"));
+    }
+    if codex {
+        present.push(format!("`policy.{CODEX_FLAG}: false`"));
+    }
+    if reason {
+        present.push(format!("a sentence starting `{OPERATOR_ONLY}`"));
+    }
+    let present = present.join(" and ");
+    let rule = "a skill kept operator-only sets both hosts' flags and says why; any other skill \
+                sets neither and puts the approval it needs in its body";
+    let mut problems = Vec::new();
+    if !claude {
+        problems.push(format!(
+            "R3 `{plugin}:{folder}` has {present} but its SKILL.md does not set `{CLAUDE_FLAG}: true`; {rule}"
+        ));
+    }
+    if !codex {
+        problems.push(format!(
+            "R3 `{plugin}:{folder}` has {present} but its `agents/openai.yaml` does not set `policy.{CODEX_FLAG}: false`; {rule}"
+        ));
+    }
+    if !reason {
+        problems.push(format!(
+            "R3 `{plugin}:{folder}` sets {present} but its description gives no reason in a sentence starting `{OPERATOR_ONLY}`; say why an agent may not start it and what it may do instead, or drop both flags"
+        ));
     }
     problems
 }
@@ -327,8 +443,9 @@ pub fn links(text: &str) -> Vec<String> {
 #[must_use]
 pub fn teaches(text: &str) -> Vec<String> {
     [
-        "disable-model-invocation: true".to_owned(),
-        "allow_implicit_invocation: false".to_owned(),
+        format!("{CLAUDE_FLAG}: true"),
+        format!("{CODEX_FLAG}: false"),
+        OPERATOR_ONLY.to_owned(),
         format!("at most {COMMAND_LINES} lines"),
         format!("at most {AGENT_LINES} lines"),
     ]
@@ -495,22 +612,12 @@ fn plugin(
         for agent in listed_agents(&text) {
             owners.entry(agent).or_default().push(folder.clone());
         }
+        let yaml = read(&path.join("agents/openai.yaml")).ok();
+        problems.extend(invocation(name, &folder, &text, yaml.as_deref()));
         skills.insert(folder);
     }
     for (folder, text) in &commands {
         problems.extend(command(name, folder, text, &skills, &activities));
-        let yaml = read(
-            &directory
-                .join("skills")
-                .join(folder)
-                .join("agents/openai.yaml"),
-        )
-        .ok();
-        if command_name(folder) && folder != name && !codex_operator_only(yaml.as_deref()) {
-            problems.push(format!(
-                "R3 command `{name}:{folder}` has no `agents/openai.yaml` with `policy.allow_implicit_invocation: false`; Codex would let the model start it"
-            ));
-        }
     }
     for lifecycle in LIFECYCLE {
         if !skills.contains(*lifecycle) {
@@ -828,6 +935,7 @@ pub fn check(root: &Path, plugins: &Plugins) -> Result<(), String> {
         for page in [
             "plugins/b10x/skills/authoring-plugins/SKILL.md",
             "website/docs/structure.md",
+            "website/docs/plugins/b10x.md",
         ] {
             for phrase in teaches(&read(&root.join(page))?) {
                 problems.push(format!(
@@ -884,11 +992,8 @@ mod tests {
         names.iter().map(|s| (*s).to_owned()).collect()
     }
 
-    fn command_text(flag: bool, body_lines: usize, handoff: &str) -> String {
+    fn command_text(body_lines: usize, handoff: &str) -> String {
         let mut text = String::from("---\nname: cleanup\ndescription: Clean up.\n");
-        if flag {
-            text.push_str("disable-model-invocation: true\n");
-        }
         text.push_str("argument-hint: \"[--repo <path>]\"\n---\n\n");
         writeln!(text, "Read `{handoff}` and follow it.").unwrap();
         for n in 1..body_lines {
@@ -922,23 +1027,26 @@ mod tests {
 
     #[test]
     fn a_valid_command_is_accepted() {
-        let text = command_text(true, 20, "worktree:managing-worktrees");
+        let text = command_text(20, "worktree:managing-worktrees");
         assert_eq!(worktree_command("cleanup", &text), Vec::<String>::new());
     }
 
+    /// A command an agent may start on the operator's request is the default, not a defect: the
+    /// approval it needs is a step in its body or in the activity it hands off to.
     #[test]
-    fn a_command_without_disable_model_invocation_is_refused() {
-        let text = command_text(false, 5, "worktree:managing-worktrees");
-        let problems = worktree_command("cleanup", &text);
-        assert!(
-            problems.len() == 1 && problems[0].contains("disable-model-invocation: true"),
-            "{problems:?}"
+    fn a_command_need_not_be_operator_only() {
+        let text = command_text(5, "worktree:managing-worktrees");
+        assert!(!frontmatter_true(&text, CLAUDE_FLAG));
+        assert_eq!(worktree_command("cleanup", &text), Vec::<String>::new());
+        assert_eq!(
+            invocation("worktree", "cleanup", &text, None),
+            Vec::<String>::new()
         );
     }
 
     #[test]
     fn a_command_over_twenty_lines_is_refused() {
-        let text = command_text(true, 21, "worktree:managing-worktrees");
+        let text = command_text(21, "worktree:managing-worktrees");
         let problems = worktree_command("cleanup", &text);
         assert!(
             problems.len() == 1 && problems[0].contains("21 lines of body"),
@@ -948,7 +1056,7 @@ mod tests {
 
     #[test]
     fn a_command_naming_a_missing_skill_is_refused() {
-        let text = command_text(true, 5, "worktree:managing-trees");
+        let text = command_text(5, "worktree:managing-trees");
         let problems = worktree_command("cleanup", &text);
         assert!(
             problems
@@ -966,7 +1074,7 @@ mod tests {
 
     #[test]
     fn a_command_handing_off_to_a_lifecycle_skill_or_two_activities_is_refused() {
-        let text = command_text(true, 5, "worktree:init");
+        let text = command_text(5, "worktree:init");
         let problems = worktree_command("cleanup", &text);
         assert!(
             problems.len() == 1 && problems[0].contains("hands off to no activity"),
@@ -974,7 +1082,7 @@ mod tests {
         );
         let skills = set(&["init", "upgrade", "planning", "implementing", "wave"]);
         let activities = set(&["planning", "implementing"]);
-        let text = command_text(true, 5, "aep:implementing` after `aep:planning");
+        let text = command_text(5, "aep:implementing` after `aep:planning");
         let problems = command("aep", "wave", &text, &skills, &activities);
         assert!(
             problems.len() == 1 && problems[0].contains("2 activity skills"),
@@ -984,7 +1092,7 @@ mod tests {
 
     #[test]
     fn a_command_named_after_its_plugin_is_refused() {
-        let text = command_text(true, 5, "worktree:managing-worktrees")
+        let text = command_text(5, "worktree:managing-worktrees")
             .replace("name: cleanup", "name: worktree");
         let problems = worktree_command("worktree", &text);
         assert!(
@@ -994,16 +1102,146 @@ mod tests {
     }
 
     #[test]
-    fn a_command_is_operator_only_in_codex_too() {
-        let off =
-            "interface:\n  display_name: \"X\"\npolicy:\n  allow_implicit_invocation: false\n";
-        assert!(codex_operator_only(Some(off)));
-        let on = off.replace("false", "true");
+    fn the_codex_flag_is_read_from_policy() {
+        assert!(codex_operator_only(Some(CODEX_OFF)));
+        let on = CODEX_OFF.replace("false", "true");
         assert!(!codex_operator_only(Some(&on)));
-        assert!(!codex_operator_only(Some(
-            "interface:\n  display_name: \"X\"\n"
-        )));
+        assert!(!codex_operator_only(Some(CODEX_DEFAULT)));
         assert!(!codex_operator_only(None));
+    }
+
+    const CODEX_OFF: &str =
+        "interface:\n  display_name: \"Tidy\"\npolicy:\n  allow_implicit_invocation: false\n";
+    const CODEX_DEFAULT: &str = "interface:\n  display_name: \"Tidy\"\n";
+    const REASONED: &str = "Tidy the tree. Operator-only: it deletes files no review lists.";
+
+    fn skill_text(description: &str, claude_flag: bool) -> String {
+        let mut text = format!("---\nname: tidy\ndescription: {description}\n");
+        if claude_flag {
+            text.push_str("disable-model-invocation: true\n");
+        }
+        text.push_str("---\n\nTidy the tree.\n");
+        text
+    }
+
+    fn tidy(description: &str, claude_flag: bool, yaml: Option<&str>) -> Vec<String> {
+        invocation("demo", "tidy", &skill_text(description, claude_flag), yaml)
+    }
+
+    #[test]
+    fn a_skill_an_agent_may_start_is_accepted() {
+        assert_eq!(
+            tidy("Tidy the tree.", false, Some(CODEX_DEFAULT)),
+            Vec::<String>::new()
+        );
+        assert_eq!(tidy("Tidy the tree.", false, None), Vec::<String>::new());
+    }
+
+    #[test]
+    fn an_operator_only_skill_with_both_flags_and_its_reason_is_accepted() {
+        assert_eq!(tidy(REASONED, true, Some(CODEX_OFF)), Vec::<String>::new());
+    }
+
+    #[test]
+    fn disable_model_invocation_without_the_codex_flag_is_refused() {
+        for yaml in [Some(CODEX_DEFAULT), None] {
+            let problems = tidy(REASONED, true, yaml);
+            assert!(
+                problems.len() == 1
+                    && problems[0].contains("`demo:tidy`")
+                    && problems[0].contains("allow_implicit_invocation: false"),
+                "{problems:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_codex_flag_without_disable_model_invocation_is_refused() {
+        let problems = tidy(REASONED, false, Some(CODEX_OFF));
+        assert!(
+            problems.len() == 1
+                && problems[0].contains("`demo:tidy`")
+                && problems[0].contains("disable-model-invocation: true"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn both_flags_without_the_operator_only_sentence_are_refused() {
+        let problems = tidy("Tidy the tree.", true, Some(CODEX_OFF));
+        assert!(
+            problems.len() == 1 && problems[0].contains("`Operator-only:`"),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn one_flag_without_the_sentence_is_refused_for_both_reasons() {
+        let claude = tidy("Tidy the tree.", true, Some(CODEX_DEFAULT));
+        assert!(
+            claude.len() == 2
+                && claude
+                    .iter()
+                    .any(|p| p.contains("allow_implicit_invocation: false"))
+                && claude.iter().any(|p| p.contains("`Operator-only:`")),
+            "{claude:?}"
+        );
+        let codex = tidy("Tidy the tree.", false, Some(CODEX_OFF));
+        assert!(
+            codex.len() == 2
+                && codex
+                    .iter()
+                    .any(|p| p.contains("disable-model-invocation: true"))
+                && codex.iter().any(|p| p.contains("`Operator-only:`")),
+            "{codex:?}"
+        );
+    }
+
+    #[test]
+    fn the_operator_only_sentence_without_the_flags_is_refused() {
+        let problems = tidy(REASONED, false, Some(CODEX_DEFAULT));
+        assert!(
+            problems.len() == 2
+                && problems
+                    .iter()
+                    .any(|p| p.contains("disable-model-invocation: true"))
+                && problems
+                    .iter()
+                    .any(|p| p.contains("allow_implicit_invocation: false")),
+            "{problems:?}"
+        );
+    }
+
+    #[test]
+    fn the_reason_is_a_sentence_that_starts_operator_only() {
+        assert_eq!(
+            operator_only_reason("Operator-only: it deletes files. Use it rarely."),
+            Some("it deletes files")
+        );
+        assert_eq!(
+            operator_only_reason(REASONED),
+            Some("it deletes files no review lists")
+        );
+        for none in [
+            "Tidy the tree, which is not operator-only: anyone may.",
+            "Tidy the tree. Operator-only:",
+            "Tidy the tree. Operator-only: .",
+            "Tidy the tree.Operator-only: it deletes files.",
+            "Tidy the tree. Operator only: it deletes files.",
+        ] {
+            assert_eq!(operator_only_reason(none), None, "{none}");
+        }
+    }
+
+    #[test]
+    fn a_description_is_read_plain_quoted_or_folded() {
+        let plain = skill_text(REASONED, true);
+        assert_eq!(description(&plain).as_deref(), Some(REASONED));
+        let quoted = skill_text(&format!("\"{REASONED}\""), true);
+        assert_eq!(description(&quoted).as_deref(), Some(REASONED));
+        let folded = "---\nname: tidy\ndescription: >-\n  Tidy the tree.\n  Operator-only: it deletes files no review lists.\ndisable-model-invocation: true\n---\n\nTidy.\n";
+        assert_eq!(description(folded).as_deref(), Some(REASONED));
+        assert_eq!(description("---\nname: tidy\n---\n\nTidy.\n"), None);
     }
 
     fn agent_text(body_lines: usize, handoff: &str) -> String {
@@ -1061,19 +1299,21 @@ mod tests {
 
     #[test]
     fn a_page_teaching_the_structure_states_every_enforced_limit() {
-        let good =
-            "a command sets `disable-model-invocation: true`, has at most 20 lines of body, \
-                    and its `agents/openai.yaml` sets `allow_implicit_invocation: false`; an agent \
-                    has at most 20 lines of body and names its owning skill";
+        let good = "a command has at most 20 lines of body; a skill kept operator-only sets \
+                    `disable-model-invocation: true`, its `agents/openai.yaml` sets \
+                    `allow_implicit_invocation: false`, and its description says why in a \
+                    sentence starting `Operator-only:`; an agent has at most 20 lines of body \
+                    and names its owning skill";
         assert_eq!(teaches(good), Vec::<String>::new());
         let missing = teaches("a command is a thin skill that carries the command's behaviour");
-        assert_eq!(missing.len(), 3, "{missing:?}");
+        assert_eq!(missing.len(), 4, "{missing:?}");
         assert!(missing
             .iter()
             .any(|m| m.contains("disable-model-invocation: true")));
         assert!(missing
             .iter()
             .any(|m| m.contains("allow_implicit_invocation: false")));
+        assert!(missing.iter().any(|m| m == "Operator-only:"));
         assert!(missing.iter().any(|m| m.contains("at most 20 lines")));
     }
 

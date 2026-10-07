@@ -1,7 +1,6 @@
 ---
 name: decompose
-description: Decompose one epic into draft stories and put them before the plan-critic panel, started by the operator as /aep:decompose <epic-id>. Hands off to aep:planning and its decomposer role.
-disable-model-invocation: true
+description: Decompose one epic into draft stories and put them before the plan-critic panel, as /aep:decompose <epic-id> or when the operator asks an agent to decompose an epic. Hands off to aep:planning and its decomposer role.
 argument-hint: "<epic-id>"
 ---
 
