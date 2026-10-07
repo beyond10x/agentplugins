@@ -12,7 +12,7 @@ or audits old linked worktrees.
 |---|---|
 | `worktree:init` | install the `worktree` CLI, activate a workspace, check it |
 | `worktree:managing-worktrees` | create, lease, finish, inspect and clean worktrees |
-| `worktree:cleanup` | command: `/worktree:cleanup` reviews the managed trees, finishes and garbage-collects only the ids you approve, and reports what it kept and why |
+| `worktree:cleanup` | command: `/worktree:cleanup`, or an agent acting on your request, reviews the managed trees, garbage-collects the eligible ids by exact id, and reports what it kept and why; without a request it stops after the dry-run |
 | `worktree:upgrade` | check the plugin and CLI, offer the upgrade |
 
 ```text

@@ -178,18 +178,58 @@ fn body(text: &str) -> &str {
     rest.trim()
 }
 
-/// Whether the frontmatter sets `key: true`.
-fn frontmatter_true(text: &str, key: &str) -> bool {
-    let Some(block) = text
-        .strip_prefix("---\n")
+/// The frontmatter block of a markdown file, between its opening `---` and the next.
+fn frontmatter(text: &str) -> Option<&str> {
+    text.strip_prefix("---\n")
         .and_then(|rest| rest.find("\n---").map(|end| &rest[..end]))
-    else {
+}
+
+/// A scalar without the one pair of matching quotes around it, if it has them.
+fn unquoted(value: &str) -> &str {
+    value
+        .strip_prefix('"')
+        .and_then(|rest| rest.strip_suffix('"'))
+        .or_else(|| {
+            value
+                .strip_prefix('\'')
+                .and_then(|rest| rest.strip_suffix('\''))
+        })
+        .unwrap_or(value)
+}
+
+/// The text Claude Code reads as a set flag, once lowercased: a string or a number is coerced
+/// through this list, and a boolean is itself.
+const TRUTHY: [&str; 4] = ["1", "true", "yes", "on"];
+
+fn truthy(value: &str) -> bool {
+    TRUTHY.contains(&value.trim().to_ascii_lowercase().as_str())
+}
+
+/// Whether the frontmatter sets the flag `key` the way Claude Code reads one: a YAML boolean
+/// `true`, or a string or number whose lowercased text is in [`TRUTHY`]. So `true  # why`,
+/// `"true"`, `True`, `yes`, `on` and `1` are all set.
+///
+/// Read as YAML where the block is YAML; otherwise from the key's line at the start of a line,
+/// without a trailing comment and quotes, as [`description`] falls back for the same reason.
+fn frontmatter_true(text: &str, key: &str) -> bool {
+    let Some(block) = frontmatter(text) else {
         return false;
     };
+    if let Ok(document) = serde_yaml::from_str::<serde_yaml::Value>(block) {
+        return match document.get(key) {
+            Some(serde_yaml::Value::Bool(set)) => *set,
+            Some(serde_yaml::Value::String(value)) => truthy(value),
+            Some(serde_yaml::Value::Number(value)) => truthy(&value.to_string()),
+            _ => false,
+        };
+    }
     block.lines().any(|line| {
         line.strip_prefix(key)
             .and_then(|rest| rest.strip_prefix(':'))
-            .is_some_and(|value| value.trim() == "true")
+            .is_some_and(|value| {
+                let value = value.split(" #").next().unwrap_or_default().trim();
+                truthy(unquoted(value))
+            })
     })
 }
 
@@ -268,9 +308,7 @@ const OPERATOR_ONLY: &str = "Operator-only:";
 /// anyway, and the line is then what they show.
 #[must_use]
 pub fn description(text: &str) -> Option<String> {
-    let block = text
-        .strip_prefix("---\n")
-        .and_then(|rest| rest.find("\n---").map(|end| &rest[..end]))?;
+    let block = frontmatter(text)?;
     if let Ok(document) = serde_yaml::from_str::<serde_yaml::Value>(block) {
         if let Some(value) = document
             .get("description")
@@ -281,28 +319,24 @@ pub fn description(text: &str) -> Option<String> {
     }
     block.lines().find_map(|line| {
         let value = line.strip_prefix("description:")?.trim();
-        let unquoted = value
-            .strip_prefix('"')
-            .and_then(|rest| rest.strip_suffix('"'))
-            .or_else(|| {
-                value
-                    .strip_prefix('\'')
-                    .and_then(|rest| rest.strip_suffix('\''))
-            })
-            .unwrap_or(value);
-        Some(unquoted.trim().to_owned()).filter(|value| !value.is_empty())
+        Some(unquoted(value).trim().to_owned()).filter(|value| !value.is_empty())
     })
 }
 
 /// The reason an operator-only skill gives: what follows `Operator-only:` in the sentence of its
 /// description that starts with it, if that says anything.
+///
+/// A sentence starts the description, follows the `. `, `! ` or `? ` that ends the one before it,
+/// or starts a line, which is where it falls in a literal block (`|`) that keeps line breaks.
 #[must_use]
 pub fn operator_only_reason(description: &str) -> Option<&str> {
     description
         .match_indices(OPERATOR_ONLY)
         .filter(|(start, _)| {
+            let before = &description[..*start];
             *start == 0
-                || description[..*start]
+                || before.trim_end_matches([' ', '\t']).ends_with('\n')
+                || before
                     .strip_suffix(' ')
                     .is_some_and(|before| before.ends_with(['.', '!', '?']))
         })
@@ -311,7 +345,9 @@ pub fn operator_only_reason(description: &str) -> Option<&str> {
             let end = rest
                 .match_indices(['.', '!', '?'])
                 .map(|(index, _)| index)
-                .find(|index| rest[index + 1..].is_empty() || rest[index + 1..].starts_with(' '))
+                .find(|index| {
+                    rest[index + 1..].is_empty() || rest[index + 1..].starts_with([' ', '\n'])
+                })
                 .unwrap_or(rest.len());
             Some(rest[..end].trim()).filter(|reason| !reason.is_empty())
         })
@@ -1212,6 +1248,61 @@ mod tests {
         );
     }
 
+    /// The gate's wiring and not only [`invocation`]: `plugin()` reads every skill's `SKILL.md` and
+    /// its `agents/openai.yaml`, refuses a skill that sets a flag without its reason, and accepts it
+    /// once both flags and the `Operator-only:` sentence are there. No committed skill sets a flag,
+    /// so without this a gate that never called `invocation()` would stay green.
+    #[test]
+    fn the_plugin_check_applies_the_operator_only_rule_to_every_skill() {
+        let root = std::env::temp_dir().join(format!(
+            "agentplugins-invocation-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let write = |relative: &str, text: &str| {
+            let path = root.join(relative);
+            std::fs::create_dir_all(path.parent().expect("a file has a directory"))
+                .expect("the sandbox is writable");
+            std::fs::write(path, text).expect("the sandbox is writable");
+        };
+        write(
+            "plugins/demo/.claude-plugin/plugin.json",
+            "{\"version\": \"0.0.0\"}",
+        );
+        for lifecycle in LIFECYCLE {
+            write(
+                &format!("plugins/demo/skills/{lifecycle}/SKILL.md"),
+                &format!("---\nname: {lifecycle}\ndescription: Set it up.\n---\n\nSet it up.\n"),
+            );
+        }
+        let skill = "plugins/demo/skills/tidying/SKILL.md";
+        let flagged = "---\nname: tidying\ndescription: Tidy the tree.\n\
+                       disable-model-invocation: true\n---\n\nTidy the tree.\n";
+        write(skill, flagged);
+        let mut refused = Vec::new();
+        plugin(&root, "demo", &mut refused);
+
+        write(
+            skill,
+            &flagged.replacen("Tidy the tree.\n", &format!("\"{REASONED}\"\n"), 1),
+        );
+        write("plugins/demo/skills/tidying/agents/openai.yaml", CODEX_OFF);
+        let mut accepted = Vec::new();
+        plugin(&root, "demo", &mut accepted);
+        std::fs::remove_dir_all(&root).expect("the sandbox is removable");
+
+        assert!(
+            refused.len() == 2
+                && refused.iter().all(|p| p.contains("`demo:tidying`"))
+                && refused
+                    .iter()
+                    .any(|p| p.contains("allow_implicit_invocation: false"))
+                && refused.iter().any(|p| p.contains("`Operator-only:`")),
+            "{refused:?}"
+        );
+        assert_eq!(accepted, Vec::<String>::new());
+    }
+
     #[test]
     fn the_reason_is_a_sentence_that_starts_operator_only() {
         assert_eq!(
@@ -1450,5 +1541,74 @@ mod tests {
         let mut problems = Vec::new();
         products(&catalog, &mut problems);
         assert_eq!(problems.len(), 1, "{problems:?}");
+    }
+
+    /// A skill whose frontmatter sets `disable-model-invocation` in `spelling`, with a plain
+    /// description that gives no reason and no `agents/openai.yaml`.
+    fn adv_flagged(spelling: &str) -> String {
+        format!(
+            "---\nname: tidy\ndescription: Tidy the tree.\ndisable-model-invocation: {spelling}\n---\n\nTidy the tree.\n"
+        )
+    }
+
+    /// Adversary. The acceptance says the gate refuses a skill that sets either flag without the
+    /// `Operator-only:` sentence. A trailing YAML comment is still `true` to every YAML reader, and
+    /// Claude Code 2.1.292 then keeps the skill from the model; the official
+    /// `claude-automation-recommender` skill teaches exactly this spelling
+    /// (`disable-model-invocation: true  # Only user can invoke (for side effects)`).
+    #[test]
+    fn adv_a_flag_with_a_trailing_comment_is_still_refused_without_its_reason() {
+        let text = adv_flagged("true  # Only user can invoke (for side effects)");
+        let problems = invocation("demo", "tidy", &text, Some(CODEX_DEFAULT));
+        assert!(
+            problems
+                .iter()
+                .any(|p| p.contains("allow_implicit_invocation: false"))
+                && problems.iter().any(|p| p.contains("`Operator-only:`")),
+            "Claude Code reads `disable-model-invocation: true  # …` as true, so this skill is \
+             operator-only in Claude Code, model-invocable in Codex and gives no reason; the gate \
+             returned {problems:?}"
+        );
+    }
+
+    /// Adversary. YAML 1.2 resolves `True` and `TRUE` to the boolean, and Claude Code coerces a
+    /// string flag through its truthy list (`"1"`, `"true"`, `"yes"`, `"on"`, lowercased), so a
+    /// quoted or capitalised `true` keeps the skill from the model all the same.
+    #[test]
+    fn adv_a_quoted_or_capitalised_flag_is_still_refused_without_its_reason() {
+        for spelling in ["\"true\"", "'true'", "True", "TRUE"] {
+            let problems = invocation("demo", "tidy", &adv_flagged(spelling), None);
+            assert!(
+                !problems.is_empty(),
+                "`disable-model-invocation: {spelling}` is true to Claude Code, and the gate \
+                 accepted the skill with no Codex flag and no `Operator-only:` sentence"
+            );
+        }
+    }
+
+    /// Adversary. Claude Code 2.1.292 reads the flag with `mte`: a string or number is true when
+    /// its lowercased text is one of `1`, `true`, `yes`, `on`.
+    #[test]
+    fn adv_claude_code_truthy_spellings_are_still_refused_without_their_reason() {
+        for spelling in ["yes", "on", "1"] {
+            let problems = invocation("demo", "tidy", &adv_flagged(spelling), None);
+            assert!(
+                !problems.is_empty(),
+                "`disable-model-invocation: {spelling}` is true to Claude Code, and the gate \
+                 accepted the skill with no Codex flag and no `Operator-only:` sentence"
+            );
+        }
+    }
+
+    /// Adversary. A literal block-scalar description (`|`) keeps its line breaks, so the sentence
+    /// that starts `Operator-only:` starts a line rather than following `. `. It is still the
+    /// sentence the acceptance asks for, and the gate refuses it.
+    #[test]
+    fn adv_a_literal_block_description_carries_the_operator_only_sentence() {
+        let text = "---\nname: tidy\ndescription: |\n  Tidy the tree.\n  Operator-only: it deletes files no review lists.\ndisable-model-invocation: true\n---\n\nTidy the tree.\n";
+        assert_eq!(
+            invocation("demo", "tidy", text, Some(CODEX_OFF)),
+            Vec::<String>::new()
+        );
     }
 }
