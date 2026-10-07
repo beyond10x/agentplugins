@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:commands-agent-invocable
 kind: story
-status: active
+status: implemented
 title: An agent can start every command skill; approvals live inside the skill
 summary: drop disable-model-invocation and allow_implicit_invocation false from the five commands; R3, the gate and an eval per command follow
 refs:
@@ -24,15 +24,22 @@ scope:
 - confidence: cited
   path: plugins/b10x/skills/authoring-plugins/SKILL.md
 - confidence: cited
+  path: plugins/b10x/skills/routing/SKILL.md
+- confidence: cited
   path: plugins/worktree/skills/cleanup
+- confidence: cited
+  path: website/docs/plugins/aep.md
 - confidence: cited
   path: website/docs/plugins/b10x.md
 - confidence: cited
+  path: website/docs/plugins/worktree.md
+- confidence: cited
   path: website/docs/structure.md
-revision: 16
+revision: 20
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-07T08:06:23Z", actor: "human:timo", revision: 15}
 - {from: "proposed", to: "active", at: "2026-10-07T08:06:23Z", actor: "human:timo", revision: 16}
+- {from: "active", to: "implemented", at: "2026-10-07T09:18:25Z", actor: "human:timo", revision: 20, decided_on: {"recorded":{"test_result":1,"review_outcome":8,"verification":2}}}
 ---
 ## Context
 
@@ -69,9 +76,21 @@ the command's work or its documented approval stop, and never a refusal at invoc
 
 ## Scope
 
-Cited: plugins/aep/skills/{wave,drive,decompose,review-plan}/SKILL.md and agents/openai.yaml,
+Confirmed by the implementor's table and the merged diff (merge `adb1764`):
+
+Cited, held: plugins/aep/skills/{wave,drive,decompose,review-plan}/SKILL.md and agents/openai.yaml,
 plugins/worktree/skills/cleanup/SKILL.md and agents/openai.yaml, website/docs/structure.md,
 crates/agentplugins-check/src/concept.rs, plugins/b10x/skills/authoring-plugins/SKILL.md,
-website/docs/plugins/b10x.md. Inferred: evals/<five new cases>/, evals/README.md,
-plugins/aep/skills/implementing/SKILL.md (its sentence naming `/aep:wave` and `/aep:drive` as
-commands), README.md.
+website/docs/plugins/b10x.md, plugins/b10x/skills/routing/SKILL.md.
+
+Inferred, held: evals/ (five `command-*-agent-turn` cases and README.md).
+
+Inferred, wrong (removed before dispatch): plugins/aep/skills/implementing/SKILL.md (its sentence
+naming `/aep:wave` and `/aep:drive` stays true), README.md (no command text).
+
+Not in the scope, found by grep and changed: website/docs/plugins/aep.md:36,63 and
+website/docs/plugins/worktree.md:15,52-55 still taught that only the operator starts a command.
+
+Left for later (adversary pass 1, finding 6, pre-existing): the git regexes in
+evals/wave-claim-verdict, adversary-panel-one-family and adversary-tests-only miss
+`git -C <dir> <verb>`.

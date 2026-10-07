@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-07T08:51:50Z",
+  "actor": "human:timo",
+  "artifact": "story:legacy-store-refused",
+  "kind": "story",
+  "revision": 6,
+  "change": {
+    "change": "evidence",
+    "kind": "verification",
+    "source": "cargo run --locked --bin agentplugins-check -- tools (aep 0.68.0)",
+    "reference": "base c7a88ea: no aep.project/1 check; unit 2684ef1: refuses an aep.project/1 store, 2 rows checked; old rows reported 2 problems"
+  }
+}

@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:legacy-store-refused
 kind: story
-status: active
+status: implemented
 title: AEP skills say the newest aep refuses an aep.project/1 store and name its migration
 summary: planning and implementing stop at a project/1 store and name aep plan store migrate git; tools checks the claim against the newest aep
 refs:
@@ -15,10 +15,11 @@ scope:
   path: plugins/aep/skills/implementing/SKILL.md
 - confidence: cited
   path: plugins/aep/skills/planning/SKILL.md
-revision: 6
+revision: 8
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-07T08:06:23Z", actor: "human:timo", revision: 5}
 - {from: "proposed", to: "active", at: "2026-10-07T08:06:23Z", actor: "human:timo", revision: 6}
+- {from: "active", to: "implemented", at: "2026-10-07T09:18:25Z", actor: "human:timo", revision: 8, decided_on: {"recorded":{"test_result":1,"verification":1}}}
 ---
 ## Context
 
@@ -54,6 +55,11 @@ the row reader. `task check` passes.
 
 ## Scope
 
-Cited: plugins/aep/skills/planning/SKILL.md, plugins/aep/skills/implementing/SKILL.md,
-crates/agentplugins-check/src/tools.rs. Inferred: plugins/aep/skills/upgrade/SKILL.md (already
-says the current release migrates `/1`; wording aligned only if it disagrees).
+Confirmed by the implementor's table and the merged diff (`2684ef1`):
+
+Cited, held: plugins/aep/skills/planning/SKILL.md, plugins/aep/skills/implementing/SKILL.md
+(store-version sections only), crates/agentplugins-check/src/tools.rs.
+
+Inferred, held with no change: plugins/aep/skills/upgrade/SKILL.md already says the current
+release migrates `/1`; its code block has no `--dry-run` line, while its prose names `--dry-run`
+first.

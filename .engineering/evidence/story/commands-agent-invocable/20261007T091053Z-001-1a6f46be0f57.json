@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-07T09:10:53Z",
+  "actor": "human:timo",
+  "artifact": "story:commands-agent-invocable",
+  "kind": "story",
+  "revision": 17,
+  "change": {
+    "change": "evidence",
+    "kind": "review_outcome",
+    "source": "review-result:adversary-commands-agent-invocable-pass-1",
+    "review": "review-result:adversary-commands-agent-invocable-pass-1",
+    "outcome": "no-op"
+  }
+}
