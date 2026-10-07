@@ -26,6 +26,10 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | an aggregate over an `Optional` field | `ess/15` | `aggregate: {sum: replacement_cents, skip_absent: true}`, result `Optional<Integer>`; an `Optional` group key makes absent one group |
 | a field's own wire name, a leading underscore | any | `naming: {wire: copyId}` (same as flat `wire:`) on a field of an entity, struct, event or command input; a view field refuses it (`unknown field naming`). `_receipt` is a valid field name |
 | a branch chosen by the subject's held state | `ess/3`; `ess/7` for the error default | `when_subject_state: <State>`, below |
+| a command's typed answer, and an event field that repeats it | `ess/4`; `returns: true` from `ess/17` | `response: [{name, type}]` on the command, `returns: true` on the outcome, and `{response: code}` as an event payload source. `creates:` still takes its `instance:` from an emitted event field, so a created identity that is also the answer is minted once in the response and copied into the event. `sets:` refuses `{response: …}` |
+| a description, and the records that explain a construct | any | `naming: {summary: …}` on an entity, type, actor or command; a flat `summary:` on a field, error or outcome; `refs: ["tracker:KEY-1"]` (`provider:key`) on a command or outcome. A flat `summary:` on an entity, actor or command is an unknown field |
+| a value only its originating response may disclose | `ess/21` | `one_time_response: [token]` on the **outcome**, beside `returns: true`; on the command it is an unknown field. It names required `String` response fields, or transparent `String` newtypes; an `Optional` one is refused as `type_mismatch` |
+| a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -362,3 +366,20 @@ provenance and selects `/42` or `/43`; the target must establish and validate th
 A seed does not execute the authored document's timeline or replace a command's assertions. For a
 missing input candidate, first supply a truthful `example:`: the reservation fixture's distinct
 member identity restores the wrong-state scenario without changing the rule or injecting state.
+
+## What validates and still gets no scenario
+
+`ess verify conform synthesize` observes a record only through a view, and these limits come from
+that. Each was reproduced on 0.55.0; relay the refusal rather than reshaping the rule around it.
+
+| the model says | synthesis answers |
+|---|---|
+| a guard over a stored field (`when_subject: {predicate: holder != input.holder}`) or a `wrong_state` refusal, on an entity with no view | `ESS-SYNTH-001` "no witness": choosing an input that matches the stored value needs a view with no filter that projects the identity, `state` and the guarded fields, `read_your_writes` or an `eventual` one it waits for. The facts are observed, not assumed: the creating outcome's `sets:` and a seed do not stand in for the view |
+| `--synthesis-seed` for such a row | not applied when the row is held by an `owns` relation: `synthesis seeds: 1 selected, 0 applied`, naming the owner |
+| a `String` newtype with `alphabet:` or `invariants:` as a field of a typed `response:` | the returning outcome has no scenario: `response constrained type needs an executable invariant/reading observer` |
+| `invariants:` on a type (`value.count >= 1`) with no view publishing a field of it | `ESS-SYNTH-013` "type … has no scenario"; `alphabet:` alone is checked without one |
+| `when_subject:` comparing `now` with a stored `Timestamp` the outcome set with `{generated: true}` | every scenario of the command is refused: no arranging branch sets the field from an input or a literal |
+
+A system whose source defines no read surface (a published protocol, a credential that is never
+read back) declares no view, and keeps these refusals visible in its report. Declaring a view to
+silence them states a read surface the system does not have.

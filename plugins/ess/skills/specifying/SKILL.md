@@ -163,8 +163,9 @@ Grow it from there — types, commands, events, views, and a component that owns
 shows every one of those sections in a small specification that validates; read it before writing
 the first command. [references/later-formats.md](references/later-formats.md) lists what later
 formats add — a stored-field guard, a delete, a create into a state, an unknown-id answer, value
-expressions, wire presence, related rows, a renamed identity, per-element and bulk record effects —
-read it before marking a rule `UNMAPPED:` as not expressible.
+expressions, wire presence, related rows, a renamed identity, per-element and bulk record effects,
+typed responses, descriptions and `refs:`, the current time — read it before marking a rule
+`UNMAPPED:` as not expressible.
 
 `--path` takes one ESS file or a directory. Without an `ess-inputs.yaml`, a directory is read as
 every YAML file below it — so generated output written inside it is read back as specification and
@@ -350,7 +351,10 @@ from `synthesize` is not a refusal but names a check the suite does not make: `o
 subject through what its views publish; no view publishes …` means a wrong-state refusal that
 changed those fields would pass, and a view publishing them closes it; `declares no not-found and
 no wrong_state outcome` means an unknown id has no declared answer (`unknown_instance:` in
-[references/later-formats.md](references/later-formats.md)). Relay every note with the refusals. `--target go` or `--target typescript` writes the suite as a test
+[references/later-formats.md](references/later-formats.md)). Relay every note with the refusals.
+A model that validates can still get no scenario for a stored-field guard without a view, a seed
+on an owned row, or a constrained type in a typed response; *What validates and still gets no
+scenario* in [references/later-formats.md](references/later-formats.md) lists each refusal. `--target go` or `--target typescript` writes the suite as a test
 package your implementation runs; `ess:testing-conformance` says what to run it against. The Go
 suite is written under `<out>/essconform` without a `go.mod`: generate it inside the implementation
 module, or give its enclosing directory a module and import it with a local replacement. Keep the

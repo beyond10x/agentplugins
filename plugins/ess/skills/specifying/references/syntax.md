@@ -77,8 +77,14 @@ types:
 
 # Entities: an identity, fields, relations to other entities, and a lifecycle whose transitions
 # commands move. `owns` means the target cannot outlive this entity; `references` means it can.
+# A description goes in `naming: {summary: …}` on an entity, a type, an actor or a command, and in
+# a flat `summary:` on a field, an error or an outcome; a bare `summary:` on an entity, an actor or
+# a command is refused as an unknown field. The generated schemas and OpenAPI carry it as
+# `description`.
 entities:
   - name: library.lending.Branch
+    naming:
+      summary: A branch of the library; it owns the copies it lends.
     identity:
       name: branch_id
       type: library.lending.BranchId
@@ -156,10 +162,14 @@ errors:
 # the new identity (`branch_id` of BranchOpened); on `moves:`/`updates:` it names the input field
 # holding the identity (`copy_id` of LendCopy). Either other way is `undeclared_reference`.
 commands:
+  # `refs:` names the records outside the model that explain a command or an outcome, each as
+  # `provider:key`; a projection that knows the provider links it, and never a URL.
   - name: library.lending.OpenBranch
     naming:
       wire: open-branch
       display: Open a branch
+      summary: Open a branch that holds no copies yet.
+    refs: ["tracker:LIB-12"]
     input:
       - name: name
         type: String
