@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.21.1] — 2026-10-07
+
+- Track Worktree 0.11.0 (from 0.10.0). `verified.json` and the eval workflow move to 0.11.0 after
+  `agentplugins-check tools` (42 spelled commands) and the `worktree-onboarding` trial, whose
+  baseline is the run of 2026-10-07 (11 → 9 tool calls). `worktree skill` without `--out` now
+  prints the skill and writes no file; no skill here runs it, because the plugin ships
+  `worktree:managing-worktrees`.
+- `worktree:managing-worktrees` step 1 no longer reads as an instruction to publish every commit.
+  When a task stops at a local commit, the tree is archived or handed off, never published to make
+  it removable. The trial quoted the old sentence as conflicting with a commit-only request.
+
 ## [0.21.0] — 2026-10-07
 
 - Track ESS 0.55.0 (from 0.53.0). New specifications start on `ess/23`, and `ess:specifying`
