@@ -461,6 +461,150 @@ fn tutorial(root: &Path, ess: &Path, scratch: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// The skills whose store-version table must carry an `aep.project/1` row.
+const LEGACY_ROW_SKILLS: &[&str] = &[
+    "plugins/aep/skills/planning/SKILL.md",
+    "plugins/aep/skills/implementing/SKILL.md",
+];
+
+/// The code `aep` prints when it refuses a store's `aep.project` version.
+const REFUSAL_CODE: &str = "unsupported_protocol_version";
+
+/// What `aep` does with an `aep.project/1` store: a skill's claim, or a release's answer.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LegacyStore {
+    Opened,
+    Refused,
+}
+
+impl LegacyStore {
+    fn says(self) -> &'static str {
+        match self {
+            Self::Opened => "opens",
+            Self::Refused => "refuses",
+        }
+    }
+}
+
+/// The claim of every Markdown table row whose first cell names `` `aep.project/1` ``: refused when
+/// the row names the [`REFUSAL_CODE`], opened when it does not.
+#[must_use]
+pub fn legacy_rows(text: &str) -> Vec<LegacyStore> {
+    text.lines()
+        .filter_map(|line| line.trim().strip_prefix('|')?.split_once('|'))
+        .filter(|(first, _)| first.contains("`aep.project/1`"))
+        .map(|(_, rest)| {
+            if rest.contains(REFUSAL_CODE) {
+                LegacyStore::Refused
+            } else {
+                LegacyStore::Opened
+            }
+        })
+        .collect()
+}
+
+/// A release's answer on the generated `aep.project/1` fixture: opened on exit 0, refused on a
+/// failure that names the [`REFUSAL_CODE`]; any other failure decides nothing.
+fn legacy_answer(success: bool, output: &str) -> Result<LegacyStore, String> {
+    if success {
+        Ok(LegacyStore::Opened)
+    } else if output.contains(REFUSAL_CODE) {
+        Ok(LegacyStore::Refused)
+    } else {
+        Err(format!(
+            "neither opens nor refuses it with `{REFUSAL_CODE}`: {}",
+            output.trim()
+        ))
+    }
+}
+
+fn entries(dir: &Path) -> BTreeSet<PathBuf> {
+    let mut found = BTreeSet::new();
+    for entry in std::fs::read_dir(dir).into_iter().flatten().flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            found.extend(entries(&path));
+        }
+        found.insert(path);
+    }
+    found
+}
+
+/// Run `aep plan artifact list` on a generated `aep.project/1` store and hold every
+/// `aep.project/1` table row to what the release did; a refusal must also write nothing.
+fn legacy_store(
+    root: &Path,
+    aep: &Path,
+    tag: &str,
+    scratch: &Path,
+    problems: &mut Vec<String>,
+) -> Result<(), String> {
+    let fixture = scratch.join("legacy-store");
+    std::fs::create_dir_all(fixture.join(".engineering/planning"))
+        .map_err(|error| error.to_string())?;
+    std::fs::write(
+        fixture.join(".engineering/project.yaml"),
+        "version: aep.project/1\nprotocol: adp/1\nprofile: development.standard\nprotocols: ./protocols\n",
+    )
+    .map_err(|error| error.to_string())?;
+    let before = entries(&fixture);
+    let output = Command::new(aep)
+        .args(["plan", "artifact", "list"])
+        .current_dir(&fixture)
+        .output()
+        .map_err(|error| format!("running {}: {error}", aep.display()))?;
+    let text = format!(
+        "{}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let answer = match legacy_answer(output.status.success(), &text) {
+        Ok(answer) => answer,
+        Err(error) => {
+            problems.push(format!(
+                "aep {tag} on a generated `aep.project/1` store: {error}"
+            ));
+            return Ok(());
+        }
+    };
+    if answer == LegacyStore::Refused && entries(&fixture) != before {
+        problems.push(format!(
+            "aep {tag} refuses a generated `aep.project/1` store but writes to it"
+        ));
+    }
+    let mut checked = 0;
+    for file in command_files(root) {
+        let text = std::fs::read_to_string(&file).map_err(|error| error.to_string())?;
+        let rows = legacy_rows(&text);
+        let shown = file.strip_prefix(root).unwrap_or(&file).display();
+        if rows.is_empty()
+            && LEGACY_ROW_SKILLS
+                .iter()
+                .any(|skill| root.join(skill) == file)
+        {
+            problems.push(format!(
+                "{shown}: its store-version table has no `aep.project/1` row"
+            ));
+        }
+        for claim in rows {
+            checked += 1;
+            if claim != answer {
+                problems.push(format!(
+                    "{shown}: its `aep.project/1` row says aep {} the store (`{REFUSAL_CODE}` {}), but aep {tag} {} it",
+                    claim.says(),
+                    if claim == LegacyStore::Refused { "named" } else { "not named" },
+                    answer.says()
+                ));
+            }
+        }
+    }
+    println!(
+        "tools `aep` {tag}: {} an `aep.project/1` store; {checked} `aep.project/1` row(s) checked",
+        answer.says()
+    );
+    Ok(())
+}
+
 /// Check every plugin's spelled commands against its CLI's newest release.
 pub fn verify(root: &Path) -> Result<(), String> {
     let scratch =
@@ -527,6 +671,9 @@ pub fn verify(root: &Path) -> Result<(), String> {
                 }
             }
             println!("tools `{cli}` {tag}: {checked} spelled command(s) checked");
+            if *cli == "aep" {
+                legacy_store(root, &binary, &tag, &scratch, &mut problems)?;
+            }
             if *cli == "ess" {
                 syntax(root, &binary, &scratch)?;
                 tutorial(root, &binary, &scratch)?;
@@ -967,6 +1114,47 @@ mod tests {
         let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
         let map = verified(&root).unwrap();
         assert!(map.len() >= 3 && map.len() <= TOOLS.len());
+    }
+
+    #[test]
+    fn a_legacy_store_row_that_names_the_refusal_says_refused() {
+        let text = "| the store | what works |\n|---|---|\n| `aep.project/5` | everything |\n| `aep.project/1`, or `.engineering/planning/` with no `project.yaml` | nothing: every verb exits 1 with `[unsupported_protocol_version]` before any write |\n| `aep.project/2`, `/3` or `/4` | nothing: every planning verb refuses it |\n";
+        assert_eq!(legacy_rows(text), [LegacyStore::Refused]);
+    }
+
+    #[test]
+    fn a_legacy_store_row_that_says_every_verb_works_says_opened() {
+        let text = "| the store | upgrade |\n|---|---|\n| `aep.project/1`, or `.engineering/planning/` with no `project.yaml` | `aep plan store migrate git --verify` on a clean `.engineering`, then commit. Every verb still works; carry on |\n| `aep.project/2`, `/3` or `/4` | Every planning verb refuses the store: stop and report |\n";
+        assert_eq!(legacy_rows(text), [LegacyStore::Opened]);
+    }
+
+    #[test]
+    fn a_text_without_a_legacy_store_row_has_none() {
+        let text = "| the store | what works |\n|---|---|\n| `aep.project/5` | everything |\n\nAn `aep.project/1` store, in prose, is not a row.\n";
+        assert_eq!(legacy_rows(text), []);
+    }
+
+    #[test]
+    fn the_release_answer_is_its_exit_status_and_refusal_code() {
+        assert_eq!(legacy_answer(true, ""), Ok(LegacyStore::Opened));
+        assert_eq!(
+            legacy_answer(
+                false,
+                "error: project document is not valid: [unsupported_protocol_version] project.version: this store is `aep.project/1`"
+            ),
+            Ok(LegacyStore::Refused)
+        );
+        let other = legacy_answer(false, "error: missing field `protocol`").unwrap_err();
+        assert!(other.contains("missing field `protocol`"), "{other}");
+    }
+
+    #[test]
+    fn both_store_version_tables_say_the_verified_aep_refuses_a_legacy_store() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        for skill in LEGACY_ROW_SKILLS {
+            let text = std::fs::read_to_string(root.join(skill)).unwrap();
+            assert_eq!(legacy_rows(&text), [LegacyStore::Refused], "{skill}");
+        }
     }
 
     #[test]

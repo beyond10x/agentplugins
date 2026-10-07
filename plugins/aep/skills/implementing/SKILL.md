@@ -30,10 +30,13 @@ do not wait for `aep` to print a notice:
 
 | the store | upgrade |
 |---|---|
-| `aep.project/1`, or `.engineering/planning/` with no `project.yaml` | `aep plan store migrate git --verify` on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, `aep:planning` § 5), then commit. Every verb still works (with no `project.yaml`, only given `--store <dir>`); carry on |
+| `aep.project/1`, or `.engineering/planning/journal.jsonl` with no `project.yaml` | `aep plan store migrate git --dry-run`, then `--verify`, on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, `aep:planning` § 5), then commit. Every verb that reads or writes the plan exits 1 before any write, with `[unsupported_protocol_version]` (no `project.yaml`: an error naming `journal.jsonl` and the migration); only the migration opens the store: stop and report |
 | `aep.project/2`, `/3` or `/4` | `cargo install --git https://github.com/beyond10x/aep --rev 9c0f1da44429ff935fa0b2d743457945d51e1c51 aep-cli`, then `aep plan store migrate git --verify` on a clean `.engineering`, commit, then install the current release (`aep:upgrade`). Every planning verb refuses the store: stop and report |
 
-`aep:upgrade` carries the steps; the user decides when the migration runs.
+`aep:upgrade` carries the steps; the user decides when the migration runs. On `/1`, store work
+waits until the user has approved the migration and reviewed what `--dry-run` would write,
+`--verify` has passed, and the result is committed; do not carry on, open the store with an older
+`aep`, or edit artifact files by hand.
 
 ## Rules for both modes
 
