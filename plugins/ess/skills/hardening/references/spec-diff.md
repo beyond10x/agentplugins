@@ -15,7 +15,8 @@ The first writes `ess-diff/14`, including each change's dimensions and compatibi
 fails at exit 4 for an unacknowledged breaking or unknown change. Exit 1 is an input or
 acknowledgement refusal; it is not a compatible result. Repeat `--dimension callers`,
 `--dimension readers` or `--dimension history` only where the gate deliberately narrows its claim;
-the default checks all three.
+the default checks all three. A change to an enum variant's attributes (`ess/23`) is reported as
+`unclassified-changed`, so the gate fails it at exit 4 until it is reviewed and acknowledged.
 
 A reviewed exception uses `--acknowledgements <file>` with an
 `ess-diff-acknowledgements/1` document naming exact change IDs and both endpoint digests. Read the

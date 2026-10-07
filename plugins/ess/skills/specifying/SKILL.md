@@ -30,9 +30,10 @@ aep plan reverse openapi --domain <domain> <openapi-document> --out <file>
 ```
 
 **A new specification starts on the newest release and its newest format, never on `ess/1`.**
-Before the first file, compare `ess --version` with the newest release. Reuse the current run’s
-successful setup or upgrade plan from `b10x` when its release-resolution evidence names that release;
-matching installed output completes the check. If that evidence is absent, read the public latest
+Before the first file, compare `ess --version` with the newest release. If this run already
+wrote a `b10x` setup or upgrade plan file (usually `~/.local/state/b10x/plan.json`) that names
+the newest `ess` release, use that release; matching
+installed output completes the check. If that evidence is absent, read the public latest
 release without requiring a login:
 
 ```console
@@ -41,10 +42,16 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/22`. To
-read it from the binary, validate a header one past what you expect; the
-`unsupported_format_version` refusal lists every format the build implements (a listing command
-is beyond10x/ess#460). The `ess/1` in
+`format:` that release implements; the example below uses `ess/23`. The binary says which one that
+is:
+
+```console
+ess specify formats --since ess/22
+```
+
+It lists each format the build implements, oldest first, with the release that shipped it and what
+it added, and marks the highest `newest`; `--format json` or `yaml` prints the same as data. The
+`unsupported_format_version` refusal names this command. The `ess/1` in
 [references/syntax.md](references/syntax.md) shows the minimum header for each construct; it is
 not the header to start a document on. A higher format admits every lower one, and the document
 below validates unchanged under each.
@@ -58,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/22
+format: ess/23
 system: warehouse
 version: v1
 
@@ -138,6 +145,12 @@ reason it is worth writing:
 | a missing or mistyped `via` | the linking field is not there, or it is not the type of the identity it is supposed to carry. `via` lives on whichever side holds the field: on the **target** for `owns` — the child's field typed by the owner's identity — and on the **source** for `references` |
 | a second owner | two entities both claiming to `own` the same one. Ownership decides what a delete does, and two answers to that is not a richer model, it is an undecided question written down twice |
 
+A field typed as another entity's identity with no relation entry carrying it is a link the model
+only implies. `validate` still passes it and warns `ESS-ENTITY-019` (`implied_relation`) on standard
+error, with the `references` or `owns` entry that would declare it; `ESS-COMMAND-019` warns where a
+`when_related:` row is settled by that type alone. Declare the relation, or mark it `UNMAPPED:` as
+below; do not report a run with such a warning as clean.
+
 `owns` and `references` are not stylistic. `owns` says the far side does not stand on its own — it
 has no meaning without its owner, so a delete of the owner cannot leave it behind; `references` says
 it does stand on its own and outlives the link. What the delete *does* — refuse while children
@@ -148,9 +161,10 @@ narrows that question without answering it. Where you cannot say which kind it i
 Grow it from there — types, commands, events, views, and a component that owns the domain — running
 `ess specify validate` after each addition rather than at the end. [references/syntax.md](references/syntax.md)
 shows every one of those sections in a small specification that validates; read it before writing
-the first command. [references/later-formats.md](references/later-formats.md) lists what formats up
-to `ess/15` add — a stored-field guard, a delete, a create into a state, an unknown-id answer, value
-expressions, wire presence — read it before marking a rule `UNMAPPED:` as not expressible.
+the first command. [references/later-formats.md](references/later-formats.md) lists what later
+formats add — a stored-field guard, a delete, a create into a state, an unknown-id answer, value
+expressions, wire presence, related rows, a renamed identity, per-element and bulk record effects —
+read it before marking a rule `UNMAPPED:` as not expressible.
 
 `--path` takes one ESS file or a directory. Without an `ess-inputs.yaml`, a directory is read as
 every YAML file below it — so generated output written inside it is read back as specification and
@@ -228,7 +242,16 @@ A headless run (`claude -p`) needs permission to run the CLI, or it cannot valid
 `--allowedTools "Bash(ess:*)"`.
 
 `validate` and `compile` accumulate diagnostics. Relay every refusal; do not stop at the first or
-edit generated output around it.
+edit generated output around it. Every predicate that does not parse is reported at its own line
+(`ESS-SPEC-012`, `unparsable_predicate`) beside the file's other refusals, and the declaration
+holding it is withheld whole until it parses.
+
+`ess specify validate --path <specification> --format json` (or `yaml`) also reports
+`completeness`: the constructs synthesis gives no scenario (`unscenarioed`), the scenarios outside
+`--component <name>` (`outside`), the questions the model leaves unanswered (`unanswered`), and
+their `counts`. It runs synthesis to answer, so it takes as long as
+`ess verify conform synthesize`; the text output and the exit status do not change. Relay a
+non-zero count with the validation line.
 
 ## Deterministic projections
 
@@ -248,9 +271,17 @@ into `--out` itself. Type libraries come from `ess generate types --target rust|
 (`components.yaml`, `reached_by`). Without one, `openapi` writes `0 artifact(s)` and prints no
 refusal: that is a missing declaration, not a clean result.
 
-The same typed IR must produce the same ordered files and bytes. Compare a regenerated temporary
-tree with the committed tree before replacing anything. A stale committed file is drift; a file no
-projection owns is not authority.
+The same typed IR must produce the same ordered files and bytes. Hold committed output with the
+same command and `--check`:
+
+```console
+ess generate --path <specification> --kind <kind> --out <directory> --check
+```
+
+It regenerates in memory, writes nothing, and exits 1 with one line per edited, missing or
+no-longer-generated file and for a missing or stale `.ess-output` record; exit 0 means plain
+`ess generate` would change nothing. A stale committed file is drift; a file no projection owns is
+not authority.
 
 ## Implementation code comes from the specification
 
@@ -266,9 +297,16 @@ Choose the implementation language before writing code: `--target rust` generate
 `--target go` generates a Go module. Both carry generated model types, `…Behavior` command contracts
 and `…Query` view contracts (traits in Rust, interfaces in Go). Read `PLAN.md` and `TARGET.md`, use
 the generated behavior where present, and implement the remaining ports and obligations. Commit the
-generated tree and hold it in the gate: regenerate into a temporary directory and fail on any
-difference, exactly as for projections above. When the specification changes, regenerate; the
+generated tree and hold it in the gate: `synthesize` has no `--check`, so regenerate into a
+temporary directory and fail on any difference. When the specification changes, regenerate; the
 compiler then names every handler the change touched.
+
+A value the specification marks `{generated: true}` is the implementation's to supply, through a
+method of the generated context port. An `Optional<T>` payload value gets its own,
+`generate_optional_<t>` returning `Option<T>` in Rust (`try_generate_optional_<t>` on `TryContext`)
+and `GenerateOptional<T>` returning `*T` in Go (`TryGenerateOptional<T>` on `FallibleContext`).
+A regeneration can therefore add a port method your context must implement; the compiler error
+names it.
 
 An explicitly requested independent educational implementation, reference target or adapter over
 existing code has a different purpose: it supplies independent observations for conformance.

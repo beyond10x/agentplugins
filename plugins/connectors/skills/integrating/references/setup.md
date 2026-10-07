@@ -17,19 +17,31 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    `--credential-file` or `--credential-stdin`. The operator supplies the documented credential
    document directly to that protected channel. Never read secret bytes into model context or
    put them in chat, command arguments, logs or configuration. OAuth acquisition uses the
-   adapter's returned safe next action; do not invent an authorization URL or copy tokens.
+   adapter's returned safe next action; do not invent an authorization URL or copy tokens. A
+   profile using `oauth2_client_credentials` takes a `{client_id, client_secret}` document through
+   the same protected channel; the CLI requests and renews the access token itself.
 4. Observe the returned connection or acquisition with `connections status --adapter '<alias>'`
    and exactly one of `--connection` or `--acquisition`. Report ready only when observed state
    says so. `connections revalidate` checks a saved credential without re-entry; it contacts
-   the provider and requires the current `--expected-revision`.
+   the provider and requires the current `--expected-revision`. After the adapter's
+   configuration changes (a rebuilt bundle or selection), revalidate: the connection follows the
+   new configuration when its provider authority, profile and identity are unchanged, and
+   otherwise refuses with `next_action: create_connection` and changes nothing. A profile's access
+   read answered 401 or 403 refuses the connection as `insufficient_scope`: the credential lacks a
+   scope the profile needs, and only a credential that has it fixes that.
 5. For repair, preserve connection identity: `connections repair` takes `--adapter`,
    `--connection`, `--expected-revision` and one protected credential source. For a requested
    terminal revocation, inspect `connections revoke --help` and use the current revision.
    A conflicting revision requires a fresh observation, never a guessed increment.
+6. To hand one saved connection to a local program, inspect `connections launch --help` and the
+   release's `docs/local-consumer-launch.md`. The operator declares the consumer under
+   `[consumers]` (configuration `connectors-local/3`) with a pinned executable digest and the
+   adapters it may use; never add or widen a declaration to make a launch work. The consumer
+   receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.28.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.31.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. The local CLI targets Linux
-keyring custody. A source installation of `v0.28.0` requires Rust 1.91 or newer and builds package
+keyring custody. A source installation of `v0.31.0` requires Rust 1.91 or newer and builds package
 `connectors`; its release carries no prebuilt archives. `b10x` selects the exact release tag and
 Cargo's locked dependency graph. Build failures retain the previous installed binary.
 

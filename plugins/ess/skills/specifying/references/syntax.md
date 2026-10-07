@@ -4,7 +4,7 @@ A small lending library in three files, with every section a specification usual
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
 Keep each domain’s first segment equal to `system` and update every qualified reference together.
-It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/22` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
+It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/23` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
 
 ## `system.yaml`
 
@@ -335,6 +335,9 @@ A predicate (`when`, `invariants`, a view's `filter`) has a compact form and a s
 The compact form is one string: a comparison (`pages > 0`, `format == Hardcover`), a bare fact path
 (present and truthy), `defined(note)`, or `not` before any of those. `&&`, `||` and `in [...]`
 inside that string are refused; write a conjunction, a disjunction or a set in the structured form.
+A string that does not parse is refused at its line as `unparsable_predicate` (`ESS-SPEC-012`), and
+an unquoted `null` as `null_comparison` (`ESS-SPEC-017`): write `defined(note)` or
+`not defined(note)`, or quote `"null"` to compare with that text.
 
 | to say | structured form |
 |---|---|
@@ -342,7 +345,7 @@ inside that string are refused; write a conjunction, a disjunction or a set in t
 | A and B | `when: {all: [pages > 0, format == Hardcover]}`; a bare list is an implicit `all` |
 | not A, none of A and B | `when: {not: pages <= 0}`, `when: {none: [format == Audio, pages > 900]}` |
 | a range, by operator | `when: {pages: {gte: 1, lte: 5000}}` — `eq`, `ne`, `lt`, `lte`, `gt`, `gte` |
-| one of a set | `when: {format: [Hardcover, Paperback]}`, or `{in: […]}`, `{any_of: […]}`, `{one_of: […]}` |
+| one of a set | `when: {format: [Hardcover, Paperback]}`, or `{in: […]}`, `{any_of: […]}`, `{one_of: […]}`. The set holds literal values: an operand naming a parameter or an input (`{in: param.titles}`) is refused as `type_mismatch`; write `exists: {in: param.titles, as: t, that: title == t}` for a list, `title == param.title` for one value |
 | none of a set | `when: {format: {none_of: [Audio]}}`, or `{not_in: […]}` |
 | present or absent | `when: {note: {exists: false}}` (= `not defined(note)`), `{defined: true}`, `{truthy: true}` |
 | every or some element of a list | `forall: {in: tags, as: t, that: t != ""}`, `exists: {in: tags, as: t, that: …}` — no compact form |

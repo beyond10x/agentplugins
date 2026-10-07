@@ -2,15 +2,16 @@
 format: aep.planning-md/3
 id: task:critic-produced-state-edge
 kind: task
-status: active
+status: implemented
 title: Design and parallel-safety critics flag a read of produced state without depends_on
 summary: An acceptance line that reads state another item in the set produces needs a depends_on edge; two critics now raise it
 relations:
 - informed_by: story:plan-time-critic-panel
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-06T23:26:23Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-06T23:26:24Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-06T23:32:11Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 

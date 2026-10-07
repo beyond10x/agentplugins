@@ -43,6 +43,12 @@ manifest, tagged tool caches), archives everything else the tree holds that no r
 recovers, and finishes. A directory's name never makes it cache: records written into `target/`
 are kept. `worktree discard-cache --dry-run` shows the classification without deleting anything.
 
+`worktree sweep --all-profiles` (worktree 0.10.0 or later) does the same for trees nobody
+finished. Run daily from a timer, it discards the recognised build cache of every tree idle for a
+day or more without a live lease, and archives what an expired or finished tree still holds. It
+never changes lifecycle, removes a tree or applies GC: a swept tree shows as eligible in
+`worktree gc --dry-run`, and removal stays an exact-id apply. `--dry-run` shows what it would do.
+
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by hand. It is a command:
 only you start it, never the model, and it hands off to `worktree:managing-worktrees` for every
 step — `inspect`, `archive` for work that must not be published, `finish`, `gc --dry-run --id`,

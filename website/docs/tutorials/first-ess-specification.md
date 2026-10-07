@@ -8,7 +8,7 @@ description: Specify a lending library and hold a Rust implementation to its gen
 
 An Executable System Specification describes records, commands, refusals, events and readable views.
 ESS validates that model and generates checks that an implementation must answer. This tutorial
-uses **ESS 0.53.0 and Rust**, verified on 2026-10-05. The
+uses **ESS 0.55.0 and Rust**, verified on 2026-10-07. The
 [2026-09-28 Go recording](./first-ess-specification-2026-09-28.md) is retained as historical evidence.
 
 You finish with a specification, generated documentation and OpenAPI, a small Rust library and
@@ -56,7 +56,7 @@ show those capabilities without changing this tutorial's lifecycle checks.
 `spec/system.yaml` selects the current source language:
 
 ```yaml
-format: ess/22
+format: ess/23
 system: library
 version: v1
 domains:
@@ -67,7 +67,7 @@ domains:
 
 ```yaml
 format: ess-inputs/2
-requires: ess 0.53.0
+requires: ess 0.55.0
 specification:
   - system.yaml
   - components.yaml
@@ -135,8 +135,8 @@ publish = false
 [workspace]
 
 [dev-dependencies]
-ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.53.0" }
-ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.53.0" }
+ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.55.0" }
+ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.55.0" }
 serde_json = "1"
 
 [profile.dev]
@@ -215,9 +215,15 @@ Make validation, regeneration and the native runner part of your build:
 
 ```bash
 ess specify validate --path spec
+ess generate --kind docs --path spec --out out --check
+ess generate --kind openapi --path spec --out out --check
 ess verify conform synthesize --path spec --target ir --out impl/suite.json
 cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture
 ```
+
+`--check` regenerates in memory and writes nothing. It exits 1 naming each file in `out` that no
+longer matches the specification, so commit `out` only if you hold it with these two lines; it
+passes when plain `ess generate` would change nothing.
 
 Keep `suite.json` generated and commit the source model, implementation and lockfile. When ESS
 releases, upgrade the CLI and both Rust dependencies together, regenerate the lockfile, and run
@@ -226,10 +232,12 @@ these checks before claiming verification against the new release.
 ## Beyond one record
 
 Use `when_related` for a decision about another row, and `instances` or `affects` for selected
-record effects. `affects` can also move selected records in `ess/22`. These declarations do not
-by themselves promise atomic multi-record transactions. Validation, synthesis and code generation
-have different supported subsets; keep each refusal visible and distinguish generated suite
-coverage from implementation coverage. In ESS 0.53.0, an identity-addressed related guard beside `unknown_instance` is refused.
+record effects. `affects` can also move selected records in `ess/22`; from `ess/23` it can write one
+record per element of an input list (`each:`), and `deletes:` can remove every row a filter selects.
+These declarations do not by themselves promise atomic multi-record transactions. Validation,
+synthesis and code generation have different supported subsets; keep each refusal visible and
+distinguish generated suite coverage from implementation coverage. In ESS 0.55.0, an
+identity-addressed related guard beside `unknown_instance` is refused.
 An existence-only input-related guard beside `wrong_state` is also refused. With `ess/22`,
 `wrong_state` can coexist with related guards when at least one present-row predicate is
 declared and every such predicate branch refuses. These are distinct ordering cases; validate

@@ -1,0 +1,178 @@
+format: ess/23
+system: demo
+version: v1
+domain: demo.shelves
+types:
+  - {name: demo.shelves.ShelfCode, kind: newtype, of: String}
+  - {name: demo.shelves.CopyId, kind: newtype, of: String}
+  - name: demo.shelves.Format
+    kind: enum
+    attributes:
+      - {name: loanable, type: Boolean}
+    variants:
+      - {name: Hardcover, attributes: {loanable: true}}
+      - {name: Paperback, attributes: {loanable: true}}
+      - {name: Reference, attributes: {loanable: false}}
+  - name: demo.shelves.Arrival
+    kind: struct
+    fields:
+      - {name: copy_id, type: demo.shelves.CopyId}
+      - {name: format, type: demo.shelves.Format}
+entities:
+  - name: demo.shelves.Shelf
+    identity: {name: code, type: demo.shelves.ShelfCode}
+    fields:
+      - {name: label, type: String}
+    lifecycle: {initial: Open, states: [Open], terminal: [Open]}
+  - name: demo.shelves.Copy
+    identity: {name: copy_id, type: demo.shelves.CopyId}
+    fields:
+      - {name: shelf, type: String}
+      - {name: format, type: demo.shelves.Format}
+    lifecycle:
+      initial: Available
+      states: [Available, OnLoan]
+      terminal: [OnLoan]
+      transitions:
+        - {name: lend, from: [Available], to: OnLoan}
+errors:
+  - {name: demo.shelves.ShelfExists, fields: []}
+  - {name: demo.shelves.CodeTaken, fields: []}
+  - {name: demo.shelves.NoSuchShelf, fields: []}
+  - {name: demo.shelves.NoSuchCopy, fields: []}
+  - {name: demo.shelves.CopyExists, fields: []}
+  - {name: demo.shelves.NotLoanable, fields: []}
+  - {name: demo.shelves.DuplicateArrival, fields: []}
+  - name: demo.shelves.CopyStateConflict
+    fields:
+      - {name: current, type: demo.shelves.Copy.State}
+events:
+  - name: demo.shelves.ShelfOpened
+    fields: [{name: code, type: demo.shelves.ShelfCode}]
+  - name: demo.shelves.ShelfRecoded
+    fields: [{name: code, type: demo.shelves.ShelfCode}, {name: new_code, type: demo.shelves.ShelfCode}]
+  - name: demo.shelves.CopiesShelved
+    fields: [{name: code, type: demo.shelves.ShelfCode}]
+  - name: demo.shelves.CopyAdded
+    fields: [{name: copy_id, type: demo.shelves.CopyId}]
+  - name: demo.shelves.CopyLent
+    fields: [{name: copy_id, type: demo.shelves.CopyId}]
+  - name: demo.shelves.ShelfCleared
+    fields: [{name: shelf, type: String}, {name: removed, type: Integer}]
+actors:
+  - name: demo.shelves.Librarian
+    may: [demo.shelves.OpenShelf, demo.shelves.AddCopy, demo.shelves.RecodeShelf, demo.shelves.ShelveCopies, demo.shelves.LendCopy, demo.shelves.ClearShelf]
+commands:
+  - name: demo.shelves.OpenShelf
+    input:
+      - {name: code, type: demo.shelves.ShelfCode}
+      - {name: label, type: String}
+    outcomes:
+      - name: opened
+        creates: demo.shelves.Shelf
+        instance: code
+        sets: {label: input.label}
+        emits: [demo.shelves.ShelfOpened]
+        payload:
+          demo.shelves.ShelfOpened: {code: input.code}
+      - {name: already-open, existing_instance: true, error: demo.shelves.ShelfExists}
+  - name: demo.shelves.AddCopy
+    input:
+      - {name: copy_id, type: demo.shelves.CopyId}
+      - {name: shelf, type: String}
+      - {name: format, type: demo.shelves.Format}
+    outcomes:
+      - name: added
+        creates: demo.shelves.Copy
+        instance: copy_id
+        sets: {shelf: input.shelf, format: input.format}
+        emits: [demo.shelves.CopyAdded]
+        payload:
+          demo.shelves.CopyAdded: {copy_id: input.copy_id}
+      - {name: already-added, existing_instance: true, error: demo.shelves.CopyExists}
+  - name: demo.shelves.RecodeShelf
+    input:
+      - {name: code, type: demo.shelves.ShelfCode}
+      - {name: new_code, type: demo.shelves.ShelfCode}
+    outcomes:
+      - name: taken
+        when_related:
+          entity: demo.shelves.Shelf
+          where: code == input.new_code
+          exists: true
+        error: demo.shelves.CodeTaken
+      - name: recoded
+        updates: demo.shelves.Shelf
+        instance: code
+        sets: {code: input.new_code}
+        emits: [demo.shelves.ShelfRecoded]
+        payload:
+          demo.shelves.ShelfRecoded: {code: input.code, new_code: input.new_code}
+      - {name: no-such-shelf, unknown_instance: true, error: demo.shelves.NoSuchShelf}
+  - name: demo.shelves.ShelveCopies
+    input:
+      - {name: code, type: demo.shelves.ShelfCode}
+      - {name: label, type: String}
+      - {name: arrivals, type: List<demo.shelves.Arrival>}
+    outcomes:
+      - name: duplicated
+        when: {not: {distinct: {in: arrivals, as: a, by: a.copy_id}}}
+        error: demo.shelves.DuplicateArrival
+      - name: shelved
+        updates: demo.shelves.Shelf
+        instance: code
+        sets: {label: input.label}
+        emits: [demo.shelves.CopiesShelved]
+        payload:
+          demo.shelves.CopiesShelved: {code: input.code}
+        affects:
+          - entity: demo.shelves.Copy
+            each: {in: input.arrivals, as: arrival}
+            instance: arrival.copy_id
+            sets: {shelf: input.label, format: arrival.format}
+      - {name: no-such-shelf, unknown_instance: true, error: demo.shelves.NoSuchShelf}
+  - name: demo.shelves.LendCopy
+    input:
+      - {name: copy_id, type: demo.shelves.CopyId}
+    outcomes:
+      - name: not-loanable
+        when_subject:
+          predicate: format.loanable == false
+        error: demo.shelves.NotLoanable
+      - name: lent
+        moves: demo.shelves.Copy.lend
+        instance: copy_id
+        emits: [demo.shelves.CopyLent]
+        payload:
+          demo.shelves.CopyLent: {copy_id: input.copy_id}
+      - name: wrong-state
+        wrong_state: true
+        error: demo.shelves.CopyStateConflict
+        payload:
+          demo.shelves.CopyStateConflict: {current: {subject: state}}
+      - {name: no-such-copy, unknown_instance: true, error: demo.shelves.NoSuchCopy}
+  - name: demo.shelves.ClearShelf
+    input:
+      - {name: shelf, type: String}
+    outcomes:
+      - name: cleared
+        deletes: demo.shelves.Copy
+        instances: {where: shelf == input.shelf}
+        emits: [demo.shelves.ShelfCleared]
+        payload:
+          demo.shelves.ShelfCleared: {shelf: input.shelf, removed: {count: changed}}
+views:
+  - name: demo.shelves.Shelves
+    source: demo.shelves.Shelf
+    consistency: read_your_writes
+    fields:
+      - {name: code, type: demo.shelves.ShelfCode}
+      - {name: label, type: String}
+  - name: demo.shelves.Copies
+    source: demo.shelves.Copy
+    consistency: read_your_writes
+    fields:
+      - {name: copy_id, type: demo.shelves.CopyId}
+      - {name: shelf, type: String}
+      - {name: format, type: demo.shelves.Format}
+      - {name: state, type: demo.shelves.Copy.State}

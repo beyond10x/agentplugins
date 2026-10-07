@@ -21,6 +21,11 @@ changed yet.
   upgrade. Moving the project is a separate change to its repository:
   `ess specify toolchain install <new-version> --pin` rewrites the pin, and
   `ess specify toolchain which` confirms the release that now runs there.
+- A project that commits generated output checks it against the new release before claiming it
+  current: `ess generate --path <specification> --kind <kind> --out <directory> --check` and
+  `ess generate cli … --check` name every file whose bytes the release changed. Regenerate those,
+  regenerate the conformance suite, and rebuild generated implementation code: a release can add a
+  context port method (such as `generate_optional_<t>`) the implementation must then supply.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
 

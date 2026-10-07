@@ -11,9 +11,13 @@ ess specify validate --path examples/related-guard.yaml
 ess verify conform synthesize --path examples/related-guard.yaml --out related-suite.json
 ess specify validate --path examples/set-effects.yaml
 ess verify conform synthesize --path examples/set-effects.yaml --out set-suite.json
+ess specify validate --path examples/shelves.yaml
+ess verify conform synthesize --path examples/shelves.yaml --out shelves-suite.json
 ```
 
-These examples synthesize 3 and 14 scenarios respectively, with zero refusals on the verified release.
+These examples synthesize 3, 14 and 16 scenarios respectively, with zero refusals on the verified
+release. `shelves.yaml` is the `ess/23` example: a renamed identity, per-element and bulk record
+effects, enum attributes and the held state as a value ([later-formats.md](later-formats.md#ess23)).
 `CheckMember` uses `when_related: {via: input.member_id, exists: false}`; synthesis arranges the
 present member and decoys, and separately asks with a missing identity. This is stronger than a
 comment claiming registration is checked.
@@ -21,9 +25,10 @@ comment claiming registration is checked.
 `Invite` updates its addressed session and uses `affects` to change and end other sessions of the
 same team. `EndTeam` uses `instances` and reports `{count: changed}`. A selected move skips records
 outside its transition's source states. These constructs do not declare transaction atomicity,
-partial failure or effect ordering. Current `affects` selectors read stored fields, not the
-selected entity’s identity; set-effect values cannot read `{increment: …}`. The example selects
-by stored `team` and writes literal `on_hold`, not a per-holder counter.
+partial failure or effect ordering. A `where:` selector reads stored fields, not the selected
+entity’s identity; from `ess/23`, `affects: each:` writes the record each element of an input list
+names by its identity instead. Set-effect values cannot read `{increment: …}` (`ESS-COMMAND-009`).
+The example selects by stored `team` and writes literal `on_hold`, not a per-holder counter.
 Generated implementation targets and Entity Runtime lowering
 still refuse set effects; a valid model and generated scenarios do not certify those targets.
 
@@ -62,7 +67,7 @@ promise an application can infer from JetStream alone.
 
 ## Finite protocol checks
 
-The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.53.0/examples/protocols). It separates
+The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.55.0/examples/protocols). It separates
 queueing the response, observing transport flush, closing and receiving the response.
 
 ```console

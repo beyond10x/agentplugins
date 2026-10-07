@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.28.0](https://github.com/beyond10x/connectors/releases/tag/v0.28.0).
+[v0.31.0](https://github.com/beyond10x/connectors/releases/tag/v0.31.0).
 
 ## Install in either host
 
@@ -23,7 +23,7 @@ b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 ```
 
 The current release has no prebuilt CLI assets. Setup builds the `connectors` Cargo package from
-its exact release tag with locked dependencies; v0.28.0 requires Rust 1.91 or newer. Adapter
+its exact release tag with locked dependencies; v0.31.0 requires Rust 1.91 or newer. Adapter
 executables, configuration and credentials are separate prerequisites. The local runtime currently
 targets Linux. [Setup](../install.md) preserves other installed plugins and snapshots changes.
 
