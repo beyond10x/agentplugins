@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-ess-055-worktree-010-connectors-031
 kind: task
-status: active
+status: implemented
 title: Track ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0
 summary: Re-verify the skills against three new CLI releases and move verified.json and the eval pins
-revision: 5
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-06T23:23:27Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-06T23:23:27Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-07T00:51:41Z", actor: "human:timo", revision: 7, decided_on: {"recorded":{"test_result":2}}}
 ---
 ## Context
 
@@ -77,3 +78,13 @@ source records `unsupported` for observations and skips only entity setup and cl
 the skill now says so. It also found "release-resolution evidence" in `ess:specifying` unclear; the
 sentence now names the plan file. The `ess-tutorial` run's five wording findings are
 `task:ess-tutorial-wording-round-0211`.
+
+## Release
+
+Released in 0.21.0: PR #64, main `19acc43`, annotated tag `0.21.0` by `b10x-bot[bot]`. On that
+commit every main workflow passed, Tools included (run 37551953157, 2026-10-07T00:28:21Z). The tag's
+Release workflow (run 37552117166) passed at 2026-10-07T00:50:10Z; its `release-publication`
+artifact's four archives matched `SHA256SUMS`, each held `b10x` and `LICENSE`, `SETUP.md` matched the
+tag, and the Linux x86_64 binary printed `b10x 0.21.0`. The GitHub Release was published by
+`b10x-bot[bot]` at 2026-10-07T00:50:50Z as latest, with six assets uploaded by the bot and digests
+equal to the verified files.
