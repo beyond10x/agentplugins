@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-worktree-0110
 kind: task
-status: active
+status: implemented
 title: Track Worktree 0.11.0
 summary: Re-verify the worktree skills against Worktree 0.11.0 and move verified.json and the eval pin
-revision: 4
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-07T02:39:53Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-07T02:39:53Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-07T02:59:40Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":2}}}
 ---
 ## Context
 
@@ -54,3 +55,13 @@ The `0110c` agent quoted two more passages and resolved both as the skills direc
 changed: `worktree:init`'s workspace root (settled by the headless fallback), and
 `managing-worktrees` "Never leave a tree silently active" beside "A tree belongs to the session
 that created it" (ended with the step 5 handoff).
+
+## Release
+
+Released in 0.21.1: PR #67, main `0a0877e`, annotated tag `0.21.1` by `b10x-bot[bot]`. On that
+commit every main workflow passed, Tools included (run 37563908395, 2026-10-07T02:51:52Z). The
+tag's Release workflow (run 37564216949) passed at 2026-10-07T02:58:03Z; its `release-publication`
+artifact's four archives matched `SHA256SUMS`, each held `b10x` and `LICENSE`, `SETUP.md` matched
+the tag, and the Linux x86_64 binary printed `b10x 0.21.1`. The GitHub Release was published by
+`b10x-bot[bot]` as latest, with six assets uploaded by the bot and digests equal to the verified
+files.
