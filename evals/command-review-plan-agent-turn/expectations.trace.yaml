@@ -1,0 +1,110 @@
+format: trace-spec/1
+id: eval-case/command-review-plan-agent-turn
+title: The agent started the review command, it loaded, and the review wrote nothing
+
+# One of five cases that start a command from an agent turn; `command-wave-agent-turn` explains
+# the first three rows. This command's work is a read-only review: the rows after the first three
+# are that work and its one limit, that it writes nothing.
+
+expectations:
+
+  - id: the-command-was-offered
+    statement: the plugin loaded and offered the review command, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: aep:review-plan
+
+  - id: the-agent-started-the-command
+    statement: the agent acting on the operator's request called the Skill tool for `aep:review-plan`
+    expect:
+      tool.called:
+        tool: Skill
+        args:
+          skill: {regex: '^aep:review-plan$'}
+        count: {at_least: 1}
+
+  - id: the-command-was-not-refused-at-invocation
+    statement: the harness loaded the command for the agent instead of refusing it, so the review below is the command's own
+    # A refused call's result records no success at all, which `aep` reads as undecidable; here
+    # that is the refusal this row exists to catch, so it counts as a gap.
+    on_unknown: gap
+    expect:
+      skill.completed:
+        skill: aep:review-plan
+        count: {at_least: 1}
+
+  - id: the-reviewer-was-dispatched
+    statement: the command dispatched the plugin's plan reviewer, by its full name
+    expect:
+      tool.called:
+        tools: [Agent, Task]
+        args:
+          subagent_type: {regex: '^aep:plan-reviewer$'}
+        count: {at_least: 1}
+
+  - id: the-store-was-validated
+    statement: the review ran the store's own validator, whose output it ends with, so the absences below were decided against a run that reached the store
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +validate'}
+        count: {at_least: 1}
+
+  - id: nothing-was-written-to-the-store
+    statement: no CLI write verb ran; every proposed move stayed a command in the report
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +(new|move|relate|unrelate|body|set|scope|evidence)\b'}
+
+  - id: no-file-was-changed
+    statement: the review changed no file
+    expect:
+      tool.absent:
+        tools: [Write, Edit, NotebookEdit]
+
+  - id: the-moves-were-proposed-as-commands
+    statement: the report writes each proposed move out as a command
+    # Advisory: a store with nothing to move is a clean review, and its report proposes none.
+    severity: advisory
+    expect:
+      text.matches:
+        regex: 'artifact +move'
+
+  - id: the-scope-was-actually-tested
+    statement: the run read the plan-reviewer reference the command hands off to, so the rows above judged the review and not a guess at it
+    severity: advisory
+    expect:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/skills/planning/references/plan-reviewer.md'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the review did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 40}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

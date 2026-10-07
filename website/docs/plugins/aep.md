@@ -33,8 +33,8 @@ Planning also refuses to decompose an epic or story that introduces an entity no
 declares. The domain is drafted and cited from the artifact first, and any relation that could not
 be read from code, an OpenAPI document or an existing artifact is marked unmapped, never guessed.
 
-Two commands start planning work by hand. Only you start them, never the model, and each hands off
-to `aep:planning`:
+Two commands start planning work by name. You start one, or an agent starts it when you ask, and
+each hands off to `aep:planning`:
 
 | command | what it does |
 |---|---|
@@ -60,8 +60,8 @@ It provides:
 - an adversary role that checks the result against scope, evidence, and repository invariants;
 - the `implementing` skill, in drive mode: one governed `metaharness aep drive` run over a single story.
 
-Two commands start either mode by hand. Only you start them, never the model, and each hands off
-to `aep:implementing`:
+Two commands start either mode by name. You start one, or an agent starts it when you ask, and
+each hands off to `aep:implementing`:
 
 | command | what it does |
 |---|---|

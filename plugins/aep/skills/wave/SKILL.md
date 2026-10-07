@@ -1,7 +1,6 @@
 ---
 name: wave
-description: Start an AEP implementation wave, started by the operator as /aep:wave. Hands off to aep:implementing in wave mode, which proposes the wave and stops for approval.
-disable-model-invocation: true
+description: Start an AEP implementation wave, as /aep:wave or when the operator asks an agent to propose or start the next wave. Hands off to aep:implementing in wave mode, which proposes the wave and stops for approval.
 argument-hint: "[story-id...]"
 ---
 

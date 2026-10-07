@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.21.1** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.21.2** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -17,12 +17,15 @@ only for some of them, and a caller may have hidden it:
 | the store | what works | upgrade |
 |---|---|---|
 | `aep.project/5` | everything | none |
-| `aep.project/1`, or `.engineering/planning/` with no `project.yaml` | every verb (with no `project.yaml`, only given `--store <dir>`) | `aep plan store migrate git --verify` on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, § 5), then commit |
+| `aep.project/1`, or `.engineering/planning/journal.jsonl` with no `project.yaml` | nothing: every verb that reads or writes the plan exits 1 before any write, with `[unsupported_protocol_version]` (no `project.yaml`: an error naming `journal.jsonl` and the migration); only `aep plan store migrate git` opens it | `aep plan store migrate git --dry-run`, then `--verify`, on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, § 5), then commit |
 | `aep.project/2`, `/3` or `/4` | nothing: every planning verb refuses it | `cargo install --git https://github.com/beyond10x/aep --rev 9c0f1da44429ff935fa0b2d743457945d51e1c51 aep-cli`, then `aep plan store migrate git --verify` on a clean `.engineering`, commit, then install the current release (`aep:upgrade`) |
 
 The migration rewrites every artifact file, so it runs when the user says so; `aep:upgrade` carries
-the steps. On `/1`, carry on with the task after telling them. On `/2`–`/4`, stop store work and
-report the refusal. Done when the user has been told, or `version` is `aep.project/5`.
+the steps. On `/1`, stop store work and report the refusal: do not carry on with the task, open the
+store with an older `aep`, or edit artifact files by hand. Resume only after the user has approved
+the migration and reviewed what `--dry-run` would write, `--verify` has passed, and the result is
+committed. On `/2`–`/4`, stop store work and report the refusal. Done when the user has been told,
+or `version` is `aep.project/5`.
 
 ## 0. When the record is required
 

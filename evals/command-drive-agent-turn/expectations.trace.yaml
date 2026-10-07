@@ -1,0 +1,111 @@
+format: trace-spec/1
+id: eval-case/command-drive-agent-turn
+title: The agent started the drive command, it loaded, and the run stopped before a paid launch
+
+# One of five cases that start a command from an agent turn; `command-wave-agent-turn` explains
+# the first three rows. The documented stops here are the task document nobody has read and the
+# budget nobody named, both before `METAHARNESS_LIVE=1`.
+
+expectations:
+
+  - id: the-command-was-offered
+    statement: the plugin loaded and offered the drive command, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: aep:drive
+
+  - id: the-agent-started-the-command
+    statement: the agent acting on the operator's request called the Skill tool for `aep:drive`
+    expect:
+      tool.called:
+        tool: Skill
+        args:
+          skill: {regex: '^aep:drive$'}
+        count: {at_least: 1}
+
+  - id: the-command-was-not-refused-at-invocation
+    statement: the harness loaded the command for the agent instead of refusing it, so the stop below is the command's own
+    # A refused call's result records no success at all, which `aep` reads as undecidable; here
+    # that is the refusal this row exists to catch, so it counts as a gap.
+    on_unknown: gap
+    expect:
+      skill.completed:
+        skill: aep:drive
+        count: {at_least: 1}
+
+  - id: the-checkout-was-checked-first
+    statement: the drive's first step ran, the free check that decides whether anything may launch
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +doctor'}
+        count: {at_least: 1}
+
+  - id: no-paid-run-was-launched
+    statement: no run opted in to model spend, because the task document was unread and the budget unnamed
+    # A quoted `"1"` or `'1'` sets the variable to 1 all the same.
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: 'METAHARNESS_LIVE=["'']?1\b|--uncapped-budget'}
+
+  - id: no-status-was-moved
+    statement: the run moved no artifact, which drive mode never does itself
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move'}
+
+  - id: nothing-was-published
+    statement: no push and no tag
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '\bgit( +(-C|-c|--git-dir|--work-tree|--namespace) +\S+| +-\S+)* +(push|tag)\b'}
+
+  - id: the-task-document-was-shown
+    statement: the report shows the drafted task document's `derived_from:` line for the operator to read
+    severity: advisory
+    expect:
+      text.matches:
+        regex: 'derived_from'
+
+  - id: the-scope-was-actually-tested
+    statement: the run read the drive reference the command hands off to, so the rows above judged the drive and not a guess at it
+    severity: advisory
+    expect:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/skills/implementing/references/drive.md'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: the drive did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 30}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

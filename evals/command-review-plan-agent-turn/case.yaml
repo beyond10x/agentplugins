@@ -1,0 +1,24 @@
+format: eval-case/1
+id: command-review-plan-agent-turn
+title: Asked in words to review the plan, the agent started aep:review-plan and changed nothing
+workflow: adp/default
+states: [decompose]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [aep:review-plan]
+  paths:
+    - plugins/aep/skills/planning/references/plan-reviewer.md
+
+# The operator asks an agent, in words, for what `/aep:review-plan` does. The command is read-only:
+# it proposes moves as commands and runs none. The rows decide that the agent started the command,
+# that the harness loaded it, that the plan reviewer ran and the store was validated, and that no
+# store write and no file edit happened.
+
+task: |
+  The operator asked for this, and you are the agent acting on it: "Review the plan with
+  `aep:review-plan` and tell me what you would move." Do not push, tag or release.
+
+expectations: expectations.trace.yaml
+recorded: recorded/
