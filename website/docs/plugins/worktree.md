@@ -12,7 +12,7 @@ or audits old linked worktrees.
 |---|---|
 | `worktree:init` | install the `worktree` CLI, activate a workspace, check it |
 | `worktree:managing-worktrees` | create, lease, finish, inspect and clean worktrees |
-| `worktree:cleanup` | command: `/worktree:cleanup` reviews the managed trees, finishes and garbage-collects only the ids you approve, and reports what it kept and why |
+| `worktree:cleanup` | command: `/worktree:cleanup`, or an agent acting on your request, reviews the managed trees, garbage-collects the eligible ids by exact id, and reports what it kept and why; without a request it stops after the dry-run |
 | `worktree:upgrade` | check the plugin and CLI, offer the upgrade |
 
 ```text
@@ -49,10 +49,11 @@ day or more without a live lease, and archives what an expired or finished tree 
 never changes lifecycle, removes a tree or applies GC: a swept tree shows as eligible in
 `worktree gc --dry-run`, and removal stays an exact-id apply. `--dry-run` shows what it would do.
 
-`/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by hand. It is a command:
-only you start it, never the model, and it hands off to `worktree:managing-worktrees` for every
-step — `inspect`, `archive` for work that must not be published, `finish`, `gc --dry-run --id`,
-then `gc --apply --id` for the ids you approved. It never forces a removal.
+`/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by name. It is a command:
+you start it, or an agent starts it when you ask, and it hands off to `worktree:managing-worktrees`
+for every step — `inspect`, `archive` for work that must not be published, `finish`,
+`gc --dry-run --id`, then `gc --apply --id` for the eligible ids. Your request authorizes that
+apply; without one it stops after the dry-run. It never forces a removal.
 
 `worktree inspect --repo <primary>` reports actual Git state, storage, ignored files, leases and
 retention blockers. It defaults to one repository; use `--workspace` to inspect the wider profile.

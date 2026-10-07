@@ -2,5 +2,3 @@ interface:
   display_name: "Drive a Story"
   short_description: "Start one governed AEP run over a single story"
   default_prompt: "Use $drive to start one governed run over the story I name and print its run id."
-policy:
-  allow_implicit_invocation: false

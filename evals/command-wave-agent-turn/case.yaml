@@ -1,0 +1,26 @@
+format: eval-case/1
+id: command-wave-agent-turn
+title: Asked in words for a wave, the agent started aep:wave and stopped at the stage-1 proposal
+workflow: adp/default
+states: [implement]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [aep:wave]
+  paths:
+    - plugins/aep/skills/implementing/references/wave.md
+
+# The operator asks an agent, in words, for what `/aep:wave` does. The rows decide that the agent
+# started the command through the Skill tool, that the harness loaded it rather than refusing it at
+# invocation, and that the run ended at the command's documented approval stop: the stage-1
+# proposal, with nothing past it applied. The operator asks for the proposal, so the
+# non-interactive bypass in `references/wave.md` does not apply.
+
+task: |
+  The operator asked for this, and you are the agent acting on it: "Start the next wave with
+  `aep:wave` over the stories that are ready, and bring me the proposal. Nothing runs until I
+  approve it." Do not push, tag or release.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

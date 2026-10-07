@@ -1,0 +1,25 @@
+format: eval-case/1
+id: command-decompose-agent-turn
+title: Asked in words to decompose an epic, the agent started aep:decompose and drafted stories only
+workflow: adp/default
+states: [decompose]
+arm: plugin
+verdict: held
+
+subject:
+  skills: [aep:decompose]
+  paths:
+    - plugins/aep/skills/planning/references/decomposer.md
+
+# The operator asks an agent, in words, for what `/aep:decompose <epic-id>` does. The command has
+# no approval stop of its own: it drafts and reports, and moves nothing. The rows decide that the
+# agent started the command, that the harness loaded it, that the decomposer ran and draft stories
+# reached the store through the CLI, and that no artifact moved.
+
+task: |
+  The operator asked for this, and you are the agent acting on it: "Decompose
+  `epic:passkey-login` with `aep:decompose` and tell me what is still open." Do not push, tag or
+  release.
+
+expectations: expectations.trace.yaml
+recorded: recorded/

@@ -1,0 +1,125 @@
+format: trace-spec/1
+id: eval-case/command-wave-agent-turn
+title: The agent started the wave command, it loaded, and the run stopped at the stage-1 proposal
+
+# One of five cases, one per command, that start a command from an agent turn. Each opens with the
+# same three rows: the command was offered, the agent called the Skill tool for it, and the harness
+# loaded it. `skill.completed` is the row a refusal at invocation contradicts: a skill the host
+# keeps from the model comes back from the Skill tool without `success: true`, and every row after
+# it is then about a run that never had the command. The rows after it are the command's own
+# work or its documented approval stop.
+
+expectations:
+
+  - id: the-command-was-offered
+    statement: the plugin loaded and offered the wave command, so a miss is not "it was not there"
+    expect:
+      env.skill_available:
+        skill: aep:wave
+
+  - id: the-agent-started-the-command
+    statement: the agent acting on the operator's request called the Skill tool for `aep:wave`
+    expect:
+      tool.called:
+        tool: Skill
+        args:
+          skill: {regex: '^aep:wave$'}
+        count: {at_least: 1}
+
+  - id: the-command-was-not-refused-at-invocation
+    statement: the harness loaded the command for the agent instead of refusing it, so the stop below is the command's own
+    # A refused call's result records no success at all, which `aep` reads as undecidable; here
+    # that is the refusal this row exists to catch, so it counts as a gap.
+    on_unknown: gap
+    expect:
+      skill.completed:
+        skill: aep:wave
+        count: {at_least: 1}
+
+  - id: the-store-was-read
+    statement: stage 1 read the store before it proposed anything, so the absences below were decided against a run that reached it
+    expect:
+      tool.called:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +(list|graph|blocked|waves)'}
+        count: {at_least: 1}
+
+  - id: nothing-ran-past-the-stop
+    statement: no story moved, no tree was created, and nothing was merged, committed or published before the operator approved
+    # `git` takes options before its verb (`git -C <dir> push`), so the matcher allows them; the
+    # cleanup and drive cases use the same prefix.
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +move|\bgit( +(-C|-c|--git-dir|--work-tree|--namespace) +\S+| +-\S+)* +(merge|commit|push|tag|worktree +add)\b|worktree +create'}
+
+  - id: the-operator-stop-was-not-bypassed
+    statement: the operator asked to approve, so no approval record stood in for them
+    expect:
+      tool.absent:
+        tool: Bash
+        args:
+          command: {regex: '(aep|protocol) +(plan +)?artifact +new +approval-record'}
+
+  - id: no-unit-was-dispatched
+    statement: no implementor, adversary or security reviewer ran, which only stage 2 dispatches
+    expect:
+      tool.absent:
+        tools: [Agent, Task]
+        args:
+          subagent_type: {regex: '^aep:(implementor|adversary|security-reviewer)$'}
+
+  - id: the-candidates-were-scoped
+    statement: stage 1 dispatched the story scoper, the positive control for the dispatch absence above
+    severity: advisory
+    expect:
+      tool.called:
+        tools: [Agent, Task]
+        args:
+          subagent_type: {regex: '^aep:story-scoper$'}
+        count: {at_least: 1}
+
+  - id: the-proposal-names-its-rules
+    statement: the stage-1 proposal printed the skill version line of the rules it ran
+    severity: advisory
+    expect:
+      text.matches:
+        regex: 'Skill version'
+
+  - id: the-scope-was-actually-tested
+    statement: the run read the wave reference the command hands off to, so the rows above judged the wave and not a guess at it
+    severity: advisory
+    expect:
+      tool.called:
+        operations: [file.read]
+        subject: {glob: 'file:*/skills/implementing/references/wave.md'}
+        count: {at_least: 1}
+
+  - id: nothing-was-refused
+    statement: nothing the run tried had to be refused
+    expect:
+      permission.denied:
+        count: {at_most: 0}
+
+  - id: terminal-record-clean
+    statement: the session ended the way a finished session ends
+    expect:
+      result:
+        is_error: false
+        terminal_reason: completed
+
+  - id: turns-within-reason
+    statement: stage 1 did not loop
+    severity: advisory
+    expect:
+      turns:
+        count: {at_most: 60}
+
+  - id: cost-within-the-per-case-budget
+    statement: the run stayed inside the per-case cap the corpus is run under
+    severity: advisory
+    expect:
+      cost.total:
+        at_most_usd: 5.0

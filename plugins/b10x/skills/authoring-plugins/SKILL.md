@@ -23,13 +23,19 @@ that a component works in both hosts.
 Represent every user-visible workflow as `skills/<capability>/SKILL.md`. Both hosts load this
 layout, its `references/`, `assets/`, and optional `scripts/` resources.
 
-- For a requested command (an entry point only the operator starts), create a **command** skill:
-  a verb name (`cleanup`, `review-plan`); frontmatter `disable-model-invocation: true` and an
+- For a requested command (an entry point the operator starts by name, or an agent starts on the
+  operator's request), create a **command** skill: a verb name (`cleanup`, `review-plan`); an
   `argument-hint`; at most 20 lines of body; and exactly one hand-off, by `<plugin>:<skill>`, to
-  the activity skill of the same plugin that holds the behavior. Give it an `agents/openai.yaml`
-  that sets `policy.allow_implicit_invocation: false`, the Codex form of the same flag, so it is
-  operator-only in both hosts: Claude Code lists it as `/<plugin>:<name>`, Codex as `$<name>`,
-  and neither lets the model start it. Behavior never moves into the command.
+  the activity skill of the same plugin that holds the behavior. Claude Code lists it as
+  `/<plugin>:<name>`, Codex as `$<name>`. Put any approval it needs in its body or in that
+  activity skill, as the step where the run stops, so an agent that started it stops there too.
+  Behavior never moves into the command.
+- Keep a skill operator-only only when no approval step can carry the reason. Then set
+  `disable-model-invocation: true` in its frontmatter and
+  `policy.allow_implicit_invocation: false` in its `agents/openai.yaml`, the Codex form of the
+  same flag, and give the reason in its description in a sentence starting `Operator-only:` that
+  also says what an agent may do instead. Quote that description, because the sentence carries a
+  colon.
 - For a requested specialist agent, put the complete procedure and success criteria in its owning
   skill, as `references/<role>.md` beside it. Tell the skill to delegate when the host exposes
   subagents and to run the same bounded procedure directly otherwise; Codex does not load
@@ -58,7 +64,7 @@ Prefer this shared layout:
 ├── skills/
 │   └── <capability>/
 │       ├── SKILL.md
-│       ├── agents/openai.yaml      # Codex metadata; required for a command
+│       ├── agents/openai.yaml      # Codex metadata; required for an operator-only skill
 │       └── references/             # optional shared supporting material
 ├── agents/                         # optional thin Claude adapters over skill roles
 ├── commands/                       # optional Claude adapter only; prefer skills

@@ -2,5 +2,3 @@ interface:
   display_name: "Review the Plan"
   short_description: "Audit the AEP planning store read-only and propose moves"
   default_prompt: "Use $review-plan to audit the planning store for drift that validate cannot see, and propose moves without making any."
-policy:
-  allow_implicit_invocation: false

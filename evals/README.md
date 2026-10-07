@@ -13,12 +13,12 @@ A case is four things and no others:
 | the expectations | `expectations.trace.yaml` | a `trace-spec/1` document: what the run must have looked like |
 | the transcript | `recorded/` | a recorded run, replayed through the checker for nothing |
 
-## The seventeen cases
+## The twenty-two cases
 
 Every cell in the middle column is that case's `subject:` in full, read from its `case.yaml`, and
 those fields — not this table and not any prose elsewhere — are the source of truth for what the
-corpus covers: counted from them the seventeen cases name **8 of this repository's 14 agents** and
-**6 of its 22 skills** (the 6 command skills are not counted).
+corpus covers: counted from them the twenty-two cases name **8 of this repository's 14 agents** and
+**11 of its 28 skills**, the 5 commands among them.
 
 | Case | `subject:` agents and skills | The claim it holds the subject to |
 |---|---|---|
@@ -39,6 +39,16 @@ corpus covers: counted from them the seventeen cases name **8 of this repository
 | `decomposer-expand-migrate-contract` | `aep:decomposer` | a codebase-wide rename became at least four stories linked by at least three `depends_on` edges |
 | `adversary-panel-one-family` | `aep:implementing`, `aep:adversary` | a panel asked for under one model family recorded one seat and said the panel was one reviewer |
 | `authoring-prohibition-only-rule` | `b10x:authoring-plugins` | a wording review read the seeded skill, edited nothing, and named the prohibition with a positive target |
+| `command-wave-agent-turn` | `aep:wave` (and the path `plugins/aep/skills/implementing/references/wave.md`) | started from an agent turn, the command loaded and the run stopped at the stage-1 proposal with nothing applied |
+| `command-drive-agent-turn` | `aep:drive` (and the path `plugins/aep/skills/implementing/references/drive.md`) | started from an agent turn, the command loaded, `aep doctor` ran, and no paid run launched |
+| `command-decompose-agent-turn` | `aep:decompose` (and the path `plugins/aep/skills/planning/references/decomposer.md`) | started from an agent turn, the command loaded, the decomposer drafted stories through the CLI, and nothing moved |
+| `command-review-plan-agent-turn` | `aep:review-plan` (and the path `plugins/aep/skills/planning/references/plan-reviewer.md`) | started from an agent turn, the command loaded, the plan reviewer ran, the store was validated, and nothing was written |
+| `command-cleanup-agent-turn` | `worktree:cleanup` (and the path `plugins/worktree/skills/managing-worktrees/SKILL.md`) | started from an agent turn, the command loaded, and only ids from a dry-run were applied, unforced |
+
+The five `command-` cases are one per command. Each opens with the same three rows: the command
+was offered, the agent called the Skill tool for it, and `skill.completed` says the harness loaded
+it rather than refusing it at invocation (an undecidable result counts as a gap there). The rows
+after them are the command's work or its documented approval stop, never a stop at invocation.
 
 No case names the agents `aep:implementor`, `aep:plan-reviewer`, `aep:reverse-engineer`,
 `ess:author`, `ess:conformance` or `ess:retrofitter`, nor the activity skills `aep:migrating`, `aep:investigating`,
@@ -180,9 +190,9 @@ error: live evaluation moved to `metaharness aep drive eval run`; use --stream f
 
 | | |
 |---|---|
-| cases in the corpus | **8** |
+| cases in the corpus | **22** |
 | per-case cap | **$5** — `story:plugin-eval-cases`, the operator's default |
-| one full run, one arm, one harness | **$40** |
+| one full run, one arm, one harness | **$110** |
 | `EVAL_BUDGET_USD` default | **$20** — `story:eval-ci-gates`, the operator's default |
 
 **So a full sweep does not fit its own default budget, and that is the intended behaviour rather
@@ -193,7 +203,7 @@ pull request touching one agent or one skill actually selects. Running the whole
 deliberate act: raise the repository variable, or dispatch one case at a time.
 
 The cap is a **cap, not an estimate** — no recorded run has priced this corpus yet, so nothing here
-claims a full sweep will cost $40 rather than refusing above it. `--assume-usd-per-run` is what the
+claims a full sweep will cost $110 rather than refusing above it. `--assume-usd-per-run` is what the
 runner charges a run whose stream states no cost, and it is set to the per-case cap so the runner's
 own pre-spawn check is made against the budgeted number and not against its optimistic default.
 
