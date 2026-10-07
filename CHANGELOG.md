@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.21.2] — 2026-10-07
+
+- `aep:planning` and `aep:implementing` no longer say an `aep.project/1` store keeps working. The
+  newest `aep` refuses it with `[unsupported_protocol_version]` before any write, and a
+  `journal.jsonl` plan with no `project.yaml` is refused naming the migration. Store work stops
+  until the user approves `aep plan store migrate git --dry-run`, then `--verify`, and commits the
+  result. `agentplugins-check tools` runs the newest `aep` against a generated `/1` store and
+  flags a skill row that disagrees with it (https://github.com/beyond10x/agentplugins/issues/54).
+- An agent can start every command skill: `aep:wave`, `aep:drive`, `aep:decompose`,
+  `aep:review-plan` and `worktree:cleanup` no longer set `disable-model-invocation` or, for Codex,
+  `allow_implicit_invocation: false`. Each command's approval stays inside its procedure; for
+  `worktree:cleanup` the operator's request, as the command or in words, authorizes the apply, and
+  without one it stops after the dry-run. R3 and the gate now allow an operator-only skill only
+  with both flags and an `Operator-only:` sentence in its description. Five eval cases start each
+  command from an agent turn (https://github.com/beyond10x/agentplugins/issues/41).
+
 ## [0.21.1] — 2026-10-07
 
 - Track Worktree 0.11.0 (from 0.10.0). `verified.json` and the eval workflow move to 0.11.0 after
