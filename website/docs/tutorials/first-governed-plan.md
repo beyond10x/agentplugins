@@ -16,7 +16,7 @@ change before drafting stories, sends those stories to four critics, and impleme
 approved wave with an independent adversary. Counts and identifiers depend on the resulting model;
 do not copy scenario counts from a different run.
 
-These instructions target AEP 0.68.0 and ESS 0.55.0. The complete
+These instructions target AEP 0.69.0 and ESS 0.56.0. The complete
 [2026-09-28 recording](./first-governed-plan-2026-09-28.md) preserves the earlier Go session and its
 costs as historical evidence.
 
@@ -102,7 +102,7 @@ Record unsupported semantics and unresolved questions in the store instead of gu
 
 The agent may use separate commands for collecting a hold and borrowing a shelf book. The exact
 command and guard structure must be supported by the released ESS validator and synthesis path.
-In ESS 0.55, an existence-only input-related guard cannot accompany `wrong_state`, and
+In ESS 0.56, an existence-only input-related guard cannot accompany `wrong_state`, and
 identity-addressed related guards cannot accompany `unknown_instance`. Some present-row predicate refusals can accompany
 `wrong_state` in `ess/22`; see the ESS tutorial's qualified examples. Keep the intended rule
 visible; do not remove lifecycle assertions or invent predicates to obtain a green synthesis.

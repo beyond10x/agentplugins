@@ -8,7 +8,7 @@ description: With an agent, write an Executable System Specification for a small
 
 This is the preserved ESS 0.38.0 and Go transcript, not current instructions. Its one-record and
 related-guard limitations describe that recording only. Use [the current Rust tutorial](./first-ess-specification.md)
-for ESS 0.55.0; it tests consistency tokens and explains current cross-record support.
+for ESS 0.56.0; it tests consistency tokens and explains current cross-record support.
 
 An **Executable System Specification** (ESS) says what a system does: its records, the commands that
 change them, the answers a command may refuse with, the events it publishes and the views it serves.
