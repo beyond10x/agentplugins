@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-08T22:52:51Z",
+  "actor": "human:timo",
+  "artifact": "story:hardening-findings-block",
+  "kind": "story",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check",
+    "reference": "wave/findings-block dd2f96a: 174 passed, agentplugins-check valid; task site-build exit 0"
+  }
+}

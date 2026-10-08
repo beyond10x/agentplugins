@@ -2,14 +2,15 @@
 format: aep.planning-md/3
 id: task:follow-releases-2026-10-08
 kind: task
-status: active
+status: implemented
 title: 'Follow the releases of 2026-10-08: aep 0.70.0, worktree 0.14.0, connectors v0.37.0, metaharness 0.9.3'
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-08T22:38:10Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-08T22:38:10Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-08T22:52:51Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Task: follow the releases of 2026-10-08
 

@@ -2,14 +2,15 @@
 format: aep.planning-md/3
 id: story:hardening-findings-block
 kind: story
-status: active
+status: implemented
 title: ess:hardening closes its report with a findings block
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-08T22:38:10Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-08T22:38:10Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-08T22:52:51Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Story: ess:hardening closes its report with a findings block
 
