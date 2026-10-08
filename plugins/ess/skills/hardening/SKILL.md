@@ -122,7 +122,7 @@ the previous one by signature instead of by somebody re-reading two reports.
 | `severity` | `blocker` when the unit must not merge with it standing, `warning` when it should be fixed and does not hold the unit, `note` for the residue you would not have raised alone |
 | `verdict` | `CONFIRMED`, `NEEDS-CHANGE` or `INFEASIBLE` |
 | `origin` | `introduced`, `pre-existing` or `undecided` |
-| `message` | one sentence, the finding itself. Not a second wording of the row you already wrote |
+| `message` | one sentence, the finding itself. Not a second wording of the prose you already wrote |
 
 | `category` | Means |
 |---|---|
