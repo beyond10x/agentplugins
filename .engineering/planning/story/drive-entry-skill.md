@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:drive-entry-skill
 kind: story
-status: active
+status: implemented
 title: /drive runs one story under aep drive from a Claude Code session
 summary: A skill that runs aep doctor then launches aep drive run for one story in a hermetic scratch home; blocked on the aep walk reaching complete.
 owner: plugins
@@ -10,10 +10,11 @@ tags:
 - drive
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 3
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 2, imported: true}
 - {from: "proposed", to: "active", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 3, imported: true}
+- {from: "active", to: "implemented", at: "2026-10-08T09:50:41Z", actor: "human:timo", revision: 5, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Story: `/drive` runs one story under `aep drive` from a Claude Code session
 
@@ -44,3 +45,10 @@ Making the walk reach `complete`. That is `aep` `story:governed-dogfood-run`; th
 ## Open Questions
 
 None.
+
+## Evidence (2026-10-08)
+
+- `plugins/aep/skills/drive/SKILL.md`: `/aep:drive <story-id>` hands off to `aep:implementing` drive mode, moves no artifact, relays every refusal unedited.
+- `plugins/aep/skills/implementing/references/drive.md:101-102`: the run gets metaharness's hermetic scratch home, not the session's.
+- `website/docs/golden-path.md:370`: step 8, "Drive the first story", runs `aep doctor` first.
+- `evals/command-drive-agent-turn/` exercises the command.

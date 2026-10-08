@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:plugin-eval-cases
 kind: story
-status: active
+status: archived
 title: Every agent and skill has an eval case beside it
 summary: evals/ holds one eval-case/1 per critic, the decomposer, ess-schema, the golden path and the adversary, run by aep eval run --corpus evals and replayable offline.
 owner: plugins
@@ -10,10 +10,11 @@ tags:
 - evals
 relations:
 - decomposes: epic:ahead-of-the-alternative
-revision: 4
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-09-02T23:06:38Z", actor: "human:timo", revision: 2, imported: true}
 - {from: "proposed", to: "active", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 3, imported: true}
+- {from: "active", to: "archived", at: "2026-10-08T09:50:23Z", actor: "human:timo", revision: 6}
 ---
 # Story: Every agent and skill has an eval case beside it
 
@@ -59,3 +60,7 @@ Asking a model whether the agent behaved reasonably. Refused for the reason `aep
 ## Open Questions
 
 None.
+
+## Closed 2026-10-08
+
+Archived: the acceptance names subjects under plugin names retired since (`aep-drive:`, `aep-plan:`, `beyond10x:`, `workspace-hygiene:`). The coverage gap counted on 2026-10-08 from `evals/*/case.yaml` `subject:` fields is carried by `story:eval-coverage-remaining`.
