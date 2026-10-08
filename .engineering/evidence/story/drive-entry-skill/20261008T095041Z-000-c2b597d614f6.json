@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-08T09:50:41Z",
+  "actor": "human:timo",
+  "artifact": "story:drive-entry-skill",
+  "kind": "story",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check at 81c2915: valid, 22 eval cases including evals/command-drive-agent-turn"
+  }
+}
