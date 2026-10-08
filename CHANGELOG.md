@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.22.2] — 2026-10-08
+
+- Track AEP 0.69.1. `verified.json` and the planning store's `protocols` source move to it after
+  `agentplugins-check tools`; its fix to cross-member edges needs no skill change. The eval
+  workflow keeps AEP 0.68.0, the revision Metaharness 0.9.1 links.
+
 ## [0.22.1] — 2026-10-08
 
 - `connectors:integrating` spells `operations list --adapter '<alias>' --family '<contract id>'`.
