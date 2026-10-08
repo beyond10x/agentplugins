@@ -57,6 +57,11 @@ day or more without a live lease, and archives what an expired or finished tree 
 never changes lifecycle, removes a tree or applies GC: a swept tree shows as eligible in
 `worktree gc --dry-run`, and removal stays an exact-id apply. `--dry-run` shows what it would do.
 
+Since worktree 0.13.0, `worktree gc` without `--id` assesses only the current repository's trees;
+`--scope profile` assesses every repository in the profile. `finish`, `discard-cache`, `archive`,
+`gc --id` and `reconcile --id` all accept a tree's id, its path or its unique directory name, and
+`finish` prints `finished <id> <path>`, either of which `gc --id` takes.
+
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by name. It is a command:
 you start it, or an agent starts it when you ask, and it hands off to `worktree:managing-worktrees`
 for every step — `inspect`, `archive` for work that must not be published, `finish`,
