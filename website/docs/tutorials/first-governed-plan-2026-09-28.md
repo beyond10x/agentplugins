@@ -225,7 +225,9 @@ valid
 ```
 
 `valid` is the verdict. The four warnings above it come from `aep` itself: it counts a review that
-ended with an empty findings block as having none (beyond10x/aep#60).
+ended with an empty findings block as having none (beyond10x/aep#60). AEP 0.65.0 fixed this: an
+`approve` review with `findings: []` no longer draws the warning, which is kept for a review with
+no findings block at all.
 
 ## 5. Accept the stories and propose a wave
 

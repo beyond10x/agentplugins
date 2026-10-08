@@ -1,7 +1,7 @@
 planning_scope: agentplugins
 profile: development.standard
 protocol: adp/1
-protocols: git+https://github.com/beyond10x/aep#6d7a44d3607d2d9a6ffdf0a165993c546c43d0db
+protocols: git+https://github.com/beyond10x/aep#f4363b773b6eeb644731be3f91561a31f1504b59
 store:
   git: {}
 summary: Curated Codex and Claude Code plugins for AEP planning, ADP development and ESS validation, planned in their own store.
