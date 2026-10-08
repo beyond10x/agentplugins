@@ -3,6 +3,11 @@
 The `b10x` marketplace: every Beyond10x plugin, and the `b10x` CLI that installs them with their
 CLIs. Serves O2 (decisions as data) and O3 (any harness).
 
+## Serves
+
+- **O2 — decisions as data, with evidence.** The plugins teach agents to plan, review and record in the AEP store and ESS specifications.
+- **O3 — any harness, observed and compared.** One marketplace installs the same plugins and CLIs into Claude Code and Codex, and the eval corpus compares their runs.
+
 ## Map
 
 | path | what |
