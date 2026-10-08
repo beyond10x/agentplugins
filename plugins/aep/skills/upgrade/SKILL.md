@@ -47,6 +47,10 @@ b10x install aep --method cargo       # replaces the pinned build in ~/.cargo/bi
 
 Done when `aep --version` prints the newest release, `version` reads `aep.project/5`, and
 `aep plan artifact validate` exits 0. A `--verify` difference exits non-zero: relay it and stop.
+The current release's `--verify` compares every migrated evidence record with the one the old store
+answered, field by field and in order, duplicates included, and names the artifact, the record's
+position, its evidence file and the differing fields; title, body and transition differences are
+named the same way, and per-kind counts are still printed.
 
 ## Next
 
