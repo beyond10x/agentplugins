@@ -357,6 +357,12 @@ refuses the two things that quietly break later — an absolute path, and a `git
 branch rather than a commit. A `.engineering/planning/` that already holds a plan is refused too,
 naming `aep plan store migrate git`.
 
+Both `reverse init` and `aep plan store migrate git` write `planning_scope` and print where it came
+from: `--planning-scope <name>` when given, else the `origin` remote's last path segment without
+`.git`, else the primary checkout's directory name; a linked worktree's own directory name is
+never used. A repository with none of these, such as a bare repository's
+worktree with no `origin`, is refused naming `--planning-scope`.
+
 The two values, for a project that follows the published protocols:
 
 | flag | value |

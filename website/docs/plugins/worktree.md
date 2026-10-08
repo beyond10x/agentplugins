@@ -62,6 +62,13 @@ Since worktree 0.13.0, `worktree gc` without `--id` assesses only the current re
 `gc --id` and `reconcile --id` all accept a tree's id, its path or its unique directory name, and
 `finish` prints `finished <id> <path>`, either of which `gc --id` takes.
 
+Since worktree 0.14.0, `worktree prune-archives --repo <primary> --dry-run` lists each archive
+with its bytes and verdict (`--scope profile` for every archive). Only a `Removable` archive is
+deleted, with `worktree prune-archives --repo <primary> --apply --id <reviewed-directory>`: its
+tree is gone, it holds no `dirty.patch` and no nested image, and HEAD and every unique commit it
+records are ancestors of a ref a remote freshly advertises. Every other verdict is kept and no flag
+forces a removal; deleting such an archive by hand loses the only copy of its work.
+
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by name. It is a command:
 you start it, or an agent starts it when you ask, and it hands off to `worktree:managing-worktrees`
 for every step — `inspect`, `archive` for work that must not be published, `finish`,
