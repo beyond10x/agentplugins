@@ -287,9 +287,10 @@ Generate the Go package **inside the implementation's own module**: `--out <modu
 `<module root>/essconform`, the import path its `README.md` shows (`<module>/essconform`). A copy
 outside the module has no `go.mod` to import from. The package's
 `README.md` lists the methods and the wiring test. A method you cannot answer returns
-`ErrUnsupported`, never a made-up result. From entity setup or a clock reading the runner counts
-that as `skipped`; from an observation such as `ObserveInvocations` it records `unsupported`, a
-verdict of its own that is not a pass (the Rust runner fails conformance on it). A refused command still sets `Outcome` to the
+`ErrUnsupported`, never a made-up result. From entity setup or a clock reading the Go runner
+counts that as `skipped`; from an observation such as `ObserveInvocations` it records
+`unsupported`, a verdict of its own that is not a pass. The Rust runner has no skipped status:
+every unsupported answer is `unsupported`, and conformance fails on it. A refused command still sets `Outcome` to the
 refusing outcome’s name beside `Error`: the runner compares both. Successful mutations return a
 backend-issued consistency token; a view honors `AtLeast(token)` before returning rows. An adapter
 that cannot meet freshness returns a failure, never a successful weaker read.

@@ -25,6 +25,12 @@
   (`worktree.archive/2`) and restored with `tar -xpf`, and plain `worktree finish` refuses a dirty
   tree unless its archive holds the current state.
 - `aep:upgrade` says what `aep plan store migrate git --verify` compares since AEP 0.69.0.
+- `ess:testing-conformance` says the `skipped` count for an unsupported entity setup or clock
+  reading is the Go runner's; the Rust runner records every unsupported answer as `unsupported`
+  and fails conformance on it. The `ess-full-package` trial read it as applying to Rust.
+- Trials on 0.22.0, isolated: `ess-tutorial` valid, 17 scenarios, 0 refusals, cargo test 2/0;
+  `ess-full-package` valid, 31 scenarios, 0 refusals, 9/9 outputs, cargo test 3/0;
+  `worktree-onboarding` 12 tool calls. Their runs are the new baselines.
 
 ## [0.21.2] — 2026-10-07
 

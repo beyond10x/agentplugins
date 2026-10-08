@@ -7,7 +7,7 @@ title: 'ESS tutorial: five passages the 2026-10-07 trial agent could not read un
 summary: Clarify step 3, step 6, Node::Null for an absent Optional, and which status an invalid token is
 relations:
 - informed_by: task:refresh-ess-055-worktree-010-connectors-031
-revision: 1
+revision: 2
 ---
 ## Context
 
@@ -37,3 +37,11 @@ run quotes none of the five.
 ## Scope
 
 Cited: website/docs/tutorials/first-ess-specification.md, trials/ess-tutorial/fixture/tutorial.md.
+
+## Trial of 2026-10-08
+
+The isolated `ess-tutorial` trial on ESS 0.56.0 and plugins 0.22.0 passed (valid, 17 scenarios, 0
+refusals, 5/5 outputs, cargo test 2/0, 67 tool calls). Its agent again quoted "Use `Node::Text` for
+string values" (an absent `borrower_id` must be `Node::Null`; one scenario failed until it was),
+"maps only the five commands and three views" (the five are never named), and the
+`book.state != "OnShelf"` guard (it assumes a string state).
