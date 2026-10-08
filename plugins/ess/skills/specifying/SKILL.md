@@ -267,6 +267,10 @@ same pages as HTML) or `docs-ir`. Give each kind its own `--out`, side by side (
 `out/openapi`, …): an output directory inside another is refused. `schema`, `openapi`, `asyncapi`
 and `docs` add a folder named after the kind below `--out` (`out/schema/schema/…`); `site` writes
 into `--out` itself. Type libraries come from `ess generate types --target rust|go|typescript`.
+A Rust library whose types hold JSON numbers declares a default-on `exact-numbers` Cargo feature
+that enables `serde_json/arbitrary_precision`; a consumer depending on it with
+`default-features = false` gets binary64 numbers. `types-report.json` names each such value under
+`rust_exact_numbers`.
 
 **OpenAPI and AsyncAPI need a component** that owns the domain and says how it is reached
 (`components.yaml`, `reached_by`). Without one, `openapi` writes `0 artifact(s)` and prints no
@@ -283,6 +287,20 @@ It regenerates in memory, writes nothing, and exits 1 with one line per edited, 
 no-longer-generated file and for a missing or stale `.ess-output` record; exit 0 means plain
 `ess generate` would change nothing. A stale committed file is drift; a file no projection owns is
 not authority.
+
+Commit `.ess-output/` together with the files it records. Generation never replaces an owned file
+whose bytes differ from that record (a hand edit, or generated files committed without their
+record): plain `ess generate` refuses before writing and `--check` names the file, both with the
+re-enroll route. Move the file aside (or delete it if it is generated), remove `.ess-output`,
+generate the same kind into a fresh directory as the reference, run
+`ess generate output adopt --ownership-root <directory> --from <reference> --owner <family>` once
+per owner the refusal names (such as `projection:schema`), then regenerate. A leftover
+`.ess-output/state.next` makes `--check` exit 1; plain `ess generate` removes it.
+
+The record is `ess-output-state/3`. A write-mode run rewrites an older `/1` or `/2` record as `/3`
+once, even when no file changes; `--check` passes it with one warning. An `ess` that writes `/2`
+refuses a `/3` record in both modes (`error: invalid output state: missing field` naming `root`,
+exit 1), so move a CI job's `ess` pin in the same change that commits the regenerated record.
 
 ## Implementation code comes from the specification
 

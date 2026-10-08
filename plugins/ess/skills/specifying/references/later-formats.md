@@ -219,9 +219,22 @@ writes no scenario for the external branch (`ESS-SYNTH-003`) or for the states r
 through it (`ESS-SYNTH-004`), and names the guards. To keep the scenario, give the held-state
 branch an input guard the external case does not meet.
 
+Declare a branch the held state selects (`when_subject_state:`, `when_subject:`,
+`when_state_changes:`) before an accepting `when:` branch or an `external:` branch that one request
+could also satisfy. Declared the other way round, `validate` refuses it as `ESS-COMMAND-004`
+(`conflicting_declaration`), naming both branches, with the reorder as the hint. An `external:`
+branch with no input guard always overlaps. Reordering changes no answer: the held state selects
+first in either order.
+
 A specification lowered to Entity Runtime is refused there, not at `validate`, for value
 expressions (`ValueExpressionUnsupported`), the `ess/15` outcome shapes (`OutcomeShapeUnsupported`)
 and the case-insensitive operators (`CaseFoldUnsupported`); keep those out of a model that must lower.
+A String type's `alphabet:` lowers to every field, argument and member it reaches (nested alphabets
+as their intersection), and `<text>.count` lowers counted in Unicode scalar values. Still refused
+there: an alphabet on a declared response field, a text literal outside its field's alphabet, or
+nested alphabets that share no character (`AlphabetUnsupported`), and a text length read through a
+quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
+lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
 ## From `ess/16` through `ess/23`
 

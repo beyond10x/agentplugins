@@ -26,6 +26,15 @@ changed yet.
   `ess generate cli … --check` name every file whose bytes the release changed. Regenerate those,
   regenerate the conformance suite, and rebuild generated implementation code: a release can add a
   context port method (such as `generate_optional_<t>`) the implementation must then supply.
+  Regenerated Rust type libraries (`ess generate types`, which has no `--check`) can change
+  `Cargo.toml` and `types-report.json`.
+- Run `ess specify validate --path <specification>` with the new release first: a release can
+  refuse a specification an older one accepted, such as an accepting `when:` or `external:`
+  branch declared before a held-state branch (`ESS-COMMAND-004`); reorder as its hint says.
+- Regeneration that rewrites `.ess-output/state.json` to a newer record format (such as
+  `ess-output-state/3`) breaks every older `ess` that reads it: move a CI job's `ess` pin in the
+  same change that commits the regenerated record. A refusal that an owned file differs from its
+  `.ess-output` record names the re-enroll route; `ess:specifying` walks it.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
 
