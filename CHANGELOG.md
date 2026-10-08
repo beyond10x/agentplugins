@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.22.1] — 2026-10-08
+
+- `connectors:integrating` spells `operations list --adapter '<alias>' --family '<contract id>'`.
+  The family filter narrows one adapter's cached description and requires `--adapter`; the
+  command the skill showed exits 2 with `cli_parse`.
+- Track Connectors v0.33.0. `verified.json` and the eval workflow move to it after
+  `agentplugins-check tools`. The setup reference, `connectors:upgrade` and the plugin page say
+  that a store `setup init` creates cannot be opened by v0.32.0 or earlier, so every binary that
+  opens a store is upgraded first, and name the one-way `setup checkpoints-enable --confirm
+  one-way` for an existing store.
+
 ## [0.22.0] — 2026-10-08
 
 - Track AEP 0.69.0, ESS 0.56.0, Worktree 0.12.1 and Connectors v0.32.0. `verified.json` moves to

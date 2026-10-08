@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.32.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.32.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.33.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.33.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -39,8 +39,10 @@ connectors --output json operations list --adapter '<alias>'
 connectors --output json operations describe --adapter '<alias>' --operation '<listed operation>'
 ```
 
-To find which operations bind a datasource family, across adapters, run
-`connectors --output json operations list --family '<contract id>'`. A `datasource.feed/v1alpha1`
+To find which of an adapter's operations bind a datasource family, run
+`connectors --output json operations list --adapter '<alias>' --family '<contract id>'`. The
+family filter narrows that one adapter's cached description and requires `--adapter`; to search
+several adapters, repeat it per alias from `adapters list`. A `datasource.feed/v1alpha1`
 binding's profile declares what it observes (`deletions`, `kind`, `revision`, `visibility`) in
 the binding's contract document, not on the wire. Under a weak declaration a missing tombstone or
 a `private` listing proves nothing: GitLab's `gitlab-merge-requests/1` never reports deletions and
