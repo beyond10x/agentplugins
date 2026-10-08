@@ -26,7 +26,9 @@ For an existing supplied service endpoint, read `connectors describe --help` and
 `connectors invoke --help`. These top-level commands form a separate compatibility interface;
 only the global `--output` selection applies. Select the configured `--endpoint` and protected
 `--token-file`, describe that service, then construct invocation from its descriptor and the
-installed command's input options. Keep service credentials in the protected file.
+installed command's input options. Its operations' `input_schema` and `output_schema` are JSON
+Schema objects; its `configuration_schema` is still JSON text. Keep service credentials in the
+protected file.
 Enable plaintext only when the deployment and task explicitly authorize it.
 
 `connectors serve --help` describes the federation service; start it only for an authorized

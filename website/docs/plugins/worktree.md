@@ -38,10 +38,18 @@ an advertised ref carries every unique commit's exact patch.
 
 Agents end their work with `worktree finish --discard-cache --archive <tree>` (worktree 0.9.0 or
 later). It deletes only ignored build cache recognised by structure (Cargo profiles in a tagged
-target, `node_modules` below a tracked lockfile, a virtual environment beside a tracked Python
-manifest, tagged tool caches), archives everything else the tree holds that no remote ref
-recovers, and finishes. A directory's name never makes it cache: records written into `target/`
-are kept. `worktree discard-cache --dry-run` shows the classification without deleting anything.
+target and its `tmp/` test scratch, `node_modules` below a tracked lockfile, a virtual environment
+beside a tracked Python manifest, tagged tool caches), archives everything else the tree holds that
+no remote ref recovers, and finishes. Since worktree 0.12.1 an untagged `target/` beside a tracked
+`Cargo.toml` counts as tagged once a profile in it holds `.fingerprint/` and `deps/`. A directory's
+name never makes it cache: records written into `target/` are kept.
+`worktree discard-cache --dry-run` shows the classification without deleting anything.
+
+Since worktree 0.12.0 an archive also images each nested Git repository in the tree, such as a
+test fixture in an ignored directory, as `nested-<n>.tar` (manifest `worktree.archive/2`), restored
+with `tar -xpf`. Submodules, linked worktrees and nested repositories that share state with another
+repository are still refused as `archive-unsupported-entry`. Plain `worktree finish` refuses a
+dirty tree unless its archive holds exactly the current state.
 
 `worktree sweep --all-profiles` (worktree 0.10.0 or later) does the same for trees nobody
 finished. Run daily from a timer, it discards the recognised build cache of every tree idle for a

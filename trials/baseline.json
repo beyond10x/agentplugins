@@ -21,10 +21,10 @@
     }
   },
   "ess-full-package": {
-    "tool_calls": 103,
+    "tool_calls": 67,
     "validate": "valid",
     "synthesis": {
-      "scenarios": 21,
+      "scenarios": 31,
       "refusals": 0
     },
     "unmapped": 0,
@@ -40,7 +40,7 @@
       "types-rust"
     ],
     "cargo_test": {
-      "passed": 5,
+      "passed": 3,
       "failed": 0,
       "skipped": 0
     }
@@ -74,7 +74,7 @@
     "unmapped": 4
   },
   "ess-tutorial": {
-    "tool_calls": 71,
+    "tool_calls": 67,
     "validate": "valid",
     "synthesis": {
       "scenarios": 17,
@@ -97,6 +97,6 @@
     "tool_calls": 9
   },
   "worktree-onboarding": {
-    "tool_calls": 9
+    "tool_calls": 12
   }
 }

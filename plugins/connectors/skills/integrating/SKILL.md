@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.31.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.31.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.32.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.32.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -40,15 +40,20 @@ connectors --output json operations describe --adapter '<alias>' --operation '<l
 ```
 
 To find which operations bind a datasource family, across adapters, run
-`connectors --output json operations list --family '<contract id>'`.
+`connectors --output json operations list --family '<contract id>'`. A `datasource.feed/v1alpha1`
+binding's profile declares what it observes (`deletions`, `kind`, `revision`, `visibility`) in
+the binding's contract document, not on the wire. Under a weak declaration a missing tombstone or
+a `private` listing proves nothing: GitLab's `gitlab-merge-requests/1` never reports deletions and
+lists every project `private`. Report such limits with the collected data.
 
 Choose the connection matching the user's target. Use `connections describe` with `--adapter`
 and `--connection` for its safe metadata. Listing and description use cached information;
 invocation rechecks current admission and may start the supervised local owner/adapter.
 
-The operation description returns `schema`, `revision` and `operation.input_schema` (a JSON
-Schema encoded as a string). Decode and follow that schema exactly, including required fields,
-limits and pagination inputs. Keep the returned schema identity and revision; guessing either
+The operation description returns `schema`, `revision`, and `operation.input_schema` and
+`output_schema` as JSON Schema objects (`adapters describe` carries the same objects). Read them
+as values from the one parsed answer; never decode them a second time. Follow the input schema
+exactly, including required fields, limits and pagination inputs. Keep the returned schema identity and revision; guessing either
 makes the invocation invalid. Use only input values requested by the operation contract.
 
 For an authorized read:
@@ -65,7 +70,8 @@ connectors --output json operations invoke \
 input source. Keep credentials out of these ordinary operation inputs. Quote arguments as data.
 On a stale schema/revision refusal, describe again and reassess the inputs and effects before a
 new attempt. A CLI success exit alone is insufficient: check the structured `ok`, result and
-refusal fields, including nested provider outcomes.
+refusal fields, including nested provider outcomes. The provider result in `result.result` is a
+JSON value, not JSON text; read it directly.
 
 For inventory pages, pass returned `next_cursor` through `--cursor` with the same selection and
 continue until it is absent. For provider results, follow the described pagination contract and

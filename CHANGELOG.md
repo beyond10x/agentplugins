@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.22.0] — 2026-10-08
+
+- Track AEP 0.69.0, ESS 0.56.0, Worktree 0.12.1 and Connectors v0.32.0. `verified.json` moves to
+  all four after `agentplugins-check tools`; the eval workflow installs ESS 0.56.0, Worktree 0.12.1
+  and Connectors v0.32.0 and keeps AEP 0.68.0, the revision Metaharness 0.9.1 embeds. The planning
+  store's `protocols` source moves to AEP 0.69.0.
+- `ess:specifying` documents the ESS 0.55.0 constructs an author reached for and could not find
+  (`naming: {summary: …}`, `refs:`, `{response: <field>}` event payloads, `one_time_response:` on
+  the outcome, `now` in `when_subject:`/`when_related:`), and what validates and still gets no
+  scenario.
+- ESS 0.56.0: the skills say to declare a held-state branch before an accepting or `external:`
+  branch (`ESS-COMMAND-004`), describe the `exact-numbers` feature of generated Rust type
+  libraries, the `ess-output-state/3` record (move a CI `ess` pin together with the regeneration),
+  the refusal to replace an owned file whose bytes differ from `.ess-output` with its
+  `ess generate output adopt` route, and the Entity Runtime lowering of `alphabet` and `.count`.
+  The ESS and AEP tutorials and their fixtures require ESS 0.56.0.
+- Connectors v0.32.0: `--output json` answers carry `result.result`, `input_schema` and
+  `output_schema` as JSON values, and the skills no longer say to decode a schema string. The
+  setup and upgrade skills give the steps after the shipped GitLab selection set moves an
+  instance's configuration revision; `connectors:integrating` explains feed profile capabilities.
+- `worktree:managing-worktrees` follows Worktree 0.12.1: an untagged Cargo `target/` and its
+  `tmp/` are discarded as cache, nested repositories are archived as `nested-<n>.tar` images
+  (`worktree.archive/2`) and restored with `tar -xpf`, and plain `worktree finish` refuses a dirty
+  tree unless its archive holds the current state.
+- `aep:upgrade` says what `aep plan store migrate git --verify` compares since AEP 0.69.0.
+- `ess:testing-conformance` says the `skipped` count for an unsupported entity setup or clock
+  reading is the Go runner's; the Rust runner records every unsupported answer as `unsupported`
+  and fails conformance on it. The `ess-full-package` trial read it as applying to Rust.
+- Trials on 0.22.0, isolated: `ess-tutorial` valid, 17 scenarios, 0 refusals, cargo test 2/0;
+  `ess-full-package` valid, 31 scenarios, 0 refusals, 9/9 outputs, cargo test 3/0;
+  `worktree-onboarding` 12 tool calls. Their runs are the new baselines.
+
 ## [0.21.2] — 2026-10-07
 
 - `aep:planning` and `aep:implementing` no longer say an `aep.project/1` store keeps working. The

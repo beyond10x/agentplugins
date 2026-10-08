@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-08T02:31:52Z",
+  "actor": "human:timo",
+  "artifact": "story:ess-specifying-055-constructs",
+  "kind": "story",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check tools, 2026-10-08, exit 0: syntax example 3 files valid, 14 scenarios, 0 refusals on ess 0.56.0"
+  }
+}

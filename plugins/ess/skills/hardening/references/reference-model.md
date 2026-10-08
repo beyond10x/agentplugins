@@ -71,7 +71,7 @@ view whose order the spec does not declare compares as a set, and the model says
 **Unknown is an answer.** Where a view publishes a field no command ever set on that instance, the
 model does not know its value. Report that as its own finding: whatever the implementation shows,
 it rests on an undeclared default. That is how three invariants that held only by accident were
-found (beyond10x/ess#112). `validate` now refuses the invariant case itself: a creating outcome
+found (https://github.com/beyond10x/ess/issues/112). `validate` now refuses the invariant case itself: a creating outcome
 that leaves unset a field an invariant reads is `ESS-COMMAND-018`. A published field no invariant
 reads can still be unknown, so the model keeps answering unknown rather than inventing a default.
 
