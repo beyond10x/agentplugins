@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.22.3] — 2026-10-09
+## [0.22.3] — 2026-10-08
 
 - `ess:hardening` closes its report with a ` ```findings ` block, the one the AEP adversary and
   security reviewer already end with: `file`, `line`, `category`, `severity`, `verdict`, `origin`,
