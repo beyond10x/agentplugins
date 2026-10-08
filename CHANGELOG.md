@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.22.3] — 2026-10-09
+
+- `ess:hardening` closes its report with a ` ```findings ` block, the one the AEP adversary and
+  security reviewer already end with: `file`, `line`, `category`, `severity`, `verdict`, `origin`,
+  `message`, and `[]` when nothing was found. Its categories are `spec-gap`, `missing-scenario`,
+  `ess-limit`, `equivalent` and `false-positive`. A coordinator records the report verbatim and
+  `aep plan artifact findings` compares two hardening passes.
+- Track AEP 0.70.0, Worktree 0.14.0, Connectors v0.37.0 and Metaharness 0.9.3 after
+  `agentplugins-check tools`; ESS 0.56.0 is still the newest. `aep:planning` says how
+  `planning_scope` is chosen and that `--planning-scope` sets it. `worktree:managing-worktrees`
+  teaches `worktree prune-archives`. `connectors:integrating` says what a `timeout` at
+  `stage = dispatch` and an `outcome_unknown` invoke mean, and that `revalidate_connection` also
+  follows a configuration revision change.
+- The eval workflow runs Metaharness 0.9.3 and keeps AEP 0.68.0, the revision it links; the
+  planning store's `protocols` source moves to AEP 0.70.0, the shared gates workflow to gates
+  1a5ede1 (its `common.yml` is unchanged), and the website to Docs System 0.8.0.
+
 ## [0.22.2] — 2026-10-08
 
 - Track AEP 0.69.1. `verified.json` and the planning store's `protocols` source move to it after
