@@ -18,7 +18,7 @@ b10x init connectors --host claude --out ~/.local/state/b10x/plan.json
 Review the actions and resolve warnings before applying within the user's authorization:
 `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`. Ask once if installation is not
 already authorized. Current Connectors releases are source-only: `b10x` builds the `connectors`
-Cargo package at the selected exact tag, with locked dependencies. Release `v0.33.0` needs Rust
+Cargo package at the selected exact tag, with locked dependencies. Release `v0.37.0` needs Rust
 1.91 or newer. A missing toolchain or failed build is a prerequisite failure, not a completed install.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.

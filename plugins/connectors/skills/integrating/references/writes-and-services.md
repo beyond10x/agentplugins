@@ -33,5 +33,10 @@ Enable plaintext only when the deployment and task explicitly authorize it.
 
 `connectors serve --help` describes the federation service; start it only for an authorized
 service task and report the process lifecycle. The current release has no implemented MCP
-runtime or hosted login mode. Local placement uses `--config`/`--state-dir`; explicit service
-placement uses the endpoint. Neither interface uses v1 target flags or description leases.
+runtime or hosted login mode. Since `v0.35.0` a service whose configuration names a private
+`state` directory also answers `POST /v1alpha2/invoke` for library clients
+(`connectors_client::Client::invoke_v1alpha2`): each admitted invocation carries `audit_ref` and
+`audit_status`, and a write carries its recorded `mutation` attempt; a write answered
+`outcome_unknown` is never sent again. The CLI's explicit `invoke` keeps the `/v1/invoke`
+binding. Local placement uses `--config`/`--state-dir`; explicit service placement uses the
+endpoint. Neither interface uses v1 target flags or description leases.
