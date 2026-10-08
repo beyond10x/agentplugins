@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.31.0](https://github.com/beyond10x/connectors/releases/tag/v0.31.0).
+[v0.32.0](https://github.com/beyond10x/connectors/releases/tag/v0.32.0).
 
 ## Install in either host
 
@@ -23,7 +23,7 @@ b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 ```
 
 The current release has no prebuilt CLI assets. Setup builds the `connectors` Cargo package from
-its exact release tag with locked dependencies; v0.31.0 requires Rust 1.91 or newer. Adapter
+its exact release tag with locked dependencies; v0.32.0 requires Rust 1.91 or newer. Adapter
 executables, configuration and credentials are separate prerequisites. The local runtime currently
 targets Linux. [Setup](../install.md) preserves other installed plugins and snapshots changes.
 
@@ -57,3 +57,9 @@ Moving from 0.7.x changes CLI and configuration contracts. Preserve the old stat
 consumer operations, then establish current connections through protected acquisition. No v1
 configuration or credential migration occurs automatically. After any upgrade, inspect help,
 check prerequisites and validate the operations the application actually needs.
+
+Since v0.32.0, `--output json` carries an invocation's provider result and each operation's input
+and output schemas as JSON values rather than JSON text; a caller that decoded them twice reads
+them directly. The upgrade also moves the configuration revision of instances using the shipped
+GitLab selection set: print the bootstrap again, revalidate their connections and issue their
+approval policies again, as the skill's setup reference describes.

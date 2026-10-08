@@ -26,7 +26,14 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    the provider and requires the current `--expected-revision`. After the adapter's
    configuration changes (a rebuilt bundle or selection), revalidate: the connection follows the
    new configuration when its provider authority, profile and identity are unchanged, and
-   otherwise refuses with `next_action: create_connection` and changes nothing. A profile's access
+   otherwise refuses with `next_action: create_connection` and changes nothing. A release whose
+   notes say an instance's configuration revision moved (in `v0.32.0`, every instance using the
+   shipped GitLab selection set) leaves that adapter unable to start and its connections
+   `pending` until the operator prints the bootstrap again and copies its
+   `configuration_revision` into the adapter entry; then revalidate each connection and issue
+   the instance's approval policies again (the release's `docs/local-catalog-provider.md`).
+   Reading the GitLab feed also needs `feed.containers` and `feed.items` among the adapter's
+   permitted operations; add them only when the operator authorizes that access. A profile's access
    read answered 401 or 403 refuses the connection as `insufficient_scope`: the credential lacks a
    scope the profile needs, and only a credential that has it fixes that.
 5. For repair, preserve connection identity: `connections repair` takes `--adapter`,
@@ -39,9 +46,9 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
    receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.31.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.32.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. The local CLI targets Linux
-keyring custody. A source installation of `v0.31.0` requires Rust 1.91 or newer and builds package
+keyring custody. A source installation of `v0.32.0` requires Rust 1.91 or newer and builds package
 `connectors`; its release carries no prebuilt archives. `b10x` selects the exact release tag and
 Cargo's locked dependency graph. Build failures retain the previous installed binary.
 
