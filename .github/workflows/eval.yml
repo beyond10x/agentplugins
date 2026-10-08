@@ -53,10 +53,10 @@ jobs:
       # This AEP release matches the library linked by Metaharness. Its child preflight refuses
       # an installed planning executable from a different release.
       AEP_VERSION: '0.68.0'
-      METAHARNESS_VERSION: '0.9.1'
+      METAHARNESS_VERSION: '0.9.3'
       ESS_VERSION: '0.56.0'
-      CONNECTORS_VERSION: 'v0.33.0'
-      WORKTREE_VERSION: '0.13.0'
+      CONNECTORS_VERSION: 'v0.37.0'
+      WORKTREE_VERSION: '0.14.0'
       # The version qualified by this Metaharness release's Claude adapter.
       CLAUDE_VERSION: '2.1.259'
     steps:

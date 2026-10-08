@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.22.2** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.22.3** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -356,6 +356,12 @@ $ aep plan reverse scan --format json
 refuses the two things that quietly break later — an absolute path, and a `git+` source pinned to a
 branch rather than a commit. A `.engineering/planning/` that already holds a plan is refused too,
 naming `aep plan store migrate git`.
+
+Both `reverse init` and `aep plan store migrate git` write `planning_scope` and print where it came
+from: `--planning-scope <name>` when given, else the `origin` remote's last path segment without
+`.git`, else the primary checkout's directory name; a linked worktree's own directory name is
+never used. A repository with none of these, such as a bare repository's
+worktree with no `origin`, is refused naming `--planning-scope`.
 
 The two values, for a project that follows the published protocols:
 

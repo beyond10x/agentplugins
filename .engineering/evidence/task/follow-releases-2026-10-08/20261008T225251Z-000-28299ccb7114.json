@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-08T22:52:51Z",
+  "actor": "human:timo",
+  "artifact": "task:follow-releases-2026-10-08",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check",
+    "reference": "wave/findings-block dd2f96a: 174 passed, agentplugins-check valid; task site-build exit 0"
+  }
+}

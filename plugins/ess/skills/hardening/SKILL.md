@@ -100,6 +100,46 @@ the command, and the findings — each one a spec gap, an implementation defect 
 the technique, said which. Name the techniques not run. A finding that belongs to `ess` itself (a
 generator or validate gap) is an issue on beyond10x/ess, not a workaround here.
 
+**Close your report with a ` ```findings ` block holding the same findings, and nothing that is not
+one of them.** The prose is for a person; the block is for a program. A coordinator records the
+report verbatim as a `review-result`, and `aep plan artifact findings` then compares this pass with
+the previous one by signature instead of by somebody re-reading two reports.
+
+```findings
+- file: specs/orders/system.yaml
+  line: 42
+  category: missing-scenario
+  severity: blocker
+  verdict: CONFIRMED
+  origin: pre-existing
+  message: the sets-drop mutant on submit survives, so no scenario checks that submitting records submitted_at
+```
+
+| Field | What you put in it |
+|---|---|
+| `file`, `line` | where the fix lands: the specification line for a spec gap, the implementation line for an implementation defect. Where a finding is about a document rather than a line, `file` is the document and there is no `line` |
+| `category` | one word, what the technique showed — the five below |
+| `severity` | `blocker` when the unit must not merge with it standing, `warning` when it should be fixed and does not hold the unit, `note` for the residue you would not have raised alone |
+| `verdict` | `CONFIRMED`, `NEEDS-CHANGE` or `INFEASIBLE` |
+| `origin` | `introduced`, `pre-existing` or `undecided` |
+| `message` | one sentence, the finding itself. Not a second wording of the prose you already wrote |
+
+| `category` | Means |
+|---|---|
+| `spec-gap` | the specification does not declare a rule the design or a caller relies on; the fix is `ess:specifying` |
+| `missing-scenario` | the specification declares it and no scenario pins it down; the fix is `ess:testing-conformance` |
+| `ess-limit` | `ess` cannot express or check it; the fix is an issue on beyond10x/ess |
+| `equivalent` | a mutant or variant that changes nothing observable, so no scenario can tell it apart |
+| `false-positive` | the technique flagged behaviour that is correct |
+
+An implementation defect is not a category of its own: the suite was green, so a defect hardening
+finds is either declared and unpinned (`missing-scenario`) or undeclared (`spec-gap`). Its `file`
+and `line` point at the implementation, and its `message` says the code is wrong.
+
+**The block is a YAML list, and it is `[]` when you found nothing.** Finding nothing is a result,
+and an empty block is how a later comparison can tell a pass that ran clean from a pass whose block
+somebody forgot. Every finding in the prose appears in the block and nothing else does.
+
 ## Next
 
 - A finding changes the specification: `ess:specifying`.
