@@ -4,7 +4,7 @@ description: >-
   Investigate a production incident, an outage or a question about a running system from evidence that can be cited — capture state before anyone remediates, build a sourced UTC timeline, date an onset from an instrument that can see a negative, compare against a healthy peer, and label every claim verified or inferred, with a catalogue of ten techniques. Use when the user says investigate, "what happened", "when did this start", "is it still happening", "has this shipped", "is this deployed", reports an alert, an outage, a hung or crashing process or a customer-visible failure, or asks for an incident report or a postmortem. Not for a defect that can be reproduced on demand, which is `aep:diagnosing`; not for checking a change before it merges, which is `aep:implementing`.
 ---
 
-**Skill version 0.22.1** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.22.2** — the version in `.claude-plugin/plugin.json`.
 
 # Investigating a live system
 
