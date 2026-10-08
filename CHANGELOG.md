@@ -5,6 +5,11 @@
 - Track AEP 0.69.1. `verified.json` and the planning store's `protocols` source move to it after
   `agentplugins-check tools`; its fix to cross-member edges needs no skill change. The eval
   workflow keeps AEP 0.68.0, the revision Metaharness 0.9.1 links.
+- Track Worktree 0.13.0. `worktree:managing-worktrees` and the plugin page say that `gc` without
+  `--id` assesses only the current repository (`--scope profile` for the whole profile), and that
+  `finish`, `discard-cache`, `archive`, `gc --id` and `reconcile --id` accept a tree's id, path or
+  unique directory name; `finish` prints `finished <id> <path>`. `verified.json` and the eval
+  workflow move to 0.13.0.
 
 ## [0.22.1] — 2026-10-08
 
