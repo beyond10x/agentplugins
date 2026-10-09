@@ -503,6 +503,14 @@ For any review whose findings block the CLI refuses to parse, send the exact ref
 its author and request valid JSON or correctly quoted YAML with the same findings. Record the
 author's corrected response verbatim. Do not reserialize or repair the review yourself.
 
+A report with no ` ```findings ` block at all depends on the store. A store may set
+`findings_required_since` in `.engineering/project.yaml`; once it does, whatever the date,
+`new review-result` refuses a body with no block. There, send the refusal back to the author as it
+printed it and record only the corrected report; do not add a block yourself. A review that is
+prose by nature, such as a design read, is recorded with `--prose-only <reason>` instead, which
+works in every store and is shown as `prose_only` by `aep plan artifact show`. A store without
+`findings_required_since` records a block-less report as it returned.
+
 **Record the outcome of each finding as you take its row.** The row you took *is* the outcome, so
 this costs one command and no judgement — and without it the review-result you wrote says what an
 adversary thought and nothing about whether it mattered, which is the half that would tell anybody

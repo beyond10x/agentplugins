@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.22.3** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.22.4** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -515,6 +515,11 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
   If the findings block is malformed YAML or JSON, return the exact parser refusal to the critic
   and ask it to serialize the same findings correctly. Record the corrected response verbatim;
   the coordinator must not repair quoting or rewrite a critic's message itself.
+* A report with no findings block at all: where the store's `.engineering/project.yaml` sets
+  `findings_required_since`, `new review-result` refuses it whatever the date. Send that refusal
+  back to the critic as printed and record only its corrected report. A review that is prose by
+  nature is recorded with `--prose-only <reason>`, which works in every store. A store without
+  `findings_required_since` records a block-less report as it returned.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
   `aep plan artifact relations` before you rely on it, the way you would any other vocabulary.
 * Check the first line before you record. It must be exactly `approve` or exactly

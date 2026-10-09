@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.22.4] — 2026-10-09
+
+- `aep:implementing` (wave) and `aep:planning` (critic rounds): in a store whose
+  `.engineering/project.yaml` sets `findings_required_since`, which AEP 0.71.0 added,
+  `aep plan artifact new review-result` refuses a report with no ` ```findings ` block. The
+  coordinator sends that refusal back to the review's author and records only the corrected
+  report. A review that is prose by nature is recorded with `--prose-only <reason>`, also new in
+  AEP 0.71.0; a store without the key records a block-less report as it returned.
+- Track AEP 0.71.0 and Connectors v0.38.0 after `agentplugins-check tools`; ESS 0.56.0, Worktree
+  0.14.0 and Metaharness 0.9.3 are still the newest. The eval workflow runs Connectors v0.38.0
+  and keeps AEP 0.68.0, the revision Metaharness 0.9.3 links; the planning store's `protocols`
+  source moves to AEP 0.71.0.
+
 ## [0.22.3] — 2026-10-08
 
 - `ess:hardening` closes its report with a ` ```findings ` block, the one the AEP adversary and
