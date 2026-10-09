@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-09T01:23:08Z",
+  "actor": "human:timo",
+  "artifact": "story:coordinator-returns-blockless-report",
+  "kind": "story",
+  "revision": 6,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check",
+    "reference": "wave/blockless-report e25dc8c: 174 passed, agentplugins-check valid; agentplugins-check tools exit 0"
+  }
+}

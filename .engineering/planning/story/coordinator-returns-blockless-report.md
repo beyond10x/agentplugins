@@ -2,15 +2,16 @@
 format: aep.planning-md/3
 id: story:coordinator-returns-blockless-report
 kind: story
-status: active
+status: implemented
 title: The coordinator returns a review with no findings block to its author
 relations:
 - decomposes: epic:ahead-of-the-alternative
 - depends_on: story:hardening-findings-block
-revision: 6
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-09T01:19:34Z", actor: "human:timo", revision: 4}
 - {from: "proposed", to: "active", at: "2026-10-09T01:19:34Z", actor: "human:timo", revision: 5}
+- {from: "active", to: "implemented", at: "2026-10-09T01:23:08Z", actor: "human:timo", revision: 7, decided_on: {"recorded":{"test_result":1}}}
 ---
 # Story: the coordinator returns a review with no findings block to its author
 
