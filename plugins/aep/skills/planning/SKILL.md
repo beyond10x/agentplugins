@@ -515,6 +515,11 @@ created review-result:acceptance-round-1 (active) at .engineering/planning/revie
   If the findings block is malformed YAML or JSON, return the exact parser refusal to the critic
   and ask it to serialize the same findings correctly. Record the corrected response verbatim;
   the coordinator must not repair quoting or rewrite a critic's message itself.
+* A report with no findings block at all: where the store's `.engineering/project.yaml` sets
+  `findings_required_since`, `new review-result` refuses it whatever the date. Send that refusal
+  back to the critic as printed and record only its corrected report. A review that is prose by
+  nature is recorded with `--prose-only <reason>`, which works in every store. A store without
+  `findings_required_since` records a block-less report as it returned.
 * Repeat `--relate` once per artifact the critic judged. Read the edge name from
   `aep plan artifact relations` before you rely on it, the way you would any other vocabulary.
 * Check the first line before you record. It must be exactly `approve` or exactly
