@@ -5,7 +5,7 @@ kind: task
 status: active
 title: Track Connectors v0.39.0
 summary: the connectors skills follow v0.39.0, its credential-selection compatibility is named, and verified.json moves
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-09T16:11:23Z", actor: "human:timo", revision: 3}
 - {from: "proposed", to: "active", at: "2026-10-09T16:11:23Z", actor: "human:timo", revision: 4}
@@ -51,3 +51,7 @@ and `**Skill version**` line.
 - `AGENTPLUGINS_CONNECTORS_BINARY=<that binary> agentplugins-check tools`: exit 0; connectors
   v0.39.0 21 spelled commands checked against the released source contract at 1bfb2d2, runtime
   help additionally verified.
+- `task trial:run TRIAL=ess-tutorial`: isolated (1 session, plugins b10x and ess at 0.22.4 from the
+  sandbox); 85 tool calls (baseline 67), validate valid, 17 scenarios 0 refusals, 5/5 outputs,
+  cargo test 2 passed 0 failed; no measure worse than `trials/baseline.json`.
+- `task check` and `task site-build`: exit 0 on 2f2ccc5.
