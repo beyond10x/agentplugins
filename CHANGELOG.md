@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.22.5] — 2026-10-09
+
+- Track Connectors v0.39.0 after `agentplugins-check tools`; AEP 0.71.0, ESS 0.56.0, Worktree
+  0.14.0 and Metaharness 0.9.3 are still the newest. The connectors skills and plugin page name
+  v0.39.0, which still needs Rust 1.91, and the setup reference says that a catalog selection
+  naming `credential` parameters, new in v0.39.0, is refused by every earlier release. The eval
+  workflow runs Connectors v0.39.0 and keeps AEP 0.68.0, the revision Metaharness 0.9.3 links.
+
 ## [0.22.4] — 2026-10-09
 
 - `aep:implementing` (wave) and `aep:planning` (critic rounds): in a store whose

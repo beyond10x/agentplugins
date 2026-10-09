@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.37.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.37.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.39.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.39.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
