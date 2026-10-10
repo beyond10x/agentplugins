@@ -273,6 +273,9 @@ your implementation:
 
 A green interpreted run is evidence about the model and runner, not about your implementation.
 Current ESS runs the committed related-guard example as 3 passed, 0 failed, 0 error and 0 unsupported.
+It decides a current-time (`now`) guard at the instant of the step being executed, on a fixed
+clock, so two runs write the same report; its text report prints the diagnostic under an
+`unsupported` scenario, so a guard it cannot decide is named.
 Use an adapter over your actual implementation for product conformance.
 
 To hold your implementation to the suite, generate it as a test package in the implementation's
@@ -306,7 +309,12 @@ The current runner contract:
   an explicit skip, so a fixture provider is the first thing to check when skips cluster there.
 - Go and TypeScript have admitted `deletes:`, `accepts: nothing` and `presence:` suites
   (`ess-conformance/22`–`/25`). Current ESS also includes shared runtime coverage for
-  the newer expression, binding, aggregation and seed formats through `/45`. Generate with the
+  the newer expression, binding, aggregation and seed formats through `/45`. From
+  `ess-conformance/46` (`/47` with coverage), a command response that reaches a `String` newtype
+  with `alphabet:`, `prefix:` or value invariants keeps its success scenarios: the response step
+  carries the type's rules as `constraints`, and the Rust, Go and TypeScript runners fail a
+  returned value that breaks one (`ESS-CF-PAYLOAD`). The Go and TypeScript runners admit a suite
+  whose shapes hold `json` and compare it structurally, as the Rust runner does. Generate with the
   same release as the runner and inspect any target-specific refusal instead of carrying an old
   suite-version ceiling.
 - From `ess-conformance/44`, an act that claims one event N times needs N occurrences, and claims

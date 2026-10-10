@@ -50,6 +50,9 @@ domain: library.lending
 
 summary: Branches that own copies of books and lend them out.
 
+# A domain, command or view wire name is one generated HTTP path segment: a `/` in it, or the
+# name `.` or `..`, is refused as `path_segment_wire_name` (ESS-DOMAIN-012, ESS-COMMAND-012,
+# ESS-VIEW-012). Dots inside a name are accepted.
 naming:
   wire: lending
   display: Lending
