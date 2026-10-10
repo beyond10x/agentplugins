@@ -128,10 +128,9 @@ An ESS conformance report is recorded from the file rather than typed: `aep plan
 of no scenarios or with no `spec_digest`. A report/2, which ESS writes on
 `--report-format 2`, is accepted only beside `--suite <the exact suite JSON it ran>`. That suite
 may be the ordinary one ESS writes by default (an even `ess-conformance/<N>` with no `coverage`
-block) or a coverage suite; AEP before 0.71.1 refuses an ordinary suite as `MissingField at
-$suite.coverage`. A report from a generated Go or TypeScript runner (`producer_profile:
-go-scenario-status/2`) needs AEP 0.71.2 or later; earlier releases refuse it as
-`UnsupportedProducerProfile`.
+block) or a coverage suite, and the report may come from a generated Go or TypeScript runner
+(`producer_profile: go-scenario-status/2`). An older `aep` refuses the first as `MissingField at
+$suite.coverage` and the second as `UnsupportedProducerProfile`: upgrade it (`aep:upgrade`).
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
 `draft → validated → conforming` — and `aep plan artifact set <id> --model-digest
 <hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The

@@ -48,7 +48,7 @@ b10x install aep --method cargo       # replaces the pinned build in ~/.cargo/bi
 **`aep.project/5` with a repeated transition.** A store migrated from an `aep.project/1` journal
 that a Git merge left holding one move twice carries that move as two identical transitions, and
 `aep plan artifact validate` refuses the document (`transition <n> moves from <status>, and the walk
-before it stands at <status>`). No verb removes it. AEP 0.71.1 and later repair it in place: on an
+before it stands at <status>`). No verb removes it. The current release repairs it in place: on an
 `aep.project/5` store `aep plan store migrate git` drops every transition identical to the one
 immediately before it and writes nothing else.
 
