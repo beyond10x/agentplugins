@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.43.0](https://github.com/beyond10x/connectors/releases/tag/v0.43.0).
+[v0.45.0](https://github.com/beyond10x/connectors/releases/tag/v0.45.0).
 
 ## Install in either host
 
@@ -23,7 +23,7 @@ b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 ```
 
 The current release has no prebuilt CLI assets. Setup builds the `connectors` Cargo package from
-its exact release tag with locked dependencies; v0.43.0 requires Rust 1.91 or newer. Adapter
+its exact release tag with locked dependencies; v0.45.0 requires Rust 1.91 or newer. Adapter
 executables, configuration and credentials are separate prerequisites. The local runtime currently
 targets Linux. [Setup](../install.md) preserves other installed plugins and snapshots changes.
 
@@ -83,3 +83,12 @@ refuse, and the GitLab, Jira and SQL descriptors gain operations. Upgrade every 
 or loads the adapter first. An existing adapter entry keeps the operations it permits. An instance
 that takes a shipped selection set or GitLab bundle from the new release has a new configuration
 revision; recover as the setup reference describes.
+
+In v0.44.0 the GitLab selection set grows from 42 to 51 operations, and in v0.45.0 the Slack bot
+set from 7 to 10 and the Jira set from 8 to 9; each has a new configuration revision, so copy it
+again from the adapter's bootstrap output and add new operations to the adapter's `operations` only
+when they are authorized. Since v0.44.0 a source amendment may correct a request media type
+(`correct_media_type`). Since v0.45.0 a catalog connection may admit further origins in `hosts`
+for binary reads such as Slack file downloads, which changes its revision, and a Kubernetes
+configuration may enable `pod_logs`, `kubeconfig` and `pod_exec`. Pod exec is a write on the
+`connectors-private/2` exchange and needs an approval policy like every write.

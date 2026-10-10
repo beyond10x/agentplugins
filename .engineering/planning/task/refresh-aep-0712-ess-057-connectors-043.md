@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-aep-0712-ess-057-connectors-043
 kind: task
-status: active
+status: implemented
 title: Track AEP 0.71.2, ESS 0.57.0 and Connectors v0.43.0
 summary: the skills follow AEP 0.71.2, ESS 0.57.0 and Connectors v0.43.0, and verified.json moves
-revision: 5
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-10T11:20:49Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-10T11:20:49Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-10T18:37:19Z", actor: "human:timo", revision: 7, decided_on: {"recorded":{"test_result":3}}}
 ---
 ## Context
 
@@ -77,3 +78,8 @@ Cargo.toml, Cargo.lock, every plugin manifest and `**Skill version**` line.
 - Worktree 0.15.0, released during the first CI run: `agentplugins-check tools` exit 0 on dd1c6ed
   with worktree 52 spelled commands; isolated `worktree-onboarding` trial (sandbox `worktree`
   0.15.0): 10 tool calls, no measure worse than `trials/baseline.json`.
+
+## Delivered
+
+- https://github.com/beyond10x/agentplugins/pull/78 (merge 5b567be)
+- https://github.com/beyond10x/agentplugins/releases/tag/0.22.6

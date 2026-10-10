@@ -19,6 +19,7 @@ newer format a change needs, which earlier readers refuse:
 | `ess-diff/15` | a domain added to or removed from `system.yaml` is `domain/<name>/added` (compatible) or `domain/<name>/removed` (breaking for callers and readers); a purely additive revision passes `--fail-on breaking-or-unknown` |
 | `ess-diff/16` | a command input whose wire form moves between a value, an object and an array (`String` to a record, text to `List` or `Map`, a newtype redefined as a struct) is breaking for callers, with `shapes: {before, after}` |
 | `ess-diff/17` | a change that refuses an existing caller is breaking for callers, with `narrows`: `required-input` (an added input that is not `Optional`), `refusal-added`, `refusal-widened` (a `when:` that now refuses an input the earlier revision accepted) |
+| `ess-diff/18` | a move of `undeclared_fields` (`ess/24`) is `type/<name>/undeclared-fields-changed` or `command/<name>/response-undeclared-fields-changed`, never `unclassified-changed`. Opening is `expanded`: an opened struct is breaking for readers of its output use, an opened response breaking for readers. Closing is `narrowed`: breaking for callers of a struct's input use and for its stored use, compatible for a response |
 
 The two refusal ratings are decided only where every outcome of the earlier revision, and each up
 to the refusal in the later one, is a plain `when:` or `otherwise` branch; a refusal added before

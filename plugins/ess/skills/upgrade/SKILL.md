@@ -38,8 +38,17 @@ changed yet.
 - Documents a release writes in a newer format are refused by older readers: a spec diff naming a
   domain change, an input wire-form move or a narrowing (`ess-diff/15`–`/17`), a mutation report or
   manifest naming an `identical_answer` (`/5`), a suite with a constrained `String` response
-  (`ess-conformance/46`, `/47`). Move every reader (a CI job's `ess`, the runner crates or
+  (`ess-conformance/46`, `/47`), and a specification on `ess/24` with what it writes: a spec diff
+  naming an `undeclared_fields` move (`ess-diff/18`) and a suite with an opened response or struct
+  (`ess-conformance/48`, `/49`). Move every reader (a CI job's `ess`, the runner crates or
   packages) in the same change that commits them.
+- Re-run authored scenarios (`ess verify conform author`) and regenerate committed suites: the
+  current release judges an authored act by the command's precedence plan, so an act that claims a
+  branch another branch answers first is refused as `ESS-AUTHOR-041` naming that branch (an
+  `exists: false` claim over a stored reference where an input refusal's guard holds, or a
+  `when_related:` or row-set claim where an earlier accepting `when:` holds); claim the branch it
+  names. A suite for a command whose external branch comes before a `when_related:` refusal among
+  its accepting branches can change bytes, because the synthesized external witness differs.
 - Regeneration that rewrites `.ess-output/state.json` to a newer record format (such as
   `ess-output-state/3`) breaks every older `ess` that reads it: move a CI job's `ess` pin in the
   same change that commits the regenerated record. A refusal that an owned file differs from its

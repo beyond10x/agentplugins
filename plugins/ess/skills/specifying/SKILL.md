@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/23`. The binary says which one that
+`format:` that release implements; the example below uses `ess/24`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/23
+format: ess/24
 system: warehouse
 version: v1
 
