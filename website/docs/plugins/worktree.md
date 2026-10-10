@@ -69,6 +69,13 @@ tree is gone, it holds no `dirty.patch` and no nested image, and HEAD and every 
 records are ancestors of a ref a remote freshly advertises. Every other verdict is kept and no flag
 forces a removal; deleting such an archive by hand loses the only copy of its work.
 
+Since worktree 0.15.0, `worktree archive` (and `finish --archive`, and `sweep`) leaves cargo's
+build layout below a recognised target out of `dirty.patch` and records it as `build_output` in a
+`worktree.archive/3` manifest; other files under `target/` stay archived. An older archive kept as
+`UncommittedState` only because its patch holds build output shrinks with
+`worktree prune-archives --strip-build-output --repo <primary> --dry-run`, then `--apply --id
+<reviewed-directory>`; it rewrites the patch, verifies it over HEAD and never deletes an archive.
+
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by name. It is a command:
 you start it, or an agent starts it when you ask, and it hands off to `worktree:managing-worktrees`
 for every step — `inspect`, `archive` for work that must not be published, `finish`,

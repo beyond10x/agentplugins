@@ -2,8 +2,11 @@
 
 ## [0.22.6] — 2026-10-10
 
-- Track AEP 0.71.2, ESS 0.57.0 and Connectors v0.43.0 after `agentplugins-check tools`;
-  Worktree 0.14.0 and Metaharness 0.9.3 are still the newest.
+- Track AEP 0.71.2, ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0 after
+  `agentplugins-check tools`; Metaharness 0.9.3 is still the newest.
+- `worktree:managing-worktrees` and the plugin page: an archive leaves cargo build layout out of
+  `dirty.patch` and records it in a `worktree.archive/3` manifest; `worktree prune-archives
+  --strip-build-output` shrinks an older archive kept only for its build output.
 - `aep:planning`: a report/2 is recorded beside an ordinary suite (no `coverage` block) and from a
   generated Go or TypeScript runner (`go-scenario-status/2`); an older `aep` refuses both.
   `aep:upgrade`: `aep plan store migrate git` repairs an `aep.project/5` store holding a repeated
@@ -19,7 +22,7 @@
 - Connectors skills and plugin page name v0.43.0, which still needs Rust 1.91; the setup reference
   names the v0.41.0–v0.43.0 selection members and the GitLab amendment that earlier releases
   refuse, and the new GitLab, Jira and SQL operations an adapter entry must permit before use.
-- The eval workflow runs ESS 0.57.0 and Connectors v0.43.0 and keeps AEP 0.68.0, the revision
+- The eval workflow runs ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0 and keeps AEP 0.68.0, the revision
   Metaharness 0.9.3 links; the planning store's `protocols` source moves to AEP 0.71.2.
 
 ## [0.22.5] — 2026-10-09
