@@ -314,7 +314,13 @@ The current runner contract:
   with `alphabet:`, `prefix:` or value invariants keeps its success scenarios: the response step
   carries the type's rules as `constraints`, and the Rust, Go and TypeScript runners fail a
   returned value that breaks one (`ESS-CF-PAYLOAD`). The Go and TypeScript runners admit a suite
-  whose shapes hold `json` and compare it structurally, as the Rust runner does. Generate with the
+  whose shapes hold `json` and compare it structurally, as the Rust runner does. From
+  `ess-conformance/48` (`/49` with coverage), a response declared `undeclared_fields: ignored`
+  (`ess/24`) carries that on its `expect_direct_response` or `expect_response_payload` step, and
+  `undeclared_fields_ignored` lists the opened structs it reaches; a closed suite leaves both out
+  and keeps its bytes and format. The Rust, Go and TypeScript runners admit an undeclared key at
+  exactly those objects and still check every declared field; a closed response, a closed sibling
+  struct and a union fail one (`ESS-CF-PAYLOAD`). Generate with the
   same release as the runner and inspect any target-specific refusal instead of carrying an old
   suite-version ceiling.
 - From `ess-conformance/44`, an act that claims one event N times needs N occurrences, and claims

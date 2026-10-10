@@ -16,7 +16,7 @@ change before drafting stories, sends those stories to four critics, and impleme
 approved wave with an independent adversary. Counts and identifiers depend on the resulting model;
 do not copy scenario counts from a different run.
 
-These instructions target AEP 0.69.0 and ESS 0.57.0. The complete
+These instructions target AEP 0.69.0 and ESS 0.58.0. The complete
 [2026-09-28 recording](./first-governed-plan-2026-09-28.md) preserves the earlier Go session and its
 costs as historical evidence.
 
