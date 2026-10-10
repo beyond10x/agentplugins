@@ -50,9 +50,9 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
    receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.43.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.45.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. The local CLI targets Linux
-keyring custody. A source installation of `v0.43.0` requires Rust 1.91 or newer and builds package
+keyring custody. A source installation of `v0.45.0` requires Rust 1.91 or newer and builds package
 `connectors`; its release carries no prebuilt archives. `b10x` selects the exact release tag and
 Cargo's locked dependency graph. Build failures retain the previous installed binary.
 
@@ -77,6 +77,25 @@ descriptors gain operations in these releases. An existing adapter entry keeps t
 permits; add a new one to its `operations` only when the operator authorizes that access. An
 instance using a shipped selection set or GitLab bundle from the new release has a new
 configuration revision: recover as step 4 describes.
+
+Selection sets grow again: GitLab's from 42 to 51 operations in `v0.44.0`, Slack's bot set from 7
+to 10 and Jira's from 8 to 9 in `v0.45.0`. Each changes that descriptor and its configuration
+revision: copy the `configuration_revision` from the adapter executable's
+`--print-local-bootstrap` output again and recover as step 4 describes. Add a new operation to the
+adapter's `operations` only when the operator authorizes that access. Since `v0.44.0` a
+`connectors-source-amendments/1` entry may hold `correct_media_type` (GitLab's amendment file uses
+it), and since `v0.45.0` a catalog selection may read a binary response or a `download` URL;
+upgrade every binary that builds or loads the adapter before using such files. A catalog
+connection may now admit further origins in `hosts`, which some binary reads need (the adapter's
+guide names them, such as Slack file downloads or Jira attachment redirects); adding `hosts`
+changes the configuration revision.
+
+Since `v0.45.0` a Kubernetes configuration may set `pod_logs` and `kubeconfig` (reads) and
+`pod_exec`; each is off when absent and then leaves the revision unchanged. `pod_exec` advertises
+`pods.exec`, a write on the `connectors-private/2` exchange: it needs that `private_protocol`, the
+operation among the adapter's permitted operations and an approval policy, and every call goes
+through [writes-and-services.md](writes-and-services.md). Enable it only when the operator
+authorizes running commands in pods.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is

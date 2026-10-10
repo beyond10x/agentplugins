@@ -12,7 +12,7 @@ b10x upgrade connectors --host claude --out ~/.local/state/b10x/plan.json
 Use `--host codex` in Codex. The plan compares the installed plugin with the marketplace and
 the CLI on `PATH` with the newest Connectors release. It changes nothing yet. Current releases
 have no prebuilt assets, so installation uses Cargo package `connectors` at the exact release tag
-with locked dependencies; `v0.43.0` requires Rust 1.91 or newer.
+with locked dependencies; `v0.45.0` requires Rust 1.91 or newer.
 
 1. Inspect every finding. Report unresolved release lookups, pins and toolchain failures as such;
    an empty action list alone does not establish that Connectors is current. If every version was
