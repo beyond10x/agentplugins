@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-10T11:46:01Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-aep-0712-ess-057-connectors-043",
+  "kind": "task",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check tools on dd1c6ed with worktree 0.15.0: exit 0; task trial:run TRIAL=worktree-onboarding: isolated, no measure worse than trials/baseline.json"
+  }
+}

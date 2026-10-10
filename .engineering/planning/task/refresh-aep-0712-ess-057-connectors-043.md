@@ -5,7 +5,7 @@ kind: task
 status: active
 title: Track AEP 0.71.2, ESS 0.57.0 and Connectors v0.43.0
 summary: the skills follow AEP 0.71.2, ESS 0.57.0 and Connectors v0.43.0, and verified.json moves
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-10T11:20:49Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-10T11:20:49Z", actor: "human:timo", revision: 3}
@@ -55,6 +55,7 @@ Cargo.toml, Cargo.lock, every plugin manifest and `**Skill version**` line.
 | Connectors CLI contract | none | `apps/connectors/spec/cli.yaml` unchanged from v0.39.0 to v0.43.0 |
 | eval AEP 0.68.0 behind 0.71.2 | none | Metaharness 0.9.3 (newest) links AEP 0.68.0; the pair moves together |
 | planning `protocols` pin | `.engineering/project.yaml` | moves to the 0.71.2 tag commit 2b840f7; no protocol document changed |
+| Worktree 0.15.0: archives leave cargo build layout out (`worktree.archive/3`), `prune-archives --strip-build-output` | `worktree:managing-worktrees`, plugin page, eval pin | the two changed paragraphs of `worktree skill` 0.15.0 merged by hand (the skill is curated); `prune-archives --help` of the 0.15.0 binary checked |
 | workflow pins docs-system, website | none | generated; Atlas reconciliation owns them |
 | beyond10x/aep#60 closed | none | cited only in the dated tutorial |
 
@@ -73,3 +74,6 @@ Cargo.toml, Cargo.lock, every plugin manifest and `**Skill version**` line.
 - The ESS tutorial's planted step-7 defect fails 1 of 17 scenarios on the 0.57.0 crates and passes
   17 of 17 restored.
 - `task check` and `task site-build`: exit 0 on 8e10638.
+- Worktree 0.15.0, released during the first CI run: `agentplugins-check tools` exit 0 on dd1c6ed
+  with worktree 52 spelled commands; isolated `worktree-onboarding` trial (sandbox `worktree`
+  0.15.0): 10 tool calls, no measure worse than `trials/baseline.json`.
