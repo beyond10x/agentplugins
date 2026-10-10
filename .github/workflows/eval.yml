@@ -55,7 +55,7 @@ jobs:
       AEP_VERSION: '0.68.0'
       METAHARNESS_VERSION: '0.9.3'
       ESS_VERSION: '0.57.0'
-      CONNECTORS_VERSION: 'v0.39.0'
+      CONNECTORS_VERSION: 'v0.43.0'
       WORKTREE_VERSION: '0.14.0'
       # The version qualified by this Metaharness release's Claude adapter.
       CLAUDE_VERSION: '2.1.259'
