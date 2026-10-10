@@ -30,7 +30,16 @@ changed yet.
   `Cargo.toml` and `types-report.json`.
 - Run `ess specify validate --path <specification>` with the new release first: a release can
   refuse a specification an older one accepted, such as an accepting `when:` or `external:`
-  branch declared before a held-state branch (`ESS-COMMAND-004`); reorder as its hint says.
+  branch declared before a held-state branch (`ESS-COMMAND-004`); reorder as its hint says. A
+  refusal whose `when:` always holds (`when: true` beside `error:`) is also `ESS-COMMAND-004`:
+  give it the condition it refuses on, or drop `when:` to make it the default refusal. A domain,
+  command or view wire name containing `/`, or spelled `.` or `..`, is `path_segment_wire_name`
+  (`ESS-DOMAIN-012`, `ESS-COMMAND-012`, `ESS-VIEW-012`).
+- Documents a release writes in a newer format are refused by older readers: a spec diff naming a
+  domain change, an input wire-form move or a narrowing (`ess-diff/15`–`/17`), a mutation report or
+  manifest naming an `identical_answer` (`/5`), a suite with a constrained `String` response
+  (`ess-conformance/46`, `/47`). Move every reader (a CI job's `ess`, the runner crates or
+  packages) in the same change that commits them.
 - Regeneration that rewrites `.ess-output/state.json` to a newer record format (such as
   `ess-output-state/3`) breaks every older `ess` that reads it: move a CI job's `ess` pin in the
   same change that commits the regenerated record. A refusal that an owned file differs from its

@@ -15,7 +15,7 @@ ess specify compile --path <specification> --format json --out <ir.json>
 
 **Question:** would the suite notice if a declared rule broke?
 
-`ess verify conform mutate` derives one mutant per site in named classes (`sets-drop`, `outcome-order-flip`, `emit-swap`, comparison flips, `from-drop`,
+`ess verify conform mutate` derives one mutant per site in named classes (`sets-drop`, `precedence-swap`, `emit-swap`, comparison flips, `from-drop`,
 `transition-to`, `guard-boundary`, `sets-retarget`, `guard-negate`, `guard-connective`,
 `error-swap`, `emit-drop`, `order-flip`; `--class` selects), synthesizes each mutant's suite and
 scores it against an implementation of the unchanged specification. `--target` runs only the
@@ -30,9 +30,15 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `inconclusive`.
 3. `ess verify conform mutate --collect <dir> --report-out <mutation-report.json>` scores them into
    `ess-mutation-report/3` (`/4` for a component, a known-failures declaration or unavailable
-   sites): exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass
-   (`ESS-MUTATE-001`), no site (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants.
-   A `stillborn` mutant is one the model itself refuses; it says nothing about the suite.
+   sites, `/5` where an entry names an `identical_answer`): exit 0 every mutant killed, 1 a
+   survivor, 3 the baseline did not pass (`ESS-MUTATE-001`), no site (`ESS-MUTATE-003`) or only
+   inconclusive or stillborn mutants.
+   A `stillborn` mutant is one the model itself refuses; it says nothing about the suite. An
+   `equivalent` mutant (`ESS-MUTATE-005`) is one no implementation could tell apart: a guard
+   mutant whose branch no input selects, or a `precedence-swap` of two branches that answer alike
+   (same error, same or no payload, no state change, `sets:` or event), which the entry names as
+   `identical_answer`. A failed scenario still kills such a swap; the runner compares the outcome
+   name too.
 4. Answer each survivor by declaring what makes the rule observable — a view publishing the field a
    `sets` entry writes, a `wrong_state:` outcome for a dropped `from` state — then re-run and see
    it killed; or file a synthesis gap on beyond10x/ess. An authored scenario cannot answer a

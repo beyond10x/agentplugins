@@ -383,15 +383,21 @@ member identity restores the wrong-state scenario without changing the rule or i
 ## What validates and still gets no scenario
 
 `ess verify conform synthesize` observes a record only through a view, and these limits come from
-that. Each was reproduced on 0.55.0; relay the refusal rather than reshaping the rule around it.
+that. Each was reproduced on 0.55.0, the response row on 0.57.0; relay the refusal rather than reshaping the rule around it.
 
 | the model says | synthesis answers |
 |---|---|
 | a guard over a stored field (`when_subject: {predicate: holder != input.holder}`) or a `wrong_state` refusal, on an entity with no view | `ESS-SYNTH-001` "no witness": choosing an input that matches the stored value needs a view with no filter that projects the identity, `state` and the guarded fields, `read_your_writes` or an `eventual` one it waits for. The facts are observed, not assumed: the creating outcome's `sets:` and a seed do not stand in for the view |
 | `--synthesis-seed` for such a row | not applied when the row is held by an `owns` relation: `synthesis seeds: 1 selected, 0 applied`, naming the owner |
-| a `String` newtype with `alphabet:` or `invariants:` as a field of a typed `response:` | the returning outcome has no scenario: `response constrained type needs an executable invariant/reading observer` |
+| a record invariant or a reading on the type of a typed `response:` field | the returning outcome has no scenario: `ESS-SYNTH-001` "record invariant on a response type … has no executable observer" |
 | `invariants:` on a type (`value.count >= 1`) with no view publishing a field of it | `ESS-SYNTH-013` "type … has no scenario"; `alphabet:` alone is checked without one |
 | `when_subject:` comparing `now` with a stored `Timestamp` the outcome set with `{generated: true}` | every scenario of the command is refused: no arranging branch sets the field from an input or a literal |
+
+A `String` newtype with `alphabet:`, `prefix:` or value `invariants:` as a field of a typed
+`response:` no longer costs the returning outcome its scenario: the suite (`ess-conformance/46`,
+`/47` with coverage) carries the type's rules as `constraints` on the response step, and the Rust,
+Go and TypeScript runners fail a returned value that breaks one (`ESS-CF-PAYLOAD`). The type's own
+`ESS-SYNTH-013` row above still applies to a value invariant no view publishes.
 
 A system whose source defines no read surface (a published protocol, a credential that is never
 read back) declares no view, and keeps these refusals visible in its report. Declaring a view to
