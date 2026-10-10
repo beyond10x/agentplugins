@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.22.7] — 2026-10-10
+
+- Track ESS 0.58.0 and Connectors v0.45.0 after `agentplugins-check tools`; AEP 0.71.2, Worktree
+  0.15.0 and Metaharness 0.9.3 are still the newest.
+- ESS skills follow 0.58.0: `ess:specifying` documents `ess/24` and `undeclared_fields: ignored`
+  on a struct or a command response, where it is refused, its open schema and OpenAPI output, and
+  the opened-response cases synthesis refuses; `ess:hardening` rates opening and closing in
+  `ess-diff/18`; `ess:testing-conformance` names the `ess-conformance/48` (`/49`) fields and the
+  undeclared keys the runners admit only at opened objects; `ess:retrofitting` maps an extension
+  object to the key; `ess:upgrade` names the formats older readers refuse, the two acts now
+  refused as `ESS-AUTHOR-041` and the changed external witness. The tutorials and fixtures require
+  ESS 0.58.0.
+- Connectors skills and plugin page name v0.45.0, which still needs Rust 1.91; the setup reference
+  names the grown GitLab, Slack and Jira selection sets and their new configuration revisions,
+  `correct_media_type` amendments, binary and `download` selections, the catalog connection's
+  `hosts`, and the Kubernetes `pod_logs`, `kubeconfig` and `pod_exec` options (pod exec is an
+  approved write).
+- The eval workflow runs ESS 0.58.0 and Connectors v0.45.0 and keeps AEP 0.68.0, the revision
+  Metaharness 0.9.3 links.
+
 ## [0.22.6] — 2026-10-10
 
 - Track AEP 0.71.2, ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0 after
