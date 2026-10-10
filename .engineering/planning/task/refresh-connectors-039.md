@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-connectors-039
 kind: task
-status: active
+status: implemented
 title: Track Connectors v0.39.0
 summary: the connectors skills follow v0.39.0, its credential-selection compatibility is named, and verified.json moves
-revision: 5
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-09T16:11:23Z", actor: "human:timo", revision: 3}
 - {from: "proposed", to: "active", at: "2026-10-09T16:11:23Z", actor: "human:timo", revision: 4}
+- {from: "active", to: "implemented", at: "2026-10-10T11:20:48Z", actor: "human:timo", revision: 6}
 ---
 ## Context
 
@@ -55,3 +56,8 @@ and `**Skill version**` line.
   sandbox); 85 tool calls (baseline 67), validate valid, 17 scenarios 0 refusals, 5/5 outputs,
   cargo test 2 passed 0 failed; no measure worse than `trials/baseline.json`.
 - `task check` and `task site-build`: exit 0 on 2f2ccc5.
+
+## Delivered
+
+- https://github.com/beyond10x/agentplugins/pull/77 (merge 58d14a9)
+- https://github.com/beyond10x/agentplugins/releases/tag/0.22.5

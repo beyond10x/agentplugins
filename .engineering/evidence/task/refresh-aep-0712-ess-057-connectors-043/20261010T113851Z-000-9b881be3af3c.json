@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-10T11:38:51Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-aep-0712-ess-057-connectors-043",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check tools on 6c5f97d with connectors 0.43.0 built from tag 0e5fd63: exit 0"
+  }
+}

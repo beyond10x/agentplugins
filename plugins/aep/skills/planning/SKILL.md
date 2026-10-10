@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.22.5** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.22.6** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -126,7 +126,11 @@ An ESS conformance report is recorded from the file rather than typed: `aep plan
 <id> --from <report>` reads the kind, the source and the instant out of an
 `ess-conformance-report/1` — the instant is the report's own `completed_at` — and refuses a report
 of no scenarios or with no `spec_digest`. A report/2, which ESS writes on
-`--report-format 2`, is accepted only beside `--suite <the exact suite JSON it ran>`.
+`--report-format 2`, is accepted only beside `--suite <the exact suite JSON it ran>`. That suite
+may be the ordinary one ESS writes by default (an even `ess-conformance/<N>` with no `coverage`
+block) or a coverage suite, and the report may come from a generated Go or TypeScript runner
+(`producer_profile: go-scenario-status/2`). An older `aep` refuses the first as `MissingField at
+$suite.coverage` and the second as `UnsupportedProducerProfile`: upgrade it (`aep:upgrade`).
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
 `draft → validated → conforming` — and `aep plan artifact set <id> --model-digest
 <hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The

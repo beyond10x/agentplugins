@@ -45,6 +45,19 @@ git add .engineering && git commit    # message names the migration
 b10x install aep --method cargo       # replaces the pinned build in ~/.cargo/bin with the newest release
 ```
 
+**`aep.project/5` with a repeated transition.** A store migrated from an `aep.project/1` journal
+that a Git merge left holding one move twice carries that move as two identical transitions, and
+`aep plan artifact validate` refuses the document (`transition <n> moves from <status>, and the walk
+before it stands at <status>`). No verb removes it. The current release repairs it in place: on an
+`aep.project/5` store `aep plan store migrate git` drops every transition identical to the one
+immediately before it and writes nothing else.
+
+```bash
+aep plan store migrate git --dry-run   # names each document and how many it would drop
+aep plan store migrate git --verify
+git add .engineering && git commit    # message names the repair
+```
+
 Done when `aep --version` prints the newest release, `version` reads `aep.project/5`, and
 `aep plan artifact validate` exits 0. A `--verify` difference exits non-zero: relay it and stop.
 The current release's `--verify` compares every migrated evidence record with the one the old store

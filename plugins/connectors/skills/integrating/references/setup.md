@@ -50,9 +50,9 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
    receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.39.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.43.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. The local CLI targets Linux
-keyring custody. A source installation of `v0.39.0` requires Rust 1.91 or newer and builds package
+keyring custody. A source installation of `v0.43.0` requires Rust 1.91 or newer and builds package
 `connectors`; its release carries no prebuilt archives. `b10x` selects the exact release tag and
 Cargo's locked dependency graph. Build failures retain the previous installed binary.
 
@@ -67,6 +67,16 @@ Since `v0.39.0` a catalog selection may name `credential`: parameters through wh
 provider's document passes the credential the connection already sends, such as Slack's `token`.
 They are never declared, required or sent. A release before `v0.39.0` refuses a selection file
 that names one, so upgrade every `connectors` binary that loads the adapter before using it.
+
+From `v0.41.0` to `v0.43.0` the shipped selection sets use members that earlier catalog
+providers refuse: `body_types` and `body_required`, then `body_fixed`, `further_preflights`,
+`postflight.read` and `postflight.any_of`, then a `bounds` value set and `postflight.absent`. An
+earlier bundle build likewise refuses `v0.43.0`'s GitLab amendment file (`correct_path`). Upgrade
+every binary that builds or loads the adapter before using these files. The GitLab, Jira and SQL
+descriptors gain operations in these releases. An existing adapter entry keeps the operations it
+permits; add a new one to its `operations` only when the operator authorizes that access. An
+instance using a shipped selection set or GitLab bundle from the new release has a new
+configuration revision: recover as step 4 describes.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is
