@@ -11,7 +11,7 @@ to raise or audit a conformance suite against a real implementation.
 | skill | for | agent |
 |---|---|---|
 | `ess:init` | install the `ess` CLI, learn what ESS is, take the first step | — |
-| `ess:specifying` | write or extend a specification; `references/syntax.md` shows every section in one that validates, `references/later-formats.md` what formats through `ess/23` add, with runnable related-record, transport and protocol examples | `author` |
+| `ess:specifying` | write or extend a specification; `references/syntax.md` shows every section in one that validates, `references/later-formats.md` what formats through `ess/24` add, with runnable related-record, transport and protocol examples | `author` |
 | `ess:retrofitting` | derive a specification for a system that has none | `retrofitter` |
 | `ess:testing-conformance` | raise or audit what a conformance suite tests | `conformance` |
 | `ess:hardening` | after a green suite, the eight techniques that ask what it cannot, starting from `ess verify conform mutate` and the explorer in the generated Go and TypeScript packages; `references/` holds each procedure, the reference-model pattern, a design-review brief and spec-diff compatibility classification for callers, readers and history | — |

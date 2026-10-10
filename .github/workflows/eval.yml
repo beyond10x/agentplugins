@@ -54,7 +54,7 @@ jobs:
       # an installed planning executable from a different release.
       AEP_VERSION: '0.68.0'
       METAHARNESS_VERSION: '0.9.3'
-      ESS_VERSION: '0.57.0'
+      ESS_VERSION: '0.58.0'
       CONNECTORS_VERSION: 'v0.43.0'
       WORKTREE_VERSION: '0.15.0'
       # The version qualified by this Metaharness release's Claude adapter.

@@ -29,6 +29,7 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | a command's typed answer, and an event field that repeats it | `ess/4`; `returns: true` from `ess/17` | `response: [{name, type}]` on the command, `returns: true` on the outcome, and `{response: code}` as an event payload source. `creates:` still takes its `instance:` from an emitted event field, so a created identity that is also the answer is minted once in the response and copied into the event. `sets:` refuses `{response: …}` |
 | a description, and the records that explain a construct | any | `naming: {summary: …}` on an entity, type, actor or command; a flat `summary:` on a field, error or outcome; `refs: ["tracker:KEY-1"]` (`provider:key`) on a command or outcome. A flat `summary:` on an entity, actor or command is an unknown field |
 | a value only its originating response may disclose | `ess/21` | `one_time_response: [token]` on the **outcome**, beside `returns: true`; on the command it is an unknown field. It names required `String` response fields, or transparent `String` newtypes; an `Optional` one is refused as `type_mismatch` |
+| a record or an answer that admits members it does not declare (a protocol's extension object) | `ess/24` | `undeclared_fields: ignored` on a `kind: struct` type, or on a command with a `response:`, where it governs the response only; [below](#ess24) |
 | a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled |
 
 ```yaml
@@ -236,7 +237,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/23`
+## From `ess/16` through `ess/24`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -253,6 +254,7 @@ With current ESS:
 | `ess/21` | `one_time_response` non-disclosure contracts for required String response fields |
 | `ess/22` | explicit fact operands and constant offsets; UTF-8 byte lengths; instant comparison; `distinct` list keys; selected row guards/reads; Optional and two-hop related reads; several related rows; calendar windows; compensating external refusals; conditional aggregates and binding payload guards; per-outcome failure policy; lifecycle moves in `affects`; view grants; unit union variants; dotted input values |
 | `ess/23` | identity re-key by `updates:`; the held state as a value, `{subject: state}`; bulk `deletes:` with `instances:` and `deletes:` in `affects`; typed enum variant attributes; one record per input-list element with `affects: each:`; a `when_subject` predicate refusal asserts the whole record unchanged; row-set selectors on updates, deletes and upserts, scoped by a member of a struct identity |
+| `ess/24` | `undeclared_fields: ignored` on a struct type and on a command response: the record admits members it does not declare, while every declared field stays required and typed |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -380,10 +382,57 @@ A seed does not execute the authored document's timeline or replace a command's 
 missing input candidate, first supply a truthful `example:`: the reservation fixture's distinct
 member identity restores the wrong-state scenario without changing the rule or injecting state.
 
+## `ess/24`
+
+**Members a reader ignores.** A protocol whose readers must ignore members they do not recognise
+(an extension object, a response a later revision may add to) says so where it applies, and
+nowhere else. `undeclared_fields: ignored` on a `kind: struct` type admits members the struct does
+not declare, wherever the struct is reached; on a command it governs the command's `response:`
+object only, never its input. Every declared field stays required and typed. `refused` is the
+default, and a specification that does not write the key keeps its bytes:
+
+```yaml
+types:
+  - name: catalog.orders.Extension
+    kind: struct
+    undeclared_fields: ignored
+    fields:
+      - name: vendor
+        type: String
+
+commands:
+  - name: catalog.orders.PlaceOrder
+    undeclared_fields: ignored
+    input:
+      - name: item
+        type: String
+    response:
+      - name: order_ref
+        type: String
+      - name: extension
+        type: catalog.orders.Extension
+    outcomes:
+      - name: placed
+        returns: true
+```
+
+`validate` refuses the key at its own line everywhere else: on a command with no `response:` as
+`missing_declaration` (`ESS-COMMAND-005`), and on an event or an error as
+`unsupported_construct` (`ESS-EVENT-009`, `ESS-ERROR-009`; the hint: declare it on the struct type
+the fields belong to), as on every other declaration. Under a header below `ess/24` it is
+`unsupported_format_version` naming `ess/24` (`ESS-COMMAND-009`, `ESS-TYPE-009`).
+
+`ess generate --kind schema` and `--kind openapi` write `"additionalProperties": true` at the
+opened response object and at the opened struct, wherever it is reached; the command input and
+every closed object keep `false`. AsyncAPI follows, and the generated documentation says so on the
+command and the struct. The suite carries the openness to the runners ([testing-conformance](../../testing-conformance/SKILL.md)),
+and `ess verify diff` rates opening and closing ([spec-diff](../../hardening/references/spec-diff.md)).
+
 ## What validates and still gets no scenario
 
 `ess verify conform synthesize` observes a record only through a view, and these limits come from
-that. Each was reproduced on 0.55.0, the response row on 0.57.0; relay the refusal rather than reshaping the rule around it.
+that. Each was reproduced on 0.55.0, the response row on 0.57.0 and the opened-response rows on
+0.58.0; relay the refusal rather than reshaping the rule around it.
 
 | the model says | synthesis answers |
 |---|---|
@@ -392,6 +441,9 @@ that. Each was reproduced on 0.55.0, the response row on 0.57.0; relay the refus
 | a record invariant or a reading on the type of a typed `response:` field | the returning outcome has no scenario: `ESS-SYNTH-001` "record invariant on a response type … has no executable observer" |
 | `invariants:` on a type (`value.count >= 1`) with no view publishing a field of it | `ESS-SYNTH-013` "type … has no scenario"; `alphabet:` alone is checked without one |
 | `when_subject:` comparing `now` with a stored `Timestamp` the outcome set with `{generated: true}` | every scenario of the command is refused: no arranging branch sets the field from an input or a literal |
+| `one_time_response:` on an outcome of a command whose response declares `undeclared_fields: ignored` | the outcome and every disclosure scenario: `ESS-SYNTH-001` "one-time response … declares `undeclared_fields: ignored`, which the one-time observer does not carry" |
+| a `replays:` outcome (a retained result) over a response declared `undeclared_fields: ignored` | the replay has no scenario: `ESS-SYNTH-001` "retained result … declares `undeclared_fields: ignored`, which the exact retained-result observer does not carry" |
+| a complete-subject snapshot over an opened response or struct | refused at synthesis by name, because that observer compares a closed record (from the release notes; not reproduced here) |
 
 A `String` newtype with `alphabet:`, `prefix:` or value `invariants:` as a field of a typed
 `response:` no longer costs the returning outcome its scenario: the suite (`ess-conformance/46`,
