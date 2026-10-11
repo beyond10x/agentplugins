@@ -431,12 +431,13 @@ and `ess verify diff` rates opening and closing ([spec-diff](../../hardening/ref
 ## What validates and still gets no scenario
 
 `ess verify conform synthesize` observes a record only through a view, and these limits come from
-that. Each was reproduced on 0.55.0, the response row on 0.57.0 and the opened-response rows on
-0.58.0; relay the refusal rather than reshaping the rule around it.
+that. Each was reproduced on 0.55.0, the response row on 0.57.0, the opened-response rows on
+0.58.0 and the stored-field row on 0.59.0; relay the refusal rather than reshaping the rule around
+it.
 
 | the model says | synthesis answers |
 |---|---|
-| a guard over a stored field (`when_subject: {predicate: holder != input.holder}`) or a `wrong_state` refusal, on an entity with no view | `ESS-SYNTH-001` "no witness": choosing an input that matches the stored value needs a view with no filter that projects the identity, `state` and the guarded fields, `read_your_writes` or an `eventual` one it waits for. The facts are observed, not assumed: the creating outcome's `sets:` and a seed do not stand in for the view |
+| a guard over a stored field (`when_subject: {predicate: holder != input.holder}`) or a `wrong_state` refusal, on an entity with no view | since 0.59.0, the success, refusal, transition and wrong-state scenarios are written: the row is arranged through the creating command and its `sets:`, and each scenario observes only what the declared views publish. Its outcome, error and events are the evidence for the rest, and a note per scenario names the fields no view publishes ("a refusal that changed it is not checked"). The absent-subject send asserts that no row appeared only through an immediate view. 0.58.0 and earlier refused each of these with `ESS-SYNTH-001` |
 | `--synthesis-seed` for such a row | not applied when the row is held by an `owns` relation: `synthesis seeds: 1 selected, 0 applied`, naming the owner |
 | a record invariant or a reading on the type of a typed `response:` field | the returning outcome has no scenario: `ESS-SYNTH-001` "record invariant on a response type … has no executable observer" |
 | `invariants:` on a type (`value.count >= 1`) with no view publishing a field of it | `ESS-SYNTH-013` "type … has no scenario"; `alphabet:` alone is checked without one |
@@ -452,5 +453,8 @@ Go and TypeScript runners fail a returned value that breaks one (`ESS-CF-PAYLOAD
 `ESS-SYNTH-013` row above still applies to a value invariant no view publishes.
 
 A system whose source defines no read surface (a published protocol, a credential that is never
-read back) declares no view, and keeps these refusals visible in its report. Declaring a view to
-silence them states a read surface the system does not have.
+read back) declares no view, and keeps these refusals and notes visible in its report. Declaring a
+view to silence them states a read surface the system does not have. A stored-field guard on such a
+system now gets its scenarios, but they cannot check that a refusal left the guarded field alone:
+the notes say which fields that covers, and an authored scenario against the real target is the
+check that remains.

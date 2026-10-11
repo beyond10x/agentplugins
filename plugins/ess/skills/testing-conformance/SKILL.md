@@ -141,6 +141,29 @@ cause is not a missing ESS construct.
 Refusal reasons are worth writing well for this reason alone: a target that refuses with a generic
 message destroys its own diagnosis. Every refusal should name what it could not spell.
 
+A step whose command reads a caller attribute (`sets: {account_id: {caller: account_id}}`) that
+nothing supplied is `unsupported`, and its reason in the text and JSON reports
+names the attribute and `caller:` (from the release notes; a synthesized scenario supplies its own
+caller values and passed here). Supply the value from an authored scenario: on
+`type: ess-scenario/5`, an act states the caller it sends as, each attribute a literal of its
+declared type or an instance arranged with `setup:`:
+
+```yaml
+  - at: 2026-01-05T09:00:00Z
+    command: ledger.notes.OpenNote
+    actor: ledger.notes.Member
+    caller: {account_id: {$instance: account}}
+    input: {title: first}
+    outcome: opened
+```
+
+`ess verify conform author` compiles it, and the `interpreted` target and the generated Go and
+TypeScript runners send it. It refuses an attribute the act's `actor:` does not declare
+(`ESS-AUTHOR-013`), a required attribute the command reads that the act leaves out
+(`ESS-AUTHOR-014`), and an instance captured while the scenario runs (`ESS-AUTHOR-015`: a caller's
+values are fixed when the suite is written). `ess-scenario/1` to `/4` refuse the key. An act with
+no `caller:` sends none, and its suite keeps its bytes.
+
 ## Building a double for an upstream plane
 
 Most skips on a real suite are not missing constructs — they are planes the target does not drive. A
