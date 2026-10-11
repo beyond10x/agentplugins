@@ -49,6 +49,13 @@ changed yet.
   `when_related:` or row-set claim where an earlier accepting `when:` holds); claim the branch it
   names. A suite for a command whose external branch comes before a `when_related:` refusal among
   its accepting branches can change bytes, because the synthesized external witness differs.
+- From 0.59.0 a regenerated suite can gain scenarios: a command guarded by `when_subject:` on a
+  field no immediate view covers now gets its success, refusal, transition and wrong-state
+  scenarios instead of `ESS-SYNTH-001`, and one whose only covering view is `eventual` gains an
+  absent-subject send. A `when_related:` guard reading a member of a struct input sent as a captured
+  instance now picks its related row under the subject's real key, so that scenario's bytes change
+  (from the release notes). A model with an immediate view over the guarded fields keeps its suite
+  byte for byte. Authored scenarios that state `caller:` need `type: ess-scenario/5`.
 - Regeneration that rewrites `.ess-output/state.json` to a newer record format (such as
   `ess-output-state/3`) breaks every older `ess` that reads it: move a CI job's `ess` pin in the
   same change that commits the regenerated record. A refusal that an owned file differs from its

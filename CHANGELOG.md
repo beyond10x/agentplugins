@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.22.8] — 2026-10-11
+
+- Track ESS 0.59.0 after `agentplugins-check tools`; AEP 0.71.2, Worktree 0.15.0, Metaharness
+  0.9.3 and Connectors v0.45.0 are still the newest.
+- ESS skills follow 0.59.0: `ess:testing-conformance` shows an authored act stating its caller
+  under `caller:` (`ess-scenario/5`), the refusals `ESS-AUTHOR-013` to `-015`, and the unsupported
+  reason that names a caller attribute nothing supplied; `ess:specifying` says a `when_subject:`
+  guard on a field no view publishes now gets its scenarios, observed only through the declared
+  views, where it was refused with `ESS-SYNTH-001`; `ess:upgrade` names the suites that gain
+  scenarios or change bytes. The tutorials and fixtures require ESS 0.59.0.
+- The ESS tutorial says that every command answer, a refusal included, carries the current
+  revision as its consistency token, and that an optional field with no value is `Node::Null` in a
+  view row; a trial agent lost 14 scenarios to the two gaps.
+- The eval workflow runs ESS 0.59.0.
+
 ## [0.22.7] — 2026-10-10
 
 - Track ESS 0.58.0 and Connectors v0.45.0 after `agentplugins-check tools`; AEP 0.71.2, Worktree

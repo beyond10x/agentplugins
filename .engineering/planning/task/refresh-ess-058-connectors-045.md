@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-ess-058-connectors-045
 kind: task
-status: active
+status: implemented
 title: Track ESS 0.58.0 and Connectors v0.45.0
 summary: the skills follow ESS 0.58.0 and Connectors v0.45.0, and verified.json moves
-revision: 5
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-10T18:37:07Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-10T18:37:07Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-11T11:01:56Z", actor: "human:timo", revision: 6}
 ---
 ## Context
 
@@ -67,3 +68,8 @@ plugin manifest and `**Skill version**` line.
   valid, 17 scenarios 0 refusals, 5/5 outputs, cargo test 2 passed 0 failed; no measure worse than
   `trials/baseline.json`.
 - `task site-build`: exit 0.
+
+## Delivered
+
+- https://github.com/beyond10x/agentplugins/pull/79 (merge 61ea33f)
+- https://github.com/beyond10x/agentplugins/releases/tag/0.22.7

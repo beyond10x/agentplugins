@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-11T11:12:41Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-ess-059",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check tools on the f93a45b content: exit 0; aep 0.71.2 222 spelled commands, ess 0.59.0 94 (tutorial cargo test 2 passed), worktree 0.15.0 52, metaharness 0.9.3 13, connectors v0.45.0 21 against the released source contract (runtime not executed, no binary assets)"
+  }
+}

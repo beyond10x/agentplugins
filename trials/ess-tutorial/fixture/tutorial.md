@@ -8,7 +8,7 @@ description: Specify a lending library and hold a Rust implementation to its gen
 
 An Executable System Specification describes records, commands, refusals, events and readable views.
 ESS validates that model and generates checks that an implementation must answer. This tutorial
-uses **ESS 0.58.0 and Rust**, verified on 2026-10-10. The
+uses **ESS 0.59.0 and Rust**, verified on 2026-10-11. The
 [2026-09-28 Go recording](./first-ess-specification-2026-09-28.md) is retained as historical evidence.
 
 You finish with a specification, generated documentation and OpenAPI, a small Rust library and
@@ -67,7 +67,7 @@ domains:
 
 ```yaml
 format: ess-inputs/2
-requires: ess 0.58.0
+requires: ess 0.59.0
 specification:
   - system.yaml
   - components.yaml
@@ -135,8 +135,8 @@ publish = false
 [workspace]
 
 [dev-dependencies]
-ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.58.0" }
-ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.58.0" }
+ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.59.0" }
+ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.59.0" }
 serde_json = "1"
 
 [profile.dev]
@@ -169,11 +169,13 @@ fn conforms_to_generated_suite() {
 ```
 
 The complete adapter is in the example’s `impl/tests/conformance.rs`; it maps only the five
-commands and three views. Use `Node::Text` for string values and
+commands and three views. Use `Node::Text` for string values, `Node::Null` for an optional field
+with no value (a view row still carries `borrower_id` after `ReturnBook` clears it), and
 `OutcomeRef::new(req.command.clone(), outcome.parse().unwrap())` for a command-qualified outcome.
 
-Every scenario starts with an empty library. A mutation advances the store's revision; its answer
-carries that revision as an opaque consistency token. A view request demanding `AtLeast(token)`
+Every scenario starts with an empty library. A mutation advances the store's revision. Every
+command answer, a refusal included, carries the current revision as an opaque consistency token;
+a refusal leaves it unchanged. A view request demanding `AtLeast(token)`
 checks that revision before reading the same synchronous store. An invalid or future token is an
 error, never permission to return a weaker read. Returning rows alone without a command token
 caused 14 of the original tutorial's 17 scenarios to fail under current ESS.
@@ -236,7 +238,7 @@ record effects. `affects` can also move selected records in `ess/22`; from `ess/
 record per element of an input list (`each:`), and `deletes:` can remove every row a filter selects.
 These declarations do not by themselves promise atomic multi-record transactions. Validation,
 synthesis and code generation have different supported subsets; keep each refusal visible and
-distinguish generated suite coverage from implementation coverage. In ESS 0.58.0, an
+distinguish generated suite coverage from implementation coverage. In ESS 0.59.0, an
 identity-addressed related guard beside `unknown_instance` is refused.
 An existence-only input-related guard beside `wrong_state` is also refused. With `ess/22`,
 `wrong_state` can coexist with related guards when at least one present-row predicate is
