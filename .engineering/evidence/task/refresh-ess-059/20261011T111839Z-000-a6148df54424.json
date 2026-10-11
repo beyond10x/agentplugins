@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-11T11:18:39Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-ess-059",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task trial:run TRIAL=ess-tutorial NAME=ess-tutorial-0059b on 97b9b71: isolated (b10x and ess 0.22.8, sandbox ess 0.59.0); 59 tool calls, validate valid, 17 scenarios 0 refusals, 5/5 outputs, cargo test 2 passed; no measure worse than trials/baseline.json"
+  }
+}
