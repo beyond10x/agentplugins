@@ -169,11 +169,13 @@ fn conforms_to_generated_suite() {
 ```
 
 The complete adapter is in the example’s `impl/tests/conformance.rs`; it maps only the five
-commands and three views. Use `Node::Text` for string values and
+commands and three views. Use `Node::Text` for string values, `Node::Null` for an optional field
+with no value (a view row still carries `borrower_id` after `ReturnBook` clears it), and
 `OutcomeRef::new(req.command.clone(), outcome.parse().unwrap())` for a command-qualified outcome.
 
-Every scenario starts with an empty library. A mutation advances the store's revision; its answer
-carries that revision as an opaque consistency token. A view request demanding `AtLeast(token)`
+Every scenario starts with an empty library. A mutation advances the store's revision. Every
+command answer, a refusal included, carries the current revision as an opaque consistency token;
+a refusal leaves it unchanged. A view request demanding `AtLeast(token)`
 checks that revision before reading the same synchronous store. An invalid or future token is an
 error, never permission to return a weaker read. Returning rows alone without a command token
 caused 14 of the original tutorial's 17 scenarios to fail under current ESS.
