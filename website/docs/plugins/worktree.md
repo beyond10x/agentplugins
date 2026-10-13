@@ -37,12 +37,17 @@ holds their exact current state. Work merged as rebased or cherry-picked copies 
 an advertised ref carries every unique commit's exact patch.
 
 Agents end their work with `worktree finish --discard-cache --archive <tree>` (worktree 0.9.0 or
-later). It deletes only ignored build cache recognised by structure (Cargo profiles in a tagged
-target and its `tmp/` test scratch, `node_modules` below a tracked lockfile, a virtual environment
-beside a tracked Python manifest, tagged tool caches), archives everything else the tree holds that
-no remote ref recovers, and finishes. Since worktree 0.12.1 an untagged `target/` beside a tracked
-`Cargo.toml` counts as tagged once a profile in it holds `.fingerprint/` and `deps/`. A directory's
-name never makes it cache: records written into `target/` are kept.
+later). Since worktree 0.18.0 it deletes every ignored entry, file or directory, unless the
+repository's `.worktreekeep` keeps it, archives everything else the tree holds that no remote ref
+recovers, and finishes. `.worktreekeep` sits at the tree root and holds Git exclude patterns; a path
+is kept when a pattern matches it or one of its ancestors, and an invalid keep file (a symbolic
+link, a directory, an unreadable file) refuses as `keep-file-invalid` and deletes nothing. Nested
+repositories, mount points and unreadable entries are always kept. Records written into `target/`
+or any other ignored directory are deleted unless `.worktreekeep` names them; worktree 0.17.1 and
+older kept every ignored entry it did not recognise as cache. Each deleted entry is named by its
+rule: Cargo profiles in a tagged target and its `tmp/` test scratch, `node_modules` below a tracked
+lockfile, a virtual environment beside a tracked Python manifest, a Flutter app's `build/` and
+`.dart_tool/` (since 0.17.0), tagged tool caches, and `ignored-output` for everything else.
 `worktree discard-cache --dry-run` shows the classification without deleting anything.
 
 Since worktree 0.12.0 an archive also images each nested Git repository in the tree, such as a
@@ -52,7 +57,7 @@ repository are still refused as `archive-unsupported-entry`. Plain `worktree fin
 dirty tree unless its archive holds exactly the current state.
 
 `worktree sweep --all-profiles` (worktree 0.10.0 or later) does the same for trees nobody
-finished. Run daily from a timer, it discards the recognised build cache of every tree idle for a
+finished. Run daily from a timer, it discards the ignored entries `.worktreekeep` does not keep of every tree idle for a
 day or more without a live lease, and archives what an expired or finished tree still holds. It
 never changes lifecycle, removes a tree or applies GC: a swept tree shows as eligible in
 `worktree gc --dry-run`, and removal stays an exact-id apply. `--dry-run` shows what it would do.
@@ -75,6 +80,10 @@ build layout below a recognised target out of `dirty.patch` and records it as `b
 `UncommittedState` only because its patch holds build output shrinks with
 `worktree prune-archives --strip-build-output --repo <primary> --dry-run`, then `--apply --id
 <reviewed-directory>`; it rewrites the patch, verifies it over HEAD and never deletes an archive.
+Since worktree 0.17.0 a Flutter app's `build/` and `.dart_tool/` beside a `pubspec.yaml` count as
+build layout too. Since worktree 0.18.0 `archive` keeps every path `.worktreekeep` keeps in
+`dirty.patch`, and the strip also removes ignored output (an untracked file both HEAD's and the
+archived tree's `.gitignore` files ignore), never what `.worktreekeep` keeps.
 
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by name. It is a command:
 you start it, or an agent starts it when you ask, and it hands off to `worktree:managing-worktrees`
