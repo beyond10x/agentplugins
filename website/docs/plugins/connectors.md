@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.45.0](https://github.com/beyond10x/connectors/releases/tag/v0.45.0).
+[v0.48.0](https://github.com/beyond10x/connectors/releases/tag/v0.48.0).
 
 ## Install in either host
 
@@ -22,10 +22,14 @@ Use `--host codex` in Codex. Apply an approved plan with:
 b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 ```
 
-The current release has no prebuilt CLI assets. Setup builds the `connectors` Cargo package from
-its exact release tag with locked dependencies; v0.45.0 requires Rust 1.91 or newer. Adapter
-executables, configuration and credentials are separate prerequisites. The local runtime currently
-targets Linux. [Setup](../install.md) preserves other installed plugins and snapshots changes.
+Since v0.48.0 each release carries checksummed prebuilt archives for x86-64 and ARM64 Linux
+and macOS, which setup installs by default. An older, source-only release, `--method cargo` or
+another target builds the `connectors` Cargo package from its exact release tag with locked
+dependencies and needs Rust 1.91 or newer. There is no Windows build. Credentials live in the
+Secret Service on Linux and the login keychain on macOS. The macOS binary is not signed yet: one
+downloaded through a browser needs `xattr -d com.apple.quarantine connectors`, and an upgraded
+binary cannot read keychain credentials an earlier build stored, so they are entered again.
+Adapter executables, configuration and credentials are separate prerequisites. [Setup](../install.md) preserves other installed plugins and snapshots changes.
 
 A new session loads the installed skills. In Claude Code invoke `/connectors:integrating`; in
 Codex select `integrating` or invoke `$connectors:integrating`. Both hosts load the same skill
@@ -92,3 +96,12 @@ when they are authorized. Since v0.44.0 a source amendment may correct a request
 for binary reads such as Slack file downloads, which changes its revision, and a Kubernetes
 configuration may enable `pod_logs`, `kubeconfig` and `pod_exec`. Pod exec is a write on the
 `connectors-private/2` exchange and needs an approval policy like every write.
+
+Since v0.46.0 `setup check` reports the build's `os` and its `custody_backend`. In v0.47.0 the
+Slack bot set gains two writes under approval, `conversations.open` and `chat.postMessage`, and a
+catalog guard can expect a JSON boolean (`{"boolean": true}`). The same release refuses a guard
+written `{"literal": "true"}` or `{"literal": "false"}` when the selection loads: a configuration
+that carries its own selection file rewrites each as `{"boolean": …}` when it upgrades the binaries
+that load it. Since
+v0.48.0 the CLI and its local host run on macOS, with weaker platform guarantees than on Linux,
+and releases carry prebuilt archives.

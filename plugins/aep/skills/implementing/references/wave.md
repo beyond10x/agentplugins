@@ -767,9 +767,9 @@ The order is not interchangeable:
    is step 4's: never delete it by name, because agents write records into `target/` too.
 4. **Release your own lease, then finish and review managed cleanup.** Confirm each returned
    agent released its own lease; never clear another session's lease. Run
-   `worktree finish --discard-cache --archive <path>`: it deletes only the build cache it
-   recognises by structure, archives everything else the tree holds that no advertised ref
-   recovers, and finishes. Then `worktree gc --repo <primary> --dry-run --id <managed-id>`. Apply only the exact ids from
+   `worktree finish --discard-cache --archive <path>`: it deletes every ignored entry the tree
+   root's `.worktreekeep` does not keep (records in `target/` included), archives everything else
+   the tree holds that no advertised ref recovers, and finishes. Then `worktree gc --repo <primary> --dry-run --id <managed-id>`. Apply only the exact ids from
    that review with `worktree gc --repo <primary> --apply --id <managed-id>`. Follow the Worktree
    skill's reconciliation procedure for interrupted lifecycle state. Include the integration
    checkout after its wanted commits have been published.

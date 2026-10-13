@@ -176,8 +176,8 @@ A completed wave records executed scenario counts, remaining skips or refusals, 
 findings and fixes, and the merge gate. Worktree cleanup needs published recovery proof or an
 archive; local merge alone does not make a managed checkout disposable.
 Have each owner end their own lease, then run `worktree finish --discard-cache --archive <tree>`:
-it deletes only build cache it recognises by structure, archives anything else no remote ref
-holds (all of it, in a local tutorial without a remote), and finishes. Inspect
+it deletes every ignored entry the tree root's `.worktreekeep` does not keep, archives anything
+else no remote ref holds (all of it, in a local tutorial without a remote), and finishes. Inspect
 `worktree gc --dry-run`; apply cleanup
 only to the exact reviewed ID. Follow the Worktree skill if a lease or recovery check refuses.
 

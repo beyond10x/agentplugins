@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-13T14:05:45Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-worktree-018-connectors-048",
+  "kind": "task",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check tools on the integrated wave head: exit 0; aep 0.71.2 222, ess 0.59.0 94, worktree 0.18.0 52, metaharness 0.9.3 13, connectors v0.48.0 21 with runtime help of the release binary verified"
+  }
+}

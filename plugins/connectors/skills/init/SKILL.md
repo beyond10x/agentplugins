@@ -17,9 +17,14 @@ b10x init connectors --host claude --out ~/.local/state/b10x/plan.json
 
 Review the actions and resolve warnings before applying within the user's authorization:
 `b10x setup apply --plan ~/.local/state/b10x/plan.json --yes`. Ask once if installation is not
-already authorized. Current Connectors releases are source-only: `b10x` builds the `connectors`
-Cargo package at the selected exact tag, with locked dependencies. Release `v0.45.0` needs Rust
-1.91 or newer. A missing toolchain or failed build is a prerequisite failure, not a completed install.
+already authorized. From `v0.48.0` a Connectors release carries checksummed prebuilt archives for
+x86-64 and ARM64 Linux and macOS, and `b10x` installs that by default. An older, source-only
+release, `--method cargo` or another target builds the `connectors` Cargo package at the exact
+tag with locked dependencies, which needs Rust 1.91 or newer. There is no Windows build. A missing
+toolchain, failed checksum or failed build is a prerequisite failure, not a completed install.
+On macOS the binary is not signed yet: one downloaded through a browser needs
+`xattr -d com.apple.quarantine connectors` before it runs, and an upgraded binary cannot read
+keychain credentials an earlier build stored, so connections are acquired again.
 
 No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md first.
 For an existing 0.7.x deployment, read the migration guidance in `connectors:integrating` before

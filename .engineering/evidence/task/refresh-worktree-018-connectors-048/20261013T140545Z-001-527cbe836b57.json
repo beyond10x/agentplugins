@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-13T14:05:45Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-worktree-018-connectors-048",
+  "kind": "task",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task trial:run TRIAL=ess-tutorial NAME=ess-tutorial-0229: isolated, plugins 0.22.9; 59 tool calls, validate valid, 17 scenarios 0 refusals, 5/5 outputs, cargo test 2 passed; no measure worse than trials/baseline.json"
+  }
+}

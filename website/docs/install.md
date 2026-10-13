@@ -25,14 +25,14 @@ The marketplace source is the GitHub repository `beyond10x/agentplugins` and the
 identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree` and `connectors`,
 in both hosts; every one lives in this repository. The CLIs come from their own repositories'
 releases, prebuilt or with `cargo install`. The [Connectors guide](plugins/connectors.md) covers its
-source-build requirements and separate provider configuration.
+platforms, macOS notes and separate provider configuration.
 
 ## The command-line tools
 
 The `aep`, `ess`, `worktree` and `connectors` plugins drive command-line tools they do not ship.
 `b10x` installs each at its newest release, from a published archive checked against its
-`SHA256SUMS`, or with `cargo`. Connectors currently publishes source only and needs Rust 1.91
-or newer:
+`SHA256SUMS`, or with `cargo`. Connectors publishes archives from v0.48.0; an older Connectors
+release is source only and builds with `cargo` on Rust 1.91 or newer:
 
 ```shell-session
 $ b10x init ess --host claude --out plan.json  # use --host codex in Codex

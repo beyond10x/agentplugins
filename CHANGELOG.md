@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.22.9] — 2026-10-13
+
+- Track Worktree 0.18.0 and Connectors v0.48.0 after `agentplugins-check tools`; AEP 0.71.2, ESS
+  0.59.0 and Metaharness 0.9.3 are still the newest.
+- `b10x` installs Connectors from its checksummed release archive from v0.48.0, the first release
+  that carries one (Linux and macOS, x86-64 and arm64), and still builds an older, source-only
+  release with `cargo install`. `agentplugins-check tools` checks the released `connectors`
+  binary's help as well as its source contract.
+- `worktree:managing-worktrees` follows 0.16.0 to 0.18.0: `discard-cache`, `finish
+  --discard-cache` and `sweep` delete every ignored entry unless the tree root's `.worktreekeep`
+  keeps it (`ignored-output`, `keep-file-invalid`); nested repositories, mount points and
+  unreadable entries stay; Flutter build output is recognised; `archive` reads the keep file; the
+  `prune-archives --strip-build-output` strip also removes ignored output. The wave cleanup step,
+  the governed-plan tutorial and the worktree plugin page no longer say records under `target/`
+  are kept.
+- Connectors skills and pages name v0.48.0: prebuilt archives, the macOS quarantine and keychain
+  notes, `setup check`'s `os` and `custody_backend`, the Slack `chat.postMessage` and
+  `conversations.open` writes under approval, and the migration of a `{"literal": "true"}` guard
+  to `{"boolean": true}`.
+- The eval workflow runs Worktree 0.18.0 and Connectors v0.48.0, the latter from its archive.
+
 ## [0.22.8] — 2026-10-11
 
 - Track ESS 0.59.0 after `agentplugins-check tools`; AEP 0.71.2, Worktree 0.15.0, Metaharness
