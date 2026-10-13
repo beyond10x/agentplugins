@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.22.10] — 2026-10-13
+
+- Track Worktree 0.18.1 after `agentplugins-check tools`; AEP 0.71.2, ESS 0.59.0, Metaharness
+  0.9.3 and Connectors v0.48.0 are still the newest. 0.18.1 moves its dependencies and raises its
+  `rust-version` to 1.89; its `worktree skill` text and every subcommand's help equal 0.18.0's, so
+  no skill text changes. `b10x upgrade` now offers it.
+- The eval workflow runs Worktree 0.18.1.
+
 ## [0.22.9] — 2026-10-13
 
 - Track Worktree 0.18.0 and Connectors v0.48.0 after `agentplugins-check tools`; AEP 0.71.2, ESS

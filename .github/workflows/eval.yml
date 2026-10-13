@@ -56,7 +56,7 @@ jobs:
       METAHARNESS_VERSION: '0.9.3'
       ESS_VERSION: '0.59.0'
       CONNECTORS_VERSION: 'v0.48.0'
-      WORKTREE_VERSION: '0.18.0'
+      WORKTREE_VERSION: '0.18.1'
       # The version qualified by this Metaharness release's Claude adapter.
       CLAUDE_VERSION: '2.1.259'
     steps:

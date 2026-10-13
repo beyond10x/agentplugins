@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-worktree-018-connectors-048
 kind: task
-status: active
+status: implemented
 title: Track Worktree 0.18.0 and Connectors v0.48.0
 summary: the skills and b10x follow Worktree 0.18.0 and Connectors v0.48.0, and verified.json moves
-revision: 5
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-13T13:36:59Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-13T13:36:59Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-13T14:46:04Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":4}}}
 ---
 ## Context
 
