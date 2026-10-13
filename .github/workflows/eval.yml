@@ -55,7 +55,7 @@ jobs:
       AEP_VERSION: '0.68.0'
       METAHARNESS_VERSION: '0.9.3'
       ESS_VERSION: '0.59.0'
-      CONNECTORS_VERSION: 'v0.45.0'
+      CONNECTORS_VERSION: 'v0.48.0'
       WORKTREE_VERSION: '0.18.0'
       # The version qualified by this Metaharness release's Claude adapter.
       CLAUDE_VERSION: '2.1.259'
@@ -230,9 +230,15 @@ jobs:
           for tool in cargo rustc rustup; do
             ln -s "$HOME/.cargo/bin/$tool" "$HOME/.local/bin/$tool"
           done
-          # Connectors currently publishes source only. Install its exact tag for readiness evals.
-          cargo install --locked --git https://github.com/beyond10x/connectors \
-            --tag "$CONNECTORS_VERSION" --root "$HOME/.local" connectors
+          # Connectors tags carry a leading v; its archive names do not.
+          connectors_version="${CONNECTORS_VERSION#v}"
+          archive="connectors-${connectors_version}-${target}.tar.gz"
+          release="https://github.com/beyond10x/connectors/releases/download/${CONNECTORS_VERSION}"
+          curl --fail --location --remote-name "${release}/${archive}"
+          curl --fail --location --output CONNECTORS_SHA256SUMS "${release}/SHA256SUMS"
+          grep "  ${archive}$" CONNECTORS_SHA256SUMS | sha256sum --check -
+          tar -xzf "$archive"
+          install -m 0755 "connectors-${connectors_version}-${target}/connectors" "$HOME/.local/bin/connectors"
           aep --version
           metaharness --version
           "$HOME/.local/bin/ess" --version

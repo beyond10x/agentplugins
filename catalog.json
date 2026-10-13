@@ -78,6 +78,7 @@
         {
           "name": "connectors",
           "install": {
+            "archive": { "repository": "beyond10x/connectors" },
             "cargo": { "repository": "beyond10x/connectors", "package": "connectors" }
           }
         }

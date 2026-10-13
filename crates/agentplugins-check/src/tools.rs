@@ -4,9 +4,10 @@
 //! R5), so the only thing that can drift is a product release renaming or removing a command the
 //! skills still spell. This check downloads each product's newest release — the prebuilt archive,
 //! checked against its `SHA256SUMS` — and runs `<cli> <subcommands> --help` for every command a
-//! code span or code block in plugins, public docs or root guidance spells. Connectors has no
-//! binary assets: its exact release's CLI source contract verifies paths and long flags, with
-//! explicit source-only provenance. This is not a runtime invocation check.
+//! code span or code block in plugins, public docs or root guidance spells. Connectors is also
+//! checked against its exact release's CLI source contract (paths and long flags), and its release
+//! binary's help when the release carries archives (from v0.48.0); an older, source-only release
+//! is checked from source alone. This is not a runtime invocation check.
 //! ESS's syntax example must also still validate, and the public tutorial's specification must
 //! validate, synthesize an IR suite with no refusals and pass it with its Rust implementation.
 //! It runs on every pull request, every `main` push and daily; a red run is fixed by a skill edit.
@@ -617,7 +618,7 @@ pub fn verify(root: &Path) -> Result<(), String> {
         for (_, cli, repository) in TOOLS {
             let tag = latest(repository)?;
             if *cli == "connectors" {
-                verify_connectors(root, repository, &tag, &mut problems)?;
+                verify_connectors(root, repository, &tag, &scratch, &mut problems)?;
                 if let Some(release) = verified.get(*cli) {
                     problems.extend(unverified(cli, &tag, release));
                 } else {
@@ -789,6 +790,7 @@ fn verify_connectors(
     root: &Path,
     repository: &str,
     tag: &str,
+    scratch: &Path,
     problems: &mut Vec<String>,
 ) -> Result<(), String> {
     let commit = crate::upstream::release_commit(repository, tag)?;
@@ -802,7 +804,21 @@ fn verify_connectors(
     );
     let routes = run("curl", &["-fsSL", "--retry", "2", &route_url])?;
     let service_help = connector_service_routes(&routes);
-    let binary = std::env::var_os("AGENTPLUGINS_CONNECTORS_BINARY").map(PathBuf::from);
+    // The release binary (archives since v0.48.0), unless `AGENTPLUGINS_CONNECTORS_BINARY` names one;
+    // a release cut before `release-binaries.yml` has no archive and is checked from source alone.
+    let binary = match std::env::var_os("AGENTPLUGINS_CONNECTORS_BINARY") {
+        Some(binary) => Some(PathBuf::from(binary)),
+        None if connectors_has_archives(tag) => {
+            let (fetched, binary) = fetch("connectors", repository, scratch)?;
+            if fetched != tag {
+                return Err(format!(
+                    "{repository}: newest release moved from {tag} to {fetched}"
+                ));
+            }
+            Some(binary)
+        }
+        None => None,
+    };
     if let Some(binary) = &binary {
         let version = run(&binary.to_string_lossy(), &["--version"])?;
         if version.trim() != format!("connectors {}", tag.trim_start_matches('v')) {
@@ -813,7 +829,7 @@ fn verify_connectors(
             ));
         }
         println!(
-            "tools `connectors`: additional runtime help verification with {} (version {})",
+            "tools `connectors`: runtime help verification with {} (version {})",
             binary.display(),
             version.trim()
         );
@@ -826,18 +842,26 @@ fn verify_connectors(
             if let Some(binary) = &binary {
                 let mut arguments: Vec<&str> = path.iter().map(String::as_str).collect();
                 arguments.push("--help");
-                let help = run(&binary.to_string_lossy(), &arguments)?;
-                for flag in &flags {
-                    if !help
-                        .split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
-                        .any(|word| word == flag)
-                    {
-                        problems.push(format!(
-                            "{}: runtime `connectors {}` has no {flag} in {tag}",
-                            file.strip_prefix(root).unwrap_or(&file).display(),
-                            path.join(" ")
-                        ));
+                match run(&binary.to_string_lossy(), &arguments) {
+                    Ok(help) => {
+                        for flag in &flags {
+                            if !help
+                                .split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
+                                .any(|word| word == flag)
+                            {
+                                problems.push(format!(
+                                    "{}: runtime `connectors {}` has no {flag} in {tag}",
+                                    file.strip_prefix(root).unwrap_or(&file).display(),
+                                    path.join(" ")
+                                ));
+                            }
+                        }
                     }
+                    Err(_) => problems.push(format!(
+                        "{}: `connectors {}` is not a runtime command of connectors {tag}",
+                        file.strip_prefix(root).unwrap_or(&file).display(),
+                        path.join(" ")
+                    )),
                 }
             }
             if let Some(allowed) = commands.get(&path) {
@@ -861,12 +885,18 @@ fn verify_connectors(
         }
     }
     let runtime = if binary.is_some() {
-        "runtime help additionally verified"
+        "runtime help verified"
     } else {
         "source contract only; runtime not executed (release has no binary assets)"
     };
     println!("tools `connectors` {tag}: {checked} spelled command(s) checked against released source contract {url} and service help routes {route_url}; {runtime}");
     Ok(())
+}
+
+/// Whether a Connectors release carries prebuilt archives: every release from v0.48.0, the first
+/// cut with `release-binaries.yml`.
+fn connectors_has_archives(tag: &str) -> bool {
+    key(tag) >= key("v0.48.0")
 }
 
 fn connector_service_routes(source: &str) -> BTreeSet<String> {
@@ -1055,6 +1085,15 @@ mod tests {
         assert!(verify_eval_pair(manifest, "aaa").is_err());
         assert!(verify_eval_pair(&manifest.replace("bbb", "aaa"), "aaa").is_ok());
         assert!(verify_eval_pair("", "aaa").is_err());
+    }
+
+    #[test]
+    fn connectors_release_binaries_start_at_v0_48_0() {
+        assert!(!connectors_has_archives("v0.45.0"));
+        assert!(!connectors_has_archives("v0.47.9"));
+        assert!(connectors_has_archives("v0.48.0"));
+        assert!(connectors_has_archives("v1.0.0"));
+        assert!(!connectors_has_archives("not-a-tag"));
     }
 
     #[test]

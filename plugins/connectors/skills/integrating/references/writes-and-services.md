@@ -20,6 +20,12 @@ or connection must be reassessed and prepared again. After an uncertain write, p
 idempotency key and follow the operation's documented observation/recovery contract; a new key
 would describe another attempt. Report ambiguity rather than automatically resending.
 
+Since `v0.47.0` Slack's bot selection carries two such writes, `conversations.open` and
+`chat.postMessage`; a direct message is two invocations, open then post, each with its own
+preparation, approval and idempotency key. A Slack answer whose `ok` is not the JSON boolean
+`true` is `outcome_unknown`, not a refusal, and Slack's `error` string is not returned: check the
+target conversation before any new attempt.
+
 ## Explicit services
 
 For an existing supplied service endpoint, read `connectors describe --help` and

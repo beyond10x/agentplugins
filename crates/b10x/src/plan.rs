@@ -1943,7 +1943,9 @@ mod tests {
     }
 
     #[test]
-    fn connectors_installs_and_upgrades_from_its_source_only_release() {
+    fn connectors_installs_and_upgrades_with_cargo_from_a_source_only_release() {
+        // Releases before v0.48.0 carry no `SHA256SUMS`, so the resolver lists no archive target.
+        assert!(!resolved().archive_targets.contains_key("connectors"));
         for installed in [None, Some("0.7.2"), Some("0.27.0")] {
             let inventory = Inventory {
                 claude: Some(HostState::default()),
@@ -1976,7 +1978,10 @@ mod tests {
             };
             assert_eq!(tag, "v0.28.0");
             assert_eq!(*method, Method::Cargo);
-            assert!(install.archive.is_none());
+            assert!(
+                install.archive.is_some(),
+                "the catalog offers archives; this release has none"
+            );
             let cargo = install.cargo.as_ref().unwrap();
             assert_eq!(cargo.repository, "beyond10x/connectors");
             assert_eq!(cargo.package, "connectors");
@@ -1987,6 +1992,84 @@ mod tests {
                 } else {
                     "/opt/b10x-home/.cargo/bin"
                 }
+            );
+        }
+    }
+
+    #[test]
+    fn connectors_installs_its_prebuilt_archive_from_a_release_that_carries_one() {
+        let catalog = Catalog::embedded();
+        let mut resolved = resolved();
+        resolved
+            .latest
+            .insert("beyond10x/connectors".to_owned(), "v0.48.0".to_owned());
+        resolved
+            .archive_targets
+            .insert("connectors".to_owned(), every_target());
+        for (target, installed) in [
+            (X86_LINUX, None),
+            (ARM_LINUX, Some("0.45.0")),
+            (ARM_MACOS, Some("0.45.0")),
+        ] {
+            let inventory = Inventory {
+                claude: Some(HostState::default()),
+                cargo: true,
+                binaries: installed.map_or_else(Vec::new, |version| {
+                    vec![BinaryState {
+                        name: "connectors".to_owned(),
+                        copies: vec![Copy {
+                            path: "/opt/b10x-home/.cargo/bin/connectors".to_owned(),
+                            version: Some(version.to_owned()),
+                        }],
+                    }]
+                }),
+                ..Inventory::default()
+            };
+            let context = Context {
+                catalog: &catalog,
+                resolved: &resolved,
+                selection: Some(BTreeSet::from(["connectors".to_owned()])),
+                hosts: vec![Host::Claude],
+                home: Path::new("/opt/b10x-home"),
+                only: true,
+                method: None,
+                target: Some(target.to_owned()),
+                upgrade: false,
+            };
+            let plan = plan(&context, &inventory);
+            let Some(Action::InstallBinary {
+                tag,
+                method,
+                install,
+                directory,
+                ..
+            }) = plan.actions.iter().find(|action| {
+                matches!(action, Action::InstallBinary { name, .. } if name == "connectors")
+            })
+            else {
+                panic!("Connectors must install its CLI on {target}: {:#?}", plan.findings);
+            };
+            assert_eq!(tag, "v0.48.0");
+            assert_eq!(*method, Method::Prebuilt, "{target}");
+            assert_eq!(
+                install
+                    .archive
+                    .as_ref()
+                    .map(|archive| archive.repository.as_str()),
+                Some("beyond10x/connectors")
+            );
+            assert!(
+                install.cargo.is_some(),
+                "the cargo route stays for older releases"
+            );
+            assert_eq!(
+                directory,
+                if installed.is_some() {
+                    "/opt/b10x-home/.cargo/bin"
+                } else {
+                    "/opt/b10x-home/.local/bin"
+                },
+                "a cargo-built copy is replaced where it runs"
             );
         }
     }

@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.45.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.45.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.48.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.48.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -19,6 +19,8 @@ configuration, credentials and admission remain deployment prerequisites.
    Run `connectors --output json setup check`, then `connectors --output json adapters list`.
    Both inspect without authenticating or starting services. Report each failed prerequisite
    even if the process exits successfully. Read safe metadata, not credential/configuration dumps.
+   `setup check` names the build's `os` and its `custody_backend` (`secret_service` on Linux,
+   `macos_keychain` on macOS); a locked macOS login keychain is unavailable custody, never a prompt.
 3. Select an adapter alias from that inventory. Inspect it with
    `connectors --output json adapters describe --adapter '<alias>'` and, when needed,
    `connectors --output json adapters status --adapter '<alias>'`.
@@ -27,7 +29,9 @@ configuration, credentials and admission remain deployment prerequisites.
 
 An empty inventory or missing operation is a capability gap. Report it before considering
 another integration client under the session's instructions. There is no implicit switch to a
-provider API. The local runtime currently targets Linux; MCP runtime integration remains deferred.
+provider API. The local runtime runs on Linux and, since `v0.48.0`, on macOS with weaker platform
+guarantees (the release's CLI semantics name them); it does not run on Windows. MCP runtime
+integration remains deferred.
 
 ## Discover and invoke
 

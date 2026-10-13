@@ -39,7 +39,8 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 - Every tracked CLI release is re-verified before `verified.json` moves to it:
   `agentplugins-check tools`, then the affected isolated trials ([`improving-by-trial`](.agents/skills/improving-by-trial/SKILL.md)).
   Record executed binaries separately from exact released source-contract checks. Connectors
-  currently publishes source only; Metaharness and the eval's AEP executable must be source-matched.
+  publishes prebuilt archives from v0.48.0, and `tools` checks both its source contract and its
+  release binary's help; Metaharness and the eval's AEP executable must be source-matched.
 - The runnable ESS tutorial and new executable examples are Rust. Keep its specification, target,
   public guide and trial fixture together; `tools` regenerates the suite and runs the target.
 - Trial findings for another repository become an issue there, labelled `trial-finding` by the
