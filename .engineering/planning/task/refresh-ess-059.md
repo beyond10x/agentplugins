@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:refresh-ess-059
 kind: task
-status: active
+status: implemented
 title: Track ESS 0.59.0
 summary: the skills follow ESS 0.59.0, and verified.json moves
-revision: 5
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-11T11:02:18Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-11T11:02:18Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-13T13:55:56Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":4}}}
 ---
 ## Context
 
@@ -47,3 +48,8 @@ changelog is either reflected in the owning skill or recorded below as needing n
 - Candidates from the rerun, not acted on: the adapter guidance does not say a `ScenarioContext`
   needs a well-formed scenario id or that `Timestamp` has no `FromStr`; the printed cargo counts
   stop matching once a reader adds a unit test.
+
+## Delivered
+
+- https://github.com/beyond10x/agentplugins/pull/80 (merge 9d2a223)
+- https://github.com/beyond10x/agentplugins/releases/tag/0.22.8
