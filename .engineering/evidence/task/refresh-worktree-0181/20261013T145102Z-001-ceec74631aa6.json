@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-13T14:51:02Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-worktree-0181",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task trial:run TRIAL=worktree-onboarding NAME=worktree-onboarding-1449: isolated, plugins 0.22.10, sandbox worktree 0.18.1 installed by b10x as the newest release; 11 tool calls; no measure worse than trials/baseline.json"
+  }
+}

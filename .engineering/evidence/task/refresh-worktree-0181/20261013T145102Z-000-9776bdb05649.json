@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-13T14:51:02Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-worktree-0181",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "agentplugins-check tools on the wave head: exit 0; aep 0.71.2 222, worktree 0.18.1 52, metaharness 0.9.3 13, connectors v0.48.0 21 with runtime help of the release binary verified; worktree skill and every subcommand help of the 0.18.1 release binary equal 0.18.0's"
+  }
+}
