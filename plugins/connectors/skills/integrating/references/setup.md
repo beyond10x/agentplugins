@@ -50,11 +50,18 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
    receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.45.0/docs/local-runtime-foundation.md)
-and the adapter's linked guide for deployment-specific prerequisites. The local CLI targets Linux
-keyring custody. A source installation of `v0.45.0` requires Rust 1.91 or newer and builds package
-`connectors`; its release carries no prebuilt archives. `b10x` selects the exact release tag and
-Cargo's locked dependency graph. Build failures retain the previous installed binary.
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.48.0/docs/local-runtime-foundation.md)
+and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
+when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
+`v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
+to a file or an environment variable. Since `v0.48.0` each release carries checksummed prebuilt
+archives for x86-64 and ARM64 Linux and macOS, which `b10x` installs by default; there is no
+Windows build. An older, source-only release, or `--method cargo`, builds package `connectors` at
+the exact tag with Cargo's locked dependency graph and needs Rust 1.91 or newer. A failed
+download, checksum or build retains the previous installed binary. The macOS binary is not signed
+yet: a browser download needs `xattr -d com.apple.quarantine connectors` before it runs, and an
+upgraded binary cannot read keychain items an earlier build wrote, so after an upgrade on macOS
+the operator stores each credential again through a protected channel (step 3 or 5).
 
 Since `v0.33.0`, `setup init` creates a metadata store with durable open checkpoints, and
 `v0.32.0` and earlier refuse to open such a store. Upgrade every `connectors` binary and any other
@@ -96,6 +103,20 @@ Since `v0.45.0` a Kubernetes configuration may set `pod_logs` and `kubeconfig` (
 operation among the adapter's permitted operations and an approval policy, and every call goes
 through [writes-and-services.md](writes-and-services.md). Enable it only when the operator
 authorizes running commands in pods.
+
+Since `v0.47.0` a catalog guard check may expect a JSON boolean, `{"boolean": true}` or `false`,
+and a selection may hold string body keys non-empty (`body_nonempty`); the release's
+`docs/local-catalog-provider.md` defines both. The same release refuses, when the selection
+loads, a guard check written `{"literal": "true"}` or `{"literal": "false"}`: a configuration
+that carries its own selection file with either no longer loads until each is rewritten as
+`{"boolean": true}` or `{"boolean": false}`. Upgrade every binary that loads the adapter before
+using such a file. The shipped GitLab and Jira guards now compare JSON booleans, so a string
+`"true"` from the provider no longer satisfies them. Slack's bot selection gains two writes,
+`conversations.open` and `chat.postMessage` (scopes `im:write`, `mpim:write` for a group, and
+`chat:write`; a direct message is open, then post): a changed descriptor, so recover as step 4
+describes, and add either to the adapter's `operations` only when the operator authorizes
+sending messages. Both go through [writes-and-services.md](writes-and-services.md); the release's
+`docs/catalog-slack.md` (*Messages*) is their contract.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is
