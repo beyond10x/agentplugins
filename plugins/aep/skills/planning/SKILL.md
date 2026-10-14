@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.22.10** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.22.11** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -133,7 +133,11 @@ block) or a coverage suite, and the report may come from a generated Go or TypeS
 $suite.coverage` and the second as `UnsupportedProducerProfile`: upgrade it (`aep:upgrade`).
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
 `draft → validated → conforming` — and `aep plan artifact set <id> --model-digest
-<hex>` ties it to the model the suite ran against; any other kind refuses the key by name. The
+<hex>` ties it to the model the suite ran against; any other kind refuses the key by name. Since
+0.71.3 the record names the report and suite by their path relative to the repository root and
+their `sha256:` digest (a file outside the repository by name and digest only), and the command
+ends with `counts` or `does not count:` and the reason, such as a failed run or another
+`model_digest`; a record that does not count moves nothing. The
 `ess:specifying` skill says how the report is produced (`b10x skill ess:specifying` prints it where the `ess` plugin is not loaded).
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,

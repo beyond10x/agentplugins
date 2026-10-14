@@ -25,10 +25,12 @@ b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 Since v0.48.0 each release carries checksummed prebuilt archives for x86-64 and ARM64 Linux
 and macOS, which setup installs by default. An older, source-only release, `--method cargo` or
 another target builds the `connectors` Cargo package from its exact release tag with locked
-dependencies and needs Rust 1.91 or newer. There is no Windows build. Credentials live in the
-Secret Service on Linux and the login keychain on macOS. The macOS binary is not signed yet: one
-downloaded through a browser needs `xattr -d com.apple.quarantine connectors`, and an upgraded
-binary cannot read keychain credentials an earlier build stored, so they are entered again.
+dependencies and needs Rust 1.91 or newer. There is no Windows release binary; since v0.49.0 the
+CLI builds and runs on Windows from that source build. Credentials live in the Secret Service on
+Linux, the login keychain on macOS and the Credential Manager on Windows. The macOS binary is
+not signed yet: one downloaded through a browser needs `xattr -d com.apple.quarantine connectors`,
+and an upgraded binary cannot read keychain credentials an earlier build stored, so they are
+entered again.
 Adapter executables, configuration and credentials are separate prerequisites. [Setup](../install.md) preserves other installed plugins and snapshots changes.
 
 A new session loads the installed skills. In Claude Code invoke `/connectors:integrating`; in

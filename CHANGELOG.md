@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.22.11] — 2026-10-14
+
+- Track AEP 0.71.3, Worktree 0.18.2 and Connectors v0.50.0 after `agentplugins-check tools`; ESS
+  0.59.0 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
+- `aep:planning`: a conformance record names its report and suite by repository-relative path and
+  digest, and `evidence --from` says whether the record `counts` or why it `does not count`.
+- Connectors skills and the plugin page: the CLI builds and runs on Windows from source since
+  v0.49.0 (Credential Manager custody, no Windows release binary); `connectors:upgrade` explains
+  `metadata_schema_newer` from v0.50.0 and when binaries may share a state directory.
+- Worktree 0.18.2 fixes `archive` on Git before 2.42; its `worktree skill` text and every
+  subcommand help equal 0.18.1's, so `worktree:managing-worktrees` is unchanged.
+- The eval workflow runs Worktree 0.18.2 and Connectors v0.50.0.
+
 ## [0.22.10] — 2026-10-13
 
 - Track Worktree 0.18.1 after `agentplugins-check tools`; AEP 0.71.2, ESS 0.59.0, Metaharness

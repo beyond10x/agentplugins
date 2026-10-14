@@ -30,7 +30,8 @@ configuration, credentials and admission remain deployment prerequisites.
 An empty inventory or missing operation is a capability gap. Report it before considering
 another integration client under the session's instructions. There is no implicit switch to a
 provider API. The local runtime runs on Linux and, since `v0.48.0`, on macOS with weaker platform
-guarantees (the release's CLI semantics name them); it does not run on Windows. MCP runtime
+guarantees (the release's CLI semantics name them), and since `v0.49.0` on Windows, built from
+source, with the Credential Manager as custody and weaker guarantees named the same way. MCP runtime
 integration remains deferred.
 
 ## Discover and invoke

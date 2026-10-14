@@ -20,7 +20,8 @@ Review the actions and resolve warnings before applying within the user's author
 already authorized. From `v0.48.0` a Connectors release carries checksummed prebuilt archives for
 x86-64 and ARM64 Linux and macOS, and `b10x` installs that by default. An older, source-only
 release, `--method cargo` or another target builds the `connectors` Cargo package at the exact
-tag with locked dependencies, which needs Rust 1.91 or newer. There is no Windows build. A missing
+tag with locked dependencies, which needs Rust 1.91 or newer. There is no Windows release binary:
+since `v0.49.0` the CLI builds and runs on Windows from that source build alone. A missing
 toolchain, failed checksum or failed build is a prerequisite failure, not a completed install.
 On macOS the binary is not signed yet: one downloaded through a browser needs
 `xattr -d com.apple.quarantine connectors` before it runs, and an upgraded binary cannot read

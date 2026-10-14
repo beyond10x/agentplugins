@@ -55,8 +55,10 @@ and the adapter's linked guide for deployment-specific prerequisites. Credential
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
 to a file or an environment variable. Since `v0.48.0` each release carries checksummed prebuilt
-archives for x86-64 and ARM64 Linux and macOS, which `b10x` installs by default; there is no
-Windows build. An older, source-only release, or `--method cargo`, builds package `connectors` at
+archives for x86-64 and ARM64 Linux and macOS, which `b10x` installs by default. Since `v0.49.0`
+the CLI also builds and runs on Windows, with custody in the Windows Credential Manager and
+weaker platform guarantees that the release's CLI semantics name; there is no Windows release
+binary, so it is built from source there. An older, source-only release, or `--method cargo`, builds package `connectors` at
 the exact tag with Cargo's locked dependency graph and needs Rust 1.91 or newer. A failed
 download, checksum or build retains the previous installed binary. The macOS binary is not signed
 yet: a browser download needs `xattr -d com.apple.quarantine connectors` before it runs, and an
