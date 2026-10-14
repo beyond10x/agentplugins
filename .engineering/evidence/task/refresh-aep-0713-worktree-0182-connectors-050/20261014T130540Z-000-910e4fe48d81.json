@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-14T13:05:40Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-aep-0713-worktree-0182-connectors-050",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task trial:run TRIAL=worktree-onboarding NAME=worktree-onboarding-1303: isolated, plugins 0.22.11, sandbox worktree 0.18.2 installed by b10x as the newest release; 17 tool calls; no measure worse than trials/baseline.json"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-14T11:03:20Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-worktree-0181",
+  "kind": "task",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "https://github.com/beyond10x/agentplugins/pull/82 merged as 8b283dc with every check green; release https://github.com/beyond10x/agentplugins/releases/tag/0.22.10 published by the bot with 6 assets, SHA256SUMS verified"
+  }
+}
