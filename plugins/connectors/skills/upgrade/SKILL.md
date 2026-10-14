@@ -37,6 +37,12 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    every installed `connectors` binary that opens the store first. An existing store is not
    changed by the upgrade; `setup checkpoints-enable --confirm one-way` converts it, one-way, and
    only when the operator asks (the setup reference).
+   From `v0.50.0` the store records its newest writer. A binary older than that writer whose
+   record model differs refuses the store with `metadata_schema_newer` (`next_action = upgrade`,
+   naming `store_version` and `binary_version`) before it reads a record; upgrade that binary,
+   or give a pinned consumer its own `--state-dir`. Binaries share one state directory only
+   while the oldest is at least the newest that wrote it. A release up to `v0.49.0` answers such
+   a store with `metadata_unavailable`, which no retry clears.
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 
