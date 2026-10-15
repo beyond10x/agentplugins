@@ -26,6 +26,15 @@ preparation, approval and idempotency key. A Slack answer whose `ok` is not the 
 `true` is `outcome_unknown`, not a refusal, and Slack's `error` string is not returned: check the
 target conversation before any new attempt.
 
+Since `v0.51.0` the same selection carries `chat.update` (edit) and `chat.delete` (delete), each
+for a message `channel` and `ts` name and each only for the bot's own messages. Their refusals
+that leave the message unchanged are named instead (`refused`, never sent again), such as
+`cant_update_message` or `edit_window_closed` as `forbidden` and `message_not_found` as
+`not_found`; any other `ok: false` answer is still `outcome_unknown`. Every write needs an
+approval, and an approval needs the approval clock to answer: when it gives no observation,
+`connectors approvals clock-check` names why (`clock_refusal`). The release's
+`docs/catalog-slack.md` (*Messages*) is the contract.
+
 ## Explicit services
 
 For an existing supplied service endpoint, read `connectors describe --help` and

@@ -2,12 +2,13 @@
 format: aep.planning-md/3
 id: task:refresh-aep-0713-worktree-0182-connectors-050
 kind: task
-status: active
+status: implemented
 title: Track AEP 0.71.3, Worktree 0.18.2 and Connectors v0.50.0
-revision: 3
+revision: 7
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-14T11:03:25Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-14T11:03:25Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-14T22:49:50Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":2}}}
 ---
 ## Context
 
@@ -37,3 +38,9 @@ plugins/connectors/skills/{init,integrating,upgrade}, website/docs/plugins/conne
 | connectors v0.49.0: CLI builds and runs on Windows from source, Credential Manager custody, no Windows binary | connectors init, integrating, setup reference, plugin page | Windows stated as a source build |
 | connectors v0.50.0: store writer marker, `metadata_schema_newer` | connectors:upgrade | refusal, recovery and state-directory sharing rule added |
 | connectors v0.50.0: OAuth loopback answers 400 after the flow decided | none | internal fix |
+
+## Delivered
+
+https://github.com/beyond10x/agentplugins/pull/83 (a6dd720), released as
+https://github.com/beyond10x/agentplugins/releases/tag/0.22.11.
+

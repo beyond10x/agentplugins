@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.23.0] — 2026-10-15
+
+- `b10x` reads a local pin file, `~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml`
+  when set, or the file `$B10X_PINS` names by absolute path), to hold a CLI back on one machine in every directory.
+  Its `[pins]` table takes `x.y.z` or `x.y`, as a string or as `{ version, reason }`; `b10x.toml`
+  accepts the same table form. A local pin wins over a repository pin for the same CLI.
+- `b10x check` says a CLI at its local pin is held back, with the reason, instead of inviting
+  `/b10x:upgrade`, and says when the installed version differs from the pin. A local pin file that
+  does not parse is one warning line; `b10x init`, `b10x upgrade`, `b10x setup plan` and
+  `b10x install` refuse it.
+- `b10x upgrade` skips a locally pinned CLI and its finding names the pin and its reason.
+- The `b10x:upgrade` and `b10x:init` skills, `SETUP.md` and the install page document the local pin.
+- Track AEP 0.72.1 and Connectors v0.51.0 after `agentplugins-check tools`; ESS 0.59.0, Worktree
+  0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them. AEP 0.72.0
+  and 0.72.1 change driver step maps only, which no skill writes.
+- Connectors skill: Slack's bot selection adds `chat.update` and `chat.delete` with named refusals
+  (v0.51.0), the move off the credential-only `slack` adapter, `approvals clock-check`'s
+  `clock_refusal`, and `connectors-catalog-provider` in the release archives.
+- The eval workflow runs Connectors v0.51.0.
+
 ## [0.22.11] — 2026-10-14
 
 - Track AEP 0.71.3, Worktree 0.18.2 and Connectors v0.50.0 after `agentplugins-check tools`; ESS
