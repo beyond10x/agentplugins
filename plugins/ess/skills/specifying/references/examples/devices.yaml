@@ -1,0 +1,140 @@
+format: ess/25
+system: demo
+version: v1
+domain: demo.devices
+types:
+  - {name: demo.devices.DeviceId, kind: newtype, of: String}
+entities:
+  - name: demo.devices.Device
+    identity: {name: device_id, type: demo.devices.DeviceId}
+    fields:
+      - {name: label, type: String}
+      - {name: team, type: String}
+    lifecycle:
+      initial: Active
+      states: [Active, Retired]
+      terminal: [Retired]
+      transitions:
+        - {name: retire, from: [Active], to: Retired}
+errors:
+  - {name: demo.devices.DeviceRetired, fields: []}
+  - {name: demo.devices.NoSuchDevice, fields: []}
+  - {name: demo.devices.ReservedLabel, fields: []}
+  - {name: demo.devices.BadToken, fields: []}
+  - {name: demo.devices.NotActive, fields: []}
+events:
+  - name: demo.devices.DeviceRegistered
+    fields: [{name: device_id, type: demo.devices.DeviceId}]
+  - name: demo.devices.DeviceRelabelled
+    fields: [{name: device_id, type: demo.devices.DeviceId}]
+  - name: demo.devices.DeviceRetiredEvent
+    fields: [{name: device_id, type: demo.devices.DeviceId}, {name: label, type: String}]
+  - name: demo.devices.TeamMoved
+    fields: [{name: team, type: String}, {name: moved, type: Integer}]
+  - name: demo.devices.DeviceMoved
+    fields: [{name: device_id, type: demo.devices.DeviceId}, {name: from_team, type: String}]
+  - name: demo.devices.ReadingTaken
+    fields: [{name: device_id, type: demo.devices.DeviceId}]
+actors:
+  - name: demo.devices.Operator
+    may: [demo.devices.RegisterDevice, demo.devices.RetireDevice, demo.devices.MoveTeam, demo.devices.TakeReading, demo.devices.PingDevice]
+commands:
+  - name: demo.devices.RegisterDevice
+    input:
+      - {name: device_id, type: demo.devices.DeviceId}
+      - {name: label, type: String}
+      - {name: team, type: String}
+    outcomes:
+      - name: reserved
+        when:
+          label: {trimmed: {in_ignore_case: [none, unknown]}}
+        error: demo.devices.ReservedLabel
+      - name: registered
+        unknown_instance: true
+        creates: demo.devices.Device
+        instance: device_id
+        sets: {label: input.label, team: input.team}
+        emits: [demo.devices.DeviceRegistered]
+        payload:
+          demo.devices.DeviceRegistered: {device_id: input.device_id}
+      - name: retired
+        when_subject:
+          predicate: state == Retired
+        error: demo.devices.DeviceRetired
+      - name: relabelled
+        updates: demo.devices.Device
+        instance: device_id
+        sets: {label: input.label}
+        emits: [demo.devices.DeviceRelabelled]
+        payload:
+          demo.devices.DeviceRelabelled: {device_id: input.device_id}
+  - name: demo.devices.RetireDevice
+    input:
+      - {name: device_id, type: demo.devices.DeviceId}
+    outcomes:
+      - name: device-retired
+        moves: demo.devices.Device.retire
+        instance: device_id
+        emits: [demo.devices.DeviceRetiredEvent]
+        payload:
+          demo.devices.DeviceRetiredEvent: {device_id: input.device_id, label: {subject: label}}
+      - {name: wrong-state, wrong_state: true, error: demo.devices.NotActive}
+      - {name: no-such-device, unknown_instance: true, error: demo.devices.NoSuchDevice}
+  - name: demo.devices.MoveTeam
+    input:
+      - {name: team, type: String}
+      - {name: new_team, type: String}
+    outcomes:
+      - name: moved
+        updates: demo.devices.Device
+        instances: {where: team == input.team}
+        sets: {team: input.new_team}
+        emits:
+          - demo.devices.TeamMoved
+          - {event: demo.devices.DeviceMoved, each: changed, when_state: [Active]}
+        payload:
+          demo.devices.TeamMoved: {team: input.team, moved: {count: changed}}
+          demo.devices.DeviceMoved: {device_id: {changed: device_id}, from_team: {changed: team}}
+  - name: demo.devices.TakeReading
+    input:
+      - {name: device_id, type: demo.devices.DeviceId}
+      - {name: token, type: String}
+    outcomes:
+      - name: bad-token
+        external: the device token is checked before the device is read
+        before_row: true
+        error: demo.devices.BadToken
+      - name: taken
+        when_subject_state: Active
+        preserves: demo.devices.Device
+        instance: device_id
+      - name: not-active
+        error: demo.devices.NotActive
+      - {name: no-such-device, unknown_instance: true, error: demo.devices.NoSuchDevice}
+  - name: demo.devices.PingDevice
+    input:
+      - {name: device_id, type: demo.devices.DeviceId}
+    outcomes:
+      - name: pong
+        preserves: demo.devices.Device
+        instance: device_id
+      - {name: no-such-device, unknown_instance: true, error: demo.devices.NoSuchDevice}
+views:
+  - name: demo.devices.Devices
+    source: demo.devices.Device
+    consistency: read_your_writes
+    fields:
+      - {name: device_id, type: demo.devices.DeviceId}
+      - {name: label, type: String}
+      - {name: team, type: String}
+      - {name: state, type: demo.devices.Device.State}
+  - name: demo.devices.DeviceById
+    source: demo.devices.Device
+    consistency: read_your_writes
+    params: [{name: device_id, type: demo.devices.DeviceId}]
+    filter: device_id == param.device_id
+    absent: {row: {label: unregistered, team: none}}
+    fields:
+      - {name: device_id, type: demo.devices.DeviceId}
+      - {name: label, type: String}
+      - {name: team, type: String}
