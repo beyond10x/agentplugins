@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use crate::catalog::Catalog;
 use crate::install::listed_targets;
 use crate::inventory::Inventory;
-use crate::pins::{PinFile, Pinned, Spec};
+use crate::pins::{Pinned, Pins, Spec};
 use crate::version;
 
 /// Versions setup compares against.
@@ -26,7 +26,8 @@ pub struct Resolved {
     /// carries a prebuilt archive for, as its `SHA256SUMS` lists them; absent or empty when none.
     #[serde(default)]
     pub archive_targets: BTreeMap<String, BTreeSet<String>>,
-    /// Binary name → its pin in the repository's `b10x.toml`, resolved to a release.
+    /// Binary name → its pin (the local pin file's, else the repository's `b10x.toml`), resolved
+    /// to a release.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub pinned: BTreeMap<String, Pinned>,
 }
@@ -351,7 +352,7 @@ fn tag(latest: &mut BTreeMap<String, String>, repository: &str) -> Option<String
 
 /// Resolve every version the plan needs; a binary pinned in `pins` resolves to its pinned release.
 #[must_use]
-pub fn resolve(catalog: &Catalog, source: &Source<'_>, pins: Option<&PinFile>) -> Resolved {
+pub fn resolve(catalog: &Catalog, source: &Source<'_>, pins: &Pins) -> Resolved {
     let mut latest = BTreeMap::new();
     let plugins = source
         .read(".claude-plugin/marketplace.json")
@@ -365,16 +366,12 @@ pub fn resolve(catalog: &Catalog, source: &Source<'_>, pins: Option<&PinFile>) -
         for binary in &product.binaries {
             let repository = binary.install.repository();
             let newest = tag(&mut latest, repository);
-            let pin = pins.and_then(|file| {
-                let spec = file.pins.get(&binary.name)?;
-                let tag = Spec::parse(spec)
-                    .ok()
-                    .and_then(|parsed| pinned_tag(repository, parsed, newest.as_deref()));
-                Some(Pinned {
-                    spec: spec.clone(),
-                    tag,
-                    file: file.path.to_string_lossy().into_owned(),
-                })
+            let pin = pins.get(&binary.name).map(|pin| {
+                pin.pinned(
+                    Spec::parse(&pin.spec)
+                        .ok()
+                        .and_then(|parsed| pinned_tag(repository, parsed, newest.as_deref())),
+                )
             });
             let installs = match &pin {
                 Some(pin) => pin.tag.clone(),

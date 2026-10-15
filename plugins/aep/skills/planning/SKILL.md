@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.22.11** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.23.0** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -137,7 +137,10 @@ That record is what moves an `executable-system-specification` to `conforming` �
 0.71.3 the record names the report and suite by their path relative to the repository root and
 their `sha256:` digest (a file outside the repository by name and digest only), and the command
 ends with `counts` or `does not count:` and the reason, such as a failed run or another
-`model_digest`; a record that does not count moves nothing. The
+`model_digest`; a record that does not count moves nothing. Since 0.73.0, `evidence <id> --kind
+task_spend --from <file>` records what a task spent, read from a transcript, an
+`eval.run-manifest/1` or a driven run's `cursor.json` inside the repository: model calls, tokens,
+cost, wall time and llm steps, each `unknown` where the source does not state it, never `0`. The
 `ess:specifying` skill says how the report is produced (`b10x skill ess:specifying` prints it where the `ess` plugin is not loaded).
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,

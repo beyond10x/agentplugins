@@ -128,6 +128,22 @@ The pins go into `b10x.toml` in the current directory (or the nearest one above)
 `upgrade` names a newer one without installing it, and `b10x check` says when the CLI on `PATH`
 does not match the pin.
 
+To hold a CLI back on one machine, in every directory, write a local pin file instead:
+`~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml` when that is set; `$B10X_PINS`
+names another file by its absolute path). It takes the same versions, with an optional reason:
+
+```toml
+[pins]
+aep = { version = "0.71.3", reason = "0.72.0 refuses this machine's planning stores" }
+ess = "0.59"
+```
+
+A local pin wins over a repository's `b10x.toml` for the same CLI. The session-start check then
+says the CLI is held back by a local pin, with the reason, instead of inviting `/b10x:upgrade`;
+`b10x upgrade` skips it and says which pin holds it. A local pin file that does not parse makes the
+check print one warning line and makes `b10x init`, `b10x upgrade` and `b10x install` refuse until
+it is fixed. Remove a line to follow the newest release again.
+
 Beyond10x product repositories keep ESS on its newest release; they do not hold it back with a
 `b10x.toml` pin. Update the specification's toolchain requirement and validate its generated outputs
 when moving to a new release.

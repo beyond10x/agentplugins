@@ -30,20 +30,29 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `inconclusive`.
 3. `ess verify conform mutate --collect <dir> --report-out <mutation-report.json>` scores them into
    `ess-mutation-report/3` (`/4` for a component, a known-failures declaration or unavailable
-   sites, `/5` where an entry names an `identical_answer`): exit 0 every mutant killed, 1 a
-   survivor, 3 the baseline did not pass (`ESS-MUTATE-001`), no site (`ESS-MUTATE-003`) or only
-   inconclusive or stillborn mutants.
+   sites, `/5` where an entry names an `identical_answer`, `/6` where it names `overlap_taken_by`):
+   exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass (`ESS-MUTATE-001`), no site
+   (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants.
    A `stillborn` mutant is one the model itself refuses; it says nothing about the suite. An
    `equivalent` mutant (`ESS-MUTATE-005`) is one no implementation could tell apart: a guard
    mutant whose branch no input selects, or a `precedence-swap` of two branches that answer alike
    (same error, same or no payload, no state change, `sets:` or event), which the entry names as
    `identical_answer`. A failed scenario still kills such a swap; the runner compares the outcome
-   name too.
+   name too. Since 0.60.0 a swap is also `equivalent` when every input both branches select is taken
+   by branches answered before both; the entry lists them in `overlap_taken_by`. A swap of two
+   refusals a binding's failure policy treats differently is no longer `identical_answer`.
+   `guard-negate`, `guard-connective` and `guard-boundary` now also mutate `when_subject:` and
+   `when_related:` predicates (`guard-negate/<command>/<outcome>/when_subject`), so a model with
+   those guards gains mutants. Where `sets-drop` has no site, a `note:` on stderr says why
+   (`creates_row`, `source_not_input`, `optional_field`).
 4. Answer each survivor by declaring what makes the rule observable — a view publishing the field a
    `sets` entry writes, a `wrong_state:` outcome for a dropped `from` state — then re-run and see
-   it killed; or file a synthesis gap on beyond10x/ess. An authored scenario cannot answer a
-   survivor: its expectations are its author's, so it runs identically in every mutant's suite and
-   `mutate` runs none.
+   it killed; or file a synthesis gap on beyond10x/ess. An authored scenario in a mutant's suite
+   cannot answer a survivor: its expectations are its author's, so it runs identically against your
+   unchanged implementation. `ess verify conform mutate --path <specification> --target interpreted --scenarios <dir>`
+   runs authored scenarios the other way, against the interpreter of each mutant, and one that fails
+   there kills it; a scenario the baseline fails refuses the audit (`ESS-MUTATE-001`). `--scenarios`
+   is refused with `--emit`, `--collect`, `--known-failing` and the other targets.
 
 **By hand**, where `mutate` has no class for the rule you need (a mutant of the implementation's
 own rule table, or a class outside the current mutator):
@@ -90,6 +99,17 @@ reached. It models a subset; what it leaves out is listed in `excluded`, and pas
 `allowExcluded` is a claim to report. Two guards that both hold are reported in `ambiguous`, a view
 or invariant over a field no command set in `undetermined`. Go on to the steps below only for what
 it excludes.
+
+Since 0.60.0 a command the target answers `ErrUnsupported` (TypeScript: throws `unsupported`)
+is dropped only in the held state of the row that step addressed and keeps being drawn elsewhere.
+One refused in some states and driven in others is reported in the new result field `refused`
+(Go `Refused []Refusal`, one `{command, state, reason, count}` per state), and the strict
+`assertExplored` fails on it as it failed on the exclusion; `allowExcluded` accepts it. A command
+refused in every state it was drawn in stays in `excluded`. A seed names a different sequence
+wherever a command was refused. The explorers also draw `preserves:` commands and `Decimal`
+inputs, and apply a selected-rows `moves:` or `updates:` to every row the filter selects, so a
+target that passed before can fail at the view that shows the change. A bulk `deletes:` and an
+outcome with `affects:` are excluded by name.
 
 1. Build the [reference model](reference-model.md) over the IR.
 2. Drive a seeded random walk: at each step pick an actor, a command and an input (valid, boundary

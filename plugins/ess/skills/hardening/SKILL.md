@@ -76,7 +76,7 @@ somewhere nobody looked.
 ## What `ess` ships for techniques 1 and 2
 
 - **Mutation audit:** `ess verify conform mutate` mutates the specification in named
-  classes (including `sets-drop`, `precedence-swap`, comparison flips and `emit-swap`) and writes `ess-mutation-report/3` (`/4` for a component, a declaration or unavailable sites; `/5` where a `precedence-swap` names an `identical_answer`). Against your own implementation, `--emit DIR` writes
+  classes (including `sets-drop`, `precedence-swap`, comparison flips and `emit-swap`) and writes `ess-mutation-report/3` (`/4` for a component, a declaration or unavailable sites; `/5` where a `precedence-swap` names an `identical_answer`; `/6` where its overlap is `overlap_taken_by` earlier branches). Against your own implementation, `--emit DIR` writes
   the baseline's and every mutant's suite, your runner writes `report.json` beside each, and
   `--collect DIR` scores them. [references/techniques.md](references/techniques.md) § 1.
 - **Reference model and random sequences:** the Go and TypeScript packages
@@ -84,7 +84,9 @@ somewhere nobody looked.
   (`Explore`/`explore`) that walks your `Target` against a model interpreted from the IR, shrinks a
   failure and fails on an unreached outcome. Use it for technique 2. Techniques 3 and 5 still need
   a model you drive yourself, and so does a construct the explorer lists as `excluded`: build it from
-  [references/reference-model.md](references/reference-model.md).
+  [references/reference-model.md](references/reference-model.md). A command your target refuses in
+  some held states but drives in others is listed in `refused`, not `excluded`
+  ([techniques.md](references/techniques.md) § 2).
 - **Several clients at once:** the same packages carry `ExploreConcurrent`/`exploreConcurrent`,
   which drive 2–4 clients on a seeded clock, write `history-<seed>.json`, and call
   `ess verify conform check-history --history <file>` to search for an order the specification's

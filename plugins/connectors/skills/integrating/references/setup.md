@@ -120,6 +120,16 @@ describes, and add either to the adapter's `operations` only when the operator a
 sending messages. Both go through [writes-and-services.md](writes-and-services.md); the release's
 `docs/catalog-slack.md` (*Messages*) is their contract.
 
+`v0.51.0` adds `chat.update` and `chat.delete` to Slack's bot selection: a changed descriptor
+again, so recover as step 4 describes, and add either to the adapter's `operations` only when the
+operator authorizes editing or deleting messages. A local install that still holds the
+credential-only `slack` adapter beside `slack-bot` moves to `slack-bot` and retires `slack` with
+the steps in the release's `docs/catalog-slack.md`, *Moving a local install off a
+credential-only adapter*. Release archives now carry `connectors-catalog-provider` (the executable
+the catalog provider guide binds to the CLI) beside `connectors`. `b10x` installs `connectors`
+alone; where the catalog provider runs, install `connectors-catalog-provider` from the same
+archive as the release's README (*install a release binary*) shows, so both are one release.
+
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is
 no automatic v1 state or credential migration. Re-establish connections through protected

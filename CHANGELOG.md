@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.23.0] — 2026-10-15
+
+- `b10x` reads a local pin file, `~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml`
+  when set, or the file `$B10X_PINS` names by absolute path), to hold a CLI back on one machine in every directory.
+  Its `[pins]` table takes `x.y.z` or `x.y`, as a string or as `{ version, reason }`; `b10x.toml`
+  accepts the same table form. A local pin wins over a repository pin for the same CLI.
+- `b10x check` says a CLI at its local pin is held back, with the reason, instead of inviting
+  `/b10x:upgrade`, and says when the installed version differs from the pin. A local pin file that
+  does not parse is one warning line; `b10x init`, `b10x upgrade`, `b10x setup plan` and
+  `b10x install` refuse it.
+- `b10x upgrade` skips a locally pinned CLI and its finding names the pin and its reason.
+- The `b10x:upgrade` and `b10x:init` skills, `SETUP.md` and the install page document the local pin.
+- Track AEP 0.73.0, ESS 0.60.0 and Connectors v0.51.0 after `agentplugins-check tools`;
+  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
+  AEP 0.72.0 to 0.73.0 change driver step maps and drive runs, which no skill writes or quotes.
+- `aep:planning`: `evidence --kind task_spend --from <file>` records what a task spent (AEP 0.73.0).
+- ESS skills follow 0.60.0: `ess/25` (create-or-update selected by `when_subject:`, `trimmed:`
+  text guards, per-row events, `before_row:` external refusals, a view's `absent:` row), a
+  read-only command's `unknown_instance:`, newtype literals checked against their type,
+  `ess-http/1` request encoding and per-outcome answers, `ess-composition/4` roles, `ess-diff/19`,
+  mutation reports `/6` and the explorers' `refused` field; a runnable `devices.yaml` example,
+  checked by `agentplugins-check tools`.
+- The tutorials, the trial fixtures and the eval workflow run ESS 0.60.0.
+- Connectors skill: Slack's bot selection adds `chat.update` and `chat.delete` with named refusals
+  (v0.51.0), the move off the credential-only `slack` adapter, `approvals clock-check`'s
+  `clock_refusal`, and `connectors-catalog-provider` in the release archives.
+- The eval workflow runs Connectors v0.51.0.
+
 ## [0.22.11] — 2026-10-14
 
 - Track AEP 0.71.3, Worktree 0.18.2 and Connectors v0.50.0 after `agentplugins-check tools`; ESS

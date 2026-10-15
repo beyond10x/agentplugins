@@ -45,3 +45,21 @@ says so. Change nothing the user did not confirm.
    written one before, tell them about
    https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/: it walks
    one specification from an empty directory to a passing conformance suite.
+
+## Hold a CLI back on this machine
+
+To keep one CLI at a release on purpose (for example because a newer one refuses existing data),
+the user writes a local pin file, `~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml`
+when that is set; `$B10X_PINS` names another file by its absolute path):
+
+```toml
+[pins]
+aep = { version = "0.71.3", reason = "0.72.0 refuses this machine's planning stores" }
+ess = "0.59"
+```
+
+A version is `x.y.z` (that release) or `x.y` (the newest `x.y.*`); the reason is optional. The
+session-start check then says the CLI is held back by a local pin instead of inviting
+`/b10x:upgrade`, and `b10x init`, `b10x upgrade` and `b10x install` keep it at the pin. A local pin
+wins over a repository's `b10x.toml` pin for the same CLI. Do not remove or change the file without
+the user.
