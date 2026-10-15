@@ -15,7 +15,7 @@ scope:
   path: plugins/b10x/skills/upgrade
 - confidence: cited
   path: website/docs/install.md
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-14T22:46:40Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-14T22:46:40Z", actor: "human:timo", revision: 3}
@@ -61,3 +61,11 @@ version lines.
 
 The repository has no ESS specification of the `b10x` CLI (every `system.yaml` here is a fixture,
 a trial or a tutorial), so the change is driven by unit tests in the crate.
+
+## Verification
+
+- `cargo test -p b10x` in the wave tree: 77 passed, 0 failed (2026-10-15), covering pinned and equal (held-back line with reason, no `/b10x:upgrade`), pinned and different, unpinned unchanged, malformed file (one warning line with line and column, exit 0; upgrade refuses), dangling symlink, relative `$B10X_PINS`, a name outside the catalog, multi-line reasons, and `b10x pin`/`unpin` naming a local hold.
+- An adversary pass wrote 9 tests against the first implementation; 3 failed (multi-line TOML warning, dangling symlink read as no pins, newline in a reason) and 3 more findings followed (pin/unpin silent about a local hold, unknown names silent, relative `$B10X_PINS`); all six are fixed and the adversary tests are kept.
+- `cargo clippy -p b10x --all-targets -- -D warnings` and `cargo fmt --all -- --check`: clean.
+- Isolated trial `upgrade-seeded`: 11 tool calls, no measure worse than `trials/baseline.json`.
+- Known limitation: `b10x pin` rewrites a table-form `b10x.toml` entry as a plain string, dropping its reason.

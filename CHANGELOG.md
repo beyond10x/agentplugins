@@ -12,9 +12,17 @@
   `b10x install` refuse it.
 - `b10x upgrade` skips a locally pinned CLI and its finding names the pin and its reason.
 - The `b10x:upgrade` and `b10x:init` skills, `SETUP.md` and the install page document the local pin.
-- Track AEP 0.72.1 and Connectors v0.51.0 after `agentplugins-check tools`; ESS 0.59.0, Worktree
-  0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them. AEP 0.72.0
-  and 0.72.1 change driver step maps only, which no skill writes.
+- Track AEP 0.73.0, ESS 0.60.0 and Connectors v0.51.0 after `agentplugins-check tools`;
+  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
+  AEP 0.72.0 to 0.73.0 change driver step maps and drive runs, which no skill writes or quotes.
+- `aep:planning`: `evidence --kind task_spend --from <file>` records what a task spent (AEP 0.73.0).
+- ESS skills follow 0.60.0: `ess/25` (create-or-update selected by `when_subject:`, `trimmed:`
+  text guards, per-row events, `before_row:` external refusals, a view's `absent:` row), a
+  read-only command's `unknown_instance:`, newtype literals checked against their type,
+  `ess-http/1` request encoding and per-outcome answers, `ess-composition/4` roles, `ess-diff/19`,
+  mutation reports `/6` and the explorers' `refused` field; a runnable `devices.yaml` example,
+  checked by `agentplugins-check tools`.
+- The tutorials, the trial fixtures and the eval workflow run ESS 0.60.0.
 - Connectors skill: Slack's bot selection adds `chat.update` and `chat.delete` with named refusals
   (v0.51.0), the move off the credential-only `slack` adapter, `approvals clock-check`'s
   `clock_refusal`, and `connectors-catalog-provider` in the release archives.

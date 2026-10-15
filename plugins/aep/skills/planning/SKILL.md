@@ -137,7 +137,10 @@ That record is what moves an `executable-system-specification` to `conforming` â
 0.71.3 the record names the report and suite by their path relative to the repository root and
 their `sha256:` digest (a file outside the repository by name and digest only), and the command
 ends with `counts` or `does not count:` and the reason, such as a failed run or another
-`model_digest`; a record that does not count moves nothing. The
+`model_digest`; a record that does not count moves nothing. Since 0.73.0, `evidence <id> --kind
+task_spend --from <file>` records what a task spent, read from a transcript, an
+`eval.run-manifest/1` or a driven run's `cursor.json` inside the repository: model calls, tokens,
+cost, wall time and llm steps, each `unknown` where the source does not state it, never `0`. The
 `ess:specifying` skill says how the report is produced (`b10x skill ess:specifying` prints it where the `ess` plugin is not loaded).
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,
