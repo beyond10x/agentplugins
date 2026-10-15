@@ -56,6 +56,10 @@ b10x init <products> --method <cargo|prebuilt> --host claude --out ~/.local/stat
 `<products>` is the answer to step 2, comma separated (`ess`, or `aep,worktree`); `--method` is the
 answer to step 3.
 
+A CLI held back by a local pin (`~/.config/b10x/pins.toml`; `/b10x:upgrade` describes the file)
+is planned at its pinned release, never the newest; the plan names the pin and its reason. Say so
+in the list, and do not suggest removing the pin.
+
 It prints a summary and writes the plan to the file. List every change it names in one numbered
 list, one line each, and call out: CLIs it installs or replaces (which version, where), earlier
 installs it replaces, and anything under `warn` (a shadowed CLI copy, an edit to a committed file).

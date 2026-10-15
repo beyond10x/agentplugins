@@ -100,7 +100,8 @@ enum Top {
     Install {
         /// Binary name, e.g. `ess`.
         name: String,
-        /// Release tag; defaults to this repository's pin (`b10x.toml`), else the newest release.
+        /// Release tag; defaults to the local pin (`~/.config/b10x/pins.toml`), else this
+        /// repository's pin (`b10x.toml`), else the newest release.
         #[arg(long)]
         tag: Option<String>,
         /// Target directory; defaults to `~/.local/bin` (prebuilt) or `~/.cargo/bin` (cargo).
@@ -341,8 +342,8 @@ fn make_plan(
         }
     }
     let home = inventory::home();
-    let pins = repository_pins(&catalog, &home)?;
-    let mut resolved = resolve::resolve(&catalog, &source, pins.as_ref());
+    let pins = effective_pins(&catalog, &home)?;
+    let mut resolved = resolve::resolve(&catalog, &source, &pins);
     if let (Some(repository), Some(tag)) = (upstream, newest) {
         resolved.latest.insert(repository, tag);
     }
@@ -361,26 +362,31 @@ fn make_plan(
     Ok(plan::plan(&context, &inventory))
 }
 
-/// The pins that apply in the current directory; every pinned name must be a catalog binary.
-fn repository_pins(
-    catalog: &Catalog,
-    home: &std::path::Path,
-) -> Result<Option<pins::PinFile>, String> {
-    let Ok(here) = std::env::current_dir() else {
-        return Ok(None);
+/// The pins that apply in the current directory: the repository's `b10x.toml`, overridden per CLI
+/// by the local pin file. Either file failing to read, or pinning a name that is not a catalog
+/// binary, is an error: nothing may be planned past a hold that cannot be read.
+fn effective_pins(catalog: &Catalog, home: &std::path::Path) -> Result<pins::Pins, String> {
+    let repository = match std::env::current_dir() {
+        Ok(here) => pins::read(&here, home)?,
+        Err(_) => None,
     };
-    let found = pins::read(&here, home)?;
-    if let Some(file) = &found {
+    let local = pins::read_local(home)?;
+    for file in repository.iter().chain(&local) {
         for name in file.pins.keys() {
             if catalog.binary(name).is_none() {
+                let fix = if file.local {
+                    format!("remove `{name}` from it")
+                } else {
+                    format!("`b10x unpin {name}` removes it")
+                };
                 return Err(format!(
-                    "{} pins `{name}`, which is not a catalog binary; `b10x unpin {name}` removes it",
+                    "{} pins `{name}`, which is not a catalog binary; {fix}",
                     file.path.display()
                 ));
             }
         }
     }
-    Ok(found)
+    Ok(pins::merge(repository.as_ref(), local.as_ref()))
 }
 
 fn pin(name: &str, version: &str) -> Result<ExitCode, String> {
@@ -419,7 +425,21 @@ fn pin(name: &str, version: &str) -> Result<ExitCode, String> {
     if let Some(newest) = newest.filter(|newest| !version::same(newest, &tag)) {
         println!("the newest release is {newest}; `b10x unpin {name}` follows it again");
     }
+    print_local_hold(&home, name);
     Ok(ExitCode::SUCCESS)
+}
+
+/// After `b10x pin` or `b10x unpin`: say when the local pin file holds `name`, since it, not the
+/// edited `b10x.toml`, decides this machine.
+fn print_local_hold(home: &std::path::Path, name: &str) {
+    match pins::read_local(home) {
+        Ok(local) => {
+            if let Some(note) = pins::local_hold(local.as_ref(), name) {
+                println!("{note}");
+            }
+        }
+        Err(error) => println!("{error}; local pins could not be read"),
+    }
 }
 
 fn unpin(name: &str) -> Result<ExitCode, String> {
@@ -432,6 +452,7 @@ fn unpin(name: &str) -> Result<ExitCode, String> {
             "unpinned {name} in {}; `b10x upgrade` follows the newest release",
             path.display()
         );
+        print_local_hold(&home, name);
         Ok(ExitCode::SUCCESS)
     } else {
         Err(format!("{} does not pin `{name}`", path.display()))
@@ -673,13 +694,12 @@ fn install_one(
     let repository = binary.install.repository();
     let pinned = match &tag {
         Some(_) => None,
-        None => repository_pins(&catalog, &inventory::home())?
-            .and_then(|file| Some((file.pins.get(name)?.clone(), file.path))),
+        None => effective_pins(&catalog, &inventory::home())?.remove(name),
     };
     let tag = match (tag, pinned) {
         (Some(tag), _) => tag,
-        (None, Some((spec, file))) => {
-            let parsed = pins::Spec::parse(&spec)?;
+        (None, Some(pin)) => {
+            let parsed = pins::Spec::parse(&pin.spec)?;
             let tag = resolve::pinned_tag(
                 repository,
                 parsed,
@@ -687,11 +707,12 @@ fn install_one(
             )
             .ok_or_else(|| {
                 format!(
-                    "{repository} has no release matching the pin {spec} in {}",
-                    file.display()
+                    "{repository} has no release matching the pin {} in {}",
+                    pin.spec,
+                    pin.file.display()
                 )
             })?;
-            println!("{name} is pinned to {spec} by {}", file.display());
+            println!("{name} is {}", pin.pinned(None).phrase());
             tag
         }
         (None, None) => resolve::latest_tag(repository)

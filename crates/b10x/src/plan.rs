@@ -1000,8 +1000,8 @@ fn plan_binaries(
                     subject,
                     detail: match pin {
                         Some(pin) => format!(
-                            "pinned to {} by {}, but no such release could be read (offline, or no such release?); not checked",
-                            pin.spec, pin.file
+                            "{}, but no such release could be read (offline, or no such release?); not checked",
+                            pin.phrase()
                         ),
                         None => "its newest release could not be read (offline?); not checked"
                             .to_owned(),
@@ -1011,10 +1011,7 @@ fn plan_binaries(
             };
             // How the finding names the release the plan holds the binary to.
             let (held, pinned_by) = match pin {
-                Some(pin) => (
-                    format!("{tag}, pinned to {} by {}", pin.spec, pin.file),
-                    Some(pin),
-                ),
+                Some(pin) => (format!("{tag}, {}", pin.phrase()), Some(pin)),
                 None => (format!("the newest release {tag}"), None),
             };
             if let (Some(pin), Some(newest)) = (pinned_by, &newest) {
@@ -1025,10 +1022,19 @@ fn plan_binaries(
                         level: Level::Note,
                         host: None,
                         subject: subject.clone(),
-                        detail: format!(
-                            "newer release {newest} exists; pinned to {} by {}, so it stays at {tag} (`b10x unpin {}` follows the newest)",
-                            pin.spec, pin.file, binary.name
-                        ),
+                        detail: if pin.local {
+                            format!(
+                                "newer release {newest} exists; {}, so it stays at {tag} (removing the pin from {} follows the newest)",
+                                pin.phrase(),
+                                pin.file
+                            )
+                        } else {
+                            format!(
+                                "newer release {newest} exists; {}, so it stays at {tag} (`b10x unpin {}` follows the newest)",
+                                pin.phrase(),
+                                binary.name
+                            )
+                        },
                     });
                 }
             }
@@ -1069,10 +1075,7 @@ fn plan_binaries(
                     host: None,
                     subject: subject.clone(),
                     detail: match pinned_by {
-                        Some(pin) => format!(
-                            "{tag} at {}, pinned to {} by {}",
-                            first.path, pin.spec, pin.file
-                        ),
+                        Some(pin) => format!("{tag} at {}, {}", first.path, pin.phrase()),
                         None => format!("{tag} at {} is the newest release", first.path),
                     },
                 });
@@ -1082,14 +1085,24 @@ fn plan_binaries(
                     level: Level::Warn,
                     host: None,
                     subject: subject.clone(),
-                    detail: format!(
-                        "{} at {} does not match its pin {} ({}); upgrade leaves it, `b10x install {}` installs {tag}",
-                        first.version.as_deref().unwrap_or("unknown"),
-                        first.path,
-                        pin.spec,
-                        pin.file,
-                        binary.name
-                    ),
+                    detail: if pin.local {
+                        format!(
+                            "{} at {} does not match its pin, {}; upgrade leaves it, `b10x install {}` installs {tag}",
+                            first.version.as_deref().unwrap_or("unknown"),
+                            first.path,
+                            pin.phrase(),
+                            binary.name
+                        )
+                    } else {
+                        format!(
+                            "{} at {} does not match its pin {} ({}); upgrade leaves it, `b10x install {}` installs {tag}",
+                            first.version.as_deref().unwrap_or("unknown"),
+                            first.path,
+                            pin.spec,
+                            pin.file,
+                            binary.name
+                        )
+                    },
                 });
             } else if current.is_none() && binary.optional {
                 findings.push(Finding {
@@ -1264,9 +1277,80 @@ mod tests {
                 spec: spec.to_owned(),
                 tag: Some(tag.to_owned()),
                 file: "/work/repo/b10x.toml".to_owned(),
+                reason: None,
+                local: false,
             },
         );
         resolved
+    }
+
+    fn locally_pinned_ess(spec: &str, tag: &str) -> Resolved {
+        let mut resolved = resolved();
+        resolved.pinned.insert(
+            "ess".to_owned(),
+            crate::pins::Pinned {
+                spec: spec.to_owned(),
+                tag: Some(tag.to_owned()),
+                file: "/opt/b10x-home/.config/b10x/pins.toml".to_owned(),
+                reason: Some("0.30.0 refused existing stores".to_owned()),
+                local: true,
+            },
+        );
+        resolved
+    }
+
+    #[test]
+    fn an_upgrade_leaves_a_locally_pinned_cli_and_names_the_local_pin_and_its_reason() {
+        let inventory = Inventory {
+            claude: Some(HostState::default()),
+            binaries: binaries(&[("/opt/b10x-home/.local/bin/ess", "0.29.4")]),
+            ..Inventory::default()
+        };
+        let plan = run_pinned(&inventory, &locally_pinned_ess("0.29.4", "0.29.4"), true);
+        assert!(installs(&plan).is_empty(), "{:#?}", plan.actions);
+        assert!(
+            plan.findings.iter().any(|f| f.level == Level::Ok
+                && f.detail.contains(
+                    "held at 0.29.4 by the local pin in /opt/b10x-home/.config/b10x/pins.toml"
+                )
+                && f.detail.contains("0.30.0 refused existing stores")),
+            "{:#?}",
+            plan.findings
+        );
+        assert!(
+            !plan
+                .findings
+                .iter()
+                .any(|f| f.detail.contains("b10x unpin")),
+            "`b10x unpin` edits only b10x.toml: {:#?}",
+            plan.findings
+        );
+        let drifted = Inventory {
+            claude: Some(HostState::default()),
+            binaries: binaries(&[("/opt/b10x-home/.local/bin/ess", "0.30.0")]),
+            ..Inventory::default()
+        };
+        let plan = run_pinned(&drifted, &locally_pinned_ess("0.29.4", "0.29.4"), true);
+        assert!(installs(&plan).is_empty(), "{:#?}", plan.actions);
+        assert!(
+            plan.findings.iter().any(|f| f.level == Level::Warn
+                && f.detail.contains("held at 0.29.4 by the local pin in")
+                && f.detail.contains("`b10x install ess` installs 0.29.4")),
+            "{:#?}",
+            plan.findings
+        );
+        // Init installs the locally pinned release.
+        let plan = run_pinned(&drifted, &locally_pinned_ess("0.29", "0.29.4"), false);
+        assert_eq!(installs(&plan), ["ess 0.29.4"]);
+    }
+
+    #[test]
+    fn a_plan_written_before_local_pins_still_reads() {
+        let pinned: crate::pins::Pinned =
+            serde_json::from_str(r#"{"spec":"0.29","tag":"0.29.4","file":"/work/repo/b10x.toml"}"#)
+                .unwrap();
+        assert!(!pinned.local);
+        assert_eq!(pinned.reason, None);
     }
 
     fn run_pinned(inventory: &Inventory, resolved: &Resolved, upgrade: bool) -> Plan {
