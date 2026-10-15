@@ -16,7 +16,7 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | one external refusal for many commands | `ess/12` | top-level `outcome_groups:` selecting by `commands:`, `actor:` or `domain:` |
 | an input a provider supplies (a deployed id) | `ess/13` | `fixture_inputs: {borrower_id: current-borrower}` on the command |
 | a value read from the stored row, added to it, or minted | `ess/14` | `{subject: title}` (the row before this outcome, on `moves:`/`updates:`), `{increment: 1}` (`sets:` only), `{generated: true}` (now also in `sets:`), `{cleared: true}` (an `Optional` field holds nothing), `{input: shelf_mark, else: {generated: true}}` for an optional input. The text `subject.title` is refused as `misspelled_reference` |
-| an unknown id answered apart from a wrong state | `ess/15` | `unknown_instance: true` with an `error:` (or `refuses: false`), below |
+| an unknown id answered apart from a wrong state | `ess/15` | `unknown_instance: true` with an `error:` (or `refuses: false`), below. Since 0.60.0 a read-only command (only `preserves:` branches addressed by input, or `when_subject:` refusals) may declare it too; 0.59.0 refused that as `unreachable_branch` |
 | a record removed | `ess/15` | `deletes: <Entity>` with `instance:`, no `sets:`, below |
 | a record created past `initial` | `ess/15` | `into: OnLoan` beside `creates:` |
 | success with no subject and no effect | `ess/15` | `accepts: nothing`, below; with a subject it is `preserves:` |
@@ -30,6 +30,11 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | a description, and the records that explain a construct | any | `naming: {summary: …}` on an entity, type, actor or command; a flat `summary:` on a field, error or outcome; `refs: ["tracker:KEY-1"]` (`provider:key`) on a command or outcome. A flat `summary:` on an entity, actor or command is an unknown field |
 | a value only its originating response may disclose | `ess/21` | `one_time_response: [token]` on the **outcome**, beside `returns: true`; on the command it is an unknown field. It names required `String` response fields, or transparent `String` newtypes; an `Optional` one is refused as `type_mismatch` |
 | a record or an answer that admits members it does not declare (a protocol's extension object) | `ess/24` | `undeclared_fields: ignored` on a `kind: struct` type, or on a command with a `response:`, where it governs the response only; [below](#ess24) |
+| create the row, or update it by what the stored row holds | `ess/25` | an `unknown_instance: true` branch that `creates:`, beside `when_subject:` branches; [below](#ess25) |
+| a text compared after the implementation trims it | `ess/25` | `{trimmed: {in_ignore_case: [none, unknown]}}` around a text operator, in `when:`, `when_subject:` and `when_related:` |
+| one event per row a set effect changed | `ess/25` | `{event: <name>, each: changed, when_state: [<State>]}` in `emits:`, its payload read with `{changed: <field>}` |
+| a refusal decided before the row is read (a credential, a token) | `ess/25` | `before_row: true` on an `external:` refusal |
+| a read by identity that answers a default row for an unknown identity | `ess/25` | `absent: {row: {<field>: <literal>}}` on a view filtered `<identity> == param.<name>` |
 | a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled |
 
 ```yaml
@@ -237,7 +242,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/24`
+## From `ess/16` through `ess/25`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -255,6 +260,7 @@ With current ESS:
 | `ess/22` | explicit fact operands and constant offsets; UTF-8 byte lengths; instant comparison; `distinct` list keys; selected row guards/reads; Optional and two-hop related reads; several related rows; calendar windows; compensating external refusals; conditional aggregates and binding payload guards; per-outcome failure policy; lifecycle moves in `affects`; view grants; unit union variants; dotted input values |
 | `ess/23` | identity re-key by `updates:`; the held state as a value, `{subject: state}`; bulk `deletes:` with `instances:` and `deletes:` in `affects`; typed enum variant attributes; one record per input-list element with `affects: each:`; a `when_subject` predicate refusal asserts the whole record unchanged; row-set selectors on updates, deletes and upserts, scoped by a member of a struct identity |
 | `ess/24` | `undeclared_fields: ignored` on a struct type and on a command response: the record admits members it does not declare, while every declared field stays required and typed |
+| `ess/25` | create-or-update selected by `when_subject:`; `trimmed:` text guards; per-row `emits:` with `each: changed`; `before_row: true` on an `external:` refusal; a view's `absent:` default row |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -427,6 +433,128 @@ opened response object and at the opened struct, wherever it is reached; the com
 every closed object keep `false`. AsyncAPI follows, and the generated documentation says so on the
 command and the struct. The suite carries the openness to the runners ([testing-conformance](../../testing-conformance/SKILL.md)),
 and `ess verify diff` rates opening and closing ([spec-diff](../../hardening/references/spec-diff.md)).
+
+## `ess/25`
+
+[examples/devices.yaml](examples/devices.yaml) uses each construct below, validates, and
+synthesizes 16 scenarios with 0 refusals on 0.60.0; the `interpreted` target passes all 16. The
+excerpts are from it. Under a lower header `trimmed:`, a per-row `emits:` entry, `before_row:` and
+`absent:` are `unsupported_format_version` naming `ess/25` (`ESS-COMMAND-009`, `ESS-VIEW-009`).
+
+**Create or update, by what the stored row holds.** The creating branch answers an identity no row
+carries, before any predicate reads a row; the `when_subject:` predicates must partition the stored
+rows alone. Below `ess/25` the pairing is
+`conflicting_declaration` with a hint naming `ess/25`:
+
+```yaml
+      - name: registered
+        unknown_instance: true
+        creates: demo.devices.Device
+        instance: device_id
+        sets: {label: input.label, team: input.team}
+        emits: [demo.devices.DeviceRegistered]
+        payload:
+          demo.devices.DeviceRegistered: {device_id: input.device_id}
+      - name: retired
+        when_subject:
+          predicate: state == Retired
+        error: demo.devices.DeviceRetired
+      - name: relabelled
+        updates: demo.devices.Device
+        instance: device_id
+        sets: {label: input.label}
+```
+
+Guarding every update branch (`state == Active` on `relabelled`) validates alone, but beside the
+example's `trimmed:` refusal it is `non_exhaustive_branches` ("subject-fact/input coverage is not
+proved"): leave one update branch unguarded as the default. Entity Runtime refuses the command (`ExistenceSelectionUnsupported`).
+
+**Text the implementation trims first.** `trimmed:` wraps `equals`, `in`, `equals_ignore_case`,
+`in_ignore_case`, `starts_with`, `ends_with` or `contains`, so `" None "` is refused as `none` is:
+
+```yaml
+      - name: reserved
+        when:
+          label: {trimmed: {in_ignore_case: [none, unknown]}}
+        error: demo.devices.ReservedLabel
+```
+
+Only ASCII whitespace (space, tab, LF, VT, FF, CR) is removed; a Unicode space compares as itself,
+and synthesis sends one to catch a target that trims it. A literal that holds for no trimmed text
+(`" unknown"`) is `empty_declaration`; outside `when:`, `when_subject:` and `when_related:` the key
+is `unsupported_construct`. Entity Runtime refuses it (`TrimmedTextUnsupported`).
+
+**One event per changed row.** On an outcome with `instances:`, an `emits:` entry
+`{event, each: changed}` publishes once per changed row, in ascending identity order; `when_state:`
+keeps only rows that held one of those states before the outcome, and `{changed: <field>}` or
+`{changed: state}` reads the row as it was:
+
+```yaml
+      - name: moved
+        updates: demo.devices.Device
+        instances: {where: team == input.team}
+        sets: {team: input.new_team}
+        emits:
+          - demo.devices.TeamMoved
+          - {event: demo.devices.DeviceMoved, each: changed, when_state: [Active]}
+        payload:
+          demo.devices.TeamMoved: {team: input.team, moved: {count: changed}}
+          demo.devices.DeviceMoved: {device_id: {changed: device_id}, from_team: {changed: team}}
+```
+
+On an outcome without `instances:` the entry is refused at its place in `emits:`. The Rust, Go,
+Web and Clap targets and Entity Runtime still refuse set effects, and the generated explorers leave
+such an outcome out.
+
+**A refusal decided before the row is read.** `before_row: true` on an `external:` refusal answers
+among the input-guarded refusals, before existence and the held state, so the held-state branches
+may follow it:
+
+```yaml
+      - name: bad-token
+        external: the device token is checked before the device is read
+        before_row: true
+        error: demo.devices.BadToken
+      - name: taken
+        when_subject_state: Active
+        preserves: demo.devices.Device
+        instance: device_id
+```
+
+It is `conflicting_declaration` on a branch that is not `external:`, without `error:`, beside
+`compensates: true`, where the error payload reads a row, after a branch a later step answers, and
+on a command with a `when_related:` branch. Entity Runtime refuses it (`OutcomeShapeUnsupported`).
+
+**A default row for an unknown identity.** A view whose filter is exactly
+`<identity> == param.<name>` declares `absent: {row: …}`: an unknown identity reads one row holding
+it, each literal, and `null` in each `Optional` field `row:` leaves out. Synthesis reads the view for
+an identity nothing stores and checks that row:
+
+```yaml
+  - name: demo.devices.DeviceById
+    source: demo.devices.Device
+    consistency: read_your_writes
+    params: [{name: device_id, type: demo.devices.DeviceId}]
+    filter: device_id == param.device_id
+    absent: {row: {label: unregistered, team: none}}
+```
+
+`conflicting_declaration` on any other filter, an `Optional` identity parameter, beside an aggregate
+or `paging:`, and for the identity field in `row:`; `missing_declaration` for a required projected
+field without a value; `undeclared_reference` for a field the view does not project. Keep the
+unfiltered view beside it: without `Devices`, the example keeps 7 of its 16 scenarios and refuses 9
+(`ESS-SYNTH-001`, `-003`). Generated view queries do not serve it yet; `ess verify diff` reports a change as `view/<name>/absent-changed`
+(`ess-diff/19`).
+
+**Literals through a newtype** (every format, since 0.60.0). A literal in `sets:`, `payload:`, a
+binding's `mapping:`, an enum variant's `attributes:` or a view's `absent:` row is checked against
+its newtype's `alphabet:` and `invariants:`; one outside them is `type_mismatch`
+(`ESS-COMMAND-002` for `sets:`: "`xyz` holds 'x', which is not in the alphabet of …"), where 0.59.0
+checked only the representation. A specification that validated on 0.59.0 can be refused here.
+
+An HTTP binding of commands and views (`ess-http/1`) and composition roles
+(`ess-composition/4`) are documents beside the specification, not source formats:
+[current-features.md](current-features.md#http-routes-ess-http1).
 
 ## What validates and still gets no scenario
 

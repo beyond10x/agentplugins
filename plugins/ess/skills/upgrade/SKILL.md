@@ -40,8 +40,20 @@ changed yet.
   manifest naming an `identical_answer` (`/5`), a suite with a constrained `String` response
   (`ess-conformance/46`, `/47`), and a specification on `ess/24` with what it writes: a spec diff
   naming an `undeclared_fields` move (`ess-diff/18`) and a suite with an opened response or struct
-  (`ess-conformance/48`, `/49`). Move every reader (a CI job's `ess`, the runner crates or
-  packages) in the same change that commits them.
+  (`ess-conformance/48`, `/49`), a spec diff naming a view's `absent:` row (`ess-diff/19`), a
+  mutation report or manifest naming `overlap_taken_by` (`/6`), a composition with `roles:`
+  (`ess-composition/4`) and an `ess-http/1` binding. Move every reader (a CI job's `ess`, the
+  runner crates or packages) in the same change that commits them.
+- From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
+  `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
+  accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused
+  as `unsupported_format`. No ESS crate depends on `serde_yaml` any more (YAML goes through
+  `ess-yaml`), so a `cargo deny` advisory RUSTSEC-2024-0449 inherited from ESS clears with the
+  lockfile update. A suite whose model reads its caller beside a `one_time_response:` outcome
+  changes bytes, its disclosure scenarios now sending the caller. A regenerated Go module whose
+  bounded contexts reference each other in a loop puts them in one package under `types/`; an
+  explorer seed can name a different sequence; and the explorers now draw `preserves:` commands, so a green explorer run can turn red on a real
+  defect (`ess:hardening` technique 2).
 - Re-run authored scenarios (`ess verify conform author`) and regenerate committed suites: the
   current release judges an authored act by the command's precedence plan, so an act that claims a
   branch another branch answers first is refused as `ESS-AUTHOR-041` naming that branch (an

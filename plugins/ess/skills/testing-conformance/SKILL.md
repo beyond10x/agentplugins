@@ -144,7 +144,9 @@ message destroys its own diagnosis. Every refusal should name what it could not 
 A step whose command reads a caller attribute (`sets: {account_id: {caller: account_id}}`) that
 nothing supplied is `unsupported`, and its reason in the text and JSON reports
 names the attribute and `caller:` (from the release notes; a synthesized scenario supplies its own
-caller values and passed here). Supply the value from an authored scenario: on
+caller values and passed here). From 0.60.0 that includes the disclosure scenarios of a
+`one_time_response:` outcome, which 0.59.0 sent with no caller and so left `unsupported` wherever
+a command read one (from the release notes). Supply the value from an authored scenario: on
 `type: ess-scenario/5`, an act states the caller it sends as, each attribute a literal of its
 declared type or an instance arranged with `setup:`:
 
