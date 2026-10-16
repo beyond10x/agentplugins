@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.23.1] — 2026-10-16
+
+- Track AEP 0.74.0 and Connectors v0.52.0 after `agentplugins-check tools`; ESS 0.60.0,
+  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
+  AEP 0.74.0's concurrent step-map states and new workflows change drive step maps, which no skill
+  writes or quotes.
+- `aep:planning`: `aep plan artifact spend` reads `task_spend` records back per task kind and
+  figure, against an optional `spend` baseline and target in `.engineering/project.yaml`
+  (AEP 0.74.0).
+- Connectors skills: the approval clock is a quorum of Roughtime sources (`roughtime-quorum/1`)
+  and the single-source table is refused from v0.52.0; a Slack read answered `"ok": false` is a
+  named refusal; the `confluence-v1` provider, Slack user-token history reads and the new
+  Kubernetes reads are listed with their configuration-revision consequences.
+- The eval workflow runs Connectors v0.52.0.
+
 ## [0.23.0] — 2026-10-15
 
 - `b10x` reads a local pin file, `~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml`
