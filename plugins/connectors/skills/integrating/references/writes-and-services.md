@@ -35,6 +35,14 @@ approval, and an approval needs the approval clock to answer: when it gives no o
 `connectors approvals clock-check` names why (`clock_refusal`). The release's
 `docs/catalog-slack.md` (*Messages*) is the contract.
 
+Since `v0.52.0` the approval clock answers from a quorum: the `[approval_clock]` table is
+`format = "roughtime-quorum/1"` with a `quorum`, `max_rate_error_ppm` and two to eight
+`[[approval_clock.sources]]`, each with its `address`, `public_key` and `version`. The
+single-source `roughtime-clock/1` table is refused by `clock-check`, approval issuance and approved
+writes until it is rewritten as the release's `docs/local-clock.md` shows; ordinary reads need no
+clock. A Slack read answered `200` with `"ok": false` is now a refusal by name; writes keep the
+rules above.
+
 ## Explicit services
 
 For an existing supplied service endpoint, read `connectors describe --help` and

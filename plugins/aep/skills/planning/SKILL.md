@@ -3,7 +3,7 @@ name: planning
 description: Plan engineering work in a governed markdown artifact store — create, relate, move and validate epics, stories, tasks and initiatives through the `aep` CLI. Use when the user mentions planning, a backlog, an epic, a story, a task, decomposing or breaking down work, an artifact's status ("move this to active", "what is still in draft?", "why can't this be implemented?"), or when the project contains a `.engineering/planning/` directory. Use it at adoption too — the user asks to adopt AEP, to migrate from or replace the track plugin, to start a first backlog, or works in a repository with no `.engineering/` directory at all — because § 5 says how a first store is populated and it is worth nothing after one has been hand-written. Also use before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.23.0** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.23.1** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
@@ -140,7 +140,12 @@ ends with `counts` or `does not count:` and the reason, such as a failed run or 
 `model_digest`; a record that does not count moves nothing. Since 0.73.0, `evidence <id> --kind
 task_spend --from <file>` records what a task spent, read from a transcript, an
 `eval.run-manifest/1` or a driven run's `cursor.json` inside the repository: model calls, tokens,
-cost, wall time and llm steps, each `unknown` where the source does not state it, never `0`. The
+cost, wall time and llm steps, each `unknown` where the source does not state it, never `0`. Since
+0.74.0, `aep plan artifact spend [--kind <k>] [--since <YYYY-MM-DD>] [--baseline <n>]` reads them
+back, writing nothing: per task kind and figure, how many artifacts have a record, the lower median
+(`unknown` when none states it) and, where `.engineering/project.yaml` declares
+`spend.<kind>.<figure>: { baseline, target }`, whether the median is `under`, `at` or `over` the
+target; `--baseline <n>` prints the medians of the first `n` artifacts per kind to copy there. The
 `ess:specifying` skill says how the report is produced (`b10x skill ess:specifying` prints it where the `ess` plugin is not loaded).
 
 **2. Every store mutation uses `aep plan artifact`; never edit a store file directly.** Creation,

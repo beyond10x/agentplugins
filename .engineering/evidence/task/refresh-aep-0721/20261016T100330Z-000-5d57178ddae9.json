@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-16T10:03:30Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-aep-0721",
+  "kind": "task",
+  "revision": 9,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "https://github.com/beyond10x/agentplugins/pull/84 merged as f24a62c with every check green; release https://github.com/beyond10x/agentplugins/releases/tag/0.23.0 published by the bot with 6 assets, SHA256SUMS verified"
+  }
+}

@@ -130,6 +130,18 @@ the catalog provider guide binds to the CLI) beside `connectors`. `b10x` install
 alone; where the catalog provider runs, install `connectors-catalog-provider` from the same
 archive as the release's README (*install a release binary*) shows, so both are one release.
 
+`v0.52.0` changes the approval clock to a quorum of Roughtime sources (`roughtime-quorum/1`): an
+install that issues approvals or makes approved writes rewrites its `[approval_clock]` table first,
+as [writes-and-services.md](writes-and-services.md) and the release's `docs/local-clock.md` say,
+then runs `connectors approvals clock-check --adapter <alias>`. The same release adds a
+`confluence-v1` provider (seven Confluence REST v1 reads, for a token with classic scopes whose v2
+reads answer `401`), configured as its own adapter beside `confluence` as the release's
+`docs/catalog-confluence.md` shows; Slack history and thread reads in the `slack.user` selection,
+a changed descriptor, so recover as step 4 describes; and Kubernetes reads of statefulsets, nodes
+(`node_reads`) and configured custom resources, with connections through an `exec` credential
+plugin on Linux. A Kubernetes binding that sets neither `node_reads` nor `custom_resources` keeps
+its configuration revision.
+
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is
 no automatic v1 state or credential migration. Re-establish connections through protected

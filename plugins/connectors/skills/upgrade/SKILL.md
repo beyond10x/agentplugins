@@ -43,6 +43,10 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    or give a pinned consumer its own `--state-dir`. Binaries share one state directory only
    while the oldest is at least the newest that wrote it. A release up to `v0.49.0` answers such
    a store with `metadata_unavailable`, which no retry clears.
+   From `v0.52.0` a single-source `roughtime-clock/1` approval clock is refused: an install that
+   issues approvals rewrites its `[approval_clock]` table as `roughtime-quorum/1` (the integrating
+   skill's writes reference) and runs `connectors approvals clock-check --adapter <alias>` before
+   its next approval.
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 

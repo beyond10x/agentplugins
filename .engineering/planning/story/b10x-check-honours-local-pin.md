@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:b10x-check-honours-local-pin
 kind: story
-status: active
+status: implemented
 title: b10x check honours a local pin
 scope:
 - confidence: cited
@@ -15,10 +15,11 @@ scope:
   path: plugins/b10x/skills/upgrade
 - confidence: cited
   path: website/docs/install.md
-revision: 5
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-14T22:46:40Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-14T22:46:40Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-16T10:03:32Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 
