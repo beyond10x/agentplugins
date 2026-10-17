@@ -242,7 +242,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/25`
+## From `ess/16` through `ess/26`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -261,6 +261,7 @@ With current ESS:
 | `ess/23` | identity re-key by `updates:`; the held state as a value, `{subject: state}`; bulk `deletes:` with `instances:` and `deletes:` in `affects`; typed enum variant attributes; one record per input-list element with `affects: each:`; a `when_subject` predicate refusal asserts the whole record unchanged; row-set selectors on updates, deletes and upserts, scoped by a member of a struct identity |
 | `ess/24` | `undeclared_fields: ignored` on a struct type and on a command response: the record admits members it does not declare, while every declared field stays required and typed |
 | `ess/25` | create-or-update selected by `when_subject:`; `trimmed:` text guards; per-row `emits:` with `each: changed`; `before_row: true` on an `external:` refusal; a view's `absent:` default row |
+| `ess/26` | a named `external:` refusal of a command that addresses an existing row (`before_row: true` included) leaves the row unchanged: its scenario snapshots the row and requires it unchanged afterwards; a `compensates: true` refusal keeps its read-back |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual

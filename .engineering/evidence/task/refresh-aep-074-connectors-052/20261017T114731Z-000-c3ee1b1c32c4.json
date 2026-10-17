@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-17T11:47:31Z",
+  "actor": "human:timo",
+  "artifact": "task:refresh-aep-074-connectors-052",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "https://github.com/beyond10x/agentplugins/pull/85 merged f1d3697; release https://github.com/beyond10x/agentplugins/releases/tag/0.23.1"
+  }
+}
