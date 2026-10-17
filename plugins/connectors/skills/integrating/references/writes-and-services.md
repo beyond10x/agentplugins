@@ -43,6 +43,18 @@ writes until it is rewritten as the release's `docs/local-clock.md` shows; ordin
 clock. A Slack read answered `200` with `"ok": false` is now a refusal by name; writes keep the
 rules above.
 
+Since `v0.53.0` a write that creates a credential holds it in custody. OpenRouter's `key.create`
+(the catalog provider's `openrouter` adapter, required approval) sends the create once, stores the
+returned key as a new connection of the alias and profile that
+`[adapters.<alias>.permissions.custody]` names for the operation, and returns only that
+connection's reference and the key's hash, never the key. A create with no custody target, or one
+whose target disagrees with its declaration, is refused before anything is sent. A timeout or
+crash after dispatch is `unknown` and is never re-sent; custody `failed` may still have published
+the connection, so check `connections list` on the custody alias and the provider's `keys.list`
+before creating again. The release's `docs/catalog-openrouter.md` (*Creating a key*) and
+`docs/local-mutation-ledger.md` (*Created credentials*) are the contract. Since `v0.53.1` a Runpod
+`pod.create` refused for lack of capacity is `refused` with code `capacity`, not `invalid_input`.
+
 ## Explicit services
 
 For an existing supplied service endpoint, read `connectors describe --help` and

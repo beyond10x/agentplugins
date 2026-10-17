@@ -270,7 +270,11 @@ into `--out` itself. Type libraries come from `ess generate types --target rust|
 A Rust library whose types hold JSON numbers declares a default-on `exact-numbers` Cargo feature
 that enables `serde_json/arbitrary_precision`; a consumer depending on it with
 `default-features = false` gets binary64 numbers. `types-report.json` names each such value under
-`rust_exact_numbers`.
+`rust_exact_numbers`. `--rust-raw-json <type>` or `<type>.<field>` (repeatable, Rust only) keeps
+the named `Json` values as their exact JSON text (`EssRawJson`), so their bytes round-trip without
+`exact-numbers`; a name that selects no `Json` value is refused by name. Since 0.62.0 a generated
+Rust decoder of a newtype refuses a value that breaks its `alphabet:`, `prefix:` or invariants
+(`broken_constraint`, with the path), so a served route no longer admits it.
 
 **OpenAPI and AsyncAPI need a component** that owns the domain and says how it is reached
 (`components.yaml`, `reached_by`). Without one, `openapi` writes `0 artifact(s)` and prints no

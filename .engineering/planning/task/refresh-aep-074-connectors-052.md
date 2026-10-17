@@ -2,12 +2,13 @@
 format: aep.planning-md/3
 id: task:refresh-aep-074-connectors-052
 kind: task
-status: active
+status: implemented
 title: Track AEP 0.74.0 and Connectors v0.52.0
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-16T10:03:44Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-16T10:03:44Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-17T11:47:31Z", actor: "human:timo", revision: 5, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 

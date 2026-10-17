@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.23.2] — 2026-10-17
+
+- Track ESS 0.62.0 and Connectors v0.53.1 after `agentplugins-check tools`; AEP 0.74.0,
+  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
+- `ess:specifying`: `ess generate types --target rust --rust-raw-json <type>[.<field>]` keeps the
+  named `Json` values as their exact JSON text, and a generated Rust newtype decoder refuses a value
+  breaking its alphabet, prefix or invariants; `ess/26` in the format table. A read by identity
+  narrows on the identity field;
+  a read a scenario cannot decide is skipped and named by `ESS-SYNTH-005` while the scenario stays
+  (the syntax reference and `ess:retrofitting` said such a view was refused).
+- `ess:hardening`: `ess-history/3` records each operation's input, events and arranged
+  `external:` branches, and `check-history` holds the target to them; the explorers draw
+  `Timestamp` inputs and perform `deletes:`; a mutant whose suite does not change is `unwitnessed`
+  (`ess-mutation-report/7`).
+- `ess:testing-conformance`: `hold_now` scenarios on `now` boundaries (`ess-conformance/50`,
+  `/51`) and the optional `ConformanceTarget::hold_now`; `ess:upgrade` names the new formats.
+- Connectors skills: a credential created by a write (OpenRouter `key.create`, v0.53.0) is held in
+  custody and never returned; OpenRouter, Runpod `billing.pods` and GitLab `file.raw` and
+  `project.languages` reads; Runpod's capacity refusal (v0.53.1); a catalog provider upgrade
+  renews the alias's SHA-256 and revision and revalidates the saved key.
+- The eval workflow runs Connectors v0.53.1.
+
 ## [0.23.1] — 2026-10-16
 
 - Track AEP 0.74.0 and Connectors v0.52.0 after `agentplugins-check tools`; ESS 0.60.0,

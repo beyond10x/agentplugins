@@ -42,7 +42,9 @@ changed yet.
   naming an `undeclared_fields` move (`ess-diff/18`) and a suite with an opened response or struct
   (`ess-conformance/48`, `/49`), a spec diff naming a view's `absent:` row (`ess-diff/19`), a
   mutation report or manifest naming `overlap_taken_by` (`/6`), a composition with `roles:`
-  (`ess-composition/4`) and an `ess-http/1` binding. Move every reader (a CI job's `ess`, the
+  (`ess-composition/4`) and an `ess-http/1` binding; from 0.62.0 a suite with a `hold_now` step
+  (`ess-conformance/50`, `/51`), a mutation report naming an `unchanged_suite` (`/7`) and an
+  `ess-runtime/2` document. Move every reader (a CI job's `ess`, the
   runner crates or packages) in the same change that commits them.
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0

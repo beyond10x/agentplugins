@@ -47,6 +47,12 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    issues approvals rewrites its `[approval_clock]` table as `roughtime-quorum/1` (the integrating
    skill's writes reference) and runs `connectors approvals clock-check --adapter <alias>` before
    its next approval.
+   A catalog provider upgrade (`v0.53.0` OpenRouter `key.create` and its custody table, `v0.53.1`
+   Runpod's capacity refusal) writes the new `connectors-catalog-provider` SHA-256 into the
+   alias's `executable.sha256`, reprints the bootstrap
+   (`connectors-catalog-provider --local-config <file> --print-local-bootstrap`), writes a changed
+   `configuration_revision`, then renews the saved key without re-entry:
+   `connectors --output json connections revalidate --adapter <alias> --connection <id> --expected-revision <revision>`.
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 

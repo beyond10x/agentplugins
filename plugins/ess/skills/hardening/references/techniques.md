@@ -30,9 +30,15 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `inconclusive`.
 3. `ess verify conform mutate --collect <dir> --report-out <mutation-report.json>` scores them into
    `ess-mutation-report/3` (`/4` for a component, a known-failures declaration or unavailable
-   sites, `/5` where an entry names an `identical_answer`, `/6` where it names `overlap_taken_by`):
+   sites, `/5` where an entry names an `identical_answer`, `/6` where it names `overlap_taken_by`,
+   `/7` where it names `unchanged_suite`):
    exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass (`ESS-MUTATE-001`), no site
-   (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants.
+   (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants. A mutant whose synthesized suite
+   asks what the baseline's asks is `unwitnessed` (`ESS-MUTATE-004`, "the suite does not change"),
+   written as `unchanged_suite` in `ess-mutation-report/7`, so a survivor always has a suite that
+   differs and still passes; an unwitnessed mutant exits 3, never 0. The interpreted target has no
+   clock, so it reports a `guard-boundary` mutant on a `now` boundary `inconclusive`; your target
+   kills it by implementing `hold_now` (`ess:testing-conformance`).
    A `stillborn` mutant is one the model itself refuses; it says nothing about the suite. An
    `equivalent` mutant (`ESS-MUTATE-005`) is one no implementation could tell apart: a guard
    mutant whose branch no input selects, or a `precedence-swap` of two branches that answer alike

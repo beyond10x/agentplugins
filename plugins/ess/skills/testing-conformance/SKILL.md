@@ -345,7 +345,15 @@ The current runner contract:
   `undeclared_fields_ignored` lists the opened structs it reaches; a closed suite leaves both out
   and keeps its bytes and format. The Rust, Go and TypeScript runners admit an undeclared key at
   exactly those objects and still check every declared field; a closed response, a closed sibling
-  struct and a union fail one (`ESS-CF-PAYLOAD`). Generate with the
+  struct and a union fail one (`ESS-CF-PAYLOAD`). From `ess-conformance/50` (`/51` with coverage),
+  a command decided by a `now` boundary (an input guard, or a `when_subject:`/`when_related:`
+  predicate over a stored field written from an input) gets one more scenario per boundary,
+  `<command>/outcome/<outcome>/held/<field>/<seconds>`, whose `hold_now` step fixes the instant
+  the target reads as `now` before the command. The runner holds its own clock or calls the
+  optional `ConformanceTarget::hold_now` (Go `NowHolder`, TypeScript `holdNow`); a target without
+  it reports that scenario `unsupported`, named and counted, and only that kind of unsupported
+  scenario does not fail the run. Implement `hold_now` to make the boundary count: until then the
+  `guard-boundary` mutant (`<` to `<=`) is not killed. Generate with the
   same release as the runner and inspect any target-specific refusal instead of carrying an old
   suite-version ceiling.
 - From `ess-conformance/44`, an act that claims one event N times needs N occurrences, and claims

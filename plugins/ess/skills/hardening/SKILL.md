@@ -76,13 +76,17 @@ somewhere nobody looked.
 ## What `ess` ships for techniques 1 and 2
 
 - **Mutation audit:** `ess verify conform mutate` mutates the specification in named
-  classes (including `sets-drop`, `precedence-swap`, comparison flips and `emit-swap`) and writes `ess-mutation-report/3` (`/4` for a component, a declaration or unavailable sites; `/5` where a `precedence-swap` names an `identical_answer`; `/6` where its overlap is `overlap_taken_by` earlier branches). Against your own implementation, `--emit DIR` writes
+  classes (including `sets-drop`, `precedence-swap`, comparison flips and `emit-swap`) and writes `ess-mutation-report/3` (`/4` for a component, a declaration or unavailable sites; `/5` where a `precedence-swap` names an `identical_answer`; `/6` where its overlap is `overlap_taken_by` earlier branches; `/7` where a mutant's suite is unchanged). Against your own implementation, `--emit DIR` writes
   the baseline's and every mutant's suite, your runner writes `report.json` beside each, and
   `--collect DIR` scores them. [references/techniques.md](references/techniques.md) § 1.
 - **Reference model and random sequences:** the Go and TypeScript packages
   `ess verify conform synthesize --target go|typescript` writes carry a seeded explorer
   (`Explore`/`explore`) that walks your `Target` against a model interpreted from the IR, shrinks a
-  failure and fails on an unreached outcome. Use it for technique 2. Techniques 3 and 5 still need
+  failure and fails on an unreached outcome. Since 0.62.0 it draws `Timestamp` inputs and decides
+  a guard over `now` against `ExploreOptions.Now` (TypeScript `now`, the wall clock by default),
+  listing a step whose answer turns on when the target reads its clock in `Undetermined`; it also
+  performs an outcome that `deletes:` its subject (the concurrent explorer still leaves such a
+  command out and says why). Use it for technique 2. Techniques 3 and 5 still need
   a model you drive yourself, and so does a construct the explorer lists as `excluded`: build it from
   [references/reference-model.md](references/reference-model.md). A command your target refuses in
   some held states but drives in others is listed in `refused`, not `excluded`
@@ -93,7 +97,11 @@ somewhere nobody looked.
   model accepts. Exit 0 is linearizable, 1 a violation (with a shrunk history), 3 the search budget
   ran out, which is never a pass. With `Inject`/`inject` it adds only the faults the specification
   declares (`delivery: at_least_once`, `replays:`, `external:` branches). Use it for technique 2
-  wherever the service takes concurrent calls.
+  wherever the service takes concurrent calls. An `ess-history/3` operation records its `input`,
+  the `events` it published and the `external:` branches it `arranged`; `check-history` steps it
+  with exactly that input and admits only a branch with those events and payloads, so a wrong
+  outcome or payload fails even on a model without entities. The generated explorers record all
+  three; a history you write yourself should too.
 
 ## Reporting
 

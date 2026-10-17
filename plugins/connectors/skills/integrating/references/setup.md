@@ -142,6 +142,15 @@ a changed descriptor, so recover as step 4 describes; and Kubernetes reads of st
 plugin on Linux. A Kubernetes binding that sets neither `node_reads` nor `custom_resources` keeps
 its configuration revision.
 
+`v0.53.0` adds OpenRouter management through the catalog provider (`openrouter`, profile
+`openrouter.api-key`: reads `key.get`, `workspaces.list`, `keys.list`, and the approved write
+`key.create`, whose created key goes into custody as
+[writes-and-services.md](writes-and-services.md) says), Runpod's `billing.pods` read, and GitLab's
+`file.raw` and `project.languages` reads. An install that already has an OpenRouter alias adds
+`key.create`, the custody table and the custody alias, with the new revisions and provider SHA-256,
+as the release's `docs/catalog-openrouter.md` (*Moving an existing install*) shows; every catalog
+provider alias renews its revision and SHA-256 as the upgrade skill says.
+
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is
 no automatic v1 state or credential migration. Re-establish connections through protected

@@ -4,7 +4,7 @@ A small lending library in three files, with every section a specification usual
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
 Keep each domain’s first segment equal to `system` and update every qualified reference together.
-It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/25` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
+It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/26` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
 
 ## `system.yaml`
 
@@ -304,8 +304,9 @@ events:
 # Views: read models over an entity. `read_your_writes` or `eventual`; an optional `filter`. A view
 # the caller narrows takes `params: [{name: title, type: library.lending.Title}]` with
 # `filter: title == param.title` (the key is `params:`); the creating outcome must `sets:` the field.
-# Never narrow on the identity (`filter: id == param.id`): synthesis refuses every outcome that view
-# observes (ESS-SYNTH-005, "bound by nothing a scenario knows"). A read by id is the unfiltered view.
+# A read by id narrows on the identity field (`filter: book_id == param.book_id`); a filter on a
+# field the entity does not declare is refused (ESS-VIEW-003). A read a scenario cannot decide is
+# skipped and named (ESS-SYNTH-005); the scenario stays.
 views:
   - name: library.lending.AvailableCopies
     source: library.lending.Copy
