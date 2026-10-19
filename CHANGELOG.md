@@ -1464,8 +1464,8 @@ at the operator's request. Earlier preparation evidence remains in the planning 
   and the sentence as written told a reader to expect a write that never happens. The refusal is now
   quoted, with the exit code to expect and the two things to check on the second run.
 - Teach both skills AEP's `refs:` field, released in AEP 0.41.0. A ticket id found in a legacy file
-  becomes `--ref jira:DEV-630` in frontmatter rather than only a line of prose, so
-  `aep artifact list --ref jira:DEV-630` answers *what, here, is this ticket*; the URL is configured
+  becomes `--ref jira:EX-1` in frontmatter rather than only a line of prose, so
+  `aep artifact list --ref jira:EX-1` answers *what, here, is this ticket*; the URL is configured
   once in `.engineering/project.yaml` instead of copied into every artifact.
 - Correct the version line in `planning` and `adp/wave`: both claimed 0.3.3 while their manifests
   had moved on.

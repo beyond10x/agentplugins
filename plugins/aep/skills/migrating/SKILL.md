@@ -37,7 +37,7 @@ restated here.
 **The repository's**, which only the files answer. There is no legacy format. Observed shapes so
 far: numbered story trees with YAML frontmatter (`S-001-…md`, `id`/`status`/`epic`/`areas`),
 prefix-less story files with a bold prose `**Status:**` line and no frontmatter at all, `Plan:
-<title> (DEV-nnn)` documents whose status is a sentence in a `Status` section, flat `TODO.md`
+<title> (EX-nnn)` documents whose status is a sentence in a `Status` section, flat `TODO.md`
 bullets with no identity of any kind, and incident write-ups that are evidence rather than work.
 Do not pattern-match onto the first one you recognise. § 3 step 1 exists to find out.
 
@@ -83,11 +83,11 @@ things if it is not held to a rule.
 
 - **Title** — the H1. If there is none, the filename, said so.
 - **Slug** — from the title, lowercased, hyphenated, checked against the id charset in § 4. Legacy
-  ids (`S-001`, `DEV-630`) do **not** become slugs; they go in the body, because the store's id is
+  ids (`S-001`, `EX-1`) do **not** become slugs; they go in the body, because the store's id is
   `<kind>:<slug>` and a number carries no meaning outside its old tree.
 - **Status** — read from the document's own words and **quote those words in the body**. Prose is
   the evidence for the rung, so it travels with it.
-- **Ticket ids** — `DEV-\d+`, `S-\d+` and similar become a `--ref` (see § 4), and a body reference
+- **Ticket ids** — `EX-\d+`, `S-\d+` and similar become a `--ref` (see § 4), and a body reference
   beside it for a human to read. Never an artifact id.
 - **Dates** — see § 4. They are retained, in the body, from git.
 - **Anything with no source** — left unset. A migration does not get to decide a priority nobody
@@ -112,7 +112,7 @@ One artifact at a time, body supplied at creation:
 
 ```console
 $ aep plan artifact new story dispatch-retry-backoff \
-    --title "Back off ACD v3 dispatch retries" --from body.md
+    --title "Back off downstream dispatch retries" --from body.md
 created story:dispatch-retry-backoff (draft) at .engineering/planning/story/dispatch-retry-backoff.md
 ```
 
@@ -181,13 +181,13 @@ which is what makes it expensive.
 slugify helper in the CLI, so derive it and check it before calling `new`; a title with a colon, an
 ampersand or a leading digit-free symbol will be refused.
 
-**A ticket id is a reference, not a sentence.** A legacy file naming `DEV-630` or a Zendesk number
+**A ticket id is a reference, not a sentence.** A legacy file naming `EX-1` or a Zendesk number
 carries a join to a system that is still the real tracker. Record it with `--ref`, which puts it in
-frontmatter where `aep plan artifact list --ref jira:DEV-630` can find it:
+frontmatter where `aep plan artifact list --ref jira:EX-1` can find it:
 
 ```console
-$ aep plan artifact new story dispatch-retry-backoff --title "…" --ref jira:DEV-630
-$ aep plan artifact set story:presence-sync-race --ref jira:DEV-425 --ref zendesk:8812
+$ aep plan artifact new story dispatch-retry-backoff --title "…" --ref jira:EX-1
+$ aep plan artifact set story:presence-sync-race --ref jira:EX-2 --ref zendesk:8812
 ```
 
 Write the link too, but write it **once**: `.engineering/project.yaml` takes a `providers:` map
@@ -204,11 +204,11 @@ references — there is no door for an arbitrary key. So dates live in the body:
 ```markdown
 ## Provenance
 
-Migrated from `.agents/plans/DEV-630_dispatch-retry-backoff.md`.
+Migrated from `.agents/plans/EX-1_dispatch-retry-backoff.md`.
 
 - Source first written 2026-06-16 · last touched 2026-06-16 · 1 git revision of the source
 - Status quoted from that file, line 17: **PLANNED — not yet implemented**
-- Ticket [DEV-630](https://example.atlassian.net/browse/DEV-630)
+- Ticket [EX-1](https://example.atlassian.net/browse/EX-1)
 ```
 
 The three git facts, in order:

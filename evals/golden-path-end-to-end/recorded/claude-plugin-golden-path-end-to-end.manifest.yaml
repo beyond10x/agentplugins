@@ -11,7 +11,7 @@ plugins:
     digest: 9e94e5b15115d43b1f26a829c7f5704b1424e79cfbe7f157713fd2588cd1a37f
 model: claude-opus-5[1m]
 harness_version: claude 2.1.259
-transcript_digest: d95c060b1bb5abf47491f80c75d4dc0ebebc18560691eea770815a9afa299791
+transcript_digest: b183d98325f195442bbc2b6675f2c7ff07abc83a53147ab629a220e335d4a147
 observed_at: 2026-09-03
 cost_micro_usd: 22528343
 tokens: 15536297
