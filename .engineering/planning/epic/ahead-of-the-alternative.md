@@ -9,7 +9,7 @@ owner: plugins
 tags:
 - bench
 - comparison
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-09-02T23:06:39Z", actor: "human:timo", revision: 2, imported: true}
 - {from: "proposed", to: "active", at: "2026-09-02T23:06:40Z", actor: "human:timo", revision: 3, imported: true}
@@ -22,7 +22,7 @@ An adopter choosing between these plugins and `bdfinst/agentic-dev-team` finds n
 
 ## Why Now
 
-`epic:second-adopter-feedback` (implemented, 0.4.0) closed the six adoption gaps the second adopter hit. The full review (`company-brain` `docs/reviews/2026-09-02-agentic-dev-team-vs-beyond10x.md` §10, moving to `beyond10x/bench`) lists what is still open on this side: no `model:`/`effort:` on any of the 10 agents; wave selection by pairwise prose (`plugins/adp/skills/wave/SKILL.md:149`); a one-sentence attack budget (`:421`); no behavioural test of any skill (`agentplugins-check` is structural); no recorded review outcome; no session path that runs `aep drive`. `bdfinst` ships 100 `dev-team-v*` tags since 2026-03-02, so parity decays without work behind it.
+`epic:second-adopter-feedback` (implemented, 0.4.0) closed the six adoption gaps the second adopter hit. The full review (§10 of the 2026-09-02 comparison, written in an earlier organisation-memory prototype's repository and now `beyond10x/bench` `docs/subjects/bdfinst-agentic-dev-team/2026-09-02-review.md`) lists what is still open on this side: no `model:`/`effort:` on any of the 10 agents; wave selection by pairwise prose (`plugins/adp/skills/wave/SKILL.md:149`); a one-sentence attack budget (`:421`); no behavioural test of any skill (`agentplugins-check` is structural); no recorded review outcome; no session path that runs `aep drive`. `bdfinst` ships 100 `dev-team-v*` tags since 2026-03-02, so parity decays without work behind it.
 
 ## Scope
 
