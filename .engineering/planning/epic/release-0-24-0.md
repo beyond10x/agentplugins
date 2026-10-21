@@ -2,12 +2,13 @@
 format: aep.planning-md/3
 id: epic:release-0-24-0
 kind: epic
-status: active
+status: implemented
 title: 'Release 0.24.0: newest CLIs, gates 0.1.22, neutral sample keys, Keep a Changelog'
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-21T08:39:47Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-21T08:39:47Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-21T21:03:18Z", actor: "human:timo", revision: 4}
 ---
 ## Context
 

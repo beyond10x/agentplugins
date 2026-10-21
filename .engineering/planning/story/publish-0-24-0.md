@@ -2,15 +2,16 @@
 format: aep.planning-md/3
 id: story:publish-0-24-0
 kind: story
-status: active
+status: implemented
 title: Publish Agentplugins 0.24.0
 relations:
 - decomposes: epic:release-0-24-0
 - depends_on: story:changelog-keep-a-changelog
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-21T08:39:48Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-21T08:39:48Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-21T21:03:18Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 

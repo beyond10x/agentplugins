@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-21T21:03:11Z",
+  "actor": "human:timo",
+  "artifact": "story:publish-0-24-0",
+  "kind": "story",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "release 0.24.0 published by b10x-bot[bot]: tag cd8e4d2 on main 51039d8, 6 assets match SHA256SUMS of Release run 39674831734; Tools, CI and Shared source gates green on 51039d8"
+  }
+}

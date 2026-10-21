@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-21T21:03:10Z",
+  "actor": "human:timo",
+  "artifact": "story:settle-pr-87",
+  "kind": "story",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "PR 87 closed by b10x-bot[bot] with a superseded-by-#90 comment; its content is on main in 27567fe"
+  }
+}
