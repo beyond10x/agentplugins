@@ -372,7 +372,18 @@ The current runner contract:
   `awaitOutcome`. From `ess-conformance/54` (`/55`, since 0.64.0) a view reading through a
   reference (`ess/28`) gets one `<view>/reference/<field>` scenario per reference it reads
   through, named after the reference field (`Leases/reference/device_id` for a `device_label` read
-  via `device_id`), reading the view before and after the referenced row changes. Since 0.66.0, under report format 2, the generated Go and
+  via `device_id`), reading the view before and after the referenced row changes. From
+  `ess-conformance/56` (`/57` with coverage, since 0.67.0) a one-time
+  `<command>/disclosure/<outcome>/<field>/read/<view>/as/actor/<A>` cell reads the view as `A`
+  after a `read_as` step, the value issued by `A` where it is granted the command and otherwise by
+  the first actor granted it; the target answers through its read-as-actor seam (`query_view_as`,
+  or the actor the Go and TypeScript runtimes send with the read). An actor who may read the view
+  but not issue the value gets a cell of its own, where earlier suites refused it: on 0.67.0 a
+  two-actor model with one view gained the `Viewer` read cell (6 to 7 scenarios) and passed on the
+  `interpreted` target, and the 0.66.0 runner refused the suite (`execution readers admit suite
+  majors 1–55`). Below 56 the same id names the issuer and reads as no actor; an older suite
+  keeps its bytes. A read cell is still refused where the view's read grant (`may:` naming the
+  view) does not name the actor. Since 0.66.0, under report format 2, the generated Go and
   TypeScript runners show an unsupported required scenario as a skipped subtest or case carrying
   the reason (Go `t.Skipf`, TypeScript `t.skip`) instead of a failed one; the enclosing test still
   fails once, naming how many were unsupported, and the process exits nonzero. The JSON report is

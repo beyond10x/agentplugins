@@ -48,8 +48,9 @@ changed yet.
   invariant or a system-issued command (`ess-conformance/52`, `/53`) and a spec diff naming a
   struct `shorthand:`, a system actor, an `await_within:` bound or a domain's display name or
   summary (`ess-diff/20`); from 0.64.0 a suite with a view read through a reference
-  (`ess-conformance/54`, `/55`) and a spec diff naming `field-source-changed` (`ess-diff/21`).
-  Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  (`ess-conformance/54`, `/55`) and a spec diff naming `field-source-changed` (`ess-diff/21`);
+  from 0.67.0 a suite with a one-time read cell that names its reader (`ess-conformance/56`,
+  `/57`). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -62,6 +63,18 @@ changed yet.
   `ess generate --check` reports drift once per such newtype.
 - From 0.66.0 a regenerated Go or TypeScript package shows an unsupported required scenario as a
   skipped subtest that still fails the run once (`ess:testing-conformance`).
+- From 0.67.0, raising a header to `ess/29` refuses a guarded branch declared below one a later
+  precedence step answers (`conflicting_declaration` naming both branches and the order to declare
+  them in): move each named branch up ([later-formats.md](../specifying/references/later-formats.md#ess29)).
+  Below `ess/29` declaration order is checked as before. Regenerate committed suites with no
+  specification change: a guard's `coalesce(x, d)` (the structured form from `ess/27`) now reads
+  `d` where `x` is absent instead of unknown; a ranked head scoped by another head's value ranks
+  above the rows that scope placed, and one over owned rows is synthesized under the other head's
+  owner; a connective child ordering two `Integer` inputs (`a <= b`) is witnessed instead of
+  refused; an authored scenario that isolates a connective child withdraws its `ESS-SYNTH-022`;
+  and a model with one-time responses, actors and a view gains a read cell per reader, written at
+  `ess-conformance/56` (`ess:testing-conformance`). Read the change with
+  `ess verify conform diff`.
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
   accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused
