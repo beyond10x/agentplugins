@@ -1690,9 +1690,9 @@ mod tests {
         let inventory = Inventory {
             claude: Some(state),
             settings: vec![SettingsEntry {
-                file: "/work/acd/.claude/settings.local.json".to_owned(),
+                file: "/work/demo/.claude/settings.local.json".to_owned(),
                 scope: "local".to_owned(),
-                project: Some("/work/acd".to_owned()),
+                project: Some("/work/demo".to_owned()),
                 plugin: "beyond10x@beyond10x".to_owned(),
                 enabled: true,
             }],

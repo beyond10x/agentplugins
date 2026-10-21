@@ -64,7 +64,7 @@ or relations. Ask for them at the moment you need them:
 | What edges exist between artifacts? | `aep plan artifact relations` |
 | What statuses does this kind have, and what moves where? | `aep plan artifact lifecycle <kind>` |
 | What is already in the store? | `aep plan artifact list [--kind k] [--status s] [--ref p:key] [--format json]` |
-| What, here, is this ticket? | `aep plan artifact list --ref jira:DEV-630` |
+| What, here, is this ticket? | `aep plan artifact list --ref jira:EX-1` |
 | Which tracker keys does this repository mention that the plan does not? | `aep plan reverse tickets --provider jira` |
 | What does it look like as a board? | `aep plan artifact board [--kind k]` |
 | What is stopped, on what type of thing, and on which item? | `aep plan artifact blocked [--type t]` |
