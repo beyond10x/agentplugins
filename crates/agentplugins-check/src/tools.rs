@@ -721,7 +721,44 @@ fn eval_pair(root: &Path) -> Result<(), String> {
     println!(
         "tools eval: AEP {aep} matches Metaharness {metaharness} embedded AEP commit {commit}"
     );
+    let claude = pin("CLAUDE_VERSION: '")?;
+    let adapter = run("curl", &["-fsSL", "--retry", "2", &format!("https://raw.githubusercontent.com/beyond10x/metaharness/{metaharness}/crates/metaharness-claude/src/lib.rs")])?;
+    let pinned = verify_claude_pin(&adapter, &claude)
+        .map_err(|error| format!("eval.yml: Metaharness {metaharness}: {error}"))?;
+    println!(
+        "tools eval: Claude Code {claude} is pinned by Metaharness {metaharness} ({})",
+        pinned.join(", ")
+    );
     Ok(())
+}
+
+/// The Claude Code versions `metaharness-claude` declares in `PINNED_VERSIONS`, provided
+/// `claude` is one of them.
+fn verify_claude_pin(source: &str, claude: &str) -> Result<Vec<String>, String> {
+    let declaration = source
+        .lines()
+        .find(|line| line.trim_start().starts_with("pub const PINNED_VERSIONS"))
+        .ok_or("metaharness-claude declares no PINNED_VERSIONS")?;
+    let list = declaration
+        .rsplit_once('[')
+        .and_then(|(_, rest)| rest.split_once(']'))
+        .map(|(list, _)| list)
+        .ok_or("metaharness-claude PINNED_VERSIONS is not a one-line array")?;
+    let pinned: Vec<String> = list
+        .split(',')
+        .map(|item| item.trim().trim_matches('"').to_owned())
+        .filter(|item| !item.is_empty())
+        .collect();
+    if pinned.is_empty() {
+        return Err("metaharness-claude PINNED_VERSIONS is empty".to_owned());
+    }
+    if !pinned.iter().any(|version| version == claude) {
+        return Err(format!(
+            "CLAUDE_VERSION {claude} is not one of the Claude Code versions its adapter pins ({})",
+            pinned.join(", ")
+        ));
+    }
+    Ok(pinned)
 }
 
 fn verify_eval_pair(manifest: &str, commit: &str) -> Result<(), String> {
@@ -1117,6 +1154,22 @@ mod tests {
         assert!(verify_eval_pair(manifest, "aaa").is_err());
         assert!(verify_eval_pair(&manifest.replace("bbb", "aaa"), "aaa").is_ok());
         assert!(verify_eval_pair("", "aaa").is_err());
+    }
+
+    #[test]
+    fn eval_claude_version_must_be_one_the_adapter_pins() {
+        let source =
+            "/// Pinned.\npub const PINNED_VERSIONS: [&str; 2] = [\"2.1.304\", \"2.1.305\"];\n";
+        assert!(verify_claude_pin(source, "2.1.305").is_ok());
+        assert!(verify_claude_pin(source, "2.1.304").is_ok());
+        assert!(verify_claude_pin(source, "2.1.259").is_err());
+        assert!(verify_claude_pin(source, "2.1.30").is_err());
+        let single = "pub const PINNED_VERSIONS: [&str; 1] = [\"2.1.259\"];";
+        assert!(verify_claude_pin(single, "2.1.259").is_ok());
+        assert!(verify_claude_pin("", "2.1.259").is_err());
+        assert!(
+            verify_claude_pin("pub const PINNED_VERSIONS: [&str; 0] = [];", "2.1.259").is_err()
+        );
     }
 
     #[test]
