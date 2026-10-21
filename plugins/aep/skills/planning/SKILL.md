@@ -158,7 +158,15 @@ installed CLI predates it and the honest report says so. Supply the complete
 body from a file or standard input — `body --from` after creation, or `new … --from` at creation; the
 CLI preserves frontmatter, validates the store, and bumps the revision once when bytes change. For a
 kind whose records are immutable (`review-result` refuses `body`), `new --from` is the only way a
-body arrives, and `move --to archived` is the only way one is retired.
+body arrives, and `move --to archived` is the only way one is retired. Since 0.75.0, **`aep plan
+artifact redact <id> --literal <text> --with <replacement> --reason <text>` is the only way to
+change an immutable record's text** after it is committed, for a literal that must leave the tree
+(a name, a hostname, a secret). It replaces the literal in any letter case in title, summary and
+body and writes one evidence record holding the literal's SHA-256, never the literal, with the
+replacement, the count and the reason; `validate` then admits the record only while replaying those
+redactions over its first committed version reproduces the current text byte for byte. Any other
+change to a committed record's text still fails `validate`. Put the
+literal in nothing you commit: not the `--reason`, not a commit message.
 
 Two corollaries, both from a recorded run (2026-09-03). **Never create an artifact to look at its
 template.** `aep plan artifact new` writes the kind's template into the store, and a probe you then

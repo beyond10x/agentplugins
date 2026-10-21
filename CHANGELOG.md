@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+- Track AEP 0.75.0 after `agentplugins-check tools`. `aep:planning` guardrail 2 and the store
+  conventions name `aep plan artifact redact` as the only way to change an immutable record's text:
+  it writes one evidence record per redaction holding the literal's SHA-256, never the literal, and
+  `validate` admits a `review-result` only while replaying those records over its first committed
+  version reproduces its current text.
+
 ## [0.23.2] — 2026-10-17
 
 - Track ESS 0.62.0 and Connectors v0.53.1 after `agentplugins-check tools`; AEP 0.74.0,

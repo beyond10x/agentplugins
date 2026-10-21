@@ -69,6 +69,12 @@ No planning-store file is edited directly. One command surface owns every change
 | change a title, summary, owner, tag, reference or model digest | `aep plan artifact set` |
 | record which surfaces a story lands on, read (`cited`) or worked out (`--inferred`) | `aep plan artifact scope <id> --add <path>` |
 | record an observation a later move rests on, by kind or from a conformance report | `aep plan artifact evidence` |
+| remove a literal from a record whose text is immutable (`review-result`), since 0.75.0 | `aep plan artifact redact <id> --literal <text> --with <replacement> --reason <text>` |
+
+`redact` is the only way to change an immutable record's text once it exists. It writes one
+evidence file per redaction (the literal's SHA-256, never the literal; the replacement, the count,
+the reason and the instant), and `validate` admits the changed record only while replaying those
+files over its first committed version reproduces the current title and body byte for byte.
 
 This makes the store a single-writer system: a write takes the store's writer lock, validates, and
 changes exactly one artifact file (`evidence` adds one evidence file), bumping its `revision` once.
