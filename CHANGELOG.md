@@ -1,1545 +1,987 @@
 # Changelog
 
+All notable changes to this project are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
 
-- Track AEP 0.75.0 after `agentplugins-check tools`. `aep:planning` guardrail 2 and the store
-  conventions name `aep plan artifact redact` as the only way to change an immutable record's text:
-  it writes one evidence record per redaction holding the literal's SHA-256, never the literal, and
-  `validate` admits a `review-result` only while replaying those records over its first committed
-  version reproduces its current text.
-- Track ESS 0.66.0 after `agentplugins-check tools`: the ESS skills describe `ess/27` (expressions, function guards, one precedence rule, system-issued commands), `ess/28` (views through a reference, related `state`, `all:` and list guards), `ess-conformance/52`–`/55`, `ess-diff/20`–`/21`, `ess verify conform diff`, `synthesize --check`, `ESS-AUTHOR-042`, `--schema-id-base` and the Go and TypeScript runners' skipped unsupported scenarios; the ESS tutorial set, its trial fixtures and the eval workflow move to 0.66.0 together, and a gate test holds them to `verified.json`.
-- Track Connectors v0.55.0: the connectors skills spell `instances`, `--connector`/`--instance` and `connections reconnect`, `connectors:upgrade` names `setup migrate`, and `tools` refuses a spelling the release's help marks deprecated.
-- Track Metaharness 0.10.1 after `agentplugins-check tools`: the eval workflow pins it with AEP 0.68.1, the release it links, and keeps Claude Code 2.1.259; its new `project --from` and `--scratch-cwd` need no skill text. The shared gates workflow pins gates 0.1.22.
-- Sample tracker keys and project paths in the `aep:planning` and `aep:migrating` skills, a `b10x`
-  test and the recorded golden-path transcript are neutral; the transcript's manifest digest follows.
-
-## [0.23.2] — 2026-10-17
-
-- Track ESS 0.62.0 and Connectors v0.53.1 after `agentplugins-check tools`; AEP 0.74.0,
-  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
-- `ess:specifying`: `ess generate types --target rust --rust-raw-json <type>[.<field>]` keeps the
-  named `Json` values as their exact JSON text, and a generated Rust newtype decoder refuses a value
-  breaking its alphabet, prefix or invariants; `ess/26` in the format table. A read by identity
-  narrows on the identity field;
-  a read a scenario cannot decide is skipped and named by `ESS-SYNTH-005` while the scenario stays
-  (the syntax reference and `ess:retrofitting` said such a view was refused).
-- `ess:hardening`: `ess-history/3` records each operation's input, events and arranged
-  `external:` branches, and `check-history` holds the target to them; the explorers draw
-  `Timestamp` inputs and perform `deletes:`; a mutant whose suite does not change is `unwitnessed`
-  (`ess-mutation-report/7`).
-- `ess:testing-conformance`: `hold_now` scenarios on `now` boundaries (`ess-conformance/50`,
-  `/51`) and the optional `ConformanceTarget::hold_now`; `ess:upgrade` names the new formats.
-- Connectors skills: a credential created by a write (OpenRouter `key.create`, v0.53.0) is held in
-  custody and never returned; OpenRouter, Runpod `billing.pods` and GitLab `file.raw` and
-  `project.languages` reads; Runpod's capacity refusal (v0.53.1); a catalog provider upgrade
-  renews the alias's SHA-256 and revision and revalidates the saved key.
-- The eval workflow runs Connectors v0.53.1.
-
-## [0.23.1] — 2026-10-16
-
-- Track AEP 0.74.0 and Connectors v0.52.0 after `agentplugins-check tools`; ESS 0.60.0,
-  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
-  AEP 0.74.0's concurrent step-map states and new workflows change drive step maps, which no skill
-  writes or quotes.
-- `aep:planning`: `aep plan artifact spend` reads `task_spend` records back per task kind and
-  figure, against an optional `spend` baseline and target in `.engineering/project.yaml`
-  (AEP 0.74.0).
-- Connectors skills: the approval clock is a quorum of Roughtime sources (`roughtime-quorum/1`)
-  and the single-source table is refused from v0.52.0; a Slack read answered `"ok": false` is a
-  named refusal; the `confluence-v1` provider, Slack user-token history reads and the new
-  Kubernetes reads are listed with their configuration-revision consequences.
-- The eval workflow runs Connectors v0.52.0.
-
-## [0.23.0] — 2026-10-15
-
-- `b10x` reads a local pin file, `~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml`
-  when set, or the file `$B10X_PINS` names by absolute path), to hold a CLI back on one machine in every directory.
-  Its `[pins]` table takes `x.y.z` or `x.y`, as a string or as `{ version, reason }`; `b10x.toml`
-  accepts the same table form. A local pin wins over a repository pin for the same CLI.
-- `b10x check` says a CLI at its local pin is held back, with the reason, instead of inviting
-  `/b10x:upgrade`, and says when the installed version differs from the pin. A local pin file that
-  does not parse is one warning line; `b10x init`, `b10x upgrade`, `b10x setup plan` and
-  `b10x install` refuse it.
-- `b10x upgrade` skips a locally pinned CLI and its finding names the pin and its reason.
-- The `b10x:upgrade` and `b10x:init` skills, `SETUP.md` and the install page document the local pin.
-- Track AEP 0.73.0, ESS 0.60.0 and Connectors v0.51.0 after `agentplugins-check tools`;
-  Worktree 0.18.2 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
-  AEP 0.72.0 to 0.73.0 change driver step maps and drive runs, which no skill writes or quotes.
-- `aep:planning`: `evidence --kind task_spend --from <file>` records what a task spent (AEP 0.73.0).
-- ESS skills follow 0.60.0: `ess/25` (create-or-update selected by `when_subject:`, `trimmed:`
-  text guards, per-row events, `before_row:` external refusals, a view's `absent:` row), a
-  read-only command's `unknown_instance:`, newtype literals checked against their type,
-  `ess-http/1` request encoding and per-outcome answers, `ess-composition/4` roles, `ess-diff/19`,
-  mutation reports `/6` and the explorers' `refused` field; a runnable `devices.yaml` example,
-  checked by `agentplugins-check tools`.
-- The tutorials, the trial fixtures and the eval workflow run ESS 0.60.0.
-- Connectors skill: Slack's bot selection adds `chat.update` and `chat.delete` with named refusals
-  (v0.51.0), the move off the credential-only `slack` adapter, `approvals clock-check`'s
-  `clock_refusal`, and `connectors-catalog-provider` in the release archives.
-- The eval workflow runs Connectors v0.51.0.
-
-## [0.22.11] — 2026-10-14
-
-- Track AEP 0.71.3, Worktree 0.18.2 and Connectors v0.50.0 after `agentplugins-check tools`; ESS
-  0.59.0 and Metaharness 0.9.3 are still the newest. `b10x upgrade` now offers them.
-- `aep:planning`: a conformance record names its report and suite by repository-relative path and
-  digest, and `evidence --from` says whether the record `counts` or why it `does not count`.
-- Connectors skills and the plugin page: the CLI builds and runs on Windows from source since
-  v0.49.0 (Credential Manager custody, no Windows release binary); `connectors:upgrade` explains
-  `metadata_schema_newer` from v0.50.0 and when binaries may share a state directory.
-- Worktree 0.18.2 fixes `archive` on Git before 2.42; its `worktree skill` text and every
-  subcommand help equal 0.18.1's, so `worktree:managing-worktrees` is unchanged.
-- The eval workflow runs Worktree 0.18.2 and Connectors v0.50.0.
-
-## [0.22.10] — 2026-10-13
-
-- Track Worktree 0.18.1 after `agentplugins-check tools`; AEP 0.71.2, ESS 0.59.0, Metaharness
-  0.9.3 and Connectors v0.48.0 are still the newest. 0.18.1 moves its dependencies and raises its
-  `rust-version` to 1.89; its `worktree skill` text and every subcommand's help equal 0.18.0's, so
-  no skill text changes. `b10x upgrade` now offers it.
-- The eval workflow runs Worktree 0.18.1.
-
-## [0.22.9] — 2026-10-13
-
-- Track Worktree 0.18.0 and Connectors v0.48.0 after `agentplugins-check tools`; AEP 0.71.2, ESS
-  0.59.0 and Metaharness 0.9.3 are still the newest.
-- `b10x` installs Connectors from its checksummed release archive from v0.48.0, the first release
-  that carries one (Linux and macOS, x86-64 and arm64), and still builds an older, source-only
-  release with `cargo install`. `agentplugins-check tools` checks the released `connectors`
-  binary's help as well as its source contract.
-- `worktree:managing-worktrees` follows 0.16.0 to 0.18.0: `discard-cache`, `finish
-  --discard-cache` and `sweep` delete every ignored entry unless the tree root's `.worktreekeep`
-  keeps it (`ignored-output`, `keep-file-invalid`); nested repositories, mount points and
-  unreadable entries stay; Flutter build output is recognised; `archive` reads the keep file; the
-  `prune-archives --strip-build-output` strip also removes ignored output. The wave cleanup step,
-  the governed-plan tutorial and the worktree plugin page no longer say records under `target/`
-  are kept.
-- Connectors skills and pages name v0.48.0: prebuilt archives, the macOS quarantine and keychain
-  notes, `setup check`'s `os` and `custody_backend`, the Slack `chat.postMessage` and
-  `conversations.open` writes under approval, and the migration of a `{"literal": "true"}` guard
-  to `{"boolean": true}`.
-- The eval workflow runs Worktree 0.18.0 and Connectors v0.48.0, the latter from its archive.
-
-## [0.22.8] — 2026-10-11
-
-- Track ESS 0.59.0 after `agentplugins-check tools`; AEP 0.71.2, Worktree 0.15.0, Metaharness
-  0.9.3 and Connectors v0.45.0 are still the newest.
-- ESS skills follow 0.59.0: `ess:testing-conformance` shows an authored act stating its caller
-  under `caller:` (`ess-scenario/5`), the refusals `ESS-AUTHOR-013` to `-015`, and the unsupported
-  reason that names a caller attribute nothing supplied; `ess:specifying` says a `when_subject:`
-  guard on a field no view publishes now gets its scenarios, observed only through the declared
-  views, where it was refused with `ESS-SYNTH-001`; `ess:upgrade` names the suites that gain
-  scenarios or change bytes. The tutorials and fixtures require ESS 0.59.0.
-- The ESS tutorial says that every command answer, a refusal included, carries the current
-  revision as its consistency token, and that an optional field with no value is `Node::Null` in a
-  view row; a trial agent lost 14 scenarios to the two gaps.
-- The eval workflow runs ESS 0.59.0.
-
-## [0.22.7] — 2026-10-10
-
-- Track ESS 0.58.0 and Connectors v0.45.0 after `agentplugins-check tools`; AEP 0.71.2, Worktree
-  0.15.0 and Metaharness 0.9.3 are still the newest.
-- ESS skills follow 0.58.0: `ess:specifying` documents `ess/24` and `undeclared_fields: ignored`
-  on a struct or a command response, where it is refused, its open schema and OpenAPI output, and
-  the opened-response cases synthesis refuses; `ess:hardening` rates opening and closing in
-  `ess-diff/18`; `ess:testing-conformance` names the `ess-conformance/48` (`/49`) fields and the
-  undeclared keys the runners admit only at opened objects; `ess:retrofitting` maps an extension
-  object to the key; `ess:upgrade` names the formats older readers refuse, the two acts now
-  refused as `ESS-AUTHOR-041` and the changed external witness. The tutorials and fixtures require
-  ESS 0.58.0.
-- Connectors skills and plugin page name v0.45.0, which still needs Rust 1.91; the setup reference
-  names the grown GitLab, Slack and Jira selection sets and their new configuration revisions,
-  `correct_media_type` amendments, binary and `download` selections, the catalog connection's
-  `hosts`, and the Kubernetes `pod_logs`, `kubeconfig` and `pod_exec` options (pod exec is an
-  approved write).
-- The eval workflow runs ESS 0.58.0 and Connectors v0.45.0 and keeps AEP 0.68.0, the revision
-  Metaharness 0.9.3 links.
-
-## [0.22.6] — 2026-10-10
-
-- Track AEP 0.71.2, ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0 after
-  `agentplugins-check tools`; Metaharness 0.9.3 is still the newest.
-- `worktree:managing-worktrees` and the plugin page: an archive leaves cargo build layout out of
-  `dirty.patch` and records it in a `worktree.archive/3` manifest; `worktree prune-archives
-  --strip-build-output` shrinks an older archive kept only for its build output.
-- `aep:planning`: a report/2 is recorded beside an ordinary suite (no `coverage` block) and from a
-  generated Go or TypeScript runner (`go-scenario-status/2`); an older `aep` refuses both.
-  `aep:upgrade`: `aep plan store migrate git` repairs an `aep.project/5` store holding a repeated
-  transition, which `aep plan artifact validate` refuses and no verb removes.
-- ESS skills follow 0.57.0: `ess:hardening` rates domain changes, input wire-form moves and
-  narrowed inputs and refusals (`ess-diff/15`–`/17`) and scores identical-answer
-  `precedence-swap` mutants as equivalent (`ess-mutation-report/5`); `ess:specifying` drops the
-  constrained `String` response limit (`ess-conformance/46`, `/47`) and names the
-  `path_segment_wire_name` refusals; `ess:testing-conformance` says the interpreted target
-  decides `now` guards and the Go and TypeScript runners admit `json`; `ess:upgrade` names the
-  0.57.0 refusals and the formats older readers refuse. The tutorials and fixtures require ESS
-  0.57.0.
-- Connectors skills and plugin page name v0.43.0, which still needs Rust 1.91; the setup reference
-  names the v0.41.0–v0.43.0 selection members and the GitLab amendment that earlier releases
-  refuse, and the new GitLab, Jira and SQL operations an adapter entry must permit before use.
-- The eval workflow runs ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0 and keeps AEP 0.68.0, the revision
-  Metaharness 0.9.3 links; the planning store's `protocols` source moves to AEP 0.71.2.
-
-## [0.22.5] — 2026-10-09
-
-- Track Connectors v0.39.0 after `agentplugins-check tools`; AEP 0.71.0, ESS 0.56.0, Worktree
-  0.14.0 and Metaharness 0.9.3 are still the newest. The connectors skills and plugin page name
-  v0.39.0, which still needs Rust 1.91, and the setup reference says that a catalog selection
-  naming `credential` parameters, new in v0.39.0, is refused by every earlier release. The eval
-  workflow runs Connectors v0.39.0 and keeps AEP 0.68.0, the revision Metaharness 0.9.3 links.
-
-## [0.22.4] — 2026-10-09
-
-- `aep:implementing` (wave) and `aep:planning` (critic rounds): in a store whose
-  `.engineering/project.yaml` sets `findings_required_since`, which AEP 0.71.0 added,
-  `aep plan artifact new review-result` refuses a report with no ` ```findings ` block. The
-  coordinator sends that refusal back to the review's author and records only the corrected
-  report. A review that is prose by nature is recorded with `--prose-only <reason>`, also new in
-  AEP 0.71.0; a store without the key records a block-less report as it returned.
-- Track AEP 0.71.0 and Connectors v0.38.0 after `agentplugins-check tools`; ESS 0.56.0, Worktree
-  0.14.0 and Metaharness 0.9.3 are still the newest. The eval workflow runs Connectors v0.38.0
-  and keeps AEP 0.68.0, the revision Metaharness 0.9.3 links; the planning store's `protocols`
-  source moves to AEP 0.71.0.
-
-## [0.22.3] — 2026-10-08
-
-- `ess:hardening` closes its report with a ` ```findings ` block, the one the AEP adversary and
-  security reviewer already end with: `file`, `line`, `category`, `severity`, `verdict`, `origin`,
-  `message`, and `[]` when nothing was found. Its categories are `spec-gap`, `missing-scenario`,
-  `ess-limit`, `equivalent` and `false-positive`. A coordinator records the report verbatim and
-  `aep plan artifact findings` compares two hardening passes.
-- Track AEP 0.70.0, Worktree 0.14.0, Connectors v0.37.0 and Metaharness 0.9.3 after
-  `agentplugins-check tools`; ESS 0.56.0 is still the newest. `aep:planning` says how
-  `planning_scope` is chosen and that `--planning-scope` sets it. `worktree:managing-worktrees`
-  teaches `worktree prune-archives`. `connectors:integrating` says what a `timeout` at
-  `stage = dispatch` and an `outcome_unknown` invoke mean, and that `revalidate_connection` also
-  follows a configuration revision change.
-- The eval workflow runs Metaharness 0.9.3 and keeps AEP 0.68.0, the revision it links; the
-  planning store's `protocols` source moves to AEP 0.70.0, the shared gates workflow to gates
-  1a5ede1 (its `common.yml` is unchanged), and the website to Docs System 0.8.0.
-
-## [0.22.2] — 2026-10-08
-
-- Track AEP 0.69.1. `verified.json` and the planning store's `protocols` source move to it after
-  `agentplugins-check tools`; its fix to cross-member edges needs no skill change. The eval
-  workflow keeps AEP 0.68.0, the revision Metaharness 0.9.1 links.
-- Track Worktree 0.13.0. `worktree:managing-worktrees` and the plugin page say that `gc` without
-  `--id` assesses only the current repository (`--scope profile` for the whole profile), and that
-  `finish`, `discard-cache`, `archive`, `gc --id` and `reconcile --id` accept a tree's id, path or
-  unique directory name; `finish` prints `finished <id> <path>`. `verified.json` and the eval
-  workflow move to 0.13.0.
-
-## [0.22.1] — 2026-10-08
-
-- `connectors:integrating` spells `operations list --adapter '<alias>' --family '<contract id>'`.
-  The family filter narrows one adapter's cached description and requires `--adapter`; the
-  command the skill showed exits 2 with `cli_parse`.
-- Track Connectors v0.33.0. `verified.json` and the eval workflow move to it after
-  `agentplugins-check tools`. The setup reference, `connectors:upgrade` and the plugin page say
-  that a store `setup init` creates cannot be opened by v0.32.0 or earlier, so every binary that
-  opens a store is upgraded first, and name the one-way `setup checkpoints-enable --confirm
-  one-way` for an existing store.
-
-## [0.22.0] — 2026-10-08
-
-- Track AEP 0.69.0, ESS 0.56.0, Worktree 0.12.1 and Connectors v0.32.0. `verified.json` moves to
-  all four after `agentplugins-check tools`; the eval workflow installs ESS 0.56.0, Worktree 0.12.1
-  and Connectors v0.32.0 and keeps AEP 0.68.0, the revision Metaharness 0.9.1 embeds. The planning
-  store's `protocols` source moves to AEP 0.69.0.
-- `ess:specifying` documents the ESS 0.55.0 constructs an author reached for and could not find
-  (`naming: {summary: …}`, `refs:`, `{response: <field>}` event payloads, `one_time_response:` on
-  the outcome, `now` in `when_subject:`/`when_related:`), and what validates and still gets no
-  scenario.
-- ESS 0.56.0: the skills say to declare a held-state branch before an accepting or `external:`
-  branch (`ESS-COMMAND-004`), describe the `exact-numbers` feature of generated Rust type
-  libraries, the `ess-output-state/3` record (move a CI `ess` pin together with the regeneration),
-  the refusal to replace an owned file whose bytes differ from `.ess-output` with its
-  `ess generate output adopt` route, and the Entity Runtime lowering of `alphabet` and `.count`.
-  The ESS and AEP tutorials and their fixtures require ESS 0.56.0.
-- Connectors v0.32.0: `--output json` answers carry `result.result`, `input_schema` and
-  `output_schema` as JSON values, and the skills no longer say to decode a schema string. The
-  setup and upgrade skills give the steps after the shipped GitLab selection set moves an
-  instance's configuration revision; `connectors:integrating` explains feed profile capabilities.
-- `worktree:managing-worktrees` follows Worktree 0.12.1: an untagged Cargo `target/` and its
-  `tmp/` are discarded as cache, nested repositories are archived as `nested-<n>.tar` images
-  (`worktree.archive/2`) and restored with `tar -xpf`, and plain `worktree finish` refuses a dirty
-  tree unless its archive holds the current state.
-- `aep:upgrade` says what `aep plan store migrate git --verify` compares since AEP 0.69.0.
-- `ess:testing-conformance` says the `skipped` count for an unsupported entity setup or clock
-  reading is the Go runner's; the Rust runner records every unsupported answer as `unsupported`
-  and fails conformance on it. The `ess-full-package` trial read it as applying to Rust.
-- Trials on 0.22.0, isolated: `ess-tutorial` valid, 17 scenarios, 0 refusals, cargo test 2/0;
-  `ess-full-package` valid, 31 scenarios, 0 refusals, 9/9 outputs, cargo test 3/0;
-  `worktree-onboarding` 12 tool calls. Their runs are the new baselines.
-
-## [0.21.2] — 2026-10-07
-
-- `aep:planning` and `aep:implementing` no longer say an `aep.project/1` store keeps working. The
-  newest `aep` refuses it with `[unsupported_protocol_version]` before any write, and a
-  `journal.jsonl` plan with no `project.yaml` is refused naming the migration. Store work stops
-  until the user approves `aep plan store migrate git --dry-run`, then `--verify`, and commits the
-  result. `agentplugins-check tools` runs the newest `aep` against a generated `/1` store and
-  flags a skill row that disagrees with it (https://github.com/beyond10x/agentplugins/issues/54).
-- An agent can start every command skill: `aep:wave`, `aep:drive`, `aep:decompose`,
-  `aep:review-plan` and `worktree:cleanup` no longer set `disable-model-invocation` or, for Codex,
-  `allow_implicit_invocation: false`. Each command's approval stays inside its procedure; for
-  `worktree:cleanup` the operator's request, as the command or in words, authorizes the apply, and
-  without one it stops after the dry-run. R3 and the gate now allow an operator-only skill only
-  with both flags and an `Operator-only:` sentence in its description. Five eval cases start each
-  command from an agent turn (https://github.com/beyond10x/agentplugins/issues/41).
-
-## [0.21.1] — 2026-10-07
-
-- Track Worktree 0.11.0 (from 0.10.0). `verified.json` and the eval workflow move to 0.11.0 after
-  `agentplugins-check tools` (42 spelled commands) and the `worktree-onboarding` trial, whose
-  baseline is the run of 2026-10-07 (11 → 9 tool calls). `worktree skill` without `--out` now
-  prints the skill and writes no file; no skill here runs it, because the plugin ships
-  `worktree:managing-worktrees`.
-- `worktree:managing-worktrees` step 1 no longer reads as an instruction to publish every commit.
-  When a task stops at a local commit, the tree is archived or handed off, never published to make
-  it removable. The trial quoted the old sentence as conflicting with a commit-only request.
-
-## [0.21.0] — 2026-10-07
-
-- Track ESS 0.55.0 (from 0.53.0). New specifications start on `ess/23`, and `ess:specifying`
-  reads the newest format from `ess specify formats` instead of validating a header one past it
-  (beyond10x/ess#460). `later-formats.md` covers `ess/23`: an `updates:` that re-keys a record,
-  `{subject: state}`, bulk `deletes: instances:`, enum variant attributes, per-element
-  `affects: each:` and row-set selectors, each with the targets that still refuse it; the new
-  `shelves.yaml` example is validated, synthesized and interpreted by `agentplugins-check tools`.
-  The skills explain `ess generate --check`, validation `completeness`, the `ESS-ENTITY-019`,
-  `ESS-COMMAND-019`, `ESS-SPEC-012` and `ESS-SPEC-017` diagnostics, the `type_mismatch` refusal
-  of a membership operand naming an input, the `generate_optional_<t>` port method, suite formats
-  `ess-conformance/44` and `/45`, `ESS-SYNTH-003`/`004`, and mutation report `/4`. The Rust
-  tutorial, the governed-plan tutorial and their trial fixtures require ESS 0.55.0 and its crates.
-  `ess:testing-conformance` no longer calls `ErrUnsupported` a skip: the runner records
-  `unsupported`, which is not a pass, except for entity setup and clock readings.
-- `verified.json` tracks ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0 after
-  `agentplugins-check tools` and the `ess-full-package`, `ess-tutorial` and `worktree-onboarding`
-  trials; their baselines are the runs of 2026-10-07.
-- Track Worktree 0.10.0. `worktree:managing-worktrees` and the Worktree plugin page describe
-  `worktree sweep --all-profiles`, the daily timer that discards the build cache of idle trees and
-  archives expired or finished ones without removing any. `worktree:init` no longer suggests the
-  downloaded profile may be committed into a repository, names the headless workspace root as the
-  repository's parent directory, and states plainly that a `worktree --version` answer means the
-  CLI is installed: the `worktree-onboarding` trial quoted all three as confusing. The gc step
-  says what an id-less run assesses in one sentence.
-- Track Connectors v0.31.0 (from v0.28.0). `connectors:integrating` follows a refusal's
-  `next_action`, including the new `revalidate_connection` for expired evidence with an intact
-  credential, quotes `service_reason`, reports `retry_after_seconds` and leaves a `429` write
-  `unknown`, and lists operations by datasource family. Its setup reference covers
-  `oauth2_client_credentials` profiles, revalidation after an adapter configuration change
-  (`create_connection` when identity changed), `insufficient_scope`, and handing one connection to
-  an operator-pinned consumer with `connections launch`. `connectors:upgrade` explains the single
-  `metadata_unavailable` answer after upgrading to v0.31.0.
-- The design and parallel-safety plan critics trace every acceptance line's reads to the item in
-  the set that produces them, and raise a finding when no `depends_on` edge orders the reader
-  after its producer. A panel had approved a set where one story read a store its sibling created.
-- The live eval installs ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0.
-
-## [0.20.1] — 2026-10-06
-
-- Track Worktree 0.9.0. `worktree:managing-worktrees` ends work with
-  `worktree finish --discard-cache --archive <tree>`: it deletes only ignored build cache the CLI
-  recognises by structure, archives everything else no remote ref recovers, and finishes. The skill
-  no longer asks agents to prove they own a build directory before deleting it, which left 105
-  trees (49.0 GB) unfinished on one machine, and it forbids deleting a build directory by name,
-  because agents write records into `target/`.
-- A sub-agent that creates a tree finishes it before it returns or returns its id and path; the
-  parent finishes every returned tree. In 14 days of transcripts, 105 of 153 sub-agent sessions
-  created a tree and never finished it.
-- AEP wave teardown uses the same command: unpublished wave commits go into a local archive instead
-  of keeping the tree, and only scratch outside the tree is removed by exact path.
-- The governed-plan tutorial and the Worktree plugin page describe the new finish.
-
-## [0.20.0] — 2026-10-05
-
-- Refresh ESS resources for the current source language, related guards and selected effects,
-  transport clients, finite protocol checks and compatibility gates. Bundle executable examples
-  and distinguish supported declarations from implementation and synthesis limits.
-- Replace the current lending walkthrough and its fixtures with Rust, canonical suite IR and
-  the native ESS runner. All 17 scenarios pass with real consistency tokens and checked fresh
-  reads; deliberate lifecycle, token and view defects are rejected. Keep dated Go recordings as
-  historical evidence and provide a current governed-plan continuation.
-- Migrate Connectors guidance to v0.28.0: local setup, protected acquisition, exact operation
-  schemas and revisions, approval proofs and explicit service endpoints. `b10x` now installs and
-  upgrades its source-only CLI from the exact release tag (Rust 1.91 or newer). Existing 0.7.x
-  configuration and credentials require an explicit migration; this release does not convert them.
-- Repair upgrades from a frozen local marketplace by planning the selected source change before
-  plugin upgrades, with the existing snapshot and undo path preserved.
-- Match eval AEP 0.68.0 to Metaharness 0.9.1's embedded source. Install the actual eval prerequisites
-  and make their executables available on the governed child's PATH. Update the planning protocol,
-  shared Gates workflow and Docs System package pins.
-- Expand current-tool and upstream checks to maintained eval, protocol and package pins,
-  Metaharness and Connectors command contracts, command options and executable ESS examples.
-  Report source-only verification separately from executed binaries. Exclude generated website
-  output from source checks without hiding authored documents.
-- Measure Rust trials with Cargo summaries, preserving abnormal process failures and incomplete
-  runs. Close false-green cases involving equals-style global options and a crashed test process
-  after an earlier passing target.
-- Refresh setup, routing, delivery and maintenance instructions. Source releases finish after
-  their own checks and artifact publication; downstream documentation publication is asynchronous.
-- Make governed-plan trials install Worktree and allow their own sandbox's managed trees. Explain
-  named partial-wave obligations, remaining conformance gaps and archive recovery in the tutorial.
-
-## [0.19.2] — 2026-10-03
-
-- An explicit Worktree cleanup request authorizes exact eligible removals without a second
-  approval prompt. Inspection-only requests remain read-only; recovery and lease checks remain.
-- Restore the Rust 1.99 gate without weakening test assertions, and remove obsolete AEP command
-  inventory entries.
-- Verify the skills against AEP 0.68.0, ESS 0.52.0 and Worktree 0.8.2. Two isolated ESS
-  full-package trials produced all nine outputs and passed 24 and 15 scenarios without failures
-  or skips; the recorded trial evidence states the limits of those observations.
-- Clarify Rust and Go implementation synthesis and Go conformance package placement.
-- The release workflow prepares checksummed artifacts with read-only permissions; publication
-  uses the organization bot rather than the default Actions identity.
-
-## [0.19.1] — 2026-09-29
-
-The ess skills now say where implementation code comes from: the specification, through
-`ess generate synthesize`, and never a hand transcription. A hand-transcribed model passed a
-669-scenario conformance suite with every entity field unchecked.
-
-- `ess:specifying` gains "Implementation code comes from the specification": fill the generated
-  `…Behavior` and `…Query` obligations, commit the generated tree, and fail the gate when a
-  regeneration differs. When `synthesize` refuses a specification, file the refusal on
-  beyond10x/ess; until the fix ships, a hand-written model needs a test that compares it with the
-  compiled IR field by field.
-- `ess:testing-conformance`: a green suite proves only the fields its expectations read, and a
-  synthesized scenario witnesses one value per `any_of` guard.
-- `verified.json` does not move: `agentplugins-check tools` still reports aep 0.65.0 and ess 0.43.0
-  as newer than verified, and `aep plan artifact divergences` as not a command of aep 0.65.0. The
-  commands the new sections spell pass against ess 0.43.0.
-
-## [0.19.0] — 2026-09-29
-
-A new skill investigates what cannot be re-run: a production incident, an outage, or a question
-about a running system. `aep:diagnosing` builds a failing command first. `aep:investigating`
-keeps the evidence and cites where every fact came from.
-
-- New skill: `aep:investigating`, with ten techniques in `references/techniques.md`: capture
-  before remediation, a sourced UTC timeline, onset from state, peer differential, negative
-  claims, ship state, a hypothesis ledger, checking the check, complete reads, and the
-  post-incident report. Each technique names the failure it was written from. The investigation
-  is an `incident-report` artifact, observations are `health_observation` evidence, and each
-  follow-up is a draft story.
-- `aep:diagnosing` and `b10x:routing` send an incident that cannot be re-run to
-  `aep:investigating`.
-- No eval case covers the new skill yet; `evals/README.md` lists it with the uncovered ones.
-- `verified.json` still pins aep 0.64.0 and ess 0.39.0. aep 0.65.0 and ess 0.42.0 are not yet
-  re-verified: `agentplugins-check tools` reports `aep plan artifact divergences`, spelled in
-  `aep:planning`, as not a command of aep 0.65.0.
-
-## [0.18.0] — 2026-09-28
-
-A second tutorial continues the first: the ESS tutorial's library gets an AEP plan, four critics
-review it, and the first story is built in a reviewed wave. The skills are verified against aep
-0.64.0 and ess 0.39.0, and a new report and skill keep this repository in step with the releases
-it depends on.
-
-- New page: [Your first governed plan](website/docs/tutorials/first-governed-plan.md), recorded with
-  aep 0.64.0 and ess 0.39.0: adopt an `aep.project/5` store, model a new state in ESS before any
-  story is written (17 → 55 scenarios), six stories, four critic verdicts, a wave proposal, and one
-  story implemented, attacked by the adversary and merged. The `aep-tutorial` trial has a fresh
-  agent follow it.
-- `agentplugins-check upstream` reports what moved in every repository this one depends on: the
-  releases its plugins drive with their changelog sections, the `beyond10x/*` workflow pins, and
-  the issues its text cites. `.agents/skills/following-upstream` is the loop that acts on it.
-- `agentplugins-check` refuses a `b10x.docs.yaml` link that names no page. One such link
-  (`plugins/beyond10x/`, renamed in 0.14.0) failed every organization website publication from
-  2026-09-24 to 2026-09-28.
-- `verified.json` pins aep 0.64.0 and ess 0.39.0. `ess:retrofitting` and `syntax.md`: a read by
-  identity is the unfiltered view; `filter: id == param.id` leaves every outcome it observes
-  unsynthesized (beyond10x/ess#193). `ess:hardening` covers the concurrent explorer and
-  `ess verify conform check-history`.
-- `aep:planning` checks each critic's verdict line before recording it; the decomposer relates each
-  story to the epic's objective, which `development.standard` requires before a story is accepted.
-- Eval recording moved to `metaharness aep drive eval run` with aep 0.64.0; it is blocked until
-  metaharness links a current aep (beyond10x/metaharness#10). The four plan-critic cases have a
-  working tree, `fixtures/library-reservations-drafted`.
-- `task trial:sandbox` can recreate a sandbox that ran `aep`.
-
-## [0.17.0] — 2026-09-28
-
-A tutorial takes a developer from an empty directory to a validated ESS specification and a Go
-implementation that passes its conformance suite, with an agent doing the writing. The onboarding
-pages install through `b10x` and name the five plugins that ship. The skills are verified against
-ess 0.38.0.
-
-- New page: [Your first ESS specification](website/docs/tutorials/first-ess-specification.md).
-  `ess:specifying` interviews, writes a lending-library specification, and `ess` validates it,
-  refuses a planted mistake, generates docs and OpenAPI, and synthesizes a Go suite of 17
-  scenarios that the implementation passes and a planted bug fails. Every output is from a real
-  run. `agentplugins-check tools` validates the page's specification against the newest `ess` and
-  runs its suite, and the `ess-tutorial` trial has a fresh agent follow the page.
-- `install.md` installs every command-line tool through `b10x init` and `b10x setup apply`, and
-  Metaharness through `b10x install metaharness`; the hand install of AEP 0.55.0 is gone.
-  `choose-a-plugin.md`, `trust-and-scope.md`, the b10x reference, the golden path's prerequisites,
-  the landing page, the footer and `b10x:routing`'s resources name `b10x`, `aep`, `ess`,
-  `worktree` and `connectors`.
-- `agentplugins-check` refuses the retired display names "AEP Plan", "AEP Drive" and "ESS Specify".
-- `verified.json` pins ess 0.38.0. From the trial round: `ess:specifying` counts "make sure it
-  validates" as a request for a finished specification and allows a named refusal where synthesis
-  cannot arrange the model; `ess:testing-conformance` generates the Go package at the module root,
-  requires `ESS_REPORT_FORMAT=2`, and has a refused command set `Outcome` (beyond10x/ess#186).
-- This repository's planning store is `aep.project/5`.
-
-## [0.16.0] — 2026-09-28
-
-The `ess`, `aep` and `worktree` plugins describe the newest CLI releases: ess 0.37.0, aep 0.63.1
-and worktree 0.8.2. `verified.json` pins all three.
-
-- `aep` describes the Git-native store, `aep.project/5`. The artifact files are the store, a move
-  appends to `transitions`, and each evidence record is one file under `.engineering/evidence/`.
-  `aep:planning` and `aep:implementing` read `.engineering/project.yaml` before the first write, and
-  tell the user once, with the exact upgrade, when the store is not `/5`: `/1` migrates with
-  `aep plan store migrate git --verify`, `/2`–`/4` through the pinned build named in
-  `aep:upgrade`. `aep:init`, adoption and the reverse engineer start new stores at `/5`. Reasons
-  that rested on the old append-only journal now rest on one writer and the `revision:` conflict.
-- `ess:hardening` uses `ess verify conform mutate`, with `--emit` and `--collect` for a project's
-  own runner, and the Go and TypeScript explorers. It no longer says the audit is unshipped. A
-  surviving mutant is answered by making the rule observable or filing a synthesis gap, never by
-  an authored scenario.
-- `ess:specifying` gains `references/later-formats.md`: fixtures, value expressions, the outcome
-  shapes (`unknown_instance:`, `deletes:`, `into:`, `accepts: nothing`, `preconditions:`),
-  `presence:`, `Json`, `prefix:`, `skip_absent`, case-insensitive guards, `when_subject_state:`
-  with its limits, and a per-holder limit ("at most five per member"). Each example validates and
-  synthesizes under ess 0.37.0. `syntax.md` gives the unknown-instance order, `instance:` on a
-  create and on a move, `params:` on a view, and the one-default rule for outcome `when`s.
-- `ess:retrofitting` maps a command that ignores in one state and refuses in another. `ess:init`
-  and `ess:upgrade` cover `ess specify toolchain` and an exact `requires: ess` pin.
-  `ess:testing-conformance` covers fixture providers and the suite versions the Go and TypeScript
-  runtimes accept.
-- The specification interview skips its questions when the request asks for a finished
-  specification. Without an AEP store it lists the decisions it took in the report.
-- `worktree:managing-worktrees` covers what `archive` includes and refuses, and how `gc` finishes an
-  interrupted removal. `worktree:init` covers `activate --install-agent-guidance`.
-- The `ess-pipeline` trial fixture sets the fields its invariant reads, which ess 0.37.0 requires
-  (`ESS-COMMAND-018`). The four ESS trials' baselines are re-recorded. `ess-new` now takes 38 tool
-  calls, not 12, because it models the per-member limit it used to leave unmapped; unmapped
-  markers fell from 7 to 4.
-
-## [0.15.0] — 2026-09-28
-
-Eight methods from two public MIT skill collections, rewritten into the `aep`, `ess` and `b10x`
-plugins, each with an eval case beside it.
-
-- `aep:diagnosing` is a new activity skill. It builds one command that goes red on the reported
-  symptom, and has already been run, before any hypothesis. Then it minimises, ranks falsifiable
-  hypotheses, probes one variable at a time and writes the regression test at a seam that
-  reproduces the real call pattern. The red and green runs are `test_result` evidence; a missing
-  seam is filed as a draft story. `b10x:routing` reaches it.
-- `ess:specifying` interviews before drafting a domain nobody has described
-  (`references/interview.md`): the open decisions in numbered rounds, each with the answer the
-  agent would take, facts looked up rather than asked. Headless, the questions become
-  `approval-record`s. `aep:planning` guardrail 7 points at it.
-- The adversary and `ess:testing-conformance` reject a test that would still pass if every
-  function it calls returned a default value, and name the five shapes that do.
-- A wave verifies a green unit's claim against the base before merging: one command on both
-  branches, one verdict of `VERIFIED`, `NOT VERIFIED` or `INCONCLUSIVE`, recorded as
-  `verification` evidence. Only `VERIFIED` merges.
-- The story scoper returns a `Safety fact` line with how far it was proved on a five-step ladder;
-  the security reviewer proves that fact with a test before calling a change safe.
-- The decomposer cuts stories as vertical slices and drafts a codebase-wide mechanical change as
-  expand, migrate batches and contract. The design critic's fifth defect is the horizontal slice.
-- On request, the adversary step runs as a cross-family panel (`references/adversary-panel.md`),
-  one `review-result` per seat; with one model family it is one reviewer and says so.
-- `b10x:authoring-plugins` carries five rules for writing what an agent reads
-  (`references/writing.md`).
-- `evals/` holds 17 cases; its README recounts coverage from the `subject:` fields.
-
-Sources: `github.com/mattpocock/skills` at `c55ee46` and `github.com/cursor/plugins` at `ecc249f`,
-both MIT. Each method is adapted in this repository's words; no text is copied verbatim.
-
-## [0.14.17] — 2026-09-27
-
-Codex parity for the AEP agents, two planning commands, and routing that reaches every skill.
-
-- The eleven `aep` agents are thin Claude Code adapters. Each role's procedure moved, unchanged
-  apart from its links and a three-line note on running it without subagents, to
-  `references/<role>.md` of the skill that owns it (`aep:planning` or `aep:implementing`), which
-  Codex loads. Both skills and the wave and panel dispatch rules say to run a role from that file
-  where the host has no subagents. R4 now refuses an agent with more than 20 lines of body, one
-  that does not name its owning skill, and a link it carries that does not resolve. An eval case scoped to an agent also re-runs when the procedure it links changes.
-- `aep:review-plan` (`/aep:review-plan`) and `aep:decompose` (`/aep:decompose`) are commands
-  handing off to `aep:planning`: the plan reviewer over the store, and the decomposer over one epic
-  followed by the critic panel.
-- `b10x:routing` sent upgrade requests to `b10x:init`; they go to `b10x:upgrade` and each
-  product's `upgrade`. The routing skill now names every skill of every plugin (`aep:migrating`
-  and the per-product `init` and `upgrade` were missing), and the gate refuses a skill it does
-  not reach and an upgrade row that routes to an `init` skill.
-- `b10x:authoring-plugins` describes the command kind (operator-only in both hosts, at most 20
-  lines, one hand-off, `agents/openai.yaml` with `allow_implicit_invocation: false`) and thin
-  agents over skill-owned roles. The gate refuses that skill or `website/docs/structure.md` when
-  either stops stating a limit the checker enforces.
-
-## [0.14.16] — 2026-09-26
-
-Commands: operator-only entry points for work that is started by hand.
-
-- R3 gains a third kind of skill, the command: a verb name, `disable-model-invocation: true`, at
-  most 20 lines of body, handing off to exactly one activity skill of its plugin, with an
-  `agents/openai.yaml` that sets `policy.allow_implicit_invocation: false` for Codex.
-  `agentplugins-check` enforces each part.
-- `worktree:cleanup` (`/worktree:cleanup`) reviews managed trees and removes only approved ids,
-  through `worktree:managing-worktrees`.
-- `verified.json` moves `worktree` to 0.8.1 after `agentplugins-check tools` passed against it
-  (19 spelled commands).
-- `aep:wave` (`/aep:wave`) and `aep:drive` (`/aep:drive`) start `aep:implementing` in wave or drive
-  mode. They are no longer retired names.
-- The `**Skill version**` line in `aep:implementing`, `aep:planning` and `aep:migrating` read
-  0.14.2; it now reads the plugin version, and the gate refuses a line that differs from
-  `.claude-plugin/plugin.json`.
-- `b10x:routing` lists the three commands.
-
-## [0.14.15] — 2026-09-26
-
-`worktree:managing-worktrees` follows `worktree` 0.8.0; skills verified against `aep` 0.60.0, `ess`
-0.35.0 and `worktree` 0.8.0.
-
-- `managing-worktrees` is regenerated from `worktree skill` 0.8.0, keeping its name and three local
-  steps: `worktree archive` as recovery proof for work that must not be published, the
-  `worktree-hidden-state` and `worktree-local-refs` refusals, and the raw restore of an archive
-  (attributes disabled through `.git/info/attributes`; Git 2.55 `apply` crashes with
-  `--attr-source`).
-- `verified.json` moves `aep` to 0.60.0, `ess` to 0.35.0 and `worktree` to 0.8.0 after
-  `agentplugins-check tools` passed against them.
-
-## [0.14.14] — 2026-09-26
-
-Skills verified against `ess` 0.34.0.
-
-- `verified.json` moves `ess` to 0.34.0 after `agentplugins-check tools` passed against it: 24 spelled
-  commands exist, and the syntax example validates and synthesizes 14 scenarios with 0 refusals.
-- The ESS syntax reference's lending example sets `pages` on the `AddCopy` creating outcome, which
-  `ess` 0.34.0 requires when an invariant reads the field (`ESS-COMMAND-018`, beyond10x/ess#112).
-
-## [0.14.13] — 2026-09-26
-
-Hardening a specification after its suite is green.
-
-- `ess:hardening`: eight specification-hardening techniques for after a conformance suite is green —
-  mutation, random sequences against a reference model, caller replay, determinism, metamorphic
-  relations, guard analysis, spec diff in the gate and design review — in cheapest-first order with
-  the design review early, and the rule that a check nobody has seen fail is not evidence. Its
-  `references/` carry a procedure per technique, the reference-model pattern (to ship as `ess`
-  features, beyond10x/ess#114), a design-review brief and spec-diff classification. (#35)
-- `ess:conformance` offers the catalogue when a coverage task ends on a green suite, and
-  `ess:testing-conformance` links it from its mutation section.
-
-## [0.14.12] — 2026-09-26
-
-Skills that start from what a repository already has, and plans that say what the other host needs.
-
-- `ess:init` checks a specification that is already there first: it runs `ess specify validate` and
-  the repository's own conformance command, reports the counts, and recommends
-  `ess:testing-conformance` when the suite is green. (#32)
-- Every `b10x init` or `upgrade` command a plugin prints names `--host`, with the wording of
-  `b10x:init`; `agentplugins-check` refuses one that does not. (#32)
-- `ess:testing-conformance` shows a TypeScript refusal recorder (`err.cause === ErrUnsupported`)
-  beside the Go one. (#32)
-- The ESS syntax reference lists the structured predicate forms (`all`, `any`, `not`, `none`, map
-  operators, quantifiers, `.count`) that `when`, `invariants` and `filter` accept, no longer tells
-  authors to split "A or B" into two views, and names the forms `synthesize` still refuses.
-  (beyond10x/ess#92)
-- `b10x init`/`upgrade --host <one>` says what a plan for the other host would do when it holds
-  Beyond10x installs — action count and legacy, missing and marketplace changes — and prints
-  "Nothing to change for <host>." while that plan has changes. When the other host is current, one
-  line says so. (#33)
-
-## [0.14.11] — 2026-09-26
-
-Keeping installs current, keeping the skills matched to each product release, and pinning a tooling
-version per repository.
-
-- `b10x check` (the session-start line) refreshes the newest releases from GitHub at most once a day,
-  in parallel with a short timeout, and names `/b10x:upgrade` when the installed plugins or a CLI are
-  older. It used to compare against a record written only by the last plan, so a machine on 0.14.7
-  heard nothing about 0.14.10.
-- `b10x upgrade` and `b10x setup plan` read plugin versions from the newest release when the local
-  marketplace copy is older than it; they reported 0.14.7 as current until the apply step refreshed
-  the copy.
-- `verified.json` records the aep, ess and worktree releases the skills were last verified against;
-  the daily `agentplugins-check tools` fails when a newer release exists, until the skills are
-  re-verified and the file is bumped.
-- `b10x pin <cli> <version>` and `b10x unpin <cli>` keep a committed `b10x.toml` (`[pins]`, exact or
-  a minor line such as `0.32`). `init`, `upgrade`, `setup plan` and `install` install the pinned
-  release; `upgrade` reports newer ones and changes nothing; `b10x check` warns when the CLI on
-  `PATH` differs from the pin and when the skills describe a newer release. The matching `requires`
-  line in `ess-inputs.yaml` waits for beyond10x/ess#106.
-
-## [0.14.10] — 2026-09-25
-
-From round 5, the first measured trial round: seven trials on 0.14.9, all isolated. The
-full-package trial generated every ESS output and ran `go test` against the synthesized suite: 13
-passed, 0 failed, 0 skipped.
-
-- `agentplugins-check trial-report` recognises every spelling of `go test` (`go -C <dir> test`,
-  behind environment assignments, after `cd … &&`) and only in command position; it had reported the
-  full-package run as "not run".
-- `b10x setup plan` with no selection keeps every installed product, optional ones included; it
-  proposed uninstalling an installed `connectors`.
-- `ess:specifying`: every `--kind` of `ess generate` (`schema`, `openapi`, `asyncapi`, `docs`,
-  `site`, `docs-ir`) and `ess generate types`; one `--out` per kind side by side, because nested
-  output directories are refused; which kinds add their own folder (`site` does not). OpenAPI and
-  AsyncAPI need a component that says how the service is reached, or they write `0 artifact(s)`
-  without a refusal (beyond10x/ess#102).
-- `ess:testing-conformance`: generate the Go suite inside the implementation's module; return payload
-  numbers as `float64` (beyond10x/ess#101).
-- Trials: `cargo` is allowed (the Rust type library can be compiled); the aep, worktree and upgrade
-  prompts say nobody will answer questions.
-
-## [0.14.9] — 2026-09-25
-
-Trials become measurable: their prompts live in the repository, and each run is scored against a
-committed baseline, so a drop in quality fails instead of waiting to be noticed.
-
-- `trials/<name>/trial.yaml` defines each trial (prompt, fixture, setup, measures, expected
-  outputs); `task trial:run TRIAL=<name>` builds the sandbox, prepares the fixture and runs it. Seven
-  trials: ESS new spec, retrofit, pipeline and full package; aep backlog planning; worktree
-  onboarding; upgrade from a seeded install. The gate checks the definitions.
-- New trial `ess-full-package`: every ESS output (JSON Schema, OpenAPI, AsyncAPI, docs and site,
-  Rust and Go type libraries, the Go conformance suite), then an in-memory Go implementation run
-  with `go test` against the generated suite. Sandboxes get `go`.
-- `agentplugins-check trial-report` measures a run: tool calls, the last `validate` verdict,
-  synthesis scenarios and refusals, `UNMAPPED:` markers read from the files written, which outputs
-  exist, and `go test` passed/failed/skipped. With `--baseline trials/baseline.json` it exits 1 when
-  a measure gets worse; `--write-baseline` records an accepted run. `trial:run` calls it after the
-  isolation check.
-
-## [0.14.8] — 2026-09-25
-
-`b10x-harness` joins the catalog, and `b10x` chooses a prebuilt archive only where one exists for
-the machine.
-
-- `catalog.json`: `b10x-harness` (the Beyond10x agent loop that Metaharness's `b10x` adapter runs)
-  is an optional binary of `aep`, installed with `b10x install b10x-harness`. It runs on Linux only:
-  a new `platforms` field on a catalog binary keeps `b10x` from planning it elsewhere.
-- `b10x` reads which targets the newest release's `SHA256SUMS` lists and chooses prebuilt only when
-  this machine's target is among them; otherwise `cargo`, or a warning that names the target. A
-  release with an archive for some machines no longer sends the others to a download that fails.
-- `b10x install <cli>` follows the same default. Since 0.14.7 it still chose `cargo` whenever `cargo`
-  was on `PATH`, although its help and the docs said prebuilt.
-- `aep:init`: `metaharness` is optional in the plan and installed with `b10x install metaharness`;
-  the skill said `b10x init aep` offers it.
-- Docs name `b10x-harness` beside `metaharness`.
-
-## [0.14.7] — 2026-09-25
-
-The operator's decision on the install method, asked for by a team adopting ESS: anyone with Rust
-installed used to get a full source build of every CLI.
-
-- `b10x` installs CLIs from the release's checksummed prebuilt archive by default; `cargo` is used
-  when `--method cargo` asks for it or a release has no archive. Before, `cargo` on `PATH` made it
-  the default.
-- `b10x:init` offers prebuilt first; the product `init` skills say which method is planned and
-  offer the other; `SETUP.md`, the install page and the plugin pages say the same.
-
-## [0.14.6] — 2026-09-25
-
-The fixes for the trial findings shipped in aep 0.59.3 and ess 0.32.0; the skills now describe that
-behaviour instead of the workarounds. Each change was checked against the released binaries.
-
-**`ess`**
-
-- `ess:retrofitting`: `ess infra import openapi` reads OpenAPI 3.0 as well as 3.1. A nullable field
-  imports as a coverage gap, carried into the draft as an `UNMAPPED:` marker; an object schema must
-  be closed with `additionalProperties: false`, and that refusal is reported, not worked around.
-- Syntax reference: two fields are compared through one struct (`window.ends_at >
-  window.starts_at`); a right-hand side without a dot is a literal, so the flat form is refused. The
-  stored-value case links ESS's design note for guards over stored fields.
-- `ess:specifying`: the note that the CLI help calls the `system.yaml` layout "legacy" is gone; the
-  help no longer says so.
-
-**`aep`**
-
-- `aep:planning`: the store's refusal of an empty findings fence now says to write `[]`; the skill
-  points at it instead of quoting the old message.
-
-## [0.14.5] — 2026-09-25
-
-From the round-4 trials on 0.14.4 (an ESS retrofit of a stock-reservation service and worktree
-onboarding, both isolated). The skills were checked against ess 0.31.0, the newest release, which
-changes nothing they describe.
-
-**`ess`**
-
-- `ess:retrofitting`: a command the code silently ignores in some state gets no `wrong_state:`
-  outcome and no error. `synthesize` then reports `ESS-SYNTH-012` for that state and still writes
-  a scenario requiring that nothing happened, which is the code's behaviour; report it, and do not
-  add an error the code never raises. The view that invariants need is structural: mark it as such.
-
-**`worktree`**
-
-- `worktree:init`: the profile download creates its directory (`curl --create-dirs`) instead of a
-  separate `mkdir`; any local file works as the profile although `--help` says "committed"; a
-  headless run uses the directory that holds the current repository as the workspace root and
-  says so.
-- `worktree:managing-worktrees`: always pass `--id` to `gc`.
-
-## [0.14.4] — 2026-09-25
-
-From the round-3 trials on 0.14.3, the first product fix they led to (worktree 0.7.1), and eight
-findings from a team adopting ESS. Two isolated trials on this version passed (an ESS retrofit and
-worktree onboarding).
-
-**Setup**
-
-- `SETUP.md` step 1 asks the user before it installs `b10x`, showing the target, the download URL
-  and the install path. The product `init` skills say they install CLIs only after the user
-  confirms.
-
-**`ess`**
-
-- `ess:specifying`: never invent an entity so that a command type-checks. In an interactive session
-  the open `UNMAPPED:` markers become questions to the user; headless runs and the `author` agent
-  keep them and list them. Marker examples no longer say "Ask".
-- `ess:specifying`: a second source document goes into the same system, a new system or an
-  external boundary, by what it says about itself; when it says neither, that is an open question.
-- `ess:specifying`: `## Next` starts with the owner reviewing every marker and contradiction, then
-  planning (`aep:planning`), then generate and conformance. The `author` agent ends its report the
-  same way.
-- `ess:specifying`: a headless run needs `--allowedTools "Bash(ess:*)"` (also on the plugin page).
-  Where a repository has no gate, validate plus a synthesis with 0 refusals is the check to report.
-- Syntax reference: a predicate is one comparison or a bare fact path; `&&`, `||` and `in` are
-  refused and a list's length cannot be tested, so "state A or B" is two views. Error outcomes count
-  toward "all but one needs a `when`"; `wrong_state` outcomes do not.
-- `ess:retrofitting`: a service that publishes no events declares one per success outcome for the
-  fact it produces and leaves it out of `publishes:`, since `validate` refuses an outcome with
-  nothing observable. An entity the code gives no status gets one structural state, marked as such.
-
-**`worktree`**
-
-- `worktree:init`: `worktree doctor --check` fails with `no active profile` since worktree 0.7.1;
-  the `profiles=0` workaround is gone.
-
-**Docs and tooling**
-
-- The docs intro and `b10x skill --help` name the current skills (`init`, `specifying`, …).
-- `agentplugins-check trial-isolation`: a skill or agent from outside the sandbox fails a run only
-  when the run used it; one merely offered (claude.ai account skills in sub-agent sessions) is a
-  note.
-
-## [0.14.3] — 2026-09-25
-
-From trial 3: five fresh agents on 0.14.2 (an ESS specification from nothing, an ESS retrofit of an
-existing service, an ESS pipeline through generate and a synthesized suite, AEP planning over a
-`TODO.md`, worktree onboarding) plus a migration of a seeded older install.
-
-- `ess:specifying`: lifecycle state names start upper-case; `ess-inputs.yaml` is documented and
-  recommended once anything is generated, since a directory without it is read whole;
-  `generate --out <dir>` writes its own `schema/` or `openapi/` below `<dir>`; an entity invariant
-  needs a view holding every state and publishing the fields it reads, or `synthesize` refuses the
-  check. The syntax example gains that view: it synthesized with 3 refusals, now 12 scenarios and 0.
-- The syntax reference says how to write rules the trials hit: a limit read from stored state, and
-  no double booking (a per-slot lifecycle, or `UNMAPPED:`). A time range is ordered by an `Integer`
-  length; comparing two `Timestamp`s validates and then fails `synthesize`, and `Duration` does not
-  compare with a number.
-- `ess:retrofitting`: `ess infra import openapi` reads OpenAPI 3.1 only; `aep plan reverse openapi`
-  accepts 3.0. Its description named the retired `specify` and `coverage` skills.
-- `ess:testing-conformance`: what the built-in targets `interpreted`, `oracle-fixture` and `billing`
-  are, why a new domain reports nothing useful against them, and `synthesize --target go|typescript`
-  to hold a real implementation to the suite.
-- `aep:planning`: the `--protocols` and `--profile` values for `reverse init`; body files live in a
-  git-ignored directory of the repository, not `$TMPDIR`; a critic's empty findings fence is
-  recorded as `[]`, which the store accepts, since it refuses the empty fence. Two references to
-  `ess skill`, which no longer exists, now name `b10x skill ess:specifying`.
-- `aep:migrating`: `reverse init` creates the store in every case; a backlog item that introduces a
-  new noun gets its ESS domain before its stories. Provenance says whose revisions it counts.
-- `b10x:init` and `aep:init` offer `ess` with `aep`.
-- The design and parallel-safety critics name the same two remedies for a shared file (an ordering
-  edge, or splitting the file) instead of asking for opposite changes in consecutive rounds.
-- `worktree:init`: where to get a profile and where it goes; `doctor --check` exits 0 with
-  `profiles=0`; cleanup needs a remote. `worktree:managing-worktrees`: switch to a branch before the
-  first commit.
-- `b10x:routing` routes ESS and worktree work to their skills instead of to `ess skill`.
-- `b10x upgrade` installs the replacement of a legacy plugin it removes; it used to remove it and
-  only note the replacement as missing. A legacy `local` install is not reinstalled at `local` when
-  the user scope covers it. A plan names Beyond10x plugins on a host it does not cover. `b10x check`
-  no longer says nothing is set up when only a legacy plugin is installed.
-- `agentplugins-check tools` also synthesizes and generates the ESS syntax example.
-- `agentplugins-check` parses its arguments with clap; new `trial-isolation` checks that a headless
-  trial loaded only the plugins its sandbox installed, at the version under test, and no MCP server.
-  Sandboxes live outside `$HOME` (`/var/tmp/b10x-trials-$USER`): below it, a trial loaded the
-  operator's `CLAUDE.md` and a settings file an earlier trial left behind. `task trial:sandbox` and
-  `task trial:run`, and the repository skill `improving-by-trial`, describe the loop.
-- The README lists every plugin's skills and agents, linked to their files; the gate keeps it
-  exact. The retired-name sweep covers `ess skill` and the `beyond10x/ess` marketplace.
-
-## [0.14.2] — 2026-09-24
-
-From trial 2, in which fresh agents given only a sentence and this repository's link onboarded
-(10 tool calls), wrote a valid todo specification in a new session that loaded the plugins
-(9 calls, no ESS clone), and upgraded a seeded `ess` 0.29.0 after the session-start line named it.
-
-- `SETUP.md` creates `~/.cache` before `mktemp` in it; a fresh home has none.
-- `b10x:init`'s plan example uses placeholders for the products and method it asked about, instead
-  of values an agent can paste unchanged.
-- A product's `init` skips the install step when its CLI already answers, rather than asking the
-  install-method question again right after `b10x:init`.
-- `ess:specifying`'s syntax example is a lending library, not a todo service: an agent asked for a
-  todo spec copied the example's domain. It now also shows a lifecycle with no final state
-  (`terminal: []`), which the trial agent had to guess; `ess specify validate` accepts it.
-- `b10x upgrade` updates only what is installed: it no longer proposes new plugins, and a host with
-  nothing from Beyond10x on it is left alone with a note naming `b10x init --host …`. The upgrade
-  skills plan with `--host` for the host they run in.
-- Plan output lists the marketplace refresh that `apply` runs, under "Also runs".
-
-## [0.14.1] — 2026-09-24
-
-- Publishes what 0.14.0 could not: the 0.14.0 release workflow's smoke test still looked for the
-  retired `name: installing` in `b10x setup guide`, so all four package jobs failed and no GitHub
-  Release or archives were published for 0.14.0. The test now looks for `name: init`. Content is
-  0.14.0's otherwise.
-
-## [0.14.0] — 2026-09-24
-
-- **Every plugin lives here.** `ess` and `worktree` join `b10x`, `aep` and `connectors` in
-  `plugins/`, all at this repository's version; the marketplace entries that pointed into the ESS
-  and worktree repositories are gone. `ess@ess` and `worktree@worktree` installs are migrated by
-  `b10x` as before.
-- **`init` and `upgrade` on every plugin.** `/b10x:init` is guided onboarding: it asks what the user
-  wants to do (plan and deliver work, write specifications, isolated Git checkouts, integrations)
-  and how to install the CLIs, then installs the matching plugins. `/aep:init`, `/ess:init`,
-  `/worktree:init`, `/connectors:init` set up one product and take its first step;
-  `/<plugin>:upgrade` and `/b10x:upgrade` check plugins and CLIs and offer the upgrade.
-- **Breaking:** skill renames under the concept's R3: `b10x:init` (was `installing`),
-  `ess:init` (was `ess`), `ess:specifying`, `ess:retrofitting`, `ess:testing-conformance` (were
-  `specify`, `retrofit`, `coverage`), `worktree:managing-worktrees` (was `worktree`).
+### Changed
+
+- Track AEP 0.75.0; `aep:planning` names `aep plan artifact redact` as the only way to change an immutable record
+- Track ESS 0.66.0: the ESS skills describe `ess/27` and `ess/28`; tutorials, fixtures and eval workflow move together
+- Track Connectors v0.55.0: the skills spell `instances` and `--instance`; `tools` refuses deprecated spellings
+- Track Metaharness 0.10.1 in the eval workflow (with AEP 0.68.1) and gates 0.1.22 in the shared gates workflow
+- Sample tracker keys and project paths in skills, a `b10x` test and the golden-path transcript are neutral
+- **Breaking:** `CHANGELOG.md` follows Keep a Changelog 1.1.0; `release verify` needs `## [x.y.z] - YYYY-MM-DD`
+
+## [0.23.2] - 2026-10-17
+
+### Changed
+
+- Track ESS 0.62.0 and Connectors v0.53.1; `b10x upgrade` now offers them
+- `ess:specifying`: `ess generate types --rust-raw-json`, `ess/26`, and reads by identity a scenario cannot decide
+- `ess:hardening`: `ess-history/3`, `Timestamp` inputs and `deletes:` in the explorers, `unwitnessed` mutants
+- `ess:testing-conformance`: `hold_now` scenarios on `now` boundaries (`ess-conformance/50`, `/51`)
+- Connectors skills: custody of write-created credentials, new OpenRouter, Runpod and GitLab reads
+- The eval workflow runs Connectors v0.53.1
+
+## [0.23.1] - 2026-10-16
+
+### Added
+
+- `aep:planning`: `aep plan artifact spend` reads `task_spend` records against an optional baseline and target
+
+### Changed
+
+- Track AEP 0.74.0 and Connectors v0.52.0; `b10x upgrade` now offers them
+- Connectors skills: the approval clock is a Roughtime quorum; a Slack `"ok": false` read is a named refusal
+- The eval workflow runs Connectors v0.52.0
+
+## [0.23.0] - 2026-10-15
+
+### Added
+
+- `b10x` reads a local pin file, `~/.config/b10x/pins.toml`, which wins over a repository pin
+
+### Changed
+
+- `b10x check` reports a CLI held back at its local pin, with the reason, instead of inviting an upgrade
+- `b10x upgrade` skips a locally pinned CLI and its finding names the pin and its reason
+- The `b10x:upgrade` and `b10x:init` skills, `SETUP.md` and the install page document the local pin
+- Track AEP 0.73.0, ESS 0.60.0 and Connectors v0.51.0; `b10x upgrade` now offers them
+- `aep:planning`: `evidence --kind task_spend --from <file>` records what a task spent (AEP 0.73.0)
+- ESS skills follow 0.60.0 (`ess/25`, `ess-http/1`, `ess-composition/4`) with a runnable `devices.yaml` example
+- The tutorials, the trial fixtures and the eval workflow run ESS 0.60.0
+- Connectors skill: Slack `chat.update` and `chat.delete`, `clock_refusal`, the catalog provider binary
+- The eval workflow runs Connectors v0.51.0
+
+## [0.22.11] - 2026-10-14
+
+### Changed
+
+- Track AEP 0.71.3, Worktree 0.18.2 and Connectors v0.50.0; `b10x upgrade` now offers them
+- `aep:planning`: a conformance record names its report and suite by path and digest
+- Connectors skills and page: the CLI builds and runs on Windows from source since v0.49.0
+- Worktree 0.18.2 changes no skill text, so `worktree:managing-worktrees` is unchanged
+- The eval workflow runs Worktree 0.18.2 and Connectors v0.50.0
+
+## [0.22.10] - 2026-10-13
+
+### Changed
+
+- Track Worktree 0.18.1; its skill text and help are unchanged, so no skill text changes
+- The eval workflow runs Worktree 0.18.1
+
+## [0.22.9] - 2026-10-13
+
+### Changed
+
+- Track Worktree 0.18.0 and Connectors v0.48.0
+- `b10x` installs Connectors from its checksummed release archive from v0.48.0; `tools` checks its binary's help
+- **Breaking:** `worktree:managing-worktrees` 0.18.0: cleanup deletes ignored entries `.worktreekeep` does not keep
+- Connectors skills and pages name v0.48.0: prebuilt archives, macOS notes, Slack writes under approval
+- The eval workflow runs Worktree 0.18.0 and Connectors v0.48.0, the latter from its archive
+
+## [0.22.8] - 2026-10-11
+
+### Changed
+
+- Track ESS 0.59.0
+- ESS skills follow 0.59.0: authored acts state their caller under `caller:` (`ess-scenario/5`)
+- The eval workflow runs ESS 0.59.0
+
+### Fixed
+
+- The ESS tutorial says every command answer carries the revision and an unset optional field is `Node::Null`
+
+## [0.22.7] - 2026-10-10
+
+### Changed
+
+- Track ESS 0.58.0 and Connectors v0.45.0
+- ESS skills follow 0.58.0: `ess/24` and `undeclared_fields: ignored`; tutorials and fixtures require it
+- Connectors skills and page name v0.45.0 and its grown GitLab, Slack, Jira and Kubernetes selections
+- The eval workflow runs ESS 0.58.0 and Connectors v0.45.0 and keeps AEP 0.68.0
+
+## [0.22.6] - 2026-10-10
+
+### Changed
+
+- Track AEP 0.71.2, ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0
+- `worktree:managing-worktrees`: archives leave build layout out of `dirty.patch`; `prune-archives` shrinks old ones
+- `aep:planning`: report/2 beside an ordinary suite; `aep:upgrade` repairs a store holding a repeated transition
+- ESS skills follow 0.57.0 (`ess-diff/15`–`/17`, `ess-mutation-report/5`); tutorials and fixtures require it
+- Connectors skills and page name v0.43.0 and the GitLab, Jira and SQL operations an adapter must permit
+- The eval workflow runs ESS 0.57.0, Connectors v0.43.0 and Worktree 0.15.0; the store's protocols move to AEP 0.71.2
+
+## [0.22.5] - 2026-10-09
+
+### Changed
+
+- Track Connectors v0.39.0; catalog selections naming `credential` parameters need it
+
+## [0.22.4] - 2026-10-09
+
+### Changed
+
+- Waves and critic rounds return a review without a ` ```findings ` block to its author when the store requires one
+- Track AEP 0.71.0 and Connectors v0.38.0
+
+## [0.22.3] - 2026-10-08
+
+### Added
+
+- `ess:hardening` ends its report with a ` ```findings ` block that `aep plan artifact findings` compares
+
+### Changed
+
+- Track AEP 0.70.0, Worktree 0.14.0, Connectors v0.37.0 and Metaharness 0.9.3
+- The eval workflow runs Metaharness 0.9.3 and keeps AEP 0.68.0; protocols, gates and Docs System pins move
+
+## [0.22.2] - 2026-10-08
+
+### Changed
+
+- Track AEP 0.69.1
+- Track Worktree 0.13.0: `gc` without `--id` assesses only the current repository; commands accept a tree's id or path
+
+## [0.22.1] - 2026-10-08
+
+### Changed
+
+- Track Connectors v0.33.0: upgrade every binary that opens a store before `setup init` creates one
+
+### Fixed
+
+- `connectors:integrating` spells `operations list --adapter <alias> --family <id>`; the old command exited 2
+
+## [0.22.0] - 2026-10-08
+
+### Changed
+
+- Track AEP 0.69.0, ESS 0.56.0, Worktree 0.12.1 and Connectors v0.32.0
+- `ess:specifying` documents the ESS 0.55.0 constructs authors reached for and could not find
+- ESS 0.56.0: declare a held-state branch first (`ESS-COMMAND-004`); tutorials and fixtures require 0.56.0
+- `worktree:managing-worktrees` follows 0.12.1: `target/` is cache, nested repositories are archived as images
+- `aep:upgrade` says what `aep plan store migrate git --verify` compares since AEP 0.69.0
+- Trials on 0.22.0 (`ess-tutorial`, `ess-full-package`, `worktree-onboarding`) are the new baselines
+
+### Fixed
+
+- Connectors v0.32.0: JSON answers carry schemas as JSON values; the skills no longer decode a schema string
+- `ess:testing-conformance`: the `skipped` count for unsupported setup is the Go runner's; Rust fails on it
+
+## [0.21.2] - 2026-10-07
+
+### Fixed
+
+- **Breaking:** The `aep` skills say the newest `aep` refuses an `aep.project/1` store until it is migrated
+- An agent can start every command skill; only a skill with both flags and an `Operator-only:` sentence cannot
+
+## [0.21.1] - 2026-10-07
+
+### Changed
+
+- Track Worktree 0.11.0; the `worktree-onboarding` baseline is the run of 2026-10-07
+
+### Fixed
+
+- `worktree:managing-worktrees` step 1 no longer reads as an instruction to publish every commit
+
+## [0.21.0] - 2026-10-07
+
+### Changed
+
+- Track ESS 0.55.0: new specifications start on `ess/23`; `ess:specifying` reads the newest format from the CLI
+- `verified.json` tracks ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0 after `tools` and three trials
+- Track Connectors v0.31.0: `connectors:integrating` follows a refusal's `next_action`, incl. `revalidate_connection`
+- The design and parallel-safety critics flag a reader not ordered after its producer by `depends_on`
+- The live eval installs ESS 0.55.0, Worktree 0.10.0 and Connectors v0.31.0
+
+### Fixed
+
+- Track Worktree 0.10.0: `worktree sweep --all-profiles`; `worktree:init` fixes three confusing sentences
+
+## [0.20.1] - 2026-10-06
+
+### Changed
+
+- Track Worktree 0.9.0: work ends with `worktree finish --discard-cache --archive <tree>`
+- A sub-agent that creates a tree finishes it or returns its id and path for the parent to finish
+- AEP wave teardown archives unpublished wave commits locally instead of keeping the tree
+- The governed-plan tutorial and the Worktree plugin page describe the new finish
+
+## [0.20.0] - 2026-10-05
+
+### Changed
+
+- Refresh ESS resources for the current source language and bundle executable examples
+- The lending walkthrough is Rust with canonical suite IR and the native ESS runner; 17 scenarios pass
+- **Breaking:** Connectors guidance moves to v0.28.0; 0.7.x configuration and credentials need a migration
+- Match eval AEP 0.68.0 to Metaharness 0.9.1's embedded source and install the eval prerequisites
+- Current-tool and upstream checks cover eval, protocol and package pins and executable ESS examples
+- Refresh setup, routing, delivery and maintenance instructions; documentation publication is asynchronous
+- Governed-plan trials install Worktree; the tutorial explains partial-wave obligations and archive recovery
+
+### Fixed
+
+- Repair upgrades from a frozen local marketplace by planning the source change before plugin upgrades
+- Measure Rust trials with Cargo summaries and close two false-green cases
+
+## [0.19.2] - 2026-10-03
+
+### Changed
+
+- An explicit Worktree cleanup request authorizes exact eligible removals without a second approval prompt
+- Verify the skills against AEP 0.68.0, ESS 0.52.0 and Worktree 0.8.2
+- Clarify Rust and Go implementation synthesis and Go conformance package placement
+
+### Removed
+
+- Restore the Rust 1.99 gate without weakening test assertions; remove obsolete AEP command inventory entries
+
+### Security
+
+- The release workflow has read-only permissions; publication goes through the organization bot
+
+## [0.19.1] - 2026-09-29
+
+### Added
+
+- `ess:specifying`: implementation code comes from the specification through `synthesize`, never by hand
+
+### Changed
+
+- `ess:testing-conformance`: a green suite proves only the fields its expectations read
+- `verified.json` does not move: aep 0.65.0 and ess 0.43.0 are not yet re-verified
+
+## [0.19.0] - 2026-09-29
+
+### Added
+
+- `aep:investigating` skill: ten techniques for incidents that cannot be re-run, recorded as an `incident-report`
+
+### Changed
+
+- `aep:diagnosing` and `b10x:routing` send an incident that cannot be re-run to `aep:investigating`
+- No eval case covers the new skill yet; `evals/README.md` lists it with the uncovered ones
+- `verified.json` still pins aep 0.64.0 and ess 0.39.0; aep 0.65.0 and ess 0.42.0 are not yet re-verified
+
+## [0.18.0] - 2026-09-28
+
+### Added
+
+- Tutorial: Your first governed plan, an AEP plan, four critics and a reviewed wave for the ESS tutorial's library
+- `agentplugins-check upstream` reports what moved upstream; `.agents/skills/following-upstream` acts on it
+
+### Changed
+
+- `agentplugins-check` refuses a `b10x.docs.yaml` link that names no page
+- `verified.json` pins aep 0.64.0 and ess 0.39.0; `ess:hardening` covers the concurrent explorer
+- `aep:planning` checks each critic's verdict line; the decomposer relates each story to the epic's objective
+- Eval recording moves to `metaharness aep drive eval run` with aep 0.64.0
+
+### Fixed
+
+- `task trial:sandbox` can recreate a sandbox that ran `aep`
+
+## [0.17.0] - 2026-09-28
+
+### Added
+
+- Tutorial: Your first ESS specification, from an empty directory to a Go implementation passing 17 scenarios
+
+### Changed
+
+- `install.md` installs every CLI through `b10x`; the docs name the five shipped plugins
+- `agentplugins-check` refuses the retired display names "AEP Plan", "AEP Drive" and "ESS Specify"
+- `verified.json` pins ess 0.38.0; trial-round fixes to `ess:specifying` and `ess:testing-conformance`
+- This repository's planning store is `aep.project/5`
+
+## [0.16.0] - 2026-09-28
+
+### Added
+
+- `ess:specifying` gains `references/later-formats.md`, each example validated under ess 0.37.0
+
+### Changed
+
+- **Breaking:** `aep` describes the Git-native store `aep.project/5`; skills name the upgrade when a store is older
+- `ess:retrofitting`, `ess:init`, `ess:upgrade` and `ess:testing-conformance` follow ess 0.37.0
+- The specification interview skips its questions when the request asks for a finished specification
+- `worktree:managing-worktrees` covers `archive` contents and interrupted removals; `worktree:init` agent guidance
+
+### Fixed
+
+- `ess:hardening` uses `ess verify conform mutate`; it no longer says the audit is unshipped
+- The `ess-pipeline` trial fixture sets the fields its invariant reads; four ESS trial baselines are re-recorded
+
+## [0.15.0] - 2026-09-28
+
+### Added
+
+- `aep:diagnosing` skill: a command that goes red on the symptom before any hypothesis
+- `ess:specifying` interviews before drafting a domain nobody has described (`references/interview.md`)
+- On request, the adversary step runs as a cross-family panel (`references/adversary-panel.md`)
+- `b10x:authoring-plugins` carries five rules for writing what an agent reads (`references/writing.md`)
+- These methods are adapted from `mattpocock/skills` and `cursor/plugins`, both MIT, in this repository's words
+
+### Changed
+
+- The adversary and `ess:testing-conformance` reject a test that passes when every call returns a default
+- A wave verifies a green unit's claim against the base before merging; only `VERIFIED` merges
+- The decomposer cuts vertical slices and drafts mechanical changes as expand, migrate and contract
+- `evals/` holds 17 cases; its README recounts coverage from the `subject:` fields
+
+### Security
+
+- The story scoper returns a `Safety fact`; the security reviewer proves it with a test before calling a change safe
+
+## [0.14.17] - 2026-09-27
+
+### Added
+
+- `aep:review-plan` and `aep:decompose` commands hand off to `aep:planning`
+
+### Changed
+
+- **Breaking:** The eleven `aep` agents are thin adapters; each role's procedure moved to its skill's `references/`
+- `b10x:authoring-plugins` describes the command kind and thin agents over skill-owned roles
+
+### Fixed
+
+- `b10x:routing` sends upgrade requests to the upgrade skills and names every skill; the gate refuses a gap
+
+## [0.14.16] - 2026-09-26
+
+### Added
+
+- R3 gains a third kind of skill, the command, which `agentplugins-check` enforces
+- `worktree:cleanup` (`/worktree:cleanup`) reviews managed trees and removes only approved ids
+- `aep:wave` and `aep:drive` commands start `aep:implementing`; they are no longer retired names
+
+### Changed
+
+- `verified.json` moves `worktree` to 0.8.1
+- `b10x:routing` lists the three commands
+
+### Fixed
+
+- The `**Skill version**` line reads the plugin version, and the gate refuses one that differs
+
+## [0.14.15] - 2026-09-26
+
+### Changed
+
+- `managing-worktrees` is regenerated from `worktree skill` 0.8.0, keeping its name and three local steps
+- `verified.json` moves `aep` to 0.60.0, `ess` to 0.35.0 and `worktree` to 0.8.0
+
+## [0.14.14] - 2026-09-26
+
+### Changed
+
+- `verified.json` moves `ess` to 0.34.0
+
+### Fixed
+
+- The ESS syntax reference's lending example sets `pages` on `AddCopy`, which `ess` 0.34.0 requires
+
+## [0.14.13] - 2026-09-26
+
+### Added
+
+- `ess:hardening`: eight specification-hardening techniques for after a conformance suite is green
+
+### Changed
+
+- `ess:conformance` offers the catalogue when a coverage task ends on a green suite
+
+## [0.14.12] - 2026-09-26
+
+### Added
+
+- `ess:testing-conformance` shows a TypeScript refusal recorder beside the Go one
+
+### Changed
+
+- `ess:init` checks an existing specification first and reports its validation and conformance counts
+- Every `b10x init` or `upgrade` command a plugin prints names `--host`; `agentplugins-check` refuses one that does not
+- `b10x init`/`upgrade --host <one>` says what a plan for the other host would do
+
+### Fixed
+
+- The ESS syntax reference lists the structured predicate forms and no longer says to split "A or B" views
+
+## [0.14.11] - 2026-09-26
+
+### Added
+
+- `verified.json` records the releases the skills were verified against; `tools` fails when a newer one exists
+- `b10x pin <cli> <version>` and `b10x unpin <cli>` keep a committed `b10x.toml`
+
+### Fixed
+
+- `b10x check` refreshes the newest releases at most once a day and names `/b10x:upgrade` when anything is older
+- `b10x upgrade` and `b10x setup plan` read plugin versions from the newest release, not a stale local copy
+
+## [0.14.10] - 2026-09-25
+
+### Changed
+
+- `ess:specifying`: every `--kind` of `ess generate`, one `--out` per kind, and what OpenAPI and AsyncAPI need
+- `ess:testing-conformance`: generate the Go suite inside the module; return payload numbers as `float64`
+- Trials allow `cargo`; the aep, worktree and upgrade prompts say nobody will answer questions
+
+### Fixed
+
+- `agentplugins-check trial-report` recognises every spelling of `go test`; it had reported a run as "not run"
+- `b10x setup plan` with no selection keeps every installed product; it proposed uninstalling `connectors`
+
+## [0.14.9] - 2026-09-25
+
+### Added
+
+- `trials/<name>/trial.yaml` defines seven trials; `task trial:run TRIAL=<name>` runs one
+- Trial `ess-full-package`: every ESS output, then a Go implementation run against the generated suite
+- `agentplugins-check trial-report` measures a run and exits 1 when a measure is worse than the baseline
+
+## [0.14.8] - 2026-09-25
+
+### Added
+
+- `catalog.json`: `b10x-harness`, an optional Linux-only binary of `aep`; catalog binaries gain `platforms`
+
+### Changed
+
+- Docs name `b10x-harness` beside `metaharness`
+
+### Fixed
+
+- `b10x` chooses prebuilt only when the release's `SHA256SUMS` lists this machine's target
+- `b10x install <cli>` follows the same default; since 0.14.7 it chose `cargo` whenever `cargo` was on `PATH`
+- `aep:init`: `metaharness` is optional and installed with `b10x install metaharness`
+
+## [0.14.7] - 2026-09-25
+
+### Changed
+
+- **Breaking:** `b10x` installs CLIs from the checksummed prebuilt archive by default, not with `cargo`
+- `b10x:init` offers prebuilt first; the product `init` skills, `SETUP.md` and the docs say the same
+
+## [0.14.6] - 2026-09-25
+
+### Changed
+
+- `ess:retrofitting`: `ess infra import openapi` reads OpenAPI 3.0 as well as 3.1
+- Syntax reference: compare two fields through one struct; the flat form is refused
+- `aep:planning` points at the store's refusal of an empty findings fence instead of quoting the old message
+
+### Removed
+
+- `ess:specifying`: the note that the CLI help calls the `system.yaml` layout "legacy" is gone
+
+## [0.14.5] - 2026-09-25
+
+### Changed
+
+- `ess:retrofitting`: a command the code silently ignores in some state gets no `wrong_state:` outcome
+- `worktree:init`: `curl --create-dirs` for the profile; any local file works; headless workspace root
+- `worktree:managing-worktrees`: always pass `--id` to `gc`
+
+## [0.14.4] - 2026-09-25
+
+### Changed
+
+- `ess:specifying`: a second source document goes into the same system, a new system or an external boundary
+- `ess:specifying`: `## Next` starts with the owner reviewing every marker and contradiction, then planning
+- `ess:specifying`: a headless run needs `--allowedTools "Bash(ess:*)"`
+- Syntax reference: a predicate is one comparison or a bare fact path; "state A or B" is two views
+- `ess:retrofitting`: a service that publishes no events declares one per success outcome
+- `worktree:init`: `worktree doctor --check` fails with `no active profile` since worktree 0.7.1
+- `agentplugins-check trial-isolation` fails a run on an outside skill only when the run used it
+
+### Fixed
+
+- `ess:specifying`: never invent an entity so that a command type-checks; markers become questions
+- The docs intro and `b10x skill --help` name the current skills (`init`, `specifying`, …)
+
+### Security
+
+- `SETUP.md` asks the user before it installs `b10x`; product `init` skills install CLIs only after confirmation
+
+## [0.14.3] - 2026-09-25
+
+### Added
+
+- `agentplugins-check trial-isolation` checks a trial loaded only its sandbox's plugins; sandboxes leave `$HOME`
+
+### Changed
+
+- `ess:specifying`: upper-case state names, `ess-inputs.yaml`, `generate --out`, views for entity invariants
+- The syntax reference shows a limit read from stored state, no double booking and ordered time ranges
+- `ess:testing-conformance` explains the built-in targets and `synthesize --target go|typescript`
+- `aep:migrating`: `reverse init` creates the store; a new noun gets its ESS domain before its stories
+- `b10x:init` and `aep:init` offer `ess` with `aep`
+- `worktree:init`: where a profile comes from and goes; `worktree:managing-worktrees`: branch before committing
+- `agentplugins-check tools` also synthesizes and generates the ESS syntax example
+- The README lists every plugin's skills and agents, linked to their files; the gate keeps it exact
+
+### Fixed
+
+- `ess:retrofitting`: `ess infra import openapi` reads OpenAPI 3.1 only; its description named retired skills
+- `aep:planning`: `reverse init` values, body files in the repository, `[]` for empty findings; no `ess skill`
+- The design and parallel-safety critics name the same two remedies for a shared file
+- `b10x:routing` routes ESS and worktree work to their skills instead of to `ess skill`
+- `b10x upgrade` installs the replacement of a legacy plugin it removes
+
+## [0.14.2] - 2026-09-24
+
+### Changed
+
+- A product's `init` skips the install step when its CLI already answers
+- `ess:specifying`'s syntax example is a lending library, not a todo service
+- **Breaking:** `b10x upgrade` updates only what is installed and no longer proposes new plugins
+- Plan output lists the marketplace refresh that `apply` runs, under "Also runs"
+
+### Fixed
+
+- `SETUP.md` creates `~/.cache` before `mktemp` in it; a fresh home has none
+- `b10x:init`'s plan example uses placeholders instead of values an agent can paste unchanged
+
+## [0.14.1] - 2026-09-24
+
+### Fixed
+
+- Publish what 0.14.0 could not: its release smoke test looked for a retired skill name
+
+## [0.14.0] - 2026-09-24
+
+### Added
+
+- `init` and `upgrade` skills on every plugin; `/b10x:init` is guided onboarding
 - `b10x init <products>` and `b10x upgrade [<products>]` plan only the named or installed products
-  and touch nothing else. CLIs install with `cargo` when it is on `PATH`, otherwise from the
-  release's checksummed prebuilt archive; `--method cargo|prebuilt` chooses, and a release without
-  archives falls back to `cargo`. Every CLI is bound to its newest release; `catalog.json` is format
-  `b10x.catalog/2` with both methods and an `intent` phrase per product. Plans end with `Next:` hints.
-- `b10x check` (session start) now says when a CLI is older than the newest release last seen, when
-  that was more than seven days ago, and when no product is set up yet (`/b10x:init`).
-- `ess:specifying` gains `references/syntax.md`: a todo service in three files covering types,
-  entities, relations, lifecycles, actors, errors, commands (created, moved, refused), events, views
-  and a component, validated by `ess specify validate`. `ess:testing-conformance` says why a new
-  domain's suite is all `unsupported`. From trial 1, whose agent had to clone ESS for this.
-- New `agentplugins-check tools` replaces `remote`: it downloads the newest `aep`, `ess` and
-  `worktree` releases, runs every command the skills spell with `--help`, and validates the ESS syntax
-  example (pull requests, `main` pushes, daily). Its first run found `drive.md` spelling a command
-  `aep` does not have. Skills quote no CLI version (the concept check refuses one); nine quotes were
-  removed.
-
-## [0.13.1] — 2026-09-24
-
-From a trial in which an agent given only this repository's link specified a todo service with
-`ess`: it finished with a valid specification, and these were the steps that cost it time.
-
-- New `b10x skill <plugin>` lists an installed plugin's skills and agents, and
-  `b10x skill <plugin>:<skill>` prints one, from Claude Code's recorded install or Codex's cache. A
-  host loads new plugins only in a new session; the session that ran setup reads the skill through
-  this instead of searching the plugin cache. `b10x setup apply` and `SETUP.md` (new step 3) say so.
-- The `b10x:installing` skill plans for the host it runs in (`--host claude` or `--host codex`) and
-  adds the other only when the user uses it; the trial had installed into Codex for a Claude-only
-  task. It writes the plan with `--out` alone, so the full JSON no longer floods the session.
-
-## [0.13.0] — 2026-09-24
-
-- **The plugin concept, enforced.** [`website/docs/structure.md`](website/docs/structure.md) states
-  eight rules (one marketplace; one plugin per product named after its CLI; skills are activities in
-  `-ing` form; each agent owned by one skill that lists it under `## Agents`; references resolve;
-  one README row, plugin page and sidebar entry per plugin). The new `concept` check in
-  `agentplugins-check` refuses a violation; `agentplugins-check remote` lists the renames `ess`
-  and `worktree` still owe.
-- **Breaking:** `aep-plan` and `aep-drive` are one plugin, `aep`, with three skills:
-  `aep:planning`, `aep:migrating` (was `story-migration`) and `aep:implementing` (was `wave`
-  and `drive`, now its two modes), and eleven agents. `b10x setup` replaces `aep-plan` and
-  `aep-drive` installs from any marketplace, at every scope, with one `aep` install.
-- **Breaking:** skills renamed to activities: `b10x:installing` (was `setup`), `b10x:routing`
-  (was `guide`), `b10x:authoring-plugins` (was `plugin-creator`), `connectors:integrating`
-  (was `connectors`). Every old id joins the retired names the gate refuses.
-- `b10x setup undo` refreshes both hosts' marketplaces after restoring settings, so a restored
-  registration whose snapshot `apply` removed works again (Codex failed to list plugins until
-  `codex plugin marketplace upgrade`). A host whose plugin commands fail is reported with its error
-  and the repair command instead of as not installed.
-- README is one paragraph and a table of plugins with the install command for each host; the `b10x`
-  reference moved to its plugin page, eval costs and CI to `evals/README.md`, repository rules to
-  `AGENTS.md`.
-
-## [0.12.0] — 2026-09-24
-
-- **One-sentence onboarding.** Tell an agent to follow
-  `https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md`: it installs the new
-  `b10x` binary, which reads both hosts (`claude`/`codex plugin list --json`, marketplace lists,
-  `~/.codex/config.toml`), every catalog binary on `PATH` and the plugin entries in known projects'
-  settings, and prints findings and exact actions (`b10x setup plan`). The agent asks which products
-  to have and confirms the list; `b10x setup apply` snapshots every file it changes, runs the actions,
-  and re-plans to show the result converged; `b10x setup undo` restores the snapshot.
-- Setup migrates earlier installs: retired plugin ids and marketplaces (`beyond10x`, `ess`,
-  `worktree`) on both hosts and at user, project and local scope, orphan `enabledPlugins` entries
-  whose marketplace is gone, and a `b10x` registration pinned to a ref. It installs `ess` and
-  `worktree` binaries at the version of the plugin that describes them and `aep` at its newest
-  release, from checksummed release archives or `cargo install --git --tag`, into the directory of
-  the copy that runs, and names shadowed copies later on `PATH`.
-- **Breaking:** the front-door plugin `beyond10x` is now `b10x`: skills `b10x:setup` (new),
-  `b10x:guide` (was `beyond10x:beyond10x`) and `b10x:plugin-creator`, plus a SessionStart hook that
-  runs `b10x check` and prints one line per plugin/binary drift or legacy install.
-- **This repository names no version of what it points at.** `ess` and `worktree` are `git-subdir`
-  entries with repository and path only, in both marketplace files; 0.11.0's tag+commit pin on
-  `worktree` is gone. `catalog.json` is version-free. `agentplugins-check` refuses a remote entry
-  with `ref`, `sha` or `version` and a catalog that disagrees with the marketplaces;
-  `agentplugins-check remote` now refuses a product whose default branch serves a plugin version it
-  never released.
-- `ess@b10x` is back in the catalog, pointing at the ESS repository; `ess@ess` installs are migrated.
-- Correction: 0.11.0 said Codex could not install from another repository. Codex marketplaces accept
-  `git-subdir` entries (verified with `worktree` at 0.6.0); both hosts now install `worktree@b10x`
-  and `ess@b10x`.
-- Release archives `b10x-<target>.tar.gz` for four targets, `SHA256SUMS` and `SETUP.md` are published
-  with each release; the names carry no version so `releases/latest/download/…` is stable.
-
-## [0.11.0] — 2026-09-24
-
-- **Breaking:** the marketplace identity is `b10x` in both formats. Installs name plugins as
-  `<plugin>@b10x`. A registration made from an earlier release is named `beyond10x`: remove its
-  plugins and run `/plugin marketplace remove beyond10x` (Claude Code) or
-  `codex plugin marketplace remove beyond10x` (Codex), then register this release.
-- **Breaking:** `workspace-hygiene` is retired. Worktree ships its own plugin, `worktree`, from the
-  `beyond10x/worktree` repository at the version of the `worktree` binary, and the skill
-  `workspace-hygiene:worktree` becomes `worktree:worktree`. The copy here released on its own
-  cadence and had drifted: `workspace-hygiene` 0.10.0 lacked the patch-equivalent recovery-proof
-  guidance Worktree 0.5.0 generates.
-- The Claude Code marketplace lists `worktree` as a `git-subdir` entry pinned to Worktree `0.6.0`
-  and its full commit, carrying no copy. Codex reads `worktree@worktree` from the worktree
-  repository's own marketplace.
-- `agentplugins-check` checks the entry's shape offline. The new `agentplugins-check remote`
-  refuses a commit that is not the tag's, manifests at that commit that declare another version,
-  and a tag that is not the newest Worktree release; `.github/workflows/remote-plugins.yml` runs it
-  on every pull request, `main` push and daily. `workspace-hygiene` joins the retired names.
-- The routing skill, the wave skill, README, install guide and website point at `worktree`; the
-  eval corpus names 4 of 7 skills. Eval checker tests that used `workspace-hygiene` as a fixture
-  use `connectors`.
-
-## [0.10.0] — 2026-09-23
-
-- **Breaking:** `ess-specify` is retired from this marketplace. ESS now ships its own plugin, `ess`,
-  from the `beyond10x/ess` repository at the same version as the `ess` binary, and the binary prints
-  the same skills through `ess skill`. The copy here released on its own cadence and had drifted:
-  `0.9.2` told adopters to install ESS `0.22.1` while ESS was at `0.29.0`. Replace
-  `ess-specify@beyond10x` with `ess@ess` after adding the ESS repository as a marketplace.
-- The `beyond10x` front door and the `aep-plan` planning skill route spec-driven work to `ess:specify`
-  (or `ess skill specify`). `ess-specify` joins the retired names `agentplugins-check` refuses.
-- The eval case `ess-specify-new-entity` is removed; the corpus has eight cases, and
-  `golden-path-end-to-end` no longer names an ESS skill in its subject. Its step 3 still drafts and
-  validates an ESS domain.
-- Workspace, every plugin manifest, the three version-stamped skills and every install pin move to
-  `0.10.0`.
-
-## [0.9.3] — 2026-09-18
-
-- New skill `ess-specify:coverage`. It covers the half of ESS work `specify` does not: raising and
-  auditing a conformance suite's coverage against a real implementation, and judging whether a
-  passing suite is testing anything. Drafted from one measured engagement in which a suite with 156
-  passing scenarios was not exercising the mapping those scenarios existed to check — changing the
-  implementation so an upstream state folded onto the wrong internal state moved no verdict at all.
-  The skill leads with that: break the behaviour and watch a named scenario go red, before trusting
-  any count.
-- It carries four things the same engagement paid for. Skips are ranked from the target's own
-  refusal reasons and never by construct — a construct ranking was wrong about every cause, naming
-  an enum table as the largest block where measurement found zero enum skips and one unrelated
-  cause at 60%. A double's payload is grounded in what the producer emits rather than what the
-  consumer's parser accepts, because a parser ignores unknown keys and a two-key fake proves
-  nothing. A counts ratchet floors `answered` rather than `passed`, so a flapping scenario cannot
-  fail a gate while nothing has regressed. And `-race` is named as the reproducer for a CI-only
-  timing failure where a container CPU limit is not, because the detector slows every operation
-  uniformly while a CPU limit still allows a full-speed burst.
-- `ess-specify`'s manifests, the `README.md` boundary line and the eval-coverage counts follow: 10
-  skills rather than 9, with `ess-specify:coverage` listed among the uncovered ones.
-- New agent `aep-drive:security-reviewer`. It performs the same independent verification the
-  existing reviewer does — a failing conformance test for every invariant that is not yet enforced,
-  the same `CONFIRMED`/`NEEDS-CHANGE`/`INFEASIBLE` verdicts, the same origin axis, the same
-  `findings` block and report shape, so a coordinator can dispatch it wherever it dispatches a
-  review. It differs only in framing: it states the work as defensive verification of a change's own
-  invariants, without combative language, so a review of privileged, integrity- or
-  boundary-sensitive code is not misread as an exploit by a platform safety classifier and killed
-  before it runs. The existing adversary agent is unchanged.
-
-
-## [0.9.2] — 2026-09-15
-
-- The `connectors` skill and `website/docs/plugins/connectors.md` link the last v1 release,
-  `v0.7.2`, state the `0.7.x` surface these instructions drive, and say that
-  `beyond10x/connectors`' default branch and *Latest* release are the connectors_v2 lineage per
-  atlas ADR 0051 (accepted 2026-09-15). The released `0.9.1` skill still links the repository's
-  generic releases page, whose *Latest* is the v2 CLI this skill does not drive.
-- Eval coverage is counted from the `evals/*/case.yaml` `subject:` fields — 7 of 10 agents and 5
-  of 9 skills — in `README.md` and `evals/README.md`, and the seven uncovered ids are named as
-  `story:plugin-eval-cases`'s remaining scope.
-- `README.md` and the install page name the Metaharness↔AEP pin as read from
-  `crates/metaharness-aep/Cargo.toml` rather than assumed to match the `aep` on `PATH`.
-- The `inspect` upgrade check arrived at Connectors `v0.7.2`; the earlier "0.7.1 has none" claim
-  is corrected.
-
-## [0.9.1] — 2026-09-10
-
-- Pin ESS `0.22.1` instead of `0.20.0`. ESS `0.22.0` had no archives because its own release gate
-  was red at the tag; `0.22.1` is the release cut with that gate green and its `Release` run
-  publishing the four archives and `SHA256SUMS`. The install page, the README and the expected
-  `ess --version` line follow.
-- The ESS skill's example is re-validated on ESS `0.22.1` — the same line, `warehouse v1 — 2
-  file(s), valid`, exit 0 — and its `--path` paragraph no longer has to distinguish the pinned
-  release from `ess-inputs.yaml`, which the pinned release reads.
-- Align the golden path's model-driving command with Metaharness and label its older recorded
-  CLI output separately from current installation requirements.
-- Unlike `0.9.0`, this release ran `task check` and `task site-build` on the tagged tree.
-
-## [0.9.0] — 2026-09-10
-
-- Align installation guidance on AEP `0.55.0` and ESS `0.20.0`, both with published native
-  archives. Keep ESS `0.22.0` out of the download instructions while its archives are unavailable.
-- Use Metaharness `0.7.0` for governed model runs through `metaharness aep drive`. Supply the
-  separate planning executable with `--aep-binary`, preserve plugin and budget inputs, and
-  require the explicit `METAHARNESS_LIVE=1` opt-in.
-- Bring the planning skill's command inventory up to AEP `0.55.0`, including `waves`, `findings`,
-  `review-value`, `set` and `scope`. Explain conformance report ingestion through
-  `evidence --from`, report/2 suite binding, model digests and specification lifecycle states.
-- Document ESS conformance synthesis, execution and evidence ingestion. Distinguish the pinned
-  ESS `0.20.0` system-file layout from `ess-inputs.yaml`, introduced in `0.21.0`.
-- Update example crate paths for AEP's area-based layout and keep both plugin manifests and
-  current installation pins aligned at `0.9.0`.
-- Publish source through standalone bot tooling without an Atlas checkout or organization
-  admission requirement. Repository correctness and release checks remain repository-owned.
-
-Historical walkthrough and paid-evaluation pins remain attached to their original recordings.
-This source release was cut without running gates, tests, live evaluations or binary packaging,
-at the operator's request. Earlier preparation evidence remains in the planning record.
-
-## [0.8.1] — 2026-09-07
-
-- Regenerate Workspace Hygiene from Worktree 0.4.0: native storage inspection, explicit lease
-  maintenance when hooks are absent, own-lease release before finish, bounded disposable
-  storage, retained evidence and verified cleanup or an owned handoff.
-- Upgrade Connectors guidance to the released 0.7.1 surface: explicit local/hosted targets,
-  exact operation protocols, daemon-free bounded calls, pagination, restriction metadata,
-  rate-limit handling and CLI/daemon upgrade checks.
-- Refresh current marketplace installation pins to 0.8.1 and Worktree installation to 0.4.0.
-- Route wave creation and retirement through the Worktree skill and CLI; give coordinators,
-  implementors and adversaries explicit lease duties, preserve evidence before cleanup and
-  restrict branch deletion to the exact wave record.
-
-## [0.8.0] — 2026-09-05
-
-- Fix Connector readiness evaluation for Claude `Bash`/`command` and Codex
-  `exec_command`/`cmd` traces. A shared Rust command checker runs alongside AEP's session checks
-  in replay and live CI; parsed help commands no longer count as mutations. Regression cases
-  reject real mutations, missing doctor evidence, and mutations chained after help.
-- Publish the connectors plugin in the release-pinned installation guides for both hosts.
-- Repair YAML quoting in the ESS skill description so every released plugin validates.
-
-- Add the focused `connectors` plugin to both marketplaces, with one shared skill for the
-  Connectors 0.6.0 CLI, secret-safe onboarding, readiness diagnostics, and governed operation
-  invocation. Include host installation guidance and a readiness eval case.
-
-- **The planning skill says how to take an edge back.** AEP 0.53.0 adds
-  `aep plan artifact unrelate <id> <relation> <target>`, and the skill now names it in the write-verb
-  list, in guardrail 2, in the mutation-ownership table and in the renaming paragraph. Until this
-  landed the skill described a store where a relation could be added and never removed, so a session
-  that made a backwards `blocks` edge had nowhere to put the correction but the artifact's body —
-  which is what a recorded run did on 2026-09-04. A refusal naming `unrelate` as an unknown verb now
-  means the installed CLI predates 0.53.0, and the skill says so.
-
-- Every authored document teaches the **grouped** CLI spelling. AEP 0.52.0 replaced a flat first
-  level of twenty-three verbs with four areas plus `doctor`, and ESS 0.12.0 replaced twenty with
-  four;
-  both keep every flat spelling as a hidden alias with identical stdout, stderr and exit status, so
-  **nothing here was broken and nothing is fixed** — what changes is what a skill, a charter, a
-  reference, a page and an eval case teach a reader to type.
-
-  | was | is |
-  |---|---|
-  | `aep validate resolve inspect evaluate explain describe schema workflow` | `aep govern <verb>` |
-  | `aep artifact serve entity audit workspace conformance reverse` | `aep plan <verb>` |
-  | `aep eval {matrix,run}` | `aep drive eval {matrix,run}` |
-  | `aep trace contract property specification evidence` | `aep observe <verb>` |
-  | `ess validate compile compose inspect graph realization runtime` | `ess specify <verb>` |
-  | `ess synthesize project schema build release stack deployment` | `ess generate <verb>` |
-  | `ess conform diff impact` | `ess verify <verb>` |
-  | `ess import` | `ess infra import` |
-
-  `aep drive run|status|resume|transition`, `aep doctor` and `ess generate --path …` are what they
-  were: those verbs did not move. The `protocol` spelling follows `aep`'s, since they are two names
-  for one binary.
-
-- The eval corpus's command matchers **accept either spelling** rather than moving to the grouped
-  one. `'(aep|protocol) artifact +move'` is now `'(aep|protocol) +(plan +)?artifact +move'`: the
-  committed transcript of `golden-path-end-to-end` was recorded under the flat spelling and a row
-  that stopped matching it would be a specification describing a run other than the one recorded,
-  while a row that only matched the flat spelling would report `never_occurred` against the next
-  recording made by an agent reading the migrated skills. Widening witnesses a claim; it does not
-  widen one. The same holds for the `tool.absent` row in `adversary-tests-only`, where accepting
-  both spellings is what keeps *"no `artifact` command ran"* from being satisfiable by typing the
-  other one.
-
-- `agentplugins-check` refuses a flat spelling in any `.md`, `.yaml` or `.yml` this repository
-  authors, rather than leaving `AGENTS.md` § *Invariants* to a person remembering to grep. Sweeping
-  the tree found 360 of them across 47 files, five of which were in a file no hand list had — the
-  paid eval workflow.
-
-  The sweep exempts four prefixes, each visible in a diff:
-
-  | exempt | why |
-  |---|---|
-  | `CHANGELOG.md` | what a command *was* called |
-  | `changes/` | a dated record, written on the day |
-  | `.engineering/` | the planning store, whose only writer is the `aep` CLI |
-  | `.github/workflows/` | a program, not a lesson: `eval.yml` pins `AEP_VERSION: '0.44.0'`, so its spelling has to be the surface that version has |
-
-  Rust sources are not swept for the same reason as the last row: `evals.rs` spawns
-  `aep eval run --stream` against whichever binary is on `PATH`, and that call is a call.
-
-- The install page pins **AEP 0.52.0** and **ESS 0.13.1**, the latest published release of each, and
-  the versions whose `--version` lines it quotes. The grouped spelling the pages now teach exists in
-  AEP from 0.52.0 and in ESS from 0.12.0; the previous pins (0.51.0 and 0.11.1) have neither.
-
-## [0.7.0] — 2026-09-04
-
-- Every product plugin now carries its product's name and the verb it performs. `aep-planning`
-  becomes `aep-plan`, `adp` becomes `aep-drive`, and `ess-schema` becomes `ess-specify` with its
-  skill directory and frontmatter name both `specify`. The other two plugins, `beyond10x` and
-  `workspace-hygiene`, keep their names, and so do the skill directories `planning`,
-  `story-migration`, `drive`, `wave`, `beyond10x`, `plugin-creator` and `worktree`.
-
-  | old | new |
-  |---|---|
-  | `aep-planning:planning` | `aep-plan:planning` |
-  | `aep-planning:story-migration` | `aep-plan:story-migration` |
-  | `aep-planning:decomposer` | `aep-plan:decomposer` |
-  | `aep-planning:plan-reviewer` | `aep-plan:plan-reviewer` |
-  | `aep-planning:reverse-engineer` | `aep-plan:reverse-engineer` |
-  | `aep-planning:plan-critic-acceptance` | `aep-plan:plan-critic-acceptance` |
-  | `aep-planning:plan-critic-design` | `aep-plan:plan-critic-design` |
-  | `aep-planning:plan-critic-scope` | `aep-plan:plan-critic-scope` |
-  | `aep-planning:plan-critic-parallel-safety` | `aep-plan:plan-critic-parallel-safety` |
-  | `adp:drive` | `aep-drive:drive` |
-  | `adp:wave` | `aep-drive:wave` |
-  | `adp:story-scoper` | `aep-drive:story-scoper` |
-  | `adp:implementor` | `aep-drive:implementor` |
-  | `adp:adversary` | `aep-drive:adversary` |
-  | `ess-schema:ess-schema` | `ess-specify:specify` |
-
-  Reinstall under the new names: the marketplace no longer offers the old ones. The workflow id
-  `adp/default` and the protocol id `adp/1` are unchanged — they name the AEP development profile,
-  which this rename does not reach.
-- `agentplugins-check` refuses a retired plugin name anywhere this repository authors — in a file's
-  text, and in where the file sits — rather than leaving `AGENTS.md` § *Invariants* to a person
-  remembering to grep. The path half is what an incomplete `git mv` leaves: a segment equal to a
-  retired name under `plugins/`, `website/docs/plugins/` or `evals/` is refused even when the file's
-  own text spells nothing.
-
-  The sweep exempts exactly seven things, each visible in a diff:
-
-  | exempt | why |
-  |---|---|
-  | `CHANGELOG.md` | records what the names were |
-  | `changes/` | dated change records, written on the day |
-  | `.engineering/` | the planning store, whose only writer is the `aep` CLI |
-  | `evals/*/recorded/` | a transcript, its manifest and the README that produced them are evidence of a run under the old names |
-  | `crates/agentplugins-check/src/main.rs` | has to spell what it forbids: the `RETIRED` table, the matcher's doc and its rule tests. Every plugin name in it is one `plugin`, `marketplace` or `critic_pins` resolves against the tree |
-  | `adp/…` | the wire ids `adp/1` and `adp/default`, unless a `/` in front makes it a path into the plugin directory |
-  | a line marked `# recorded-under-this-name` | **only** in `evals/*/expectations.trace.yaml`, where a transcript sits beside the row. The marker excuses nothing in a README, an install block or a manifest |
-
-  `.git/`, `target/` and `node_modules/` are not exemptions; they are not authored files and are
-  never walked.
-- A replay is judged by the report it writes and no longer by its exit status. Measured on
-  aep 0.44.0: `aep eval run --stream` prints *"not conformant: the run contradicted 2
-  expectation(s) … (exit 1)"* and exits **0**, so the gate reported *"1 recorded transcript(s)
-  replayed"* over a corpus that contradicted its own recording. On `protocol 0.50.0` the same
-  fail-open has a second word: a gating row nothing in the transcript can decide prints
-  *"undecided … (exit 3)"*, exits **0**, and is left at `verdict: "unknown"` — so reading only `gap`
-  would have closed one half. The gate now refuses any report whose document `verdict` is not `ok`,
-  which is `aep`'s own arithmetic over severity and `on_unknown:`, and refuses any report that does
-  not claim `trace-report/1` or states no verdict at all.
-- Five `env.*_available` rows in `golden-path-end-to-end` keep the plugin names of 2026-09-03,
-  because they state what the recorded harness listed and that recording predates the rename.
-  Renaming them was measured on that stream — 27 of 27 rows `ok` before, 22 of 27 after, two of them
-  gating — so each carries `recorded-under-this-name` and moves when the case is re-recorded.
-- The eval case `ess-schema-new-entity` is now `ess-specify-new-entity`, and the website's plugin
-  reference pages are `plugins/aep-plan`, `plugins/aep-drive` and `plugins/ess-specify`.
-
-## [0.6.2] — 2026-09-03
-
-- Require non-trivial cross-repository and release/deployment work to enter the owning AEP store
-  before implementation continues, and route such work through the planning specialist from the
-  Beyond10x front door.
-- Publish exact Codex CLI commands for a fresh release-pinned install and for replacing a stale
-  immutable marketplace pin, installing and enabling all five focused plugins.
-- Refresh the adopter binary guidance to ESS 0.9.2 and align every plugin manifest and shared skill
-  version with this release.
-
-## [0.6.1] — 2026-09-03
-
-- The golden-path case's step 1 names the protocol source the page names,
-  `git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45`, instead of "the
-  source the project pins". The second headless recording found no pin — the fixture has no
-  `.engineering/` by design — walked the filesystem for one and adopted with a relative path into
-  another checkout.
-- Two golden-path rows stop contradicting a correct run. `nothing-was-published` matches the write
-  forms of `git tag` only (a name, `-a`, `-s`, `-f`, `-m`); the bare listing `git tag` in a step-1
-  repository inspection took the row to `gap`. `nothing-was-promoted-before-the-blocker-was-filed`
-  spells out the rungs that schedule work — `--to proposed|active|implemented` — so archiving two
-  probe artifacts no longer reads as a promotion.
-- The golden-path cost row and the documented invocation say `15`, not the corpus's `5`: the second
-  recording walked all eight steps in 118 turns and stated $10.96 on the default model. The
-  invocation also carries the two `--plugin` pins the case needs, and `recorded/README.md` names the
-  two things the second recording showed the *child's* `PATH` must hold: the `aep` at `~/.local/bin`
-  is the one the run uses, and `ess` has to be there too.
-- `.github/workflows/eval.yml` installs the pinned `aep` into `$HOME/.local/bin` as well: the
-  session metaharness spawns runs on a constructed `PATH` that never held the `~/.cargo/bin` copy, so
-  every case task that ran `aep` in CI was running nothing.
-- The planning skill's guardrail 2 gains two corollaries from that recording: never create an
-  artifact to look at its template (a probe you archive is still a lifecycle move), and a body file
-  for `--from` goes under `$TMPDIR`, never a hard-coded `/tmp`.
-
-## [0.6.0] — 2026-09-03
-
-- Rename the ESS skill's directory from `skills/schema-validation` to `skills/ess-schema`, its frontmatter name: the harness lists a skill by its directory and the eval rows and `agentplugins-check` resolve by the frontmatter name, so the first recording showed the skill offered and called on turn 1 while the row said it was not. The invocation is now `/ess-schema:ess-schema`.
-- Give the planning and wave skills a non-interactive rule. Where the task says to run without
-  stopping or no operator is present, or the harness gives no operator turn at all, the skill no
-  longer ends its turn at a stop: it records one `approval-record` through `aep artifact new` —
-  tagged `non-interactive`, naming the stop, what was decided in the operator's absence and what the
-  operator would have been asked — and continues. The kind is the store's own and both commands that
-  settle it are named, so a store that spells it differently is answered by the CLI rather than by
-  the skill. A bypass covers the **asking** and nothing else: a move whose evidence does not exist is
-  still refused, an open `decision-blocker` is never moved to `cleared`, a red unit still leaves the
-  wave, a gate that is not green is still not green, and the release stop is not bypassable. Nothing
-  is auto-approved silently — every bypass is an artifact `aep artifact list --kind approval-record`
-  returns.
-- Add § *Running it without an operator* to the golden path: the exact instruction to put in front of
-  step 1, a table of what is recorded at each of the page's five stops, and the four things a
-  headless run cannot do — clear a blocker, publish, release, or turn a refusal into a pass.
-- Point the `golden-path-end-to-end` case's task at that instruction, verbatim, and give it five
-  rows about the records it produces: an `approval-record` per stop created through the CLI with a
-  body, the `non-interactive` tag that makes them findable, a per-stop count rather than one closing
-  summary, and the two prohibitions. Its first headless run — 2026-09-03, $0.80, 173 events — adopted
-  and scanned the repository and ended after step 1 with ten rows gapped and seven held; nothing it
-  did was wrong, and `recorded/README.md` now says so beside what a recorded stream should contain.
-- Have the decomposer return its unanswerable questions rather than hold a turn open for them: an
-  unresolved epic id and a `requires-stakeholder-input` relation are both reported and returned, with
-  the blocker filed and everything not behind it drafted.
-- Fix `the-scope-was-actually-tested`, which gapped in all eight eval cases on their first live
-  recording (2026-09-03) without one of the eight runs doing anything wrong. It asserted
-  `permission.denied: {at_least: 1}` against a seam that observes and never adjudicates — every
-  `session.started` records `permission_mode: default` and every `tool.decided` reads
-  `decision: allow`, `decided_by: observe` — and it contradicted `nothing-was-refused` directly below
-  it, which asserts `{at_most: 0}` over the same quantity. The row now selects **what the run
-  touched**, one surface per case, in `trace-spec/1`'s neutral `operations:`/`subject:` selector.
-  Re-checked offline against the eight recordings the gap counts go 2→1, 1→0, 2→1, 10→9 and 1→0 four
-  times, with exactly one row's verdict moving in each. `evals/README.md` § *A control has to be able
-  to pass* carries the argument, including why a subject glob is anchored with a leading `*` rather
-  than written relative to the case's `--cwd`.
-- State the adversary's authoring order where its charter lists its steps, and again in its report
-  format: the failing case is written and its red output captured **before** the suite is run. The
-  first recording of `adversary-tests-only` ran `task check` and wrote the case afterwards, which the
-  charter's own `cases: executed <before>→<after>` line invited; hard rule 3 now names the two honest
-  sources of `<before>` and refuses a pre-emptive suite run.
-- Sharpen the `ess-schema` trigger: an entity introduction names the noun *and* something typed about
-  it — an identifier, a field, or a relation to another noun — and a repository with no `system.yaml`
-  anywhere is called out as in scope rather than left to be read into "whether or not a specification
-  exists yet". The 0.4.0 widening is kept verbatim; the added sentences exclude the planning prose
-  that merely mentions a noun.
-- Record what the first recording actually settled about `the-skill-was-offered`, which is not what
-  it looked like: the harness lists the ESS skill by its **directory**,
-  `ess-schema:schema-validation`, while the case asserts the frontmatter name, `ess-schema:ess-schema`.
-  The skill was offered and the run invoked it as its first tool call, so what gaps is the spelling —
-  not the trigger and not the run. Closing it means either renaming the skill directory or re-spelling
-  the row against what `agentplugins-check` resolves, and neither is taken here.
-
-## [0.5.1] — 2026-09-03
-
-- Correct the adopter path to install and verify the current AEP and ESS release binaries, pin the
-  Claude Code marketplace source to this immutable release, reload installed plugins, and state
-  that `ess-schema` requires the `ess` CLI.
-- Re-record the eight-step golden path against AEP 0.44.0 and ESS 0.5.1 now that ESS validates
-  entity relations, and keep its behavioural eval aligned with all eight published prompts.
-
-## [0.5.0] — 2026-09-03
-
-- Add `evals/`: one `eval-case/1` per agent and per user-facing skill — the four plan critics, the
-  decomposer's relation census, `ess-schema` on a new entity, the published golden path end to end,
-  and the wave's adversary — each judged by its own `trace-spec/1` document and run by
-  `aep eval run --corpus evals`. Every row is about what a run did; none greps the agent's markdown,
-  because a check that asserts a sentence is still written is the thing a behavioural case replaces.
-- Record no transcript and synthesize none. Each case's `recorded/` carries a README naming the live
-  command that would fill it, its budget, and what the working tree has to hold for the case to
-  measure anything. The two existing transcript sets were checked and neither fits: `aep`'s
-  conformance corpus states that its files are structurally faithful and not observed, and
-  `aep eval run --stream` refuses them besides (`EVAL-STREAM-004`); `metaharness`'s check inputs are
-  stated to be hand-written.
-- Teach `agentplugins-check` the corpus, in a module of its own: every case's `id` is its directory
-  name, its expectations document parses and declares one kind per expectation, and its `subject:`
-  resolves to an agent or a skill this repository actually ships — read from the file's own
-  frontmatter, not from its directory, because `ess-schema`'s skill directory and declared name
-  differ. `task check` gains it for free; `task evals` runs that half alone.
-- Replay whatever transcripts exist with `aep eval run --stream`, which spends nothing. An empty
-  `recorded/`, and a machine with no `aep` on `PATH`, are printed notices and never a red gate — the
-  same position the runner itself takes on a missing `metaharness`. A recorded stream without the run
-  manifest beside it *is* refused: a transcript with no observation date cannot be replayed into a
-  document that reproduces.
-- Add `.github/workflows/eval.yml`: the live arm runs only with the `run-eval` label or a manual
-  dispatch, only for the cases whose subject the diff touched, under `EVAL_BUDGET_USD` (default 20).
-  A run needing more than the budget is refused **before a tool is installed**, with the four numbers
-  that decided it in the check summary, and the `aep eval matrix` table is posted as the job summary.
-  The credential is the organization bot's and is refused by name when absent; a personal key is
-  never a substitute.
-- Add `README.md` § Evals with the arithmetic: 8 cases at a $5 per-case cap is $40 for one full live
-  run of one arm on one harness, against a $20 default budget — so a full sweep does not fit its own
-  default and is refused rather than silently truncated. What fits is the diff-scoped run a pull
-  request touching one agent actually selects.
-- Pin the four plan critics: `model: sonnet` and `effort: high` in the frontmatter of every
-  `plan-critic-*.md`, refused by `agentplugins-check` when either is missing. The rubric states the
-  pin and states that it is a **default** — the pairing the compared third-party panel uses, adopted
-  so the cost is written down while no local measurement exists — expected to change once there is a
-  review-value table to read. The decomposer, adversary and implementor stay unpinned.
-- Have the wave select on `aep artifact waves` rather than on its own reading of the pairs: the
-  selection step runs the verb first and pastes its waves, collisions and unassessed lists into the
-  proposal verbatim, dispatches a scoper for every unassessed story before proposing, and falls back
-  to the pairwise prose reading only on `unrecognized subcommand` — saying so, with the version. A
-  new *Failure modes* section decides the case the two paths will hit most: **the verb wins, and the
-  disagreement is reported**, because the verb reads a record anybody can re-read and the prose
-  reading is one agent's inference that will not survive the session.
-- Write a story's scope twice — the `## Scope` section for a person, and `aep artifact scope --add`
-  entries for the store, carrying the same `cited`/`inferred` mark. A prose section alone leaves the
-  next wave re-deriving what this one established.
-- Record what became of every review finding. The critic step writes one `review_outcome` per
-  finding after a revision round (`fixed`, `no-op`, `escalated`), and the wave writes one as it takes
-  each row of the adversary route table — the outcome is the row it took, not an opinion of the
-  finding. Both say what to do on a binary that refuses the kind: put the counts in the report,
-  never hand-edit a store file.
-- Have the critic rubric and the adversary close their reports with a fenced ` ```findings ` block —
-  the same findings as the prose, with `file`, `line`, `category`, `severity`, `verdict`, `origin`
-  and `message` — so a later pass is compared by signature instead of by re-reading two reports. The
-  wave records each adversary pass as a `review-result` holding that block, and before deciding on a
-  third attack it runs `aep artifact findings` and pastes the carried, new and resolved lists.
-- Require a domain relation to be a `relations:` entry in an `ess/1` document. `ess-schema`'s minimal
-  document carries one `owns` relation and its refusal list gains the three that come with it — an
-  unknown target, a missing or mistyped `via`, a second owner — with `via` on the target for `owns`
-  and on the source for `references`. Guardrail 7 says the same, and adds that a relation whose
-  cardinality is unknown is an `UNMAPPED:` marker rather than an entry with a guessed value.
-- Require the decomposer's `inferable` citation for a relation to point at an `ess/1` document. A
-  `path:line` into code is admissible only when the classification carries the word `inferred`,
-  because a foreign key says what one implementation currently does and nothing about whether anybody
-  decided it; the relation census now reports the split.
-- Add step 3 to the golden path — model the new noun before decomposing it — carrying the `owns`
-  relation between account and commercial client, with the delete behaviour left `UNMAPPED:`. That
-  narrows the page's open question from three answers to two before the blocker is filed. Its
-  document block is marked as **recorded before ESS shipped relations**, to be re-recorded when the
-  construct lands, rather than showing output nobody produced.
-- Add a `drive` skill to `adp`: `/drive <story-id>` runs `aep doctor` and stops on a `fail`, points
-  `aep drive run` at the task document naming the story, launches it against the project's step map
-  with a budget the operator states, and prints the run id. Each `llm` step's session is spawned by
-  the driver through `metaharness run claude` into metaharness's own hermetic scratch home; where
-  that nested launch is refused or unsupported the skill prints the exact terminal command instead
-  and stops, rather than working around it. It moves no artifact, relays refusals verbatim, and says
-  plainly that the walk has not reached `complete` on the `aep` side — two recorded runs stopped at
-  `establish_verifiers` and `adversarial_verify` — so a driven run today is an experiment with a
-  known cost. `aep drive watch` does not exist yet, so it prints the `scripts/drive-watch` path the
-  `aep` repository documents. The golden path gains it as a final step.
-
-## [0.4.0] — 2026-09-02
-
-- Give `website/docs/install.md` and `README.md` one copy-paste install block — `/plugin marketplace
-  add beyond10x/agentplugins` plus `aep-planning`, `adp` and `ess-schema` — and say before it that
-  the planning and development plugins do nothing until the `aep` binary from the `beyond10x/aep`
-  releases is on `PATH`, checked with `aep --version`.
-- Add a golden-path page to the site: one recorded run from a feature idea to a critiqued plan on a
-  repository that already exists, with the prompts to paste and every CLI block produced by running
-  it under `aep` 0.41.0. The worked CRUD example shows the decomposer filing a `decision-blocker`
-  with a `blocks` edge for the one entity relation nobody had decided, rather than drafting stories
-  around it; the front door's resource list names the page.
-- Teach the `decomposer` agent to enumerate the epic's domain relations before drafting any story:
-  each is classified `inferable` — with the `path:line` or artifact that settles it, written into the
-  story body — or `requires-stakeholder-input`, which becomes a `decision-blocker` with a `blocks`
-  edge and no story, so an undecided relation reaches the operator as a question instead of a plan
-  that improvised the answer.
-- Add a plan-time critic panel to `aep-planning`: four read-only critics (acceptance, design, scope,
-  parallel safety) argue with a decomposition before an operator reads it, each verdict recorded as
-  an immutable `review-result` through `new --from`, revisions bounded at two rounds with open
-  findings reported. The plugin validator now requires the four critics and their rubric.
-- Add a domain-first guardrail to the planning skill: an epic or story that introduces a new noun
-  models it as an `ess/1` document (or imports one with `aep reverse openapi`) before stories are
-  written around it, with every unread relation marked `UNMAPPED:` rather than guessed.
-- Widen `ess-schema` to fire when a story or epic introduces an entity, and say how to start a
-  domain from nothing: the minimal `ess/1` document that `ess validate` accepts, the three refusals
-  that shape it, and the `UNMAPPED:` marker.
-- Adopt a planning store of this repository's own under `.engineering/`, pinned to the `aep`
-  protocol tree at its 0.41.0 commit; the epic and stories behind this release are its first entries.
-- Author the planning skill's first-store instruction as `aep artifact list`; `protocol` was the
-  one remaining authored spelling.
-
-## [0.3.7] — 2026-09-02
-
-- Correct `story-migration`: a re-run does not replay, it is **refused**. 0.3.6 said the create
-  command's idempotency key made an identical migration replay; running one against a real store
-  showed the create rejected with `already exists at <path>`. Equally safe, different mechanism —
-  and the sentence as written told a reader to expect a write that never happens. The refusal is now
-  quoted, with the exit code to expect and the two things to check on the second run.
-- Teach both skills AEP's `refs:` field, released in AEP 0.41.0. A ticket id found in a legacy file
-  becomes `--ref jira:EX-1` in frontmatter rather than only a line of prose, so
-  `aep artifact list --ref jira:EX-1` answers *what, here, is this ticket*; the URL is configured
-  once in `.engineering/project.yaml` instead of copied into every artifact.
-- Correct the version line in `planning` and `adp/wave`: both claimed 0.3.3 while their manifests
-  had moved on.
-
-## [0.3.6] — 2026-09-02
-
-- Add the `story-migration` skill to `aep-planning`: migrate a repository's existing story tree,
-  `TODO.md`, plan and issue documents into the planning store without deleting or rewriting the
-  sources, and backlink both directions so no repository ends up with two plans.
-- Retain each source's dates in the migrated artifact's body, read from git rather than from
-  filesystem mtime, because AEP frontmatter carries no timestamp field and a fresh checkout would
-  date every artifact to the day the migration ran.
-- Point `planning` § 5 at it, so adoption in a repository that already tracks work does not start
-  by hand-writing a second backlog.
-
-## [0.3.5] — 2026-09-02
-
-- Refresh the generated `worktree` skill so it records that `gc --repo` selects the activated
-  workspace profile rather than the repository, that its dry-run therefore lists trees belonging
-  to other repositories, and that `status` accepts no filter at all.
-- Pin the public installation guidance to the matching Worktree 0.3.2 release.
-
-## [0.3.4] — 2026-09-02
-
-- Pin the documentation redirect façade to the 21-source Website verifier runtime.
-
-## [0.3.3] — 2026-09-02
-
-- Refresh the generated `worktree` skill for the guarded recovery of finished external legacy
-  trees stranded by stale pre-0.3 relocation intent.
-- Pin the public installation guidance to the matching Worktree 0.3.1 safety release.
-
-## [0.3.2] — 2026-09-02
-
-- Refresh the generated `worktree` skill for review-bound cleanup, durable removal recovery,
-  interrupted-provisioning reconciliation, and explicit legacy-tree handling.
-- Pin the public installation guidance to the matching Worktree 0.3.0 safety release.
-
-## [0.3.1] — 2026-09-01
-
-- Make GitHub release publication idempotent so rerunning a successful tag publication preserves
-  the existing release instead of leaving a false-red workflow.
-
-## [0.3.0] — 2026-09-01
-
-- Add the `workspace-hygiene` plugin with the `worktree` CLI-generated skill for consistent,
-  recoverable Git worktree lifecycle across agent hosts.
-- Document installation and the separation between lifecycle guidance and the standalone public
-  Rust toolchain.
-
-## [0.2.0] — 2026-09-01
-
-- Add the `beyond10x` front-door plugin for marketplace routing, public resource discovery, and
-  portable Codex and Claude Code plugin creation.
-
-## [0.1.1] — 2026-09-01
-
-- Correct the marketplace documentation relationship to the public AEP Service documentation
-  surface.
-
-## [0.1.0] — 2026-09-01
-
-- Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins.
-- Publish adopter documentation for discovering, selecting, and installing each plugin.
+- `ess:specifying` gains `references/syntax.md`, a validated todo service in three files
+- **Breaking:** `agentplugins-check tools` replaces `remote`; checks spelled commands against the newest releases
+
+### Changed
+
+- Every plugin lives here: `ess` and `worktree` join `plugins/` at this repository's version
+- **Breaking:** Skills renamed under R3: `b10x:init`, `ess:init`, `ess:specifying`, `ess:retrofitting` and others
+- `b10x check` says when a CLI is older than the newest release and when no product is set up
+
+## [0.13.1] - 2026-09-24
+
+### Added
+
+- `b10x skill <plugin>` lists an installed plugin's skills and agents; `b10x skill <plugin>:<skill>` prints one
+
+### Fixed
+
+- `b10x:installing` plans for the host it runs in and writes the plan with `--out` alone
+
+## [0.13.0] - 2026-09-24
+
+### Added
+
+- The plugin concept, enforced: `website/docs/structure.md` states eight rules the `concept` check refuses
+
+### Changed
+
+- **Breaking:** `aep-plan` and `aep-drive` are one plugin, `aep`, with three skills and eleven agents
+- **Breaking:** Skills renamed to activities, e.g. `b10x:routing` (was `guide`); old ids are retired names
+- README is one paragraph and a table of plugins; the reference moved to the plugin pages
+
+### Fixed
+
+- `b10x setup undo` refreshes both hosts' marketplaces after restoring settings
+
+## [0.12.0] - 2026-09-24
+
+### Added
+
+- `b10x setup plan`, `apply` and `undo`: one-sentence onboarding through `SETUP.md`
+- Setup migrates earlier installs, retired plugin ids and marketplaces on both hosts and every scope
+- Release archives for four targets, `SHA256SUMS` and `SETUP.md` are published with each release
+
+### Changed
+
+- **Breaking:** The front-door plugin `beyond10x` is now `b10x`, with a SessionStart hook that runs `b10x check`
+- This repository names no version of what it points at; `agentplugins-check` refuses a pinned remote entry
+- `ess@b10x` is back in the catalog, pointing at the ESS repository; `ess@ess` installs are migrated
+
+### Fixed
+
+- Correction: Codex accepts `git-subdir` entries, so both hosts install `worktree@b10x` and `ess@b10x`
+
+## [0.11.0] - 2026-09-24
+
+### Added
+
+- `agentplugins-check remote` checks the remote entry's tag and commit on every pull request and daily
+
+### Changed
+
+- **Breaking:** The marketplace identity is `b10x` in both formats; plugins install as `<plugin>@b10x`
+- The Claude Code marketplace lists `worktree` as a `git-subdir` entry pinned to Worktree 0.6.0
+- The routing skill, the wave skill, README, install guide and website point at `worktree`
+
+### Removed
+
+- **Breaking:** `workspace-hygiene` is retired; Worktree ships its own plugin, `worktree`
+
+## [0.10.0] - 2026-09-23
+
+### Changed
+
+- The front door and the planning skill route spec-driven work to `ess:specify`
+- Workspace, every plugin manifest, the three version-stamped skills and every install pin move to 0.10.0
+
+### Removed
+
+- **Breaking:** `ess-specify` is retired from this marketplace; ESS ships its own plugin, `ess`
+- The eval case `ess-specify-new-entity` is removed; the corpus has eight cases
+
+## [0.9.3] - 2026-09-18
+
+### Added
+
+- Skill `ess-specify:coverage`: raise and audit a conformance suite's coverage against a real implementation
+- It ranks skips by refusal reason, grounds doubles in the producer, floors `answered` and names `-race`
+- Agent `aep-drive:security-reviewer`: the adversary's verification, framed as defensive verification
+
+### Changed
+
+- `ess-specify`'s manifests, the README and the eval-coverage counts follow: 10 skills rather than 9
+
+## [0.9.2] - 2026-09-15
+
+### Changed
+
+- The `connectors` skill and page link the last v1 release, `v0.7.2`, and the 0.7.x surface they drive
+- Eval coverage is counted from the `subject:` fields: 7 of 10 agents and 5 of 9 skills
+- README and the install page read the Metaharness to AEP pin from `crates/metaharness-aep/Cargo.toml`
+
+### Fixed
+
+- The `inspect` upgrade check arrived at Connectors `v0.7.2`; the earlier "0.7.1 has none" claim is corrected
+
+## [0.9.1] - 2026-09-10
+
+### Changed
+
+- Pin ESS `0.22.1` instead of `0.20.0`; ESS `0.22.0` had no archives
+- The ESS skill's example is re-validated on ESS `0.22.1`
+- Align the golden path's model-driving command with Metaharness
+- Unlike `0.9.0`, this release ran `task check` and `task site-build` on the tagged tree
+
+## [0.9.0] - 2026-09-10
+
+### Added
+
+- Document ESS conformance synthesis, execution and evidence ingestion
+
+### Changed
+
+- Align installation guidance on AEP `0.55.0` and ESS `0.20.0`, both with published native archives
+- Use Metaharness `0.7.0` for governed model runs through `metaharness aep drive`
+- The planning skill's command inventory follows AEP `0.55.0`
+- Update example crate paths for AEP's area-based layout; manifests and install pins move to `0.9.0`
+- Publish source through standalone bot tooling without an Atlas checkout
+
+## [0.8.1] - 2026-09-07
+
+### Changed
+
+- Regenerate Workspace Hygiene from Worktree 0.4.0: storage inspection, lease maintenance, verified cleanup
+- Connectors guidance follows the released 0.7.1 surface
+- Refresh current marketplace installation pins to 0.8.1 and Worktree installation to 0.4.0
+- Waves create and retire trees through the Worktree skill and CLI, with explicit lease duties
+
+## [0.8.0] - 2026-09-05
+
+### Added
+
+- Publish the connectors plugin in the release-pinned installation guides for both hosts
+- Add the `connectors` plugin to both marketplaces, with one skill for the Connectors 0.6.0 CLI
+- `agentplugins-check` refuses a flat CLI spelling in any `.md`, `.yaml` or `.yml` this repository authors
+
+### Changed
+
+- The planning skill names `aep plan artifact unrelate` (AEP 0.53.0) for taking an edge back
+- Every authored document teaches the grouped CLI spelling (`aep plan …`, `ess specify …`)
+- The eval corpus's command matchers accept either spelling
+- The install page pins AEP 0.52.0 and ESS 0.13.1, the first releases with the grouped spelling
+
+### Fixed
+
+- Fix Connector readiness evaluation for Claude and Codex command traces
+- Repair YAML quoting in the ESS skill description so every released plugin validates
+
+## [0.7.0] - 2026-09-04
+
+### Added
+
+- `agentplugins-check` refuses a retired plugin name in any authored file's text or path
+
+### Changed
+
+- **Breaking:** Plugins renamed: `aep-planning` is `aep-plan`, `adp` is `aep-drive`, `ess-schema` is `ess-specify`
+- **Breaking:** The ESS skill `ess-schema:ess-schema` is `ess-specify:specify`; reinstall under the new names
+- Five `golden-path-end-to-end` rows keep the plugin names of their 2026-09-03 recording
+- The eval case `ess-schema-new-entity` is now `ess-specify-new-entity`; plugin pages follow the rename
+
+### Fixed
+
+- A replay is judged by its report's `verdict`, not by its exit status, which was 0 on contradicted runs
+
+## [0.6.2] - 2026-09-03
+
+### Added
+
+- Publish Codex CLI commands for a release-pinned install and for replacing a stale marketplace pin
+
+### Changed
+
+- Non-trivial cross-repository and release work enters the owning AEP store before implementation
+- Refresh adopter guidance to ESS 0.9.2 and align every plugin manifest and skill version with this release
+
+## [0.6.1] - 2026-09-03
+
+### Changed
+
+- The golden-path cost row and the documented invocation say `15`, not `5`
+- Planning guardrail 2: never create an artifact to see its template; body files go under `$TMPDIR`
+
+### Fixed
+
+- The golden-path case's step 1 names the protocol source the page names
+- Two golden-path rows stop contradicting a correct run
+- `.github/workflows/eval.yml` installs the pinned `aep` into `$HOME/.local/bin`, where runs find it
+
+## [0.6.0] - 2026-09-03
+
+### Added
+
+- The planning and wave skills record an `approval-record` at each stop when no operator is present
+- The golden path gains § Running it without an operator
+
+### Changed
+
+- **Breaking:** Rename the ESS skill directory to `skills/ess-schema`; the invocation is now `/ess-schema:ess-schema`
+- The `golden-path-end-to-end` case uses that instruction and checks the records it produces
+- The decomposer returns its unanswerable questions instead of holding a turn open for them
+- The adversary writes its failing case and captures red before it runs the suite
+- Sharpen the `ess-schema` trigger to entity introductions that name something typed about the noun
+- Record that `the-skill-was-offered` gapped on the skill's spelling, not on its trigger
+
+### Fixed
+
+- Fix `the-scope-was-actually-tested`, which gapped in all eight eval cases on their first live recording
+
+## [0.5.1] - 2026-09-03
+
+### Changed
+
+- Re-record the eight-step golden path against AEP 0.44.0 and ESS 0.5.1
+
+### Fixed
+
+- Correct the adopter path to install and verify the current AEP and ESS release binaries
+
+## [0.5.0] - 2026-09-03
+
+### Added
+
+- Add `evals/`: one `eval-case/1` per agent and user-facing skill, run by `aep eval run --corpus evals`
+- `agentplugins-check` validates the eval corpus; `task evals` runs that half alone
+- Replay recorded transcripts with `aep eval run --stream`; a stream without its run manifest is refused
+- Add `.github/workflows/eval.yml`: a label-gated, diff-scoped live eval under `EVAL_BUDGET_USD`
+- Add `README.md` § Evals with the cost arithmetic
+- Golden path step 3 models the new noun before decomposing it
+- Add a `drive` skill to `adp`: `/drive <story-id>` launches `aep drive run` with a stated budget
+
+### Changed
+
+- Record no transcript and synthesize none; each case's `recorded/` names the live command that fills it
+- Pin the four plan critics to `model: sonnet` and `effort: high`; `agentplugins-check` refuses a missing pin
+- The wave selects on `aep artifact waves`; when it and the prose reading disagree, the verb wins
+- Write a story's scope twice: the `## Scope` section and `aep artifact scope --add` entries
+- Record a `review_outcome` for every review finding
+- The critic rubric and the adversary end their reports with a ` ```findings ` block
+- A domain relation is a `relations:` entry in an `ess/1` document
+- The decomposer's `inferable` citation for a relation points at an `ess/1` document
+
+## [0.4.0] - 2026-09-02
+
+### Added
+
+- Add a golden-path page: a recorded run from a feature idea to a critiqued plan
+- Add a plan-time critic panel of four read-only critics to `aep-planning`
+- Add a domain-first guardrail to the planning skill
+- Adopt a planning store of this repository's own under `.engineering/`
+
+### Changed
+
+- `website/docs/install.md` and `README.md` have one copy-paste install block
+- The decomposer enumerates the epic's domain relations before drafting any story
+- Widen `ess-schema` to fire when a story or epic introduces an entity
+- The planning skill's first-store instruction is `aep artifact list`
+
+## [0.3.7] - 2026-09-02
+
+### Changed
+
+- Teach both skills AEP's `refs:` field (AEP 0.41.0)
+
+### Fixed
+
+- Correct `story-migration`: a re-run is refused, not replayed
+- Correct the version line in `planning` and `adp/wave`
+
+## [0.3.6] - 2026-09-02
+
+### Added
+
+- Add the `story-migration` skill to `aep-planning`
+
+### Changed
+
+- Migrated artifacts keep each source's dates, read from git
+- Point `planning` § 5 at it
+
+## [0.3.5] - 2026-09-02
+
+### Changed
+
+- Refresh the generated `worktree` skill: `gc --repo` selects the workspace profile; `status` takes no filter
+- Pin the public installation guidance to the matching Worktree 0.3.2 release
+
+## [0.3.4] - 2026-09-02
+
+### Changed
+
+- Pin the documentation redirect façade to the 21-source Website verifier runtime
+
+## [0.3.3] - 2026-09-02
+
+### Changed
+
+- Refresh the generated `worktree` skill for guarded recovery of stranded pre-0.3 legacy trees
+- Pin the public installation guidance to the matching Worktree 0.3.1 safety release
+
+## [0.3.2] - 2026-09-02
+
+### Changed
+
+- Refresh the generated `worktree` skill for review-bound cleanup and removal recovery
+- Pin the public installation guidance to the matching Worktree 0.3.0 safety release
+
+## [0.3.1] - 2026-09-01
+
+### Fixed
+
+- GitHub release publication is idempotent, so rerunning a successful tag publication keeps the release
+
+## [0.3.0] - 2026-09-01
+
+### Added
+
+- Add the `workspace-hygiene` plugin with the `worktree` CLI-generated skill
+- Document installation and the separation between lifecycle guidance and the Rust toolchain
+
+## [0.2.0] - 2026-09-01
+
+### Added
+
+- Add the `beyond10x` front-door plugin for routing, resource discovery and plugin creation
+
+## [0.1.1] - 2026-09-01
+
+### Fixed
+
+- Correct the marketplace documentation relationship to the public AEP Service documentation surface
+
+## [0.1.0] - 2026-09-01
+
+### Added
+
+- Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins
+- Publish adopter documentation for discovering, selecting, and installing each plugin
+
+[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.23.2...HEAD
+[0.23.2]: https://github.com/beyond10x/agentplugins/compare/0.23.1...0.23.2
+[0.23.1]: https://github.com/beyond10x/agentplugins/compare/0.23.0...0.23.1
+[0.23.0]: https://github.com/beyond10x/agentplugins/compare/0.22.11...0.23.0
+[0.22.11]: https://github.com/beyond10x/agentplugins/compare/0.22.10...0.22.11
+[0.22.10]: https://github.com/beyond10x/agentplugins/compare/0.22.9...0.22.10
+[0.22.9]: https://github.com/beyond10x/agentplugins/compare/0.22.8...0.22.9
+[0.22.8]: https://github.com/beyond10x/agentplugins/compare/0.22.7...0.22.8
+[0.22.7]: https://github.com/beyond10x/agentplugins/compare/0.22.6...0.22.7
+[0.22.6]: https://github.com/beyond10x/agentplugins/compare/0.22.5...0.22.6
+[0.22.5]: https://github.com/beyond10x/agentplugins/compare/0.22.4...0.22.5
+[0.22.4]: https://github.com/beyond10x/agentplugins/compare/0.22.3...0.22.4
+[0.22.3]: https://github.com/beyond10x/agentplugins/compare/0.22.2...0.22.3
+[0.22.2]: https://github.com/beyond10x/agentplugins/compare/0.22.1...0.22.2
+[0.22.1]: https://github.com/beyond10x/agentplugins/compare/0.22.0...0.22.1
+[0.22.0]: https://github.com/beyond10x/agentplugins/compare/0.21.2...0.22.0
+[0.21.2]: https://github.com/beyond10x/agentplugins/compare/0.21.1...0.21.2
+[0.21.1]: https://github.com/beyond10x/agentplugins/compare/0.21.0...0.21.1
+[0.21.0]: https://github.com/beyond10x/agentplugins/compare/0.20.1...0.21.0
+[0.20.1]: https://github.com/beyond10x/agentplugins/compare/0.20.0...0.20.1
+[0.20.0]: https://github.com/beyond10x/agentplugins/compare/0.19.2...0.20.0
+[0.19.2]: https://github.com/beyond10x/agentplugins/compare/0.19.1...0.19.2
+[0.19.1]: https://github.com/beyond10x/agentplugins/compare/0.19.0...0.19.1
+[0.19.0]: https://github.com/beyond10x/agentplugins/compare/0.18.0...0.19.0
+[0.18.0]: https://github.com/beyond10x/agentplugins/compare/0.17.0...0.18.0
+[0.17.0]: https://github.com/beyond10x/agentplugins/compare/0.16.0...0.17.0
+[0.16.0]: https://github.com/beyond10x/agentplugins/compare/0.15.0...0.16.0
+[0.15.0]: https://github.com/beyond10x/agentplugins/compare/0.14.17...0.15.0
+[0.14.17]: https://github.com/beyond10x/agentplugins/compare/0.14.16...0.14.17
+[0.14.16]: https://github.com/beyond10x/agentplugins/compare/0.14.15...0.14.16
+[0.14.15]: https://github.com/beyond10x/agentplugins/compare/0.14.14...0.14.15
+[0.14.14]: https://github.com/beyond10x/agentplugins/compare/0.14.13...0.14.14
+[0.14.13]: https://github.com/beyond10x/agentplugins/compare/0.14.12...0.14.13
+[0.14.12]: https://github.com/beyond10x/agentplugins/compare/0.14.11...0.14.12
+[0.14.11]: https://github.com/beyond10x/agentplugins/compare/0.14.10...0.14.11
+[0.14.10]: https://github.com/beyond10x/agentplugins/compare/0.14.9...0.14.10
+[0.14.9]: https://github.com/beyond10x/agentplugins/compare/0.14.8...0.14.9
+[0.14.8]: https://github.com/beyond10x/agentplugins/compare/0.14.7...0.14.8
+[0.14.7]: https://github.com/beyond10x/agentplugins/compare/0.14.6...0.14.7
+[0.14.6]: https://github.com/beyond10x/agentplugins/compare/0.14.5...0.14.6
+[0.14.5]: https://github.com/beyond10x/agentplugins/compare/0.14.4...0.14.5
+[0.14.4]: https://github.com/beyond10x/agentplugins/compare/0.14.3...0.14.4
+[0.14.3]: https://github.com/beyond10x/agentplugins/compare/0.14.2...0.14.3
+[0.14.2]: https://github.com/beyond10x/agentplugins/compare/0.14.1...0.14.2
+[0.14.1]: https://github.com/beyond10x/agentplugins/compare/0.14.0...0.14.1
+[0.14.0]: https://github.com/beyond10x/agentplugins/compare/0.13.1...0.14.0
+[0.13.1]: https://github.com/beyond10x/agentplugins/compare/0.13.0...0.13.1
+[0.13.0]: https://github.com/beyond10x/agentplugins/compare/0.12.0...0.13.0
+[0.12.0]: https://github.com/beyond10x/agentplugins/compare/0.11.0...0.12.0
+[0.11.0]: https://github.com/beyond10x/agentplugins/compare/0.10.0...0.11.0
+[0.10.0]: https://github.com/beyond10x/agentplugins/compare/0.9.3...0.10.0
+[0.9.3]: https://github.com/beyond10x/agentplugins/compare/0.9.2...0.9.3
+[0.9.2]: https://github.com/beyond10x/agentplugins/compare/0.9.1...0.9.2
+[0.9.1]: https://github.com/beyond10x/agentplugins/compare/0.9.0...0.9.1
+[0.9.0]: https://github.com/beyond10x/agentplugins/compare/0.8.1...0.9.0
+[0.8.1]: https://github.com/beyond10x/agentplugins/compare/0.8.0...0.8.1
+[0.8.0]: https://github.com/beyond10x/agentplugins/compare/0.7.0...0.8.0
+[0.7.0]: https://github.com/beyond10x/agentplugins/compare/0.6.2...0.7.0
+[0.6.2]: https://github.com/beyond10x/agentplugins/compare/0.6.1...0.6.2
+[0.6.1]: https://github.com/beyond10x/agentplugins/compare/0.6.0...0.6.1
+[0.6.0]: https://github.com/beyond10x/agentplugins/compare/0.5.1...0.6.0
+[0.5.1]: https://github.com/beyond10x/agentplugins/compare/0.5.0...0.5.1
+[0.5.0]: https://github.com/beyond10x/agentplugins/compare/0.4.0...0.5.0
+[0.4.0]: https://github.com/beyond10x/agentplugins/compare/0.3.7...0.4.0
+[0.3.7]: https://github.com/beyond10x/agentplugins/compare/0.3.6...0.3.7
+[0.3.6]: https://github.com/beyond10x/agentplugins/compare/0.3.5...0.3.6
+[0.3.5]: https://github.com/beyond10x/agentplugins/compare/0.3.4...0.3.5
+[0.3.4]: https://github.com/beyond10x/agentplugins/compare/0.3.3...0.3.4
+[0.3.3]: https://github.com/beyond10x/agentplugins/compare/0.3.2...0.3.3
+[0.3.2]: https://github.com/beyond10x/agentplugins/compare/0.3.1...0.3.2
+[0.3.1]: https://github.com/beyond10x/agentplugins/compare/0.3.0...0.3.1
+[0.3.0]: https://github.com/beyond10x/agentplugins/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/beyond10x/agentplugins/compare/0.1.1...0.2.0
+[0.1.1]: https://github.com/beyond10x/agentplugins/compare/0.1.0...0.1.1
+[0.1.0]: https://github.com/beyond10x/agentplugins/releases/tag/0.1.0

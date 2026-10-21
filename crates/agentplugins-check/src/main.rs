@@ -1130,9 +1130,20 @@ fn verify_release(root: &Path, version: &str) -> Result<(), String> {
 
     let changelog = std::fs::read_to_string(root.join("CHANGELOG.md"))
         .map_err(|error| format!("reading CHANGELOG.md: {error}"))?;
-    let heading = format!("## [{version}] — ");
-    if !changelog.lines().any(|line| line.starts_with(&heading)) {
-        return Err(format!("CHANGELOG.md has no dated `{heading}` heading"));
+    let heading = format!("## [{version}] - ");
+    let dated = |line: &str| {
+        line.strip_prefix(&heading).is_some_and(|date| {
+            date.len() == 10
+                && date.bytes().enumerate().all(|(index, byte)| match index {
+                    4 | 7 => byte == b'-',
+                    _ => byte.is_ascii_digit(),
+                })
+        })
+    };
+    if !changelog.lines().any(dated) {
+        return Err(format!(
+            "CHANGELOG.md has no dated `{heading}YYYY-MM-DD` heading"
+        ));
     }
 
     let object_type = Command::new("git")
@@ -1956,5 +1967,59 @@ one product only: `b10x upgrade ess`
             .expect("checker is under repository root");
         let error = verify_release(root, "9.9.9").expect_err("a mismatched version must fail");
         assert!(error.contains("does not match workspace version"));
+    }
+
+    /// `release verify` reads the Keep a Changelog 1.1.0 heading, `## [x.y.z] - YYYY-MM-DD`, and
+    /// refuses the em-dash form the file used before it.
+    #[test]
+    fn a_release_needs_a_keep_a_changelog_heading() {
+        let sandbox = std::env::temp_dir().join(format!(
+            "agentplugins-check-release-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(&sandbox).expect("the sandbox is writable");
+        let version = env!("CARGO_PKG_VERSION");
+        let changelog = sandbox.join("CHANGELOG.md");
+
+        std::fs::write(
+            &changelog,
+            format!("# Changelog\n\n## [Unreleased]\n\n## [{version}] - 2026-10-21\n\n### Added\n\n- a change\n"),
+        )
+        .expect("the sandbox is writable");
+        let error = verify_release(&sandbox, version)
+            .expect_err("the sandbox has no tag, so only the tag check may fail");
+        assert!(
+            error.contains("is missing or is not an annotated tag"),
+            "{error}"
+        );
+
+        std::fs::write(
+            &changelog,
+            format!("# Changelog\n\n## [{version}] — 2026-10-21\n\n- a change\n"),
+        )
+        .expect("the sandbox is writable");
+        let error = verify_release(&sandbox, version).expect_err("an em-dash heading must fail");
+        assert_eq!(
+            error,
+            format!("CHANGELOG.md has no dated `## [{version}] - YYYY-MM-DD` heading")
+        );
+
+        for date in ["", "TBD", "2026-1-021", "2026-10-21 extra"] {
+            std::fs::write(
+                &changelog,
+                format!("# Changelog\n\n## [{version}] - {date}\n\n- a change\n"),
+            )
+            .expect("the sandbox is writable");
+            let error = verify_release(&sandbox, version)
+                .expect_err("a heading without a YYYY-MM-DD date must fail");
+            assert_eq!(
+                error,
+                format!("CHANGELOG.md has no dated `## [{version}] - YYYY-MM-DD` heading"),
+                "date {date:?}"
+            );
+        }
+
+        std::fs::remove_dir_all(&sandbox).expect("the sandbox is removable");
     }
 }
