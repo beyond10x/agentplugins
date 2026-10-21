@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/25`. The binary says which one that
+`format:` that release implements; the example below uses `ess/28`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/25
+format: ess/28
 system: warehouse
 version: v1
 
@@ -252,7 +252,8 @@ holding it is withheld whole until it parses.
 `--component <name>` (`outside`), the questions the model leaves unanswered (`unanswered`), and
 their `counts`. It runs synthesis to answer, so it takes as long as
 `ess verify conform synthesize`; the text output and the exit status do not change. Relay a
-non-zero count with the validation line.
+non-zero count with the validation line. An `unscenarioed` disclosure scenario refused for the
+cause of another refusal carries `caused_by`, that refusal's scenario id: fix the cause first.
 
 ## Deterministic projections
 
@@ -266,7 +267,12 @@ ess generate --path <specification> --kind <kind> --out <directory>
 same pages as HTML) or `docs-ir`. Give each kind its own `--out`, side by side (`out/schema`,
 `out/openapi`, …): an output directory inside another is refused. `schema`, `openapi`, `asyncapi`
 and `docs` add a folder named after the kind below `--out` (`out/schema/schema/…`); `site` writes
-into `--out` itself. Type libraries come from `ess generate types --target rust|go|typescript`.
+into `--out` itself. With `--kind schema`, `--schema-id-base <URI>` (absolute, ending in `/` or
+`:`) gives every document a root `$id` (the base plus its path under `schema/`), so
+`ess generate schema validate` takes the documents as registry resources as written; that
+command and `validate-bundle` also read a `.yaml` or `.yml` instance as the JSON it denotes.
+Since 0.63.0 a `String` newtype's `alphabet:` projects as an anchored `pattern` beside
+`x-ess-alphabet`. Type libraries come from `ess generate types --target rust|go|typescript`.
 A Rust library whose types hold JSON numbers declares a default-on `exact-numbers` Cargo feature
 that enables `serde_json/arbitrary_precision`; a consumer depending on it with
 `default-features = false` gets binary64 numbers. `types-report.json` names each such value under

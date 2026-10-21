@@ -8,7 +8,7 @@ description: Specify a lending library and hold a Rust implementation to its gen
 
 An Executable System Specification describes records, commands, refusals, events and readable views.
 ESS validates that model and generates checks that an implementation must answer. This tutorial
-uses **ESS 0.60.0 and Rust**, verified on 2026-10-15. The
+uses **ESS 0.66.0 and Rust**, verified on 2026-10-21. The
 [2026-09-28 Go recording](./first-ess-specification-2026-09-28.md) is retained as historical evidence.
 
 You finish with a specification, generated documentation and OpenAPI, a small Rust library and
@@ -67,7 +67,7 @@ domains:
 
 ```yaml
 format: ess-inputs/2
-requires: ess 0.60.0
+requires: ess 0.66.0
 specification:
   - system.yaml
   - components.yaml
@@ -135,8 +135,8 @@ publish = false
 [workspace]
 
 [dev-dependencies]
-ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.60.0" }
-ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.60.0" }
+ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.66.0" }
+ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.66.0" }
 serde_json = "1"
 
 [profile.dev]
@@ -238,12 +238,14 @@ record effects. `affects` can also move selected records in `ess/22`; from `ess/
 record per element of an input list (`each:`), and `deletes:` can remove every row a filter selects.
 These declarations do not by themselves promise atomic multi-record transactions. Validation,
 synthesis and code generation have different supported subsets; keep each refusal visible and
-distinguish generated suite coverage from implementation coverage. In ESS 0.60.0, an
-identity-addressed related guard beside `unknown_instance` is refused.
-An existence-only input-related guard beside `wrong_state` is also refused. With `ess/22`,
-`wrong_state` can coexist with related guards when at least one present-row predicate is
-declared and every such predicate branch refuses. These are distinct ordering cases; validate
-the exact declaration instead of treating all related lifecycle checks as unsupported.
+distinguish generated suite coverage from implementation coverage. Below `ess/27`, an
+identity-addressed related guard beside `unknown_instance` is refused, and so is an
+existence-only input-related guard beside `wrong_state`. With `ess/22`, `wrong_state` can
+coexist with related guards when at least one present-row predicate is declared and every such
+predicate branch refuses. From `ess/27` one precedence rule orders every such pair: the request
+alone, then the addressed record's existence, its held state, the rows around it, and the
+accepting branches. Validate the exact declaration instead of treating all related lifecycle
+checks as unsupported.
 
 Next, [plan a library feature](./first-governed-plan.md), use `ess:retrofitting` for an existing
 service, or use `ess:hardening` to test what a green suite still misses.

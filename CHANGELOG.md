@@ -7,6 +7,7 @@
   it writes one evidence record per redaction holding the literal's SHA-256, never the literal, and
   `validate` admits a `review-result` only while replaying those records over its first committed
   version reproduces its current text.
+- Track ESS 0.66.0 after `agentplugins-check tools`: the ESS skills describe `ess/27` (expressions, function guards, one precedence rule, system-issued commands), `ess/28` (views through a reference, related `state`, `all:` and list guards), `ess-conformance/52`–`/55`, `ess-diff/20`–`/21`, `ess verify conform diff`, `synthesize --check`, `ESS-AUTHOR-042`, `--schema-id-base` and the Go and TypeScript runners' skipped unsupported scenarios; the ESS tutorial set, its trial fixtures and the eval workflow move to 0.66.0 together, and a gate test holds them to `verified.json`.
 - Track Connectors v0.55.0: the connectors skills spell `instances`, `--connector`/`--instance` and `connections reconnect`, `connectors:upgrade` names `setup migrate`, and `tools` refuses a spelling the release's help marks deprecated.
 
 ## [0.23.2] — 2026-10-17

@@ -44,8 +44,24 @@ changed yet.
   mutation report or manifest naming `overlap_taken_by` (`/6`), a composition with `roles:`
   (`ess-composition/4`) and an `ess-http/1` binding; from 0.62.0 a suite with a `hold_now` step
   (`ess-conformance/50`, `/51`), a mutation report naming an `unchanged_suite` (`/7`) and an
-  `ess-runtime/2` document. Move every reader (a CI job's `ess`, the
-  runner crates or packages) in the same change that commits them.
+  `ess-runtime/2` document; from 0.63.0 a suite carrying a one-time trace, a wrapped value
+  invariant or a system-issued command (`ess-conformance/52`, `/53`) and a spec diff naming a
+  struct `shorthand:`, a system actor, an `await_within:` bound or a domain's display name or
+  summary (`ess-diff/20`); from 0.64.0 a suite with a view read through a reference
+  (`ess-conformance/54`, `/55`) and a spec diff naming `field-source-changed` (`ess-diff/21`).
+  Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  commits them.
+- From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
+  (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
+  `now` in a view filter stays refused, its hint naming `from`/`to` view parameters the caller
+  sends. Under `ess/27` one precedence rule orders a command's branches (request, existence, held
+  state, related rows, then accepting), so a missing related row now answers after the addressed
+  record's existence and held state: raising a header to `ess/27` can change which branch a
+  request takes, and its suite. Below `ess/27` every command keeps its order. A JSON Schema
+  projection of a `String` newtype with `alphabet:` now asserts it as a `pattern`, so
+  `ess generate --check` reports drift once per such newtype.
+- From 0.66.0 a regenerated Go or TypeScript package shows an unsupported required scenario as a
+  skipped subtest that still fails the run once (`ess:testing-conformance`).
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
   accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused

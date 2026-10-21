@@ -166,6 +166,12 @@ TypeScript runners send it. It refuses an attribute the act's `actor:` does not 
 values are fixed when the suite is written). `ess-scenario/1` to `/4` refuse the key. An act with
 no `caller:` sends none, and its suite keeps its bytes.
 
+Since 0.63.0 `author` refuses an act claiming an exact value for a field the model leaves to the
+implementation (`{generated: true}` in every branch that can publish it, or a stored field every
+reached branch writes so): `ESS-AUTHOR-042`, naming the field, the value and the minting branch.
+Leave the field out, whose presence and type the suite still checks, or claim it by reference
+(`{$observed: …}`, `{$instance: …}`).
+
 ## Building a double for an upstream plane
 
 Most skips on a real suite are not missing constructs — they are planes the target does not drive. A
@@ -353,7 +359,25 @@ The current runner contract:
   optional `ConformanceTarget::hold_now` (Go `NowHolder`, TypeScript `holdNow`); a target without
   it reports that scenario `unsupported`, named and counted, and only that kind of unsupported
   scenario does not fail the run. Implement `hold_now` to make the boundary count: until then the
-  `guard-boundary` mutant (`<` to `<=`) is not killed. Generate with the
+  `guard-boundary` mutant (`<` to `<=`) is not killed. From `ess-conformance/52` (`/53` with
+  coverage, since 0.63.0) the suite root carries the declared event catalog and each one-time
+  command's response authority, and a run of `expect_no_event` steps is written by the catalog
+  events it leaves out; every runner expands it before admission, so a scenario means what it did
+  and no longer grows with the number of events. The same formats carry `value_invariants` view
+  expectations (a value type's invariants checked inside a `List`, `Map`, `Optional` or `Union`
+  a view publishes, filed as `<type>/invariant-wrapped/at/<view>/<field>/<digest>`), which the
+  Rust runner and the interpreted target execute and the generated Go and TypeScript runners
+  report `unsupported`, and the `await_outcome` and `expect_not_issued` steps of a system-issued
+  command (`system: true` actor, `ess/27`), answered by Go `AwaitTarget` and TypeScript
+  `awaitOutcome`. From `ess-conformance/54` (`/55`, since 0.64.0) a view reading through a
+  reference (`ess/28`) gets one `<view>/reference/<field>` scenario per reference it reads
+  through, named after the reference field (`Leases/reference/device_id` for a `device_label` read
+  via `device_id`), reading the view before and after the referenced row changes. Since 0.66.0, under report format 2, the generated Go and
+  TypeScript runners show an unsupported required scenario as a skipped subtest or case carrying
+  the reason (Go `t.Skipf`, TypeScript `t.skip`) instead of a failed one; the enclosing test still
+  fails once, naming how many were unsupported, and the process exits nonzero. The JSON report is
+  unchanged (`unsupported`, `execution_status: failed`). Regenerate the package to take it up; a
+  skipped subtest in a JUnit view is not a pass. Generate with the
   same release as the runner and inspect any target-specific refusal instead of carrying an old
   suite-version ceiling.
 - From `ess-conformance/44`, an act that claims one event N times needs N occurrences, and claims
@@ -365,7 +389,14 @@ The current runner contract:
   so a target that keeps only the newest or oldest record per compared value fails. It can also
   stop writing a scenario the model answers otherwise and name the refusal instead
   (`ESS-SYNTH-003`, `ESS-SYNTH-004`); a count that falls that way is a fiction leaving, not lost
-  coverage.
+  coverage. `ess verify conform diff --from <old suite> --to <new suite>` reads that diff for you:
+  scenario ids added, removed and changed, grouped by the construct each is about, with the steps
+  removed from and added to each changed one (`--format json` writes `ess-suite-diff/1`; exit 0
+  whatever changed). A newer spelling of the same scenarios is no change.
+- Hold a committed suite or package current with
+  `ess verify conform synthesize --path <specification> --target ir --out <suite.json> --check`
+  (or `--target go|typescript --out <dir>`): it writes nothing and exits 1 naming each missing or
+  differing file, 0 when `--out` is what the command would write.
 - Both packages also carry the random-sequence explorer (`explore`/`Explore`); `ess:hardening`
   technique 2 says how to wire it.
 

@@ -35,7 +35,20 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | one event per row a set effect changed | `ess/25` | `{event: <name>, each: changed, when_state: [<State>]}` in `emits:`, its payload read with `{changed: <field>}` |
 | a refusal decided before the row is read (a credential, a token) | `ess/25` | `before_row: true` on an `external:` refusal |
 | a read by identity that answers a default row for an unknown identity | `ess/25` | `absent: {row: {<field>: <literal>}}` on a view filtered `<identity> == param.<name>` |
-| a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled |
+| a value computed from the input, the stored row or a view's source row | `ess/27` | `{expr: "subject.hours + input.extra"}` in `sets:` and a `payload:`; `{name: elapsed, type: Duration, expr: "ended_at - started_at"}` on a view field; [below](#ess27-and-ess28) |
+| a guard over a digest or encoding of the input (PKCE `S256`) | `ess/27` | `challenge != base64url(sha256(ascii(input.verifier)))` in `when:`, `when_subject:` or `when_related:` |
+| a struct written as one of its fields | `ess/27` | `shorthand: <field>` on a `kind: struct` type whose other fields are all `Optional` |
+| a step the system takes itself | `ess/27` | `system: true` on an actor; a command only such actors may issue is awaited, not sent, with an optional `await_within: PT<seconds>S` |
+| the first row of an ordered selection | `ess/27` | `{related: {entity, where, order_by, first}}` |
+| a candidate tested against its own related rows | `ess/27` | `exists: {in: {entity: <E>}, as: <b>, that: <predicate>}` in a selector's `where:`, tied by `<b>.<field> == <candidate field>` |
+| each row an input list names moved or deleted by its own answer | `ess/27` | `moves:` or `deletes:` in an `affects:` entry with `each:`, which may carry a `where:` over the element |
+| a Boolean event leaf in a binding condition | `ess/27` | `where: [event.bridged == false]` |
+| unknown id, related guard and held state on one command | `ess/27` | one precedence rule orders every pair; [below](#ess27-and-ess28) |
+| a view field read from the row a reference names | `ess/28` | `field: {related: {via: <reference>, field: <field \| state>}}`, typed `Optional<…>`; a filter may read `<reference>.<field>` |
+| several related rows required at once | `ess/28` | `when_related: {all: [{via: input.<a>, predicate: …}, {via: input.<b>, predicate: …}]}` |
+| the state of a related row as a value | `ess/28` | `{related: {via: input.<field>, field: state}}`, typed as that entity's `State` |
+| a list of references naming a missing row | `ess/28` | `when_related: {via: input.<list>, exists: false}`; the payload reads the first such element with `{missing: input.<list>}` |
+| a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled. For a view, take `from`/`to` view parameters the caller sends (`<field> >= param.from`, `<field> < param.to`), as the refusal's hint says |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -242,7 +255,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/26`
+## From `ess/16` through `ess/28`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -262,6 +275,8 @@ With current ESS:
 | `ess/24` | `undeclared_fields: ignored` on a struct type and on a command response: the record admits members it does not declare, while every declared field stays required and typed |
 | `ess/25` | create-or-update selected by `when_subject:`; `trimmed:` text guards; per-row `emits:` with `each: changed`; `before_row: true` on an `external:` refusal; a view's `absent:` default row |
 | `ess/26` | a named `external:` refusal of a command that addresses an existing row (`before_row: true` included) leaves the row unchanged: its scenario snapshots the row and requires it unchanged afterwards; a `compensates: true` refusal keeps its read-back |
+| `ess/27` | typed expressions (`{expr: …}`) in values and view fields; digest and encoding functions in guards; values narrowed by their branch; `moves:`/`deletes:` in `affects: each:`; a struct `shorthand:`; Boolean leaves in binding conditions; `unknown_instance:` beside `when_related:`; one precedence rule for every guard pair; `{generated: true, present: true}` and `{payload: <Event>.<field>}` in `sets:`; system-issued commands; ordered heads; identity reads in set-effect filters; published values in selectors; `exists:` over a candidate's related rows |
+| `ess/28` | view fields and filters read through a reference, one hop; `when_related: {all: […]}`; a related row's `state` as a value; `when_related:` over a list of references with `{missing: …}` |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -556,6 +571,52 @@ checked only the representation. A specification that validated on 0.59.0 can be
 An HTTP binding of commands and views (`ess-http/1`) and composition roles
 (`ess-composition/4`) are documents beside the specification, not source formats:
 [current-features.md](current-features.md#http-routes-ess-http1).
+
+## `ess/27` and `ess/28`
+
+A probe on 0.66.0 using the excerpts below validated, synthesized 11 scenarios with 0 refusals in
+`ess-conformance/54`, and the `interpreted` target passed all 11. Under a lower header each is
+`unsupported_format_version` naming the format it needs, or keeps the reading it had there.
+
+```yaml
+      - name: unavailable                     # ess/28: the related row's state as a value
+        when_related: {via: input.device_id, predicate: state == Retired}
+        error: demo.leases.DeviceUnavailable
+        payload:
+          demo.leases.DeviceUnavailable: {state: {related: {via: input.device_id, field: state}}}
+      - name: extended                        # ess/27: a value computed from row and input
+        updates: demo.leases.Lease
+        instance: lease_id
+        sets: {hours: {expr: "subject.hours + input.extra"}}
+```
+
+```yaml
+      - name: device_label                    # ess/28: a view field through a reference
+        type: Optional<String>
+        field: {related: {via: device_id, field: label}}
+```
+
+`+ - * /` over `Integer` and `Decimal` are exact; `/` is an `Optional<Decimal>` (six places,
+half-even, absent at a zero divisor), so a required field needs `coalesce(a, b)` or `round(…)`.
+`Timestamp - Timestamp` is a `Duration`; `60s`, `5m`, `1h` are literals; `now` is not a value.
+Synthesis checks the figure on inputs worth checking (a zero divisor, a rounding tie).
+
+**One precedence rule** (`ess/27`): a command answers in the order of what each branch must read:
+the request alone (input guards, `external:` with `before_row: true`), the addressed record's
+existence, its held state, the rows around it (every `exists: false`, then every related row's
+refusal), then the accepting and external branches; within a step, the first declared whose
+condition holds. Pairs that were `conflicting_declaration` for want of an order (`when_related:`
+beside `when_subject:`, `wrong_state:` or `unknown_instance:`) validate. Raising a header to
+`ess/27` can therefore change which branch answers a request, and the suite.
+
+Validating is not lowering. A command or view using an expression stays an obligation, named by
+the expression, in the generated Rust and Go behaviours and queries and in Entity Runtime. A
+command with a function guard stays an obligation in generated Rust and Go, and Entity Runtime
+refuses the guard as `FunctionCallUnsupported`. A command copying a narrowed value stays an
+obligation in generated Rust and Go. A command with an `all:` or a list guard stays an obligation
+in generated Rust and Go, and Entity Runtime lowering refuses it, each by name. A view reading
+through a reference (`ess/28`) keeps its query an obligation in generated Rust and Go. Synthesis of
+a Rust or Go server or the web app refuses a `shorthand:` struct.
 
 ## What validates and still gets no scenario
 

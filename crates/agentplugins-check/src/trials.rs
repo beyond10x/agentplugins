@@ -441,6 +441,166 @@ mod tests {
         }
     }
 
+    /// The ESS tutorial set (its specification, target, public guides and trial fixtures) and the
+    /// eval workflow name one ESS release, the one `verified.json` names (`AGENTS.md`: keep them
+    /// together). Every pin spelling in these files counts: `requires: ess`, a Cargo tag, a
+    /// lockfile source and `ESS_VERSION`.
+    #[test]
+    fn the_ess_tutorial_set_pins_the_verified_release() {
+        let root = repository();
+        let verified = crate::tools::verified(&root).expect("verified.json is well formed");
+        let release = &verified["ess"];
+        let problems = ess_pin_problems(&root, ESS_PINNED, release);
+        assert!(
+            problems.is_empty(),
+            "pins other than verified.json's ess {release}:\n{}",
+            problems.join("\n")
+        );
+    }
+
+    /// A file whose only pin is spelled another way (a `.git` URL, a quoted `requires:`) is still
+    /// read, and a file with no pin the check recognises is named rather than passed.
+    #[test]
+    fn an_unrecognised_or_missing_ess_pin_is_named() {
+        let root = scratch("ess-pins");
+        let files = [
+            ("a/Cargo.toml", "ess-conformance = { git = \"https://github.com/beyond10x/ess.git\", tag = \"0.60.0\" }\n"),
+            ("a/Cargo.lock", "source = \"git+https://github.com/beyond10x/ess.git?tag=0.60.0#19d6010\"\n"),
+            ("a/ess-inputs.yaml", "format: ess-inputs/2\nrequires: \"ess 0.60.0\"\n"),
+            ("b/Cargo.toml", "serde_json = \"1\"\n"),
+            ("c/Cargo.toml", "ess-primitives = { git = \"https://github.com/beyond10x/ess\", tag = \"0.66.0\" }\n"),
+        ];
+        for (file, text) in files {
+            std::fs::create_dir_all(root.join(file).parent().unwrap()).unwrap();
+            std::fs::write(root.join(file), text).unwrap();
+        }
+        let names: Vec<&str> = files.iter().map(|(file, _)| *file).collect();
+        let problems = ess_pin_problems(&root, &names, "0.66.0");
+        std::fs::remove_dir_all(&root).unwrap();
+        for file in &names[..4] {
+            assert!(
+                problems.iter().any(|problem| problem.starts_with(file)),
+                "{file} not named in {problems:#?}"
+            );
+        }
+        assert!(
+            !problems.iter().any(|problem| problem.starts_with("c/")),
+            "{problems:#?}"
+        );
+    }
+
+    /// The files of the ESS tutorial set and the eval workflow, each of which pins one ESS release.
+    const ESS_PINNED: &[&str] = &[
+        ".github/workflows/eval.yml",
+        "website/docs/tutorials/first-ess-specification.md",
+        "website/docs/tutorials/first-ess-specification/spec/ess-inputs.yaml",
+        "website/docs/tutorials/first-ess-specification/impl/Cargo.toml",
+        "website/docs/tutorials/first-ess-specification/impl/Cargo.lock",
+        "website/docs/tutorials/first-governed-plan.md",
+        "trials/ess-tutorial/fixture/tutorial.md",
+        "trials/aep-tutorial/fixture/tutorial.md",
+        "trials/aep-tutorial/fixture/spec/ess-inputs.yaml",
+        "trials/aep-tutorial/fixture/impl/Cargo.toml",
+        "trials/aep-tutorial/fixture/impl/Cargo.lock",
+        "fixtures/library-reservations-drafted/spec/ess-inputs.yaml",
+        "fixtures/library-reservations-drafted/impl/Cargo.toml",
+        "fixtures/library-reservations-drafted/impl/Cargo.lock",
+    ];
+
+    /// Every problem with the ESS pins of `files` below `root` against `release`.
+    fn ess_pin_problems(root: &Path, files: &[&str], release: &str) -> Vec<String> {
+        let mut problems = Vec::new();
+        for file in files {
+            let text = std::fs::read_to_string(root.join(file)).expect("the pinned file exists");
+            let mut pins = 0;
+            for (number, line) in text.lines().enumerate() {
+                for version in ess_pins(line) {
+                    pins += 1;
+                    if version != release {
+                        problems.push(format!(
+                            "{file}:{}: ess {version}: {}",
+                            number + 1,
+                            line.trim()
+                        ));
+                    }
+                }
+            }
+            if pins == 0 {
+                problems.push(format!("{file}: no recognised ESS pin"));
+            }
+        }
+        problems
+    }
+
+    /// The ESS releases one line pins: a git dependency or lock source on the ess repository with a
+    /// tag, a `requires:` naming ess, an `ESS_VERSION`, or the tutorials' prose.
+    fn ess_pins(line: &str) -> Vec<String> {
+        let mut pins = Vec::new();
+        let repository = "github.com/beyond10x/ess";
+        for (at, _) in line.match_indices(repository) {
+            let rest = &line[at + repository.len()..];
+            if rest
+                .chars()
+                .next()
+                .is_some_and(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+            {
+                continue;
+            }
+            if let Some(tag) = rest.find("tag") {
+                pins.extend(first_release(&rest[tag..]));
+            }
+        }
+        let trimmed = line.trim_start().trim_start_matches("- ");
+        if let Some(rest) = trimmed.strip_prefix("requires:") {
+            if rest
+                .split(|c: char| !c.is_ascii_alphanumeric())
+                .any(|word| word.eq_ignore_ascii_case("ess"))
+            {
+                pins.extend(first_release(rest));
+            }
+        }
+        for (at, _) in line.match_indices("ESS_VERSION") {
+            let before = line[..at].chars().next_back();
+            let after = line[at + "ESS_VERSION".len()..].chars().next();
+            if before.is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
+                || after.is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
+            {
+                continue;
+            }
+            pins.extend(first_release(&line[at..]));
+        }
+        for prose in ["uses **ESS ", "and ESS "] {
+            for (at, _) in line.match_indices(prose) {
+                let rest = &line[at + prose.len()..];
+                if rest.starts_with(|c: char| c.is_ascii_digit()) {
+                    pins.extend(first_release(rest));
+                }
+            }
+        }
+        pins
+    }
+
+    /// The first `x.y.z` release in `text` that is not part of a longer word or number.
+    fn first_release(text: &str) -> Option<String> {
+        let bytes = text.as_bytes();
+        for (at, c) in text.char_indices() {
+            if !c.is_ascii_digit()
+                || (at > 0 && (bytes[at - 1].is_ascii_alphanumeric() || bytes[at - 1] == b'.'))
+            {
+                continue;
+            }
+            let version: String = text[at..]
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.')
+                .collect();
+            let version = version.trim_end_matches('.');
+            if crate::tools::key(version).is_some() {
+                return Some(version.to_string());
+            }
+        }
+        None
+    }
+
     #[test]
     fn a_definition_that_does_not_hold_together_is_refused() {
         let root = scratch("bad");
