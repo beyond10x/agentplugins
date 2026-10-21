@@ -52,8 +52,8 @@ jobs:
       #
       # This AEP release matches the library linked by Metaharness. Its child preflight refuses
       # an installed planning executable from a different release.
-      AEP_VERSION: '0.68.0'
-      METAHARNESS_VERSION: '0.9.3'
+      AEP_VERSION: '0.68.1'
+      METAHARNESS_VERSION: '0.10.1'
       ESS_VERSION: '0.66.0'
       CONNECTORS_VERSION: 'v0.55.0'
       WORKTREE_VERSION: '0.18.2'

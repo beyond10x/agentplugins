@@ -9,6 +9,7 @@
   version reproduces its current text.
 - Track ESS 0.66.0 after `agentplugins-check tools`: the ESS skills describe `ess/27` (expressions, function guards, one precedence rule, system-issued commands), `ess/28` (views through a reference, related `state`, `all:` and list guards), `ess-conformance/52`–`/55`, `ess-diff/20`–`/21`, `ess verify conform diff`, `synthesize --check`, `ESS-AUTHOR-042`, `--schema-id-base` and the Go and TypeScript runners' skipped unsupported scenarios; the ESS tutorial set, its trial fixtures and the eval workflow move to 0.66.0 together, and a gate test holds them to `verified.json`.
 - Track Connectors v0.55.0: the connectors skills spell `instances`, `--connector`/`--instance` and `connections reconnect`, `connectors:upgrade` names `setup migrate`, and `tools` refuses a spelling the release's help marks deprecated.
+- Track Metaharness 0.10.1 after `agentplugins-check tools`: the eval workflow pins it with AEP 0.68.1, the release it links, and keeps Claude Code 2.1.259; its new `project --from` and `--scratch-cwd` need no skill text. The shared gates workflow pins gates 0.1.22.
 
 ## [0.23.2] — 2026-10-17
 
