@@ -844,17 +844,12 @@ fn verify_connectors(
                 arguments.push("--help");
                 match run(&binary.to_string_lossy(), &arguments) {
                     Ok(help) => {
-                        for flag in &flags {
-                            if !help
-                                .split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
-                                .any(|word| word == flag)
-                            {
-                                problems.push(format!(
-                                    "{}: runtime `connectors {}` has no {flag} in {tag}",
-                                    file.strip_prefix(root).unwrap_or(&file).display(),
-                                    path.join(" ")
-                                ));
-                            }
+                        for problem in connector_help_problems(&help, &flags) {
+                            problems.push(format!(
+                                "{}: runtime `connectors {}` {problem} in {tag}",
+                                file.strip_prefix(root).unwrap_or(&file).display(),
+                                path.join(" ")
+                            ));
                         }
                     }
                     Err(_) => problems.push(format!(
@@ -891,6 +886,43 @@ fn verify_connectors(
     };
     println!("tools `connectors` {tag}: {checked} spelled command(s) checked against released source contract {url} and service help routes {route_url}; {runtime}");
     Ok(())
+}
+
+/// What a spelled Connectors command's runtime help refuses: a deprecated command or flag, and
+/// every spelled flag the help does not name.
+fn connector_help_problems(help: &str, flags: &BTreeSet<String>) -> Vec<String> {
+    let mut found = connector_deprecations(help, flags);
+    for flag in flags {
+        if !help
+            .split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
+            .any(|word| word == flag)
+        {
+            found.push(format!("has no {flag}"));
+        }
+    }
+    found
+}
+
+/// What a spelled Connectors command's runtime help marks deprecated: the command itself (its
+/// summary line starts `Deprecated name of`) or a spelled flag (its option line says `Deprecated`).
+fn connector_deprecations(help: &str, flags: &BTreeSet<String>) -> Vec<String> {
+    let mut found = Vec::new();
+    if let Some(summary) = help.lines().find(|line| !line.trim().is_empty()) {
+        if summary.trim_start().starts_with("Deprecated name of") {
+            found.push(format!("is deprecated: {}", summary.trim()));
+        }
+    }
+    for flag in flags {
+        for line in help.lines() {
+            let line = line.trim_start();
+            if line.split_whitespace().next() == Some(flag.as_str()) {
+                if let Some(at) = line.find("Deprecated") {
+                    found.push(format!("has deprecated {flag}: {}", line[at..].trim()));
+                }
+            }
+        }
+    }
+    found
 }
 
 /// Whether a Connectors release carries prebuilt archives: every release from v0.48.0, the first
@@ -1137,6 +1169,31 @@ mod tests {
         );
         assert!(!paths[&vec!["setup".to_owned(), "check".to_owned()]].contains("--operation"));
         assert!(connector_commands("commands: []").is_err());
+    }
+
+    #[test]
+    fn a_deprecated_connector_command_or_flag_is_named_with_its_replacement() {
+        let command = "Deprecated name of `connectors instances list`\n\nUsage: connectors adapters list [OPTIONS]  (deprecated; use connectors instances list)\n\nOptions:\n      --config <global_config>    \n  -h, --help                      Print help\n";
+        assert_eq!(
+            connector_deprecations(command, &BTreeSet::from(["--config".to_owned()])),
+            vec!["is deprecated: Deprecated name of `connectors instances list`".to_owned()]
+        );
+        let flag = "Inspect one configured instance\n\nUsage: connectors instances describe [OPTIONS]\n\nOptions:\n      --adapter <ALIAS>              Deprecated: the alias of a configured entry; select with --connector and --instance\n      --connector <field:connector>  \n      --instance <field:instance>    \n  -h, --help                         Print help\n";
+        assert_eq!(
+            connector_deprecations(flag, &BTreeSet::from(["--adapter".to_owned()])),
+            vec!["has deprecated --adapter: Deprecated: the alias of a configured entry; select with --connector and --instance".to_owned()]
+        );
+        assert_eq!(
+            connector_help_problems(
+                flag,
+                &BTreeSet::from(["--connector".to_owned(), "--instance".to_owned()])
+            ),
+            Vec::<String>::new()
+        );
+        assert_eq!(
+            connector_help_problems(flag, &BTreeSet::from(["--family".to_owned()])),
+            vec!["has no --family".to_owned()]
+        );
     }
 
     #[test]

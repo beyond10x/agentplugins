@@ -45,14 +45,29 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    a store with `metadata_unavailable`, which no retry clears.
    From `v0.52.0` a single-source `roughtime-clock/1` approval clock is refused: an install that
    issues approvals rewrites its `[approval_clock]` table as `roughtime-quorum/1` (the integrating
-   skill's writes reference) and runs `connectors approvals clock-check --adapter <alias>` before
-   its next approval.
+   skill's writes reference) and runs
+   `connectors approvals clock-check --connector <connector> --instance <instance>` before its
+   next approval.
    A catalog provider upgrade (`v0.53.0` OpenRouter `key.create` and its custody table, `v0.53.1`
    Runpod's capacity refusal) writes the new `connectors-catalog-provider` SHA-256 into the
    alias's `executable.sha256`, reprints the bootstrap
    (`connectors-catalog-provider --local-config <file> --print-local-bootstrap`), writes a changed
    `configuration_revision`, then renews the saved key without re-entry:
-   `connectors --output json connections revalidate --adapter <alias> --connection <id> --expected-revision <revision>`.
+   `connectors --output json connections revalidate --connector <connector> --instance <instance> --connection <id> --expected-revision <revision>`.
+   From `v0.54.0` the `[adapters.<alias>]` configuration, its alias selection flag, the
+   adapter-named command group and the old name of `connections reconnect` are deprecated (they
+   still run and say so once); spell
+   `instances`, `--connector`/`--instance` and `connections reconnect`. Move a legacy
+   configuration to connector instances with `connectors setup migrate`, within the user's
+   authorization: `connectors --output json setup migrate --mode dry-run` prints the new file and
+   each entry's disposition and writes nothing; `connectors --output json setup migrate --mode apply`
+   writes it and keeps the old one as `config.toml.before-migrate-<UTC timestamp>`. It keeps each
+   instance id, configuration revision, executable selection and custody item, so connections
+   and approval policies stay valid with no new consent; an entry it cannot map stays, with its
+   reason. Restoring the backup rolls it back. A migrated legacy entry `<alias>` is selected as
+   `--connector <connector> --instance <alias>`. After a provider executable change alone, a
+   catalog connection validates its stored credential once on the next call; republish the
+   approval policy, which binds the executable selection. `v0.55.0` needs no upgrade step.
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 

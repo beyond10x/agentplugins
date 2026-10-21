@@ -7,6 +7,7 @@
   it writes one evidence record per redaction holding the literal's SHA-256, never the literal, and
   `validate` admits a `review-result` only while replaying those records over its first committed
   version reproduces its current text.
+- Track Connectors v0.55.0: the connectors skills spell `instances`, `--connector`/`--instance` and `connections reconnect`, `connectors:upgrade` names `setup migrate`, and `tools` refuses a spelling the release's help marks deprecated.
 
 ## [0.23.2] — 2026-10-17
 

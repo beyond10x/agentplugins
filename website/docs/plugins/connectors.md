@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.48.0](https://github.com/beyond10x/connectors/releases/tag/v0.48.0).
+[v0.55.0](https://github.com/beyond10x/connectors/releases/tag/v0.55.0).
 
 ## Install in either host
 
@@ -40,10 +40,10 @@ files. `b10x skill connectors:integrating` prints the current instructions witho
 ## First use
 
 Ask: “Use connectors to inspect my local Connector readiness.” The skill checks CLI availability,
-runs `connectors --output json setup check` and lists configured adapters. These checks do not
+runs `connectors --output json setup check` and lists configured instances. These checks do not
 authenticate, start services or prove that cached metadata is current.
 
-For an existing integration, it selects a configured adapter and connection, lists operations,
+For an existing integration, it selects a configured instance and connection, lists operations,
 and describes one before invocation. The returned schema identity and revision bind the call;
 its JSON input must match the described schema. Invocation rechecks admission and may start the
 supervised local owner/adapter. Missing capability or access is reported explicitly.

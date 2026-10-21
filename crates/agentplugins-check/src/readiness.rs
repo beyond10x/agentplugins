@@ -186,7 +186,7 @@ fn inspect_words(words: &[String]) -> Result<bool, String> {
     let verb = args.get(index + 1).map(String::as_str);
     match (area, verb) {
         (Some("setup"), Some("check")) => Ok(true),
-        (Some("adapters" | "connections"), Some("list" | "describe" | "status"))
+        (Some("adapters" | "instances" | "connections"), Some("list" | "describe" | "status"))
         | (Some("operations"), Some("list" | "describe"))
         | (Some("help"), _) => Ok(false),
         _ => {

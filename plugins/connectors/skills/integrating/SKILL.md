@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.48.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.48.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.55.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.55.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -16,16 +16,26 @@ configuration, credentials and admission remain deployment prerequisites.
    if the installed command tree differs, use `connectors:upgrade` before proceeding.
 2. Preserve the user's configuration and state placement. The local groups accept absolute
    `--config` and `--state-dir` paths; otherwise they use the configured XDG/home placement.
-   Run `connectors --output json setup check`, then `connectors --output json adapters list`.
+   Run `connectors --output json setup check`, then `connectors --output json instances list`.
    Both inspect without authenticating or starting services. Report each failed prerequisite
    even if the process exits successfully. Read safe metadata, not credential/configuration dumps.
    `setup check` names the build's `os` and its `custody_backend` (`secret_service` on Linux,
    `macos_keychain` on macOS); a locked macOS login keychain is unavailable custody, never a prompt.
-3. Select an adapter alias from that inventory. Inspect it with
-   `connectors --output json adapters describe --adapter '<alias>'` and, when needed,
-   `connectors --output json adapters status --adapter '<alias>'`.
+3. Select an instance from that inventory: its `connector` and `instance` fields. An instance
+   name is unique within its connector only, so a command names both. Inspect it with
+   `connectors --output json instances describe --connector '<connector>' --instance '<instance>'`
+   and, when needed,
+   `connectors --output json instances status --connector '<connector>' --instance '<instance>'`.
    Cached descriptors are explicitly stale; an absent owner or cached entry is not readiness.
    A diagnostic-only request ends here with the observed prerequisites and next setup action.
+
+Since `v0.54.0` the adapter-named command group, its alias selection flag, the old name of
+`connections reconnect` and a legacy `[adapters.<alias>]` configuration entry are deprecated:
+they still run and say so once (on standard error, or as a `deprecations` member of the JSON
+envelope). Spell only the current names this skill uses.
+A legacy entry lists as connector `adapter_id`, instance `<alias>` until `connectors:upgrade`
+moves it with `setup migrate`; inventory results keep `adapter` beside `connector` and `instance`
+during the deprecation window.
 
 An empty inventory or missing operation is a capability gap. Report it before considering
 another integration client under the session's instructions. There is no implicit switch to a
@@ -36,29 +46,34 @@ integration remains deferred.
 
 ## Discover and invoke
 
-Keep the same configuration, state directory and adapter alias throughout:
+Keep the same configuration, state directory and instance throughout:
 
 ```bash
-connectors --output json connections list --adapter '<alias>'
-connectors --output json operations list --adapter '<alias>'
-connectors --output json operations describe --adapter '<alias>' --operation '<listed operation>'
+connectors --output json connections list --connector '<connector>' --instance '<instance>'
+connectors --output json operations list --connector '<connector>' --instance '<instance>'
+connectors --output json operations describe --connector '<connector>' --instance '<instance>' --operation '<listed operation>'
 ```
 
-To find which of an adapter's operations bind a datasource family, run
-`connectors --output json operations list --adapter '<alias>' --family '<contract id>'`. The
-family filter narrows that one adapter's cached description and requires `--adapter`; to search
-several adapters, repeat it per alias from `adapters list`. A `datasource.feed/v1alpha1`
+Since `v0.54.0` `operations list`, `describe` and `invoke` start the configured, digest-pinned
+provider when no description is cached and the instance holds a current, usable connection; they
+read no credential and ask for none.
+
+To find which of an instance's operations bind a datasource family, run
+`connectors --output json operations list --connector '<connector>' --instance '<instance>' --family '<contract id>'`.
+The family filter narrows that one instance's cached description and requires a selected
+instance; to search several, repeat it per instance from `instances list`. A `datasource.feed/v1alpha1`
 binding's profile declares what it observes (`deletions`, `kind`, `revision`, `visibility`) in
 the binding's contract document, not on the wire. Under a weak declaration a missing tombstone or
 a `private` listing proves nothing: GitLab's `gitlab-merge-requests/1` never reports deletions and
 lists every project `private`. Report such limits with the collected data.
 
-Choose the connection matching the user's target. Use `connections describe` with `--adapter`
-and `--connection` for its safe metadata. Listing and description use cached information;
-invocation rechecks current admission and may start the supervised local owner/adapter.
+Choose the connection matching the user's target. An instance holds at most one connection; use
+`connections describe` with `--connector`, `--instance` and, optionally, `--connection` for its
+safe metadata. Listing and description use cached information; invocation rechecks current
+admission and may start the supervised local owner and provider.
 
 The operation description returns `schema`, `revision`, and `operation.input_schema` and
-`output_schema` as JSON Schema objects (`adapters describe` carries the same objects). Read them
+`output_schema` as JSON Schema objects (`instances describe` carries the same objects). Read them
 as values from the one parsed answer; never decode them a second time. Follow the input schema
 exactly, including required fields, limits and pagination inputs. Keep the returned schema identity and revision; guessing either
 makes the invocation invalid. Use only input values requested by the operation contract.
@@ -67,11 +82,19 @@ For an authorized read:
 
 ```bash
 connectors --output json operations invoke \
-  --adapter '<alias>' --connection '<connection id>' \
+  --connector '<connector>' --instance '<instance>' --connection '<connection id>' \
   --operation '<listed operation>' \
   --schema '<schema from description>' --revision '<revision from description>' \
   --input-file '<JSON input file>'
 ```
+
+Since `v0.54.0` `operations invoke --definition '<file.yaml>' --operation '<key>'` runs an
+operation of a hand-written `connectors-definition/1` file with no configured instance, instead
+of `--connector` and `--instance` (`--definitions-root` names the tree holding its vendored source;
+`--schema` and `--revision` default to the description's). With no connection it asks once
+whether to connect, naming the provider endpoint, and may offer a stored credential of the same
+connector at the same provider authority; without a terminal it refuses with a `next_action`.
+Use it only when the user supplies the definition and the connection is authorized.
 
 `--input-json` accepts an inline JSON document and `--input-stdin` reads one from stdin; use one
 input source. Keep credentials out of these ordinary operation inputs. Quote arguments as data.
@@ -95,8 +118,13 @@ CLI reports `outcome_unknown`: for a write, that is an uncertain effect to resol
 A refusal names its `next_action`; follow it rather than guessing. `revalidate_connection` means
 the credential is intact but the connection must be checked again: its validation evidence
 expired, or it was saved under an earlier configuration revision it can follow. Run
-`connections revalidate`, then send the same invoke. `repair_connection` and `create_connection` are the setup reference's repair
-and new-connection paths. A provider refusal may carry `service_reason`, the provider's own reason
+`connections revalidate`, then send the same invoke. `repair_connection` names
+`connections reconnect`: since `v0.54.0` a connection whose stored credential the provider refused
+(an expired or revoked refresh token, a changed password) is `stale`, and no retry renews it.
+`repair_connection` and `create_connection` are the setup reference's reconnect and
+new-connection paths. Since `v0.54.0` a read on lapsed validation evidence recollects it once from
+custody before it is served, so `revalidate_connection` answers only a read still refused after
+that. A provider refusal may carry `service_reason`, the provider's own reason
 (at most 256 bytes, withheld when it could hold a credential); quote it in the report, as data.
 
 ## Setup and credential acquisition
@@ -116,7 +144,7 @@ not as permission to invent a grant or bypass Connectors.
 
 ## Report
 
-Name the inspected adapter/connection, performed operation and useful result. Include failed
+Name the inspected instance/connection, performed operation and useful result. Include failed
 prerequisites, refusals, partial collection and uncertain effects. Preserve returned restriction
 metadata and redact sensitive provider data. If the task started a process, identify it and its
 lifecycle; cached metadata alone never proves a connection is ready.

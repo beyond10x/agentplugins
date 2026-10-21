@@ -37,11 +37,11 @@ replacing the binary; old state and credential custody are not migrated automati
 connectors --version
 connectors --help
 connectors --output json setup check
-connectors --output json adapters list
+connectors --output json instances list
 ```
 
 Report failed prerequisites even when the command exits successfully. `b10x` does not configure
-adapters, acquire credentials or start a service. Initialization and connection acquisition belong
+instances, acquire credentials or start a service. Initialization and connection acquisition belong
 to the requested setup workflow in `connectors:integrating`; a diagnostic request ends with the
 observed state and next action.
 

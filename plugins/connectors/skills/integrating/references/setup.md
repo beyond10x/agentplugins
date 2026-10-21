@@ -11,24 +11,35 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    metadata that guide requires. An example's fictional paths or digests are not runnable
    artifacts. `b10x` installs the CLI, not every adapter. `setup check` must show its artifact and
    state prerequisites before continuing.
-3. Read `adapters describe --adapter '<alias>'` and the adapter's supported acquisition profile.
-   For an authorized connection, inspect `connections connect --help`, then use the selected
-   `--adapter` and `--profile` with one protected entry option: `--credential-prompt`,
+3. Read `instances describe --connector '<connector>' --instance '<instance>'` and the
+   instance's supported acquisition profile. An instance holds at most one connection: `connect`
+   on one that already holds a live or stale connection is refused before it asks for a
+   credential, so a second account is a second instance. For an authorized connection, inspect
+   `connections connect --help`, then use the selected `--connector`, `--instance` and
+   `--profile` with one protected entry option: `--credential-prompt`,
    `--credential-file` or `--credential-stdin`. The operator supplies the documented credential
    document directly to that protected channel. Never read secret bytes into model context or
    put them in chat, command arguments, logs or configuration. OAuth acquisition uses the
    adapter's returned safe next action; do not invent an authorization URL or copy tokens. A
    profile using `oauth2_client_credentials` takes a `{client_id, client_secret}` document through
    the same protected channel; the CLI requests and renews the access token itself.
-4. Observe the returned connection or acquisition with `connections status --adapter '<alias>'`
-   and exactly one of `--connection` or `--acquisition`. Report ready only when observed state
-   says so. `connections revalidate` checks a saved credential without re-entry; it contacts
-   the provider and requires the current `--expected-revision`. After the adapter's
-   configuration changes (a rebuilt bundle or selection), revalidate: the connection follows the
+4. Observe the returned connection or acquisition with
+   `connections status --connector '<connector>' --instance '<instance>'` and exactly one of
+   `--connection` or `--acquisition`. Report ready only when observed state says so.
+   `connections revalidate` checks a saved credential without re-entry; it contacts the provider
+   and requires the current `--expected-revision`. Since `v0.54.0` a catalog connection is bound
+   to the credential side of its configuration and to the provider executable, not to the
+   operation list: a bundle, source or selection change leaves it `ready`, and an added read
+   works with no revalidation. A provider executable change validates the stored credential once
+   on the next call and refuses as `identity_mismatch` when the identity differs; republish the
+   approval policy after it. A CA file, token CA, admitted host or request prefix change still
+   gives `pending` until revalidation. A connection saved before `v0.54.0`, or under an entry
+   other than the catalog provider's, keeps the rule that follows until its first revalidation.
+   After the instance's configuration changes (a rebuilt bundle or selection), revalidate: the connection follows the
    new configuration when its provider authority, profile and identity are unchanged, and
    otherwise refuses with `next_action: create_connection`. That refusal keeps the credential
-   and is recorded on the connection, whose reads then name `create_connection` too (a repair
-   clears it). Connect again: under the same `instance` id the new connection is admitted under
+   and is recorded on the connection, whose reads then name `create_connection` too (a
+   reconnect clears it). Connect again: under the same `instance` id the new connection is admitted under
    the configured revision, while a changed provider host or profile needs a new instance id.
    Since `v0.34.0` no such connection refuses with `retry_status`. A release whose
    notes say an instance's configuration revision moved (in `v0.32.0`, every instance using the
@@ -40,8 +51,11 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    permitted operations; add them only when the operator authorizes that access. A profile's access
    read answered 401 or 403 refuses the connection as `insufficient_scope`: the credential lacks a
    scope the profile needs, and only a credential that has it fixes that.
-5. For repair, preserve connection identity: `connections repair` takes `--adapter`,
-   `--connection`, `--expected-revision` and one protected credential source. For a requested
+5. For repair, preserve connection identity: `connections reconnect` (since `v0.54.0`; its
+   deprecated old name runs the same command) takes `--connector`, `--instance`,
+   `--expected-revision`, one protected credential source and, optionally, `--connection` (the
+   instance's one connection when left out). It turns a `stale` connection, whose credential the
+   provider refused, `live` again under the same identity. For a requested
    terminal revocation, inspect `connections revoke --help` and use the current revision.
    A conflicting revision requires a fresh observation, never a guessed increment.
 6. To hand one saved connection to a local program, inspect `connections launch --help` and the
@@ -50,7 +64,7 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
    receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.48.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.55.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
@@ -133,7 +147,7 @@ archive as the release's README (*install a release binary*) shows, so both are 
 `v0.52.0` changes the approval clock to a quorum of Roughtime sources (`roughtime-quorum/1`): an
 install that issues approvals or makes approved writes rewrites its `[approval_clock]` table first,
 as [writes-and-services.md](writes-and-services.md) and the release's `docs/local-clock.md` say,
-then runs `connectors approvals clock-check --adapter <alias>`. The same release adds a
+then runs `connectors approvals clock-check --connector <connector> --instance <instance>`. The same release adds a
 `confluence-v1` provider (seven Confluence REST v1 reads, for a token with classic scopes whose v2
 reads answer `401`), configured as its own adapter beside `confluence` as the release's
 `docs/catalog-confluence.md` shows; Slack history and thread reads in the `slack.user` selection,
@@ -150,6 +164,20 @@ its configuration revision.
 `key.create`, the custody table and the custody alias, with the new revisions and provider SHA-256,
 as the release's `docs/catalog-openrouter.md` (*Moving an existing install*) shows; every catalog
 provider alias renews its revision and SHA-256 as the upgrade skill says.
+
+`v0.54.0` adds connector instances. A `connectors-local/5` configuration enables connectors by
+name under `[connectors.<connector>]` and names their instances under
+`[connectors.<connector>.instances.<instance>]`, each with only its own `endpoint`, optional
+`description` and, where its connector declares more than one auth profile, `profile`; the
+executable, its SHA-256, the configuration revision and the operations come from the
+`connectors-catalog-provider` installed beside `connectors`, and `default_instance` selects one
+for a command that names none. `setup init` still writes the older format; the release's README
+(*Configure instances*) shows the file. A legacy `[adapters.<alias>]` entry keeps working and is
+moved by `connectors setup migrate`, as `connectors:upgrade` says. The same release adds
+approved Zendesk ticket writes, Jira issue writes with `issue.create_meta.fields`, and Slack
+`users.info`, `users.lookupByEmail` and `files.delete`: use one only when the operator authorizes
+that access, and send every write through
+[writes-and-services.md](writes-and-services.md). `v0.55.0` changes no setup step.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is

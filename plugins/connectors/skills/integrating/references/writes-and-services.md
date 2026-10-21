@@ -2,12 +2,17 @@
 
 ## Local writes
 
-An operation must be admitted by the adapter and covered by the user's existing authorization.
+An operation must be admitted by the instance and covered by the user's existing authorization.
 Inspect `connectors approvals --help` and the selected operation's current write requirements.
-Use `approvals prepare` with the exact `--adapter`, `--connection`, `--operation`, `--schema`,
-`--revision` and input document intended for invocation. This produces the reconstructed subject
-for review. Missing policy, signing custody or clock prerequisites need their documented setup;
-a refused invocation does not authorize changing them.
+Use `approvals prepare` with the exact `--connector`, `--instance`, `--connection`, `--operation`,
+`--schema`, `--revision` and input document intended for invocation. This produces the
+reconstructed subject for review. Missing policy, signing custody or clock prerequisites need
+their documented setup; a refused invocation does not authorize changing them. Since `v0.55.0` an
+`invalid_input` that `approvals policy-set`, `prepare` or `issue` decides names the refused
+argument in `Failure.field` (such as `proof_output`, `approve_subject` or `revision`), never its
+value: correct that argument, not another. `issue` refuses a `--proof-output` that is relative,
+in a directory other users can read, an existing file or behind a symbolic link; use a new
+private absolute path.
 
 When the exact effect and target are authorized, `approvals issue` takes the same request,
 `--approve-subject` from preparation and a new `--proof-output` protected path. Invoke with that
@@ -44,8 +49,8 @@ clock. A Slack read answered `200` with `"ok": false` is now a refusal by name; 
 rules above.
 
 Since `v0.53.0` a write that creates a credential holds it in custody. OpenRouter's `key.create`
-(the catalog provider's `openrouter` adapter, required approval) sends the create once, stores the
-returned key as a new connection of the alias and profile that
+(the catalog provider's `openrouter` connector, required approval) sends the create once, stores
+the returned key as a new connection of the alias and profile that
 `[adapters.<alias>.permissions.custody]` names for the operation, and returns only that
 connection's reference and the key's hash, never the key. A create with no custody target, or one
 whose target disagrees with its declaration, is refused before anything is sent. A timeout or
@@ -54,6 +59,20 @@ the connection, so check `connections list` on the custody alias and the provide
 before creating again. The release's `docs/catalog-openrouter.md` (*Creating a key*) and
 `docs/local-mutation-ledger.md` (*Created credentials*) are the contract. Since `v0.53.1` a Runpod
 `pod.create` refused for lack of capacity is `refused` with code `capacity`, not `invalid_input`.
+
+Since `v0.54.0` the catalog provider carries Zendesk ticket writes (`ticket.update`,
+`ticket.note`, and `ticket.draft_reply`, a private note that never reaches the requester), Jira
+issue writes (`issue.create`, `issue.comment.add`, `issue.edit`, `issue.link.add`,
+`issue.delete`) and Slack `files.delete`, each under an issued approval. The Zendesk writes and
+the Jira edit and delete take the target's update stamp read just before (`updated_stamp`) and
+refuse a difference as `conflict` with nothing sent: read the target again and reassess, never
+resend with a guessed stamp. Jira rich text is Atlassian Document Format that the caller writes;
+plain text and Markdown are not converted. `issue.link.add` is not verified after the write. The
+Zendesk writes are verified with the `zendesk.basic` profile only. The release's
+`docs/catalog-zendesk.md` (*Writes*), `docs/catalog-jira.md` (*Issue writes*) and
+`docs/catalog-slack.md` (*Files*) are the contract. Since `v0.55.0` a Jira `issue.create` or
+`issue.comment.add` answer that names no new id is `unknown`, not `applied`: check the issue
+before any new attempt.
 
 ## Explicit services
 
