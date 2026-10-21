@@ -733,21 +733,29 @@ fn eval_pair(root: &Path) -> Result<(), String> {
 }
 
 /// The Claude Code versions `metaharness-claude` declares in `PINNED_VERSIONS`, provided
-/// `claude` is one of them.
+/// `claude` is one of them. The array may span lines, as rustfmt wraps it once it is long.
 fn verify_claude_pin(source: &str, claude: &str) -> Result<Vec<String>, String> {
-    let declaration = source
+    let start = source
         .lines()
-        .find(|line| line.trim_start().starts_with("pub const PINNED_VERSIONS"))
+        .scan(0, |offset, line| {
+            let at = *offset;
+            *offset += line.len() + 1;
+            Some((at, line))
+        })
+        .find(|(_, line)| line.trim_start().starts_with("pub const PINNED_VERSIONS:"))
+        .map(|(at, _)| at)
         .ok_or("metaharness-claude declares no PINNED_VERSIONS")?;
-    let list = declaration
-        .rsplit_once('[')
+    let list = source[start..]
+        .split_once('=')
+        .and_then(|(_, value)| value.split_once('['))
         .and_then(|(_, rest)| rest.split_once(']'))
         .map(|(list, _)| list)
-        .ok_or("metaharness-claude PINNED_VERSIONS is not a one-line array")?;
+        .ok_or("metaharness-claude PINNED_VERSIONS is not an array literal")?;
     let pinned: Vec<String> = list
-        .split(',')
-        .map(|item| item.trim().trim_matches('"').to_owned())
-        .filter(|item| !item.is_empty())
+        .split('"')
+        .skip(1)
+        .step_by(2)
+        .map(str::to_owned)
         .collect();
     if pinned.is_empty() {
         return Err("metaharness-claude PINNED_VERSIONS is empty".to_owned());
@@ -1169,6 +1177,41 @@ mod tests {
         assert!(verify_claude_pin("", "2.1.259").is_err());
         assert!(
             verify_claude_pin("pub const PINNED_VERSIONS: [&str; 0] = [];", "2.1.259").is_err()
+        );
+    }
+
+    #[test]
+    fn eval_claude_pin_reads_the_array_rustfmt_wraps_at_six_versions() {
+        let source = "pub const PINNED_VERSIONS: [&str; 6] = [\n    \"2.1.304\", \"2.1.305\", \"2.1.306\", \"2.1.307\", \"2.1.308\", \"2.1.309\",\n];\n";
+        assert_eq!(
+            verify_claude_pin(source, "2.1.309"),
+            Ok(vec![
+                "2.1.304".to_owned(),
+                "2.1.305".to_owned(),
+                "2.1.306".to_owned(),
+                "2.1.307".to_owned(),
+                "2.1.308".to_owned(),
+                "2.1.309".to_owned(),
+            ])
+        );
+    }
+
+    #[test]
+    fn eval_claude_pin_ignores_a_constant_whose_name_only_starts_with_pinned_versions() {
+        let source = "pub const PINNED_VERSIONS_RETIRED: [&str; 1] = [\"2.1.259\"];\npub const PINNED_VERSIONS: [&str; 2] = [\"2.1.304\", \"2.1.305\"];\n";
+        assert!(verify_claude_pin(source, "2.1.259").is_err());
+        assert_eq!(
+            verify_claude_pin(source, "2.1.305"),
+            Ok(vec!["2.1.304".to_owned(), "2.1.305".to_owned()])
+        );
+    }
+
+    #[test]
+    fn eval_claude_pin_ignores_brackets_in_a_trailing_comment() {
+        let source = "pub const PINNED_VERSIONS: [&str; 2] = [\"2.1.304\", \"2.1.305\"]; // see [MENTION_CANARIES]\n";
+        assert_eq!(
+            verify_claude_pin(source, "2.1.305"),
+            Ok(vec!["2.1.304".to_owned(), "2.1.305".to_owned()])
         );
     }
 
