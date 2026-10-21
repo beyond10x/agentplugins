@@ -11,12 +11,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Track AEP 0.75.0; `aep:planning` names `aep plan artifact redact` as the only way to change an immutable record
-- Track ESS 0.66.0: the ESS skills describe `ess/27` and `ess/28`; tutorials, fixtures and eval workflow move together
-- Track Connectors v0.55.0: the skills spell `instances` and `--instance`; `tools` refuses deprecated spellings
-- Track Metaharness 0.10.1 in the eval workflow (with AEP 0.68.1) and gates 0.1.22 in the shared gates workflow
-- Sample tracker keys and project paths in skills, a `b10x` test and the golden-path transcript are neutral
+- **Breaking:** Connectors skills spell v0.55.0's `instances`, `--connector`/`--instance` and `connections reconnect`
 - **Breaking:** `CHANGELOG.md` follows Keep a Changelog 1.1.0; `release verify` needs `## [x.y.z] - YYYY-MM-DD`
+- Track AEP 0.76.0; `aep:planning` names `aep plan artifact redact` as the only way to change an immutable record
+- Track ESS 0.67.0: the ESS skills describe `ess/27` to `ess/29` and suites to `/57`; the tutorial set moves with it
+- Track Metaharness 0.12.0; the eval workflow runs it with AEP 0.68.1 and Claude Code 2.1.305
+- `agentplugins-check tools` refuses an eval `CLAUDE_VERSION` the pinned Metaharness adapter does not pin
+- `agentplugins-check tools` refuses deprecated Connectors spellings
+- The shared gates workflow runs gates 0.1.22
+- Sample tracker keys and project paths in skills, a `b10x` test and the golden-path transcript are neutral
 
 ## [0.23.2] - 2026-10-17
 

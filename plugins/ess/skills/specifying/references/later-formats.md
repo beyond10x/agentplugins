@@ -48,6 +48,8 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | several related rows required at once | `ess/28` | `when_related: {all: [{via: input.<a>, predicate: …}, {via: input.<b>, predicate: …}]}` |
 | the state of a related row as a value | `ess/28` | `{related: {via: input.<field>, field: state}}`, typed as that entity's `State` |
 | a list of references naming a missing row | `ess/28` | `when_related: {via: input.<list>, exists: false}`; the payload reads the first such element with `{missing: input.<list>}` |
+| a guard that says what an absent `Optional` compares as | `ess/29` | `coalesce(<fact>, <default>) <op> <literal>` in `when:`, `when_subject:` or `when_related:`, quoted inside a flow mapping; [below](#ess29) |
+| an external cause that applies only to some stored rows | `ess/29` | `when_subject: {predicate: …}` beside `external:`; not with `before_row: true`; [below](#ess29) |
 | a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled. For a view, take `from`/`to` view parameters the caller sends (`<field> >= param.from`, `<field> < param.to`), as the refusal's hint says |
 
 ```yaml
@@ -255,7 +257,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/28`
+## From `ess/16` through `ess/29`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -277,6 +279,7 @@ With current ESS:
 | `ess/26` | a named `external:` refusal of a command that addresses an existing row (`before_row: true` included) leaves the row unchanged: its scenario snapshots the row and requires it unchanged afterwards; a `compensates: true` refusal keeps its read-back |
 | `ess/27` | typed expressions (`{expr: …}`) in values and view fields; digest and encoding functions in guards; values narrowed by their branch; `moves:`/`deletes:` in `affects: each:`; a struct `shorthand:`; Boolean leaves in binding conditions; `unknown_instance:` beside `when_related:`; one precedence rule for every guard pair; `{generated: true, present: true}` and `{payload: <Event>.<field>}` in `sets:`; system-issued commands; ordered heads; identity reads in set-effect filters; published values in selectors; `exists:` over a candidate's related rows |
 | `ess/28` | view fields and filters read through a reference, one hop; `when_related: {all: […]}`; a related row's `state` as a value; `when_related:` over a list of references with `{missing: …}` |
+| `ess/29` | `coalesce(<fact>, <default>)` on the left of a guard's comparison; `when_subject:` beside `external:`; a guarded branch declared below one a later precedence step answers is refused |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -617,6 +620,51 @@ obligation in generated Rust and Go. A command with an `all:` or a list guard st
 in generated Rust and Go, and Entity Runtime lowering refuses it, each by name. A view reading
 through a reference (`ess/28`) keeps its query an obligation in generated Rust and Go. Synthesis of
 a Rust or Go server or the web app refuses a `shorthand:` struct.
+
+## `ess/29`
+
+A probe on 0.67.0 using the excerpt below validated, synthesized 6 scenarios with 0 refusals in
+`ess-conformance/34`, and the `interpreted` target passed all 6. Under `ess/28` each `coalesce`
+guard is `unsupported_format_version` naming `ess/29`, and `external:` beside `when_subject:` is
+`conflicting_declaration` naming `ess/29`.
+
+```yaml
+      - {name: no-job, unknown_instance: true, error: demo.jobs.NoSuchJob}
+      - name: hashed-mismatch                 # asked only on a row whose method is hashed
+        external: the outside service finds the hashed verifier differs
+        when_subject: {predicate: method == hashed}
+        error: demo.jobs.VerifierMismatch
+      - name: exhausted                       # an absent attempts field counts as 0
+        when_subject: {predicate: "coalesce(attempts, 0) >= 3"}
+        error: demo.jobs.TooManyAttempts
+```
+
+`attempts == 3` over an absent `Optional` is unknown, so no record without the field is decided;
+`coalesce(attempts, 0)` reads `0` there. The default has the fact's type and the call reads one
+fact; anything else on the left is `type_mismatch`, and a call outside a command outcome's guards
+is `unsupported_construct`. It compiles to the structured
+`{compare: {left: {expr: "coalesce(attempts, 0)"}, op: …, right: …}}` that `ess/27` admits.
+Generated Rust and Go decide it over a `Boolean`, `Integer`, `Decimal` or `String` fact; Entity
+Runtime refuses it as `FunctionCallUnsupported`.
+
+An `external:` branch with `when_subject:` is answered at the held-state step, in declaration
+order among the branches the stored row selects, before `wrong_state:`. Generated Rust and Go ask
+the provider only after the guard holds, and Entity Runtime lowers it to the guard and the host's
+external evidence. `before_row: true` or the `{field, equals}` shape beside it is
+`conflicting_declaration`.
+
+**Declaration order must agree with the precedence rule** (`ess/29`). A guarded branch declared
+below one a later step answers is refused wherever one request satisfies both. On 0.67.0 an input
+guard declared below `unknown_instance:` validated under `ess/28` and was refused under `ess/29`:
+
+```text
+[conflicting_declaration] command.demo.jobs.RetryJob.outcomes.over-budget: `over-budget` answers at step 1 of the precedence order and `no-job`, declared above it, at step 2; where both hold, the declaration order and the precedence order disagree (hint: declare `over-budget` before `no-job`: step 1 answers first in either order)
+```
+
+Declare each refused branch above the one its refusal names. Input guards the finite prover shows
+disjoint may come in either order, and a marker (`unknown_instance:`, `wrong_state:`,
+`exists: false`) declared below a guarded branch is not refused. The probe of the section above,
+raised to `ess/29`, validated on 0.67.0 and its 11 scenarios passed on the `interpreted` target.
 
 ## What validates and still gets no scenario
 
