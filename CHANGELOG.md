@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-10-21
+
 ### Changed
 
 - Track AEP 0.75.0; `aep:planning` names `aep plan artifact redact` as the only way to change an immutable record
@@ -910,7 +912,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins
 - Publish adopter documentation for discovering, selecting, and installing each plugin
 
-[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.23.2...HEAD
+[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.24.0...HEAD
+[0.24.0]: https://github.com/beyond10x/agentplugins/compare/0.23.2...0.24.0
 [0.23.2]: https://github.com/beyond10x/agentplugins/compare/0.23.1...0.23.2
 [0.23.1]: https://github.com/beyond10x/agentplugins/compare/0.23.0...0.23.1
 [0.23.0]: https://github.com/beyond10x/agentplugins/compare/0.22.11...0.23.0
