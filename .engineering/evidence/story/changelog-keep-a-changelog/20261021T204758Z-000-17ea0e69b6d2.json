@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-21T20:47:58Z",
+  "actor": "human:timo",
+  "artifact": "story:changelog-keep-a-changelog",
+  "kind": "story",
+  "revision": 3,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check, task site-build, agentplugins-check tools and upstream on wave/0.24.0 35b9304: exit 0"
+  }
+}

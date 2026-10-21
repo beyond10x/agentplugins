@@ -2,14 +2,15 @@
 format: aep.planning-md/3
 id: story:shared-gates-0122
 kind: story
-status: active
+status: implemented
 title: Pin the shared gates workflow at gates 0.1.22
 relations:
 - decomposes: epic:release-0-24-0
-revision: 3
+revision: 4
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-21T08:39:48Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-21T08:39:48Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-21T20:47:58Z", actor: "human:timo", revision: 4, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 
