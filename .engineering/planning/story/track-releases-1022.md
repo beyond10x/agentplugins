@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:track-releases-1022
 kind: story
-status: active
+status: implemented
 title: Track ESS 0.68.0, Metaharness 0.14.0 and Connectors v0.56.0
 scope:
 - confidence: cited
@@ -23,10 +23,11 @@ scope:
   path: verified.json
 - confidence: cited
   path: website/docs
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-23T12:18:10Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-23T12:18:10Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-23T13:02:35Z", actor: "human:timo", revision: 5, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 

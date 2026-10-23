@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-23T13:02:35Z",
+  "actor": "human:timo",
+  "artifact": "story:track-releases-1022",
+  "kind": "story",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "PR 93 merged by b10x-bot[bot] as 69231f6; Tools run 39957300125 green on 69231f6; release 0.24.1 published by b10x-bot[bot], tag on 69231f6, 6 assets match SHA256SUMS of Release run 39957284599"
+  }
+}
