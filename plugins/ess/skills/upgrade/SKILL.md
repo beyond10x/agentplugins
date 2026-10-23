@@ -50,7 +50,8 @@ changed yet.
   summary (`ess-diff/20`); from 0.64.0 a suite with a view read through a reference
   (`ess-conformance/54`, `/55`) and a spec diff naming `field-source-changed` (`ess-diff/21`);
   from 0.67.0 a suite with a one-time read cell that names its reader (`ess-conformance/56`,
-  `/57`). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  `/57`); from 0.68.0 a specification on `ess/30`, which 0.67.0 refuses as `ESS-SPEC-009`
+  ("this build implements specification format(s) [1, …, 29], not `ess/30`"). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -74,6 +75,17 @@ changed yet.
   refused; an authored scenario that isolates a connective child withdraws its `ESS-SYNTH-022`;
   and a model with one-time responses, actors and a view gains a read cell per reader, written at
   `ess-conformance/56` (`ess:testing-conformance`). Read the change with
+  `ess verify conform diff`.
+- From 0.68.0 regenerate every committed Go package: it passes `go vet` from Go language 1.26
+  only once regenerated (beyond10x/ess#629). Regenerate committed suites with no specification
+  change: synthesis witnesses an `existing_instance:` outcome whose creator sits behind
+  `when_related:` guards, or refuses it as `ESS-SYNTH-004` naming the guards; a ranked head on a
+  field a later command sets is arranged through that command (beyond10x/ess#626); the interpreter
+  answers a response field typed by a constrained string newtype. A view whose `source:` is a list
+  is now `unsupported_construct` at `view.<name>.source` at every format, not a parse error. No
+  suite or diff format moves. Raising a header to `ess/30` lets a kept reference drop its
+  `exists: false` branch, which adds re-reads to the suite
+  ([later-formats.md](../specifying/references/later-formats.md#ess30)). Read the change with
   `ess verify conform diff`.
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0

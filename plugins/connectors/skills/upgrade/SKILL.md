@@ -67,7 +67,7 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    reason. Restoring the backup rolls it back. A migrated legacy entry `<alias>` is selected as
    `--connector <connector> --instance <alias>`. After a provider executable change alone, a
    catalog connection validates its stored credential once on the next call; republish the
-   approval policy, which binds the executable selection. `v0.55.0` needs no upgrade step.
+   approval policy, which binds the executable selection. `v0.55.0` and `v0.56.0` need no upgrade step.
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 

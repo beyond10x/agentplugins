@@ -8,7 +8,7 @@ description: Specify a lending library and hold a Rust implementation to its gen
 
 An Executable System Specification describes records, commands, refusals, events and readable views.
 ESS validates that model and generates checks that an implementation must answer. This tutorial
-uses **ESS 0.67.0 and Rust**, verified on 2026-10-21. The
+uses **ESS 0.68.0 and Rust**, verified on 2026-10-23. The
 [2026-09-28 Go recording](./first-ess-specification-2026-09-28.md) is retained as historical evidence.
 
 You finish with a specification, generated documentation and OpenAPI, a small Rust library and
@@ -53,10 +53,10 @@ show those capabilities without changing this tutorial's lifecycle checks.
 
 ## 3. Read the specification
 
-`spec/system.yaml` selects the current source language:
+`spec/system.yaml` selects the newest source language, `ess/30` on ESS 0.68.0:
 
 ```yaml
-format: ess/23
+format: ess/30
 system: library
 version: v1
 domains:
@@ -67,7 +67,7 @@ domains:
 
 ```yaml
 format: ess-inputs/2
-requires: ess 0.67.0
+requires: ess 0.68.0
 specification:
   - system.yaml
   - components.yaml
@@ -135,8 +135,8 @@ publish = false
 [workspace]
 
 [dev-dependencies]
-ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.67.0" }
-ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.67.0" }
+ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.68.0" }
+ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.68.0" }
 serde_json = "1"
 
 [profile.dev]
@@ -178,7 +178,7 @@ command answer, a refusal included, carries the current revision as an opaque co
 a refusal leaves it unchanged. A view request demanding `AtLeast(token)`
 checks that revision before reading the same synchronous store. An invalid or future token is an
 error, never permission to return a weaker read. Returning rows alone without a command token
-caused 14 of the original tutorial's 17 scenarios to fail under current ESS.
+caused 14 of the original tutorial's 17 scenarios to fail in a run recorded on 2026-10-05.
 
 The integration-test portion of Cargo’s output is below; Cargo also prints zero-test unit and
 documentation lanes for this example:

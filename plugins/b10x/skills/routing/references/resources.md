@@ -4,7 +4,7 @@ Use the narrowest link that answers the request.
 
 | Resource | Purpose |
 |---|---|
-| [Getting started](https://beyond10x.github.io/getting-started/) | Public entry point and adoption paths |
+| [Beyond10x documentation](https://beyond10x.github.io/) | Public entry point and adoption paths |
 | [Agent Plugins](https://beyond10x.github.io/docs/agentplugins/) | Marketplace overview, installation, and plugin selection |
 | [Your first ESS specification](https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/) | Tutorial: an agent writes a specification, `ess` validates it, a Rust implementation passes its conformance suite |
 | [Golden path](https://beyond10x.github.io/docs/agentplugins/golden-path/) | One worked run, from a feature idea to a critiqued plan, on a repository that already exists |
