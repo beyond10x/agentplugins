@@ -1,7 +1,7 @@
 {
   "aep": "0.76.0",
-  "ess": "0.67.0",
+  "ess": "0.68.0",
   "worktree": "0.18.2",
-  "metaharness": "0.12.0",
-  "connectors": "v0.55.0"
+  "metaharness": "0.14.0",
+  "connectors": "v0.56.0"
 }

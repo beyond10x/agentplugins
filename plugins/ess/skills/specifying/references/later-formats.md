@@ -50,7 +50,12 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | a list of references naming a missing row | `ess/28` | `when_related: {via: input.<list>, exists: false}`; the payload reads the first such element with `{missing: input.<list>}` |
 | a guard that says what an absent `Optional` compares as | `ess/29` | `coalesce(<fact>, <default>) <op> <literal>` in `when:`, `when_subject:` or `when_related:`, quoted inside a flow mapping; [below](#ess29) |
 | an external cause that applies only to some stored rows | `ess/29` | `when_subject: {predicate: …}` beside `external:`; not with `before_row: true`; [below](#ess29) |
-| a rule on the current time | `ess/16`; `ess/22` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`. An invariant, a view filter, a selection or a set-effect filter refuses it: none of them is read while a request is handled. For a view, take `from`/`to` view parameters the caller sends (`<field> >= param.from`, `<field> < param.to`), as the refusal's hint says |
+| a stored reference every writer checks, with no missing-row branch | `ess/30` | leave out `when_related: {via: <field>, exists: false}` where every write of the field is refused first by `exists: false` over the same entity and no branch deletes a row of it; [below](#ess30) |
+| a selector that says what an absent candidate field compares as | `ess/30` | `coalesce(<field>, <literal>) == <literal>` in the `where:` of a row-set guard, a filtered read or an ordered head; not in a `forall:` body or a set effect's filter |
+| a set effect that selects rows by their held state | `ess/30` | `state == <State>` in the `where:` of `instances:` or of an `affects:` entry: the state before the outcome |
+| an external race that changes the row it refuses | `ess/30` | `compensates: true` on an `external:` refusal narrowed by `when_subject: {predicate: …}`, declared above the held-state branch |
+| an authored scenario stating a minted value its own steps determine | `ess/30` | the exact value on a `{generated: true}` field (event payload, error field, view row); below `ess/30` it is `ESS-AUTHOR-042` |
+| a rule on the current time | `ess/16`; `ess/22`; `ess/30` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`; from `ess/30` a view's `filter:` may order a `Timestamp` against `now` (`due_at > now`), read at the instant of the read. An invariant, a selection or a set-effect filter refuses it, and so does a view filter below `ess/30`, with `==`/`!=` against `now`, a window over it or `now` in a view field at any format. Generated Rust and Go view queries keep a `now` filter an obligation. Below `ess/30`, take `from`/`to` view parameters the caller sends (`<field> >= param.from`, `<field> < param.to`), as the refusal's hint says |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -257,7 +262,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/29`
+## From `ess/16` through `ess/30`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -280,6 +285,7 @@ With current ESS:
 | `ess/27` | typed expressions (`{expr: …}`) in values and view fields; digest and encoding functions in guards; values narrowed by their branch; `moves:`/`deletes:` in `affects: each:`; a struct `shorthand:`; Boolean leaves in binding conditions; `unknown_instance:` beside `when_related:`; one precedence rule for every guard pair; `{generated: true, present: true}` and `{payload: <Event>.<field>}` in `sets:`; system-issued commands; ordered heads; identity reads in set-effect filters; published values in selectors; `exists:` over a candidate's related rows |
 | `ess/28` | view fields and filters read through a reference, one hop; `when_related: {all: […]}`; a related row's `state` as a value; `when_related:` over a list of references with `{missing: …}` |
 | `ess/29` | `coalesce(<fact>, <default>)` on the left of a guard's comparison; `when_subject:` beside `external:`; a guarded branch declared below one a later precedence step answers is refused |
+| `ess/30` | no `exists: false` branch on a stored reference every writer checks and nothing deletes; `coalesce(<field>, <literal>)` in a selector's `where:`; `state` in the `where:` of `instances:` and `affects:`; `compensates: true` on an `external:` race narrowed by `when_subject:`; an authored exact value on a `{generated: true}` field; a view `filter:` ordering a `Timestamp` against `now` |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -665,6 +671,151 @@ Declare each refused branch above the one its refusal names. Input guards the fi
 disjoint may come in either order, and a marker (`unknown_instance:`, `wrong_state:`,
 `exists: false`) declared below a guarded branch is not refused. The probe of the section above,
 raised to `ess/29`, validated on 0.67.0 and its 11 scenarios passed on the `interpreted` target.
+
+## `ess/30`
+
+A probe on 0.68.0 using the excerpts below (a `Parcel` stored with a `shelf_id` reference to a
+`Shelf`) validated and synthesized 19 scenarios with 4 refusals in `ess-conformance/34`; the
+`interpreted` target passed all 19. Under `ess/29` it is refused six times, once per construct,
+each hint naming `ess/30`. No suite format moves in 0.68.0.
+
+```yaml
+  - name: demo.depot.RenameParcel             # no exists: false branch; see the rule below
+    input:
+      - {name: parcel_id, type: demo.depot.ParcelId}
+      - {name: name, type: String}
+    outcomes:
+      - name: shelf-sealed
+        when_related: {via: shelf_id, predicate: state == Sealed}
+        error: demo.depot.ShelfSealed
+      - name: renamed
+        updates: demo.depot.Parcel
+        instance: parcel_id
+        emits: [demo.depot.ParcelRenamed]
+        payload: {demo.depot.ParcelRenamed: {parcel_id: input.parcel_id}}
+        sets: {name: input.name}
+  - name: demo.depot.PickParcel
+    input:
+      - {name: parcel_id, type: demo.depot.ParcelId}
+    outcomes:
+      - name: collected                       # the provider took it first: refuse, and withdraw the row
+        external: the carrier reports it already collected the parcel
+        when_subject: {predicate: state == Waiting}
+        error: demo.depot.AlreadyCollected
+        compensates: true
+        moves: demo.depot.Parcel.withdraw
+        instance: parcel_id
+      - name: picked
+        when_subject_state: Waiting
+        moves: demo.depot.Parcel.pick
+        instance: parcel_id
+        emits: [demo.depot.ParcelPicked]
+        payload: {demo.depot.ParcelPicked: {parcel_id: input.parcel_id}}
+      - {name: not-waiting, wrong_state: true, error: demo.depot.NotWaiting}
+```
+
+```yaml
+      - name: sealed                          # SealShelf: send back only the parcels still waiting
+        moves: demo.depot.Shelf.seal
+        instance: shelf_id
+        emits: [demo.depot.ShelfWasSealed]
+        payload: {demo.depot.ShelfWasSealed: {shelf_id: input.shelf_id}}
+        affects:
+          - entity: demo.depot.Parcel
+            where: {all: ["shelf_id == input.shelf_id", "state == Waiting"]}
+            moves: demo.depot.Parcel.send_back
+      - name: none-sturdy                     # CheckStackable: a parcel with no fragile field is sturdy
+        when_related:
+          entity: demo.depot.Parcel
+          where: {all: ["shelf_id == input.shelf_id", "coalesce(fragile, false) == false"]}
+          exists: false
+        error: demo.depot.NoSturdyParcel
+```
+
+```yaml
+  - name: demo.depot.DueParcels               # a view of the rows not yet due
+    source: demo.depot.Parcel
+    consistency: read_your_writes
+    filter: "due_at > now"
+    fields:
+      - {name: parcel_id, type: demo.depot.ParcelId}
+      - {name: due_at, type: Timestamp}
+```
+
+**A kept reference needs no missing-row branch.** `RenameParcel` reads the shelf its parcel's
+stored `shelf_id` names. Validation derives that the row is always there, and nothing is declared,
+when every branch creating a `Parcel` sets `shelf_id`, every branch writing it writes nothing, its
+own value or an input its command first refuses with `when_related: {via: input.shelf_id, exists:
+false}` (here `AddParcel`'s `no-shelf`), and no branch deletes a `Shelf`. Under `ess/29` 0.68.0
+still requires the branch:
+
+```text
+[non_exhaustive_branches] command.demo.depot.RenameParcel.outcomes: `demo.depot.RenameParcel` reads the related row's fields, and a missing row makes every predicate over it unknown: no branch answers when the row does not exist (hint: declare the branch taken when it does not: `when_related: {via: shelf_id, exists: false}`, or declare `format: ess/30`, which needs none here: every write of the reference checks the row, and no command deletes one)
+```
+
+Adding a command with `deletes: demo.depot.Shelf` brings the refusal back at `ess/30`, naming the
+deleting branch (`the row can be missing because demo.depot.RemoveShelf/removed deletes
+demo.depot.Shelf rows`). Declaring the branch anyway still validates; synthesis then reports it
+unreachable (`ESS-SYNTH-003`). Leaving it out adds `Parcel/invariant/after/<command>/<outcome>`
+scenarios that read the referenced shelf again after each accepting branch writing a `Parcel` or a
+`Shelf` and require it present: four in the probe. For a branch that reads every row of a view or
+a selection (here `SealShelf/sealed` and `ClearPicked/cleared`), that read is refused
+(`ESS-SYNTH-001`: "a row pointed at the referenced one cannot be added beside it"). With an
+`unknown_instance:` branch added, generated Rust and Go serve `RenameParcel` instead of leaving it
+an obligation.
+
+**A guarded creator costs row-set scenarios** (0.67.0 and 0.68.0;
+[beyond10x/ess#682](https://github.com/beyond10x/ess/issues/682)). The other two refusals come
+from `AddParcel` creating parcels behind its `exists: false` guard: synthesis arranges no rows for
+`CheckStackable`'s accepting branch ("`none-sturdy` is not decidedly passed over: its row set is
+True") or for `ClearPicked`'s `instances:` ("no three rows the filter selects that the arranging
+commands can produce"). The same model with an unguarded `AddParcel` and an explicit `exists: false`
+branch on `RenameParcel` synthesized 17 scenarios with 0 refusals, all passed on `interpreted`.
+Choose by what the system does; report the refused scenarios rather than dropping the guard.
+
+**`coalesce` in a selector** reads the default where the candidate's field is absent. Under
+`ess/29` it is `unsupported_construct`. Generated Rust and Go keep the command an obligation named
+by its selector; Entity Runtime refuses it as it does every row set.
+
+**`state` in a set effect's `where:`** is the state the row holds before the outcome. Synthesis
+arranges a row in another state beside each selected row. Under `ess/29` it is `unobservable_fact`.
+
+**A compensating narrowed race** answers where the predicate selects the row and the provider takes
+it, and its refusal moves or updates that row: synthesis forces the provider and reads the row back
+in the compensating state (`Parcel/transition/withdraw/by/demo.depot.PickParcel/collected`). Give
+the compensation its own transition from the states the predicate selects: on a shared
+`send_back` from `[Waiting, Picked]` the `Picked` start had no scenario (`ESS-SYNTH-003`, "no
+candidate of the 1 tried satisfies `collected selected in held state Picked`"). Under `ess/29` it
+is `refusal_mutated_state`. Generated Rust and Go keep the command an obligation.
+
+**`now` in a view filter** is the instant of the read. Synthesis writes each row at a `now_offset`
+instant and claims a side of the bound only for a row that stays there from 500 ms before its write to
+3600 s after it, so the suite
+format does not move. Generated Rust and Go keep the view query an obligation ("orders a field
+against the current time, the instant of the read, that a generated view query does not read").
+Under `ess/29` it is `type_mismatch`, naming the `from`/`to` parameter idiom.
+
+**An authored scenario may pin a minted value.** At `ess/30` this act compiled, and the suite
+checks the value exactly:
+
+```yaml
+    command: demo.depot.OpenShelf
+    input: {label: North}
+    outcome: opened
+    events:
+      - event: demo.depot.ShelfOpened
+        payload: {shelf_id: 00000000-0000-4000-8000-000000000001}
+```
+
+On `interpreted` it passed with `…0001` and failed with `…0002`, because the model interpreter
+mints its own sequence; state only a value the scenario's own steps determine (a revision count, a
+cursor), never an identity, against a real target. Under `ess/29` it is `ESS-AUTHOR-042`, its help
+naming `ess/30`. Synthesis never pins a minted value.
+
+**A view `source:` that is a list** is refused as `unsupported_construct` at
+`view.<name>.source` at every format on 0.68.0 (0.67.0 failed to parse it): "a view has one source,
+an entity whose rows are its rows, and is never a join". Read the other entity through a
+reference, `field: {related: {via, field}}` or a filter path `<reference>.<field>` (`ess/28`).
 
 ## What validates and still gets no scenario
 

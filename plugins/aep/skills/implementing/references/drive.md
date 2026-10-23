@@ -121,7 +121,7 @@ machine's harness nesting, and the operator can act on it in one paste.
 $ metaharness aep drive status
 ```
 
-`status` reports what the store's last run is doing and who holds the lock. `metaharness aep drive resume <run>` continues a compatible paused run, retaining its budget and plugin inputs. A version or integrity refusal is binding.
+`status` reports what the store's last run is doing and who holds the lock. `metaharness aep drive resume <run>` continues a compatible paused run, retaining its budget and plugin inputs. `--budget-usd` may lower that cap down to the run's remembered assumed charge and never raise it; a cap below the charge is refused before anything is written. A version or integrity refusal is binding.
 
 When reporting an adapter's outcome, read the terminal verdict and `stream.closed.process`
 separately. A native process exit, signal, or unknown status is an observation of process completion;

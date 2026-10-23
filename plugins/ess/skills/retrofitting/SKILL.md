@@ -128,6 +128,12 @@ Retrofit-specific rules:
   | reports the current status in an error body | `{subject: state}` in the error payload (`ess/23`) |
   | returns or reads an object whose readers must ignore members they do not know (an extension object, `#[serde(flatten)]` into a map, `additionalProperties: true`) | `undeclared_fields: ignored` on the struct type, or on the command for its response (`ess/24`); events and errors stay closed |
   | checks a nullable column with a default (`attempts.unwrap_or(0) >= 3`, `COALESCE(attempts, 0)`) | `"coalesce(attempts, 0) >= 3"` in the guard (`ess/29`) |
+  | selects rows with a nullable column read as a default (`WHERE COALESCE(enabled, true)`) | `"coalesce(enabled, true) == true"` in a row-set guard's or ordered head's `where:` (`ess/30`) |
+  | checks a foreign key on every insert and update and never deletes the referenced row | no `when_related: {via, exists: false}` branch on the readers, once every writer refuses a missing row (`ess/30`) |
+  | updates every row of a status (`UPDATE … WHERE shelf_id = $1 AND status = 'waiting'`) | `state == Waiting` in the `where:` of `instances:` or `affects:` (`ess/30`) |
+  | lists rows not yet expired (`WHERE expires_at > NOW()`) | `filter: "expires_at > now"` on the view (`ess/30`) |
+  | undoes its own write when a provider call loses a race | `compensates: true` on the `external:` race narrowed by `when_subject:` (`ess/30`) |
+  | lists a join of two tables | one `source:` and the other table read through a reference (`ess/28`); a list `source:` is `unsupported_construct` |
 - **An entity the code gives no status still needs a lifecycle.** The language requires one, so
   declare a single state that is both `initial` and `terminal` (`Stocked`), and say in a comment
   that it is structural, not read from the code. That is the one state a retrofit may name.

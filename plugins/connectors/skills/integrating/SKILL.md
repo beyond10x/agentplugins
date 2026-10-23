@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.55.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.55.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.56.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.56.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -56,7 +56,14 @@ connectors --output json operations describe --connector '<connector>' --instanc
 
 Since `v0.54.0` `operations list`, `describe` and `invoke` start the configured, digest-pinned
 provider when no description is cached and the instance holds a current, usable connection; they
-read no credential and ask for none.
+read no credential and ask for none. Since `v0.56.0` `operations list` and `operations describe`
+take `--connection` to describe the binding that connection uses, on an instance with
+`bindings` ([references/setup.md](references/setup.md)). Under a binding, `operations invoke`
+answers an operation the bound binding does not serve as `not_found` before any request, and a
+description read from another binding as `stale_description`: describe again with `--connection`.
+Since `v0.56.0` a feed watermark that can no longer be resumed answers `stale_cursor` (starting
+again from it loops), and a 404 or 410 from an item listing after the container lookup answers
+`not_found`.
 
 To find which of an instance's operations bind a datasource family, run
 `connectors --output json operations list --connector '<connector>' --instance '<instance>' --family '<contract id>'`.

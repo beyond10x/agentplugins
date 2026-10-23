@@ -39,7 +39,10 @@ The source language has related guards from `ess/18`, related lifecycle state fr
 row-set selectors, Optional references and several related rows from `/22`. Guard combinations
 have narrower ordering rules in the current ESS release:
 
-- An identity-addressed `when_related` beside `unknown_instance` is refused.
+- Below `ess/27`, an identity-addressed `when_related` beside `unknown_instance` is refused
+  (`conflicting_declaration`, its hint naming `ess/27`). From `ess/27` the pair validates: the
+  unknown addressed identity answers after an `exists: false` over the input's row and before the
+  related row's predicates (checked on 0.68.0 at `ess/26`, `ess/27` and `ess/30`).
 - For `via: input.member_id`, an existence-only `exists: false` guard beside `wrong_state` is
   refused. This is the combination tried against the introductory library tutorial.
 - In `ess/22`, `wrong_state` is admitted when at least one present-row predicate is declared and
@@ -157,7 +160,7 @@ composition digest is bare hex, without the `sha256:` prefix the HTTP binding wr
 
 ## Finite protocol checks
 
-The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.55.0/examples/protocols). It separates
+The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.68.0/examples/protocols). It separates
 queueing the response, observing transport flush, closing and receiving the response.
 
 ```console

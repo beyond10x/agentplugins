@@ -383,7 +383,13 @@ The current runner contract:
   `interpreted` target, and the 0.66.0 runner refused the suite (`execution readers admit suite
   majors 1–55`). Below 56 the same id names the issuer and reads as no actor; an older suite
   keeps its bytes. A read cell is still refused where the view's read grant (`may:` naming the
-  view) does not name the actor. Since 0.66.0, under report format 2, the generated Go and
+  view) does not name the actor. 0.68.0 adds no suite format. Where an `ess/30` command reads a
+  kept reference with no `exists: false` branch, the suite reads the referenced row again after
+  every accepting branch writing either entity and requires it present, filed under
+  `<entity>/invariant/after/<command>/<outcome>`: a 0.68.0 probe gained four such scenarios and
+  stayed at `ess-conformance/34`. A view filter on `now` writes its rows at `now_offset` instants,
+  and an authored scenario may pin a `{generated: true}` value, which the suite checks exactly
+  ([later formats](../specifying/references/later-formats.md#ess30)). Since 0.66.0, under report format 2, the generated Go and
   TypeScript runners show an unsupported required scenario as a skipped subtest or case carrying
   the reason (Go `t.Skipf`, TypeScript `t.skip`) instead of a failed one; the enclosing test still
   fails once, naming how many were unsupported, and the process exits nonzero. The JSON report is

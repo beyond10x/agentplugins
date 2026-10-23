@@ -64,7 +64,7 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
    receives the protected document on file descriptor 3 and nothing you can read holds it.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.55.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.56.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
@@ -178,6 +178,16 @@ approved Zendesk ticket writes, Jira issue writes with `issue.create_meta.fields
 `users.info`, `users.lookupByEmail` and `files.delete`: use one only when the operator authorizes
 that access, and send every write through
 [writes-and-services.md](writes-and-services.md). `v0.55.0` changes no setup step.
+
+`v0.56.0` lets one pinned, read-only catalog instance carry `bindings` in its
+`connectors-catalog-local/2` native configuration: 1 to 8 alternative APIs, each with its own
+bundle, selection set and access read, tried in order on the 401 or 403 its `next` names (the
+release's `docs/catalog-confluence.md`, *One instance for either API*). `connections connect`,
+`describe` and `revalidate` then name the `binding` the connection uses, and a revalidation that
+changes it adds `"rebound": {"from", "to"}`. When every binding refuses, the result is
+`insufficient_scope` naming each answer; a wrong password is `invalid_credential` and tries no
+other binding. No shipped connector declares `bindings`, so only an operator-pinned instance has
+them, and the change needs no setup step otherwise.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is
