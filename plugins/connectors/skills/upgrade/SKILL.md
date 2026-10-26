@@ -67,7 +67,12 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    reason. Restoring the backup rolls it back. A migrated legacy entry `<alias>` is selected as
    `--connector <connector> --instance <alias>`. After a provider executable change alone, a
    catalog connection validates its stored credential once on the next call; republish the
-   approval policy, which binds the executable selection. `v0.55.0` and `v0.56.0` need no upgrade step.
+   approval policy, which binds the executable selection. `v0.55.0` to `v0.59.0` need no upgrade step.
+   An owner the previous binary started keeps running, and a command that needs it answers
+   `owner_build_mismatch` with `next_action = stop_owner`: `connectors --output json setup owner-stop`
+   asks it to drain and exit, and the next command starts one from the new binary (the release's
+   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.59.0/website/docs/guides/upgrade-the-cli.md)
+   guide).
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
 

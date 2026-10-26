@@ -22,7 +22,16 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    put them in chat, command arguments, logs or configuration. OAuth acquisition uses the
    adapter's returned safe next action; do not invent an authorization URL or copy tokens. A
    profile using `oauth2_client_credentials` takes a `{client_id, client_secret}` document through
-   the same protected channel; the CLI requests and renews the access token itself.
+   the same protected channel; the CLI requests and renews the access token itself. Since
+   `v0.58.0` a profile using `oauth2_grant` signs in instead: `connections connect` runs the
+   authorization code grant with PKCE (it prints the authorization address and takes the redirect
+   on a loopback port, or the profile has the operator paste the code), or with `--device` the
+   device grant, showing a user code to enter in any browser within the window the release
+   documents. Only the operator signs in; nothing is stored when the grant fails.
+   `connections token --connector '<connector>' --instance '<instance>' --connection '<id>'`
+   then prints the access token's expiry, scopes and issue, refreshing it first when it is
+   about to expire. `--reveal` prints the token itself: that is the operator's command for their
+   own tool, never one you run.
 4. Observe the returned connection or acquisition with
    `connections status --connector '<connector>' --instance '<instance>'` and exactly one of
    `--connection` or `--acquisition`. Report ready only when observed state says so.
@@ -62,9 +71,11 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    release's `docs/local-consumer-launch.md`. The operator declares the consumer under
    `[consumers]` (configuration `connectors-local/3`) with a pinned executable digest and the
    adapters it may use; never add or widen a declaration to make a launch work. The consumer
-   receives the protected document on file descriptor 3 and nothing you can read holds it.
+   receives the protected document on file descriptor 3 and nothing you can read holds it. For
+   an `oauth2_grant` connection (since `v0.58.0`) descriptor 3 carries only the current access
+   token, never the stored entry or its refresh token.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.56.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.59.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
@@ -188,6 +199,25 @@ changes it adds `"rebound": {"from", "to"}`. When every binding refuses, the res
 `insufficient_scope` naming each answer; a wrong password is `invalid_credential` and tries no
 other binding. No shipped connector declares `bindings`, so only an operator-pinned instance has
 them, and the change needs no setup step otherwise.
+
+`v0.57.0` ships the Jira issue feed (`jira-issues/1`) and the Confluence REST v1 page feed
+(`confluence-pages/1`) in their selections, so a `jira` or `confluence-v1` instance has
+`feed.containers` and `feed.items`, and Jira gains `projects.list` and `project.get`. Both feeds
+are verified against fixtures only, not live. An instance derived from the shipped declaration
+takes the new operations from the installed `connectors-catalog-provider`; a pinned instance or a
+legacy `[adapters.<alias>]` entry adds one to its `operations` only when the operator authorizes
+that access.
+
+`v0.58.0` adds `oauth2_grant` profiles (step 3) and two catalog connectors that sign in with a
+person's own subscription: `chatgpt` (profile `chatgpt.subscription`, browser or `--device`, read
+`models.list`) and `claude-subscription` (profiles `claude.subscription` and
+`claude.subscription-pasted`, read `account.profile`). Neither ships a client id: the operator pins
+an instance whose native configuration names its own `oauth2_client_id`, and an instance without
+one is refused as `InvalidConfiguration`. Whether a client may use a plan is the provider's terms'
+question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.59.0/website/docs/connectors/chatgpt.md),
+[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.59.0/website/docs/connectors/claude-subscription.md)).
+Both sign-ins are verified against a local fake authorization server only, never live.
+`v0.59.0` changes no setup step.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is

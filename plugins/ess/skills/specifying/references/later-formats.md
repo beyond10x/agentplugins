@@ -56,6 +56,10 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | an external race that changes the row it refuses | `ess/30` | `compensates: true` on an `external:` refusal narrowed by `when_subject: {predicate: …}`, declared above the held-state branch |
 | an authored scenario stating a minted value its own steps determine | `ess/30` | the exact value on a `{generated: true}` field (event payload, error field, view row); below `ess/30` it is `ESS-AUTHOR-042` |
 | a rule on the current time | `ess/16`; `ess/22`; `ess/30` | `now`, and offsets such as `now - 10m`, compared with a `Timestamp` in a command outcome's `when:` over its input; from `ess/22` also in `when_subject:` and `when_related:`; from `ess/30` a view's `filter:` may order a `Timestamp` against `now` (`due_at > now`), read at the instant of the read. An invariant, a selection or a set-effect filter refuses it, and so does a view filter below `ess/30`, with `==`/`!=` against `now`, a window over it or `now` in a view field at any format. Generated Rust and Go view queries keep a `now` filter an obligation. Below `ess/30`, take `from`/`to` view parameters the caller sends (`<field> >= param.from`, `<field> < param.to`), as the refusal's hint says |
+| a list a creator starts empty, with no input for it | `ess/31` | `sets: {tags: []}` over a required `List<…>` field; only the empty list, and not over `Optional<List<…>>`; [below](#ess31) |
+| a list input synthesis sends as given | `ess/31` | `example:` on a `List` input, a list of element values (structs naming their required members) |
+| one element added to a stored list | `ess/31` | `sets: {tags: {append: input.tag}}` on an existing subject; the element is `input.<path>` of the list's element type |
+| a member that may be left out or sent as `null` | `ess/31` | `presence: omitted_or_null` on an `Optional` field; a view field over it carries the policy into its row |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -262,7 +266,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/30`
+## From `ess/16` through `ess/31`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -286,6 +290,7 @@ With current ESS:
 | `ess/28` | view fields and filters read through a reference, one hop; `when_related: {all: […]}`; a related row's `state` as a value; `when_related:` over a list of references with `{missing: …}` |
 | `ess/29` | `coalesce(<fact>, <default>)` on the left of a guard's comparison; `when_subject:` beside `external:`; a guarded branch declared below one a later precedence step answers is refused |
 | `ess/30` | no `exists: false` branch on a stored reference every writer checks and nothing deletes; `coalesce(<field>, <literal>)` in a selector's `where:`; `state` in the `where:` of `instances:` and `affects:`; `compensates: true` on an `external:` race narrowed by `when_subject:`; an authored exact value on a `{generated: true}` field; a view `filter:` ordering a `Timestamp` against `now` |
+| `ess/31` | the empty list `[]` in `sets:` over a required `List<…>`; an `example:` on a `List` input; `{append: input.<field>}` in `sets:` over a stored list; `presence: omitted_or_null`; a view field carries its `Optional` source field's `presence:` |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -764,14 +769,21 @@ a selection (here `SealShelf/sealed` and `ClearPicked/cleared`), that read is re
 `unknown_instance:` branch added, generated Rust and Go serve `RenameParcel` instead of leaving it
 an obligation.
 
-**A guarded creator costs row-set scenarios** (0.67.0 and 0.68.0;
-[beyond10x/ess#682](https://github.com/beyond10x/ess/issues/682)). The other two refusals come
-from `AddParcel` creating parcels behind its `exists: false` guard: synthesis arranges no rows for
-`CheckStackable`'s accepting branch ("`none-sturdy` is not decidedly passed over: its row set is
-True") or for `ClearPicked`'s `instances:` ("no three rows the filter selects that the arranging
-commands can produce"). The same model with an unguarded `AddParcel` and an explicit `exists: false`
-branch on `RenameParcel` synthesized 17 scenarios with 0 refusals, all passed on `interpreted`.
-Choose by what the system does; report the refused scenarios rather than dropping the guard.
+**A guarded creator still costs an `instances:` scenario.** On 0.68.0 the other two refusals
+came from `AddParcel` creating parcels behind its `exists: false` guard: synthesis arranged no rows
+for `CheckStackable`'s accepting branch ("`none-sturdy` is not decidedly passed over: its row set
+is True") or for `ClearPicked`'s `instances:`, and the same model with an unguarded `AddParcel`
+and an explicit `exists: false` branch on `RenameParcel` synthesized 17 scenarios with 0 refusals.
+From 0.69.0 a row-set guard's accepting branch is arranged through the guarded creator, which
+creates the related row first ([beyond10x/ess#682](https://github.com/beyond10x/ess/issues/682)):
+the issue's two-command shape (`AddParcel` behind `no-shelf`, `CheckShelf` refusing an empty
+shelf) synthesized 5 scenarios with 0 refusals on 0.69.2, `CheckShelf/outcome/holds-parcels`
+included (4 on 0.68.0), and all 5 passed on `interpreted`. An `instances:` selection over the rows
+that creator makes is still refused on 0.69.2: an `updates:` with
+`instances: {where: shelf_id == input.shelf_id}` got `ESS-SYNTH-001` ("no three rows the filter
+selects that the arranging commands can produce"), whose help to write the filtered field from an
+input does not apply, since the creator already does; without the guard it got its scenario. Keep
+the guard where the system has it and report that refusal.
 
 **`coalesce` in a selector** reads the default where the candidate's field is absent. Under
 `ess/29` it is `unsupported_construct`. Generated Rust and Go keep the command an obligation named
@@ -785,7 +797,7 @@ it, and its refusal moves or updates that row: synthesis forces the provider and
 in the compensating state (`Parcel/transition/withdraw/by/demo.depot.PickParcel/collected`). Give
 the compensation its own transition from the states the predicate selects: on a shared
 `send_back` from `[Waiting, Picked]` the `Picked` start had no scenario (`ESS-SYNTH-003`, "no
-candidate of the 1 tried satisfies `collected selected in held state Picked`"). Under `ess/29` it
+candidate of the 1 tried satisfies `collected selected in held state Picked`", again on 0.69.2). Under `ess/29` it
 is `refusal_mutated_state`. Generated Rust and Go keep the command an obligation.
 
 **`now` in a view filter** is the instant of the read. Synthesis writes each row at a `now_offset`
@@ -816,6 +828,70 @@ naming `ess/30`. Synthesis never pins a minted value.
 `view.<name>.source` at every format on 0.68.0 (0.67.0 failed to parse it): "a view has one source,
 an entity whose rows are its rows, and is never a join". Read the other entity through a
 reference, `field: {related: {via, field}}` or a filter path `<reference>.<field>` (`ess/28`).
+
+## `ess/31`
+
+A probe on 0.69.2 using the excerpts below (a `Note` with a required `tags: List<String>`, a
+required `lines: List<demo.notes.Line>` of `{text, done}` structs and an `Optional` `colour`)
+validated and synthesized 2 scenarios with 0 refusals in `ess-conformance/34`; the `interpreted`
+target passed both. Under `ess/30` it is refused five times, once per construct, each naming
+`ess/31`. No suite format moves in 0.69.x.
+
+```yaml
+  - name: demo.notes.OpenNote
+    input:
+      - {name: title, type: String}
+      - name: lines                           # a list input's example: sent at the plain instance
+        type: List<demo.notes.Line>
+        example: [{text: buy milk, done: false}, {text: post letter, done: true}]
+      - {name: colour, type: Optional<String>, presence: omitted_or_null}
+    outcomes:
+      - name: opened
+        creates: demo.notes.Note
+        instance: note_id
+        emits: [demo.notes.NoteOpened]
+        payload: {demo.notes.NoteOpened: {note_id: {generated: true}}}
+        sets: {title: input.title, tags: [], lines: input.lines, colour: input.colour}
+  - name: demo.notes.TagNote
+    input:
+      - {name: note_id, type: demo.notes.NoteId}
+      - {name: tag, type: String}
+    outcomes:
+      - name: tagged
+        updates: demo.notes.Note
+        instance: note_id
+        emits: [demo.notes.NoteTagged]
+        payload: {demo.notes.NoteTagged: {note_id: input.note_id, tag: input.tag}}
+        sets: {tags: {append: input.tag}}
+```
+
+**The empty list** fills a required `List<…>` field the creator has no input for, so a view
+publishing the field can be read. Only `[]`: a list holding anything keeps its refusal, `[]` over
+an `Optional<List<…>>` or a field that is no list is `type_mismatch`, and it is a `sets:` source
+only. Generated Rust and Go store an empty list. Under `ess/30`: "`tags: []` stores the empty
+list, which requires specification format ess/31".
+
+**A list input's `example:`** is sent at the plain instance wherever no guard reads into the list,
+as a scalar's is: the probe's `TagNote` scenario read back both example lines from the `Notes`
+view. An element its type refuses is `type_mismatch` naming its position, a struct element missing
+a required member `missing_declaration`. Under `ess/30` it is `type_mismatch` ("is not a scalar"),
+its hint naming `ess/31`.
+
+**`{append: input.<field>}`** stores the list the row held before the outcome, an absent
+`Optional<List<…>>` read as empty, with the element last. The synthesized scenario asserts the
+whole list (`tags: ["tag"]` after the creator's `[]`), and the interpreter and generated Rust and
+Go append. An element of another type, an `Optional` read included, is `type_mismatch`; on a
+`creates:` or in a `payload:` it is `conflicting_declaration`, and on a set effect
+`unsupported_construct`. Entity Runtime refuses it by name (from the release notes). Under
+`ess/30` the same mapping over a list is `unsupported_format_version`.
+
+**`presence: omitted_or_null`** admits a member left out or sent as `null`, both one absent value.
+Its schema property is nullable and not required (generated TypeScript `"colour"?: (string |
+null)`), and a suite admits both spellings. On a field that is no `Optional<…>` it is
+`type_mismatch`. From `ess/31` a view field written field by field over an `Optional` source field
+carries that field's `presence:` (not a computed field, one read through a reference, or a view with
+`shape:` or an aggregate): the probe's `Notes` row typed `colour` as `"colour"?: (string | null)`
+where the same view field over a field without a policy is `"note"?: string`.
 
 ## What validates and still gets no scenario
 

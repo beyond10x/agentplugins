@@ -111,15 +111,25 @@ ess generate synthesize --path <specification> --target rust --http http.yaml --
 ```
 
 - **Request:** `request: {encoding: json | form | query, unknown: refuse | ignore}`. `query` is the
-  only encoding of a command on `get` and carries every input the path does not map; `json` or
-  `form` on `get`, `query` elsewhere, or `ignore` beside `json` is `ESS-HTTP-020`; a `form` or
-  `query` field with no flat spelling (a struct, a union, a map, `Json`) is `ESS-HTTP-021`.
+  only encoding of a command on `get`, and a command on `delete` may declare it; it carries every
+  input the path does not map, and the body is not read. The OpenAPI document writes each such
+  input as an `in: query` parameter under its wire name, with no `requestBody` on `delete`, and a
+  non-optional `List` input as `required: false`, because both generated servers read an absent
+  key as the empty list. `json` or `form` on `get`, `query` on `post`, `put` or `patch`, or
+  `ignore` beside `json` is `ESS-HTTP-020`; a `form` or `query` field with no flat spelling (a
+  struct, a union, a map, `Json`) is `ESS-HTTP-021`.
 - **Answers:** `outcomes: {<outcome>: {status, body}}`, the body `envelope` (the default),
-  `response` (bare, for a `returns: true` outcome without an error), `none` or `{<member>: error}`.
-  Outcomes, headers and redirects are checked as `ESS-HTTP-022` to `-028`; an outcome not listed
-  keeps the envelope and its derived status. A view route answers one row with `body: single` and
-  `empty: {status: <4xx>}` (`ESS-HTTP-030`, `-031` when the view is not selected by identity).
-  Top-level `refusals:` overrides `malformed`, `not_granted` and `unfinished` (`ESS-HTTP-029`).
+  `response` (bare, for a `returns: true` outcome without an error), `response.<field>` (that one
+  field's value alone, a JSON string for a `String`), `none` or `{<member>: error}`. The field of
+  `response.<field>` must be declared and not `Optional`, on a `returns: true` outcome without
+  `error`, or it is `ESS-HTTP-024`. A command route's `errors: {status, body}` answers every
+  outcome with `error` that `outcomes:` does not list, so an `external:` refusal's status is stated
+  once and its derived `502` replaced; on a view, or where every error outcome is listed, it is
+  `ESS-HTTP-022`. Outcomes, headers and redirects are checked as `ESS-HTTP-022` to `-028`; an
+  outcome not listed and not covered by `errors:` keeps the envelope and its derived status. A
+  view route answers one row with `body: single` and `empty: {status: <4xx>}` (`ESS-HTTP-030`,
+  `-031` when the view is not selected by identity). Top-level `refusals:` overrides `malformed`,
+  `not_granted` and `unfinished` (`ESS-HTTP-029`).
 - **Refinement:** a server binding that fills in a protocol binding's open paths names it with
   `refines: sha256:<hex>` and is checked with `--refines <file>` (`ESS-HTTP-003`, `-012`).
 
@@ -127,6 +137,30 @@ Without a path a route is open, and OpenAPI and the servers refuse it. `--http` 
 `rust` and `go` synthesis targets only; the Rust target still refuses set effects. The example
 above validated, compiled and projected to OpenAPI against `examples/devices.yaml` laid out with a
 `components.yaml`.
+
+These routes validated and projected to OpenAPI on 0.69.2 against a `Ticket` specification whose
+`OpenTicket` refuses a blank title, has an `external:` `provider-down` refusal and returns
+`ticket_id`, and whose `DeleteTicket` takes `ticket_id`, `reason` and `labels: List<String>`:
+`opened` answered the bare `TicketId` schema, `provider-down` 503, and the `delete` operation
+`reason` (`required: true`) and `labels` (`required: false`) as query parameters, with no body.
+
+```yaml
+  - command: demo.desk.OpenTicket
+    method: post
+    path: /tickets
+    outcomes:
+      opened: {status: 201, body: response.ticket_id}
+      blank: {status: 422, body: {error: error}}
+    errors: {status: 503, body: {error: error}}
+  - command: demo.desk.DeleteTicket
+    method: delete
+    path: /tickets/{ticket_id}
+    parameters: {ticket_id: input.ticket_id}
+    request: {encoding: query}
+    outcomes:
+      deleted: {status: 204, body: none}
+      no-ticket: {status: 404, body: {error: error}}
+```
 
 ## Composition roles (`ess-composition/4`)
 
@@ -160,7 +194,7 @@ composition digest is bare hex, without the `sha256:` prefix the HTTP binding wr
 
 ## Finite protocol checks
 
-The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.68.0/examples/protocols). It separates
+The terminal-response example is adapted from [the versioned upstream protocol examples](https://github.com/beyond10x/ess/tree/0.69.2/examples/protocols). It separates
 queueing the response, observing transport flush, closing and receiving the response.
 
 ```console

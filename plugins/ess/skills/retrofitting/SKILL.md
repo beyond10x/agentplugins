@@ -26,7 +26,8 @@ Use every source that exists. Where two disagree, the draft records both and mar
 `type: [T, "null"]`) imports as a coverage gap at its pointer, because the interface has no null:
 carry each gap into the draft as an `UNMAPPED:` marker, or, where the contract says the key is
 always sent and may be `null`, declare it `Optional<T>` with `presence: null_when_absent`
-(`ess/15`), which publishes exactly that. An object schema must be closed with
+(`ess/15`), which publishes exactly that; where the key may also be left out (nullable and not
+`required`), `presence: omitted_or_null` (`ess/31`). An object schema must be closed with
 `additionalProperties: false`, or the import refuses it; that refusal is a finding about the
 contract, so report it rather than editing the contract to pass.
 
@@ -134,6 +135,9 @@ Retrofit-specific rules:
   | lists rows not yet expired (`WHERE expires_at > NOW()`) | `filter: "expires_at > now"` on the view (`ess/30`) |
   | undoes its own write when a provider call loses a race | `compensates: true` on the `external:` race narrowed by `when_subject:` (`ess/30`) |
   | lists a join of two tables | one `source:` and the other table read through a reference (`ess/28`); a list `source:` is `unsupported_construct` |
+  | inserts a row with an empty list column (`tags: Vec::new()`, `DEFAULT '{}'`) | `sets: {tags: []}` on the creator (`ess/31`) |
+  | pushes one request value onto a stored list (`tags.push(tag)`, `array_append(tags, $1)`) | `sets: {tags: {append: input.tag}}` (`ess/31`) |
+  | reads a missing member and `null` alike (`Option<T>` under serde, a nullable property not in `required`) | `presence: omitted_or_null` on the `Optional` field (`ess/31`) |
 - **An entity the code gives no status still needs a lifecycle.** The language requires one, so
   declare a single state that is both `initial` and `terminal` (`Stocked`), and say in a comment
   that it is structural, not read from the code. That is the one state a retrofit may name.

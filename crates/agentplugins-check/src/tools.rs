@@ -849,6 +849,7 @@ fn verify_connectors(
     );
     let routes = run("curl", &["-fsSL", "--retry", "2", &route_url])?;
     let service_help = connector_service_routes(&routes);
+    let native = connector_native_routes(repository, &commit);
     // The release binary (archives since v0.48.0), unless `AGENTPLUGINS_CONNECTORS_BINARY` names one;
     // a release cut before `release-binaries.yml` has no archive and is checked from source alone.
     let binary = match std::env::var_os("AGENTPLUGINS_CONNECTORS_BINARY") {
@@ -913,8 +914,9 @@ fn verify_connectors(
                     ));
                 }
             } else if !(path.len() == 1
-                && service_help.contains(&path[0])
-                && flags == BTreeSet::from(["--help".to_owned()]))
+                && ((service_help.contains(&path[0])
+                    && flags == BTreeSet::from(["--help".to_owned()]))
+                    || (binary.is_some() && native.contains(&path[0]))))
             {
                 problems.push(format!(
                     "{}: `connectors {}` is absent from {tag} CLI contract",
@@ -974,6 +976,18 @@ fn connector_deprecations(help: &str, flags: &BTreeSet<String>) -> Vec<String> {
 /// cut with `release-binaries.yml`.
 fn connectors_has_archives(tag: &str) -> bool {
     key(tag) >= key("v0.48.0")
+}
+
+/// Native integration commands (`server`, v0.57.0) are routed before the generated parser by
+/// `mcp/entry.rs` and are not in `cli.yaml`; one is admitted only when the release binary's own
+/// help verified it and its spelled flags. A release without that file has none.
+fn connector_native_routes(repository: &str, commit: &str) -> BTreeSet<String> {
+    let url = format!(
+        "https://raw.githubusercontent.com/{repository}/{commit}/apps/connectors/src/mcp/entry.rs"
+    );
+    run("curl", &["-fsSL", "--retry", "2", &url])
+        .map(|source| connector_service_routes(&source))
+        .unwrap_or_default()
 }
 
 fn connector_service_routes(source: &str) -> BTreeSet<String> {
@@ -1235,6 +1249,10 @@ mod tests {
         assert_eq!(
             connector_service_routes("Some(\"retired\") => return false,"),
             BTreeSet::new()
+        );
+        assert_eq!(
+            connector_service_routes("            Some(\"server\") => return true,\n"),
+            BTreeSet::from(["server".to_owned()])
         );
     }
 

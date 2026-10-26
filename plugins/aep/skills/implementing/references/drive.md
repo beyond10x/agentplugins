@@ -41,6 +41,11 @@ check exists is that it costs nothing.
 Pass `--plugin-dir` for each plugin directory the run will load, because `doctor` checks the ones it
 is given and guesses none.
 
+Then `metaharness doctor <claude|codex|b10x>` for the harness the map's `llm` steps use. It compares
+the installed harness with the versions the adapter pins and exits 1 on one `OFF the adapter's pin`.
+Every version-pinned claim of the adapter is unverified on that harness, so relay the line and let
+the operator install a pinned version or accept the unverified run. Do not launch on it unasked.
+
 ## 2. Point the driver at the story
 
 **`metaharness aep drive run --help` has to answer before anything else.** AEP hands every
@@ -68,6 +73,13 @@ So `/drive story:credential-store` resolves to one of two situations, and you sa
 **The step map is the project's, and you do not choose it.** Run without `--map` and let the driver
 select the one that fits; where two fit, it **refuses and names both**, and that refusal goes to the
 operator to answer. Do not pick one to get the run started.
+
+An `llm` step's shell is held to its map. A step that declares `commands:`, the argv prefixes it
+may run (such as `[aep, plan, artifact]` or `[cargo, test]`), gets one simple invocation of a
+declared prefix per shell call, and its prompt names them. A step that declares none keeps the
+default surface: `aep plan artifact …`, `aep observe trace …` and read-only programs. `cargo --config`
+and `rg --pre` are refused under every surface. A call outside the surface is refused with the
+declared surface named. Widening `commands:` is a map change, so it is the operator's.
 
 ```console
 $ METAHARNESS_LIVE=1 metaharness aep drive run --project . --task <the reviewed task document> \
@@ -122,6 +134,13 @@ $ metaharness aep drive status
 ```
 
 `status` reports what the store's last run is doing and who holds the lock. `metaharness aep drive resume <run>` continues a compatible paused run, retaining its budget and plugin inputs. `--budget-usd` may lower that cap down to the run's remembered assumed charge and never raise it; a cap below the charge is refused before anything is written. A version or integrity refusal is binding.
+
+A run stopped at an `operator` step prints who may answer it and names
+`aep drive resume <run> --evidence <file>`, which submits the file's evidence records to the run
+before it continues. The approval is a person's: relay the pause verbatim and write no record
+for it. `aep drive resume` continues only a map without `llm` steps. On a model-backed map it
+refuses and names `metaharness aep drive resume`, which takes no `--evidence`, so tell the
+operator that and stop. `aep govern evaluate --evidence --state` writes nothing back to a run.
 
 When reporting an adapter's outcome, read the terminal verdict and `stream.closed.process`
 separately. A native process exit, signal, or unknown status is an observation of process completion;
