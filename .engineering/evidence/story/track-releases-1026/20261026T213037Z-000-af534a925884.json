@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-26T21:30:37Z",
+  "actor": "human:timo",
+  "artifact": "story:track-releases-1026",
+  "kind": "story",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "PR 95 merged by b10x-bot[bot] as 3a1067c; CI, Tools, Shared source gates and Documentation runs green on 3a1067c; release 0.24.2 published by b10x-bot[bot], tag on 3a1067c, 6 assets match SHA256SUMS of Release run 40404136648"
+  }
+}

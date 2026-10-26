@@ -16,7 +16,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Track ESS 0.69.2: the ESS skills describe `ess/31`, the new `ess-http/1` forms and `ess generate types` roots and Rust options; the tutorial set moves with it and its specification to `ess/31`
 - Track Connectors v0.59.0; `connectors:integrating` describes `connectors list`, the local stdio MCP server, `oauth2_grant` sign-in and `connections token`
 - `agentplugins-check tools` admits a Connectors native integration command (`server`) once the release binary's help verifies it; such commands are routed outside `cli.yaml`
-- `agentplugins-check tools` admits a Connectors native integration command (`server`) that the release binary's help verifies; it is routed outside `cli.yaml`
 
 ## [0.24.1] - 2026-10-23
 
