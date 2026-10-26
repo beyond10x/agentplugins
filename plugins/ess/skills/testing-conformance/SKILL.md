@@ -169,8 +169,25 @@ no `caller:` sends none, and its suite keeps its bytes.
 Since 0.63.0 `author` refuses an act claiming an exact value for a field the model leaves to the
 implementation (`{generated: true}` in every branch that can publish it, or a stored field every
 reached branch writes so): `ESS-AUTHOR-042`, naming the field, the value and the minting branch.
-Leave the field out, whose presence and type the suite still checks, or claim it by reference
-(`{$observed: …}`, `{$instance: …}`).
+In an event's payload or an error's fields, leave the field out, whose presence and type the suite
+still checks there, or claim it by reference (`{$observed: …}`, `{$instance: …}`). In a view row
+the suite does not check a field left out: assert `satisfies: defined(<field>)` on the view, or relate
+it to an event's value with `{$observed: {event: …, field: …}}`, as the refusal's help says. From
+`format: ess/30` the exact value is accepted as the scenario's own claim
+([later formats](../specifying/references/later-formats.md#ess30)).
+
+A view assertion and the fields of an expected error read a member that is absent and one that is
+`null` as one value at any depth, inside list elements and nested structs too: on 0.69.2 an
+authored row asserting `colour: null` and a list element `{…, hint: null}` passed against the
+`interpreted` target, which leaves both members out, and the same row asserting `hint: x` failed.
+A member written with a value still fails against an absent one. Event payloads and observed
+invocations stay exact. The Rust, Go and TypeScript runners compare alike (from the release notes).
+
+`author` refuses a document whose `type:` is not an `ess-scenario/N` format as `ESS-AUTHOR-002`,
+naming its format, whatever other keys it carries; a repository's own trace format is not a
+scenario input and stays out of `--scenarios` and `ess-inputs.yaml`. A `.nan`, `.inf` or `-.inf`
+value is `ESS-AUTHOR-015`: `Decimal` and `Binary64` hold finite values only, and refusing a
+non-finite number belongs to the decoder or the binding's `malformed` refusal.
 
 ## Building a double for an upstream plane
 
@@ -389,7 +406,14 @@ The current runner contract:
   `<entity>/invariant/after/<command>/<outcome>`: a 0.68.0 probe gained four such scenarios and
   stayed at `ess-conformance/34`. A view filter on `now` writes its rows at `now_offset` instants,
   and an authored scenario may pin a `{generated: true}` value, which the suite checks exactly
-  ([later formats](../specifying/references/later-formats.md#ess30)). Since 0.66.0, under report format 2, the generated Go and
+  ([later formats](../specifying/references/later-formats.md#ess30)). 0.69.x adds no suite format
+  either: `ess/31` probes stayed at `ess-conformance/34`, an appended list is asserted whole, and a
+  `presence: omitted_or_null` member is never carried, so a suite admits it left out or `null`
+  ([later formats](../specifying/references/later-formats.md#ess31)). With unchanged suite bytes,
+  the runners now read a `<command>/grant/denied` scenario's `read_your_writes` view at the token
+  of the last command before the refusal, and an awaited system-issued command that leaves an
+  `Optional` input out (or sends `null`) as leaving it out, so a target that changes the row on a
+  refused send, or relays a value it never issued, fails (from the release notes). Since 0.66.0, under report format 2, the generated Go and
   TypeScript runners show an unsupported required scenario as a skipped subtest or case carrying
   the reason (Go `t.Skipf`, TypeScript `t.skip`) instead of a failed one; the enclosing test still
   fails once, naming how many were unsupported, and the process exits nonzero. The JSON report is

@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/30`. The binary says which one that
+`format:` that release implements; the example below uses `ess/31`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/30
+format: ess/31
 system: warehouse
 version: v1
 
@@ -273,12 +273,29 @@ into `--out` itself. With `--kind schema`, `--schema-id-base <URI>` (absolute, e
 command and `validate-bundle` also read a `.yaml` or `.yml` instance as the JSON it denotes.
 Since 0.63.0 a `String` newtype's `alphabet:` projects as an anchored `pattern` beside
 `x-ess-alphabet`. Type libraries come from `ess generate types --target rust|go|typescript`.
+Select what they hold with `--root <type-or-event>`, `--root <command>.input`,
+`--root <command>.response` or `--root <view>.row` (repeatable; a body is the one the OpenAPI
+document publishes, so HTTP request and response types need not be kept by hand), or with
+`--all-types`, `--all-events`, `--all-commands` and `--all-views`, which combine; any other root
+is `unknown_root`. An enum's variants are named after their declared names (`in_review` is Rust
+`InReview` renamed to its wire spelling, Go `<Type>InReview`, a TypeScript constant member); an
+enum whose names do not each give a distinct `PascalCase` identifier, or one from a schema bundle,
+keeps `V0`, `V1`, …. The Rust `Cargo.toml` takes compatible ranges (`serde = "^1.0.229"`), so a
+workspace that locks newer patches keeps them.
 A Rust library whose types hold JSON numbers declares a default-on `exact-numbers` Cargo feature
 that enables `serde_json/arbitrary_precision`; a consumer depending on it with
 `default-features = false` gets binary64 numbers. `types-report.json` names each such value under
 `rust_exact_numbers`. `--rust-raw-json <type>` or `<type>.<field>` (repeatable, Rust only) keeps
 the named `Json` values as their exact JSON text (`EssRawJson`), so their bytes round-trip without
-`exact-numbers`; a name that selects no `Json` value is refused by name. Since 0.62.0 a generated
+`exact-numbers`; a name that selects no `Json` value is refused by name. Three more Rust-only
+options, each recorded in the report's `configuration`: `--rust-derive <DERIVE>` or
+`<type>=<DERIVE>` (repeatable) adds `Eq`, `Hash`, `PartialOrd`, `Ord` or `Default`, and a derive a
+type cannot hold is refused before anything is written (`rust_derive_unsatisfied`, naming the type
+and the member: `Eq` over a `Binary64` field, `Default` on an enum; `Ord` needs `Eq` and
+`PartialOrd` beside it); `--rust-fold-null` decodes an explicit `null` in an optional field as the
+missing member (a `rust_fold_null` obligation per field); `--rust-drop-unknown-members` drops the
+undeclared members of an open object with declared fields, so it has no `ess_extra` field (a
+`rust_drop_unknown_members` obligation in place of `open_object_storage`). Since 0.62.0 a generated
 Rust decoder of a newtype refuses a value that breaks its `alphabet:`, `prefix:` or invariants
 (`broken_constraint`, with the path), so a served route no longer admits it.
 
@@ -335,7 +352,10 @@ method of the generated context port. An `Optional<T>` payload value gets its ow
 `generate_optional_<t>` returning `Option<T>` in Rust (`try_generate_optional_<t>` on `TryContext`)
 and `GenerateOptional<T>` returning `*T` in Go (`TryGenerateOptional<T>` on `FallibleContext`).
 A regeneration can therefore add a port method your context must implement; the compiler error
-names it.
+names it. An `Optional` field an invariant requires (`defined(code)`) is minted with
+`{generated: true, present: true}`: with `{generated: true}` alone the implementation may leave it
+absent, so the `interpreted` target breaks the invariant on its own outcome and answers
+`ESS-CF-TARGET`, its help naming each such outcome and the `present: true` spelling.
 
 An explicitly requested independent educational implementation, reference target or adapter over
 existing code has a different purpose: it supplies independent observations for conformance.

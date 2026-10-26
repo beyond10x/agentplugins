@@ -51,7 +51,9 @@ changed yet.
   (`ess-conformance/54`, `/55`) and a spec diff naming `field-source-changed` (`ess-diff/21`);
   from 0.67.0 a suite with a one-time read cell that names its reader (`ess-conformance/56`,
   `/57`); from 0.68.0 a specification on `ess/30`, which 0.67.0 refuses as `ESS-SPEC-009`
-  ("this build implements specification format(s) [1, …, 29], not `ess/30`"). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  ("this build implements specification format(s) [1, …, 29], not `ess/30`"); from 0.69.0 a
+  specification on `ess/31`, which 0.68.0 refuses the same way ("[1, …, 30], not `ess/31`"), and
+  at parse time for `presence: omitted_or_null` ("unknown variant `omitted_or_null`"). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -87,6 +89,27 @@ changed yet.
   `exists: false` branch, which adds re-reads to the suite
   ([later-formats.md](../specifying/references/later-formats.md#ess30)). Read the change with
   `ess verify conform diff`.
+- From 0.69.0 regenerate every committed type library and update the code that uses it: an enum's
+  variants are named after their declared names, so Rust `V0`, `V1`, … become `Pending`,
+  `InReview`, … (Go `<Type>Pending`, TypeScript members of a constant), and code naming `V0` stops
+  compiling; an enum whose names give no distinct `PascalCase` identifiers keeps `V0`, …. The Rust
+  `Cargo.toml` of a type library and of a synthesized server crate takes `^` ranges where 0.68.0
+  pinned `=` (`serde = "^1.0.229"`, `clap = "^4.6.7"`). The JSON Schema projection annotates an
+  enum whose names differ from their wire spellings with `x-ess-variants`, so `ess generate --check`
+  names each file holding one, and the OpenAPI document of a `query`-encoded route declares a
+  non-optional `List` input `required: false`. Regenerate committed suites with no specification
+  change: a row-set guard's accepting branch whose rows a guarded creator makes gets its scenario
+  (beyond10x/ess#682; the issue's shape went from 4 scenarios on 0.68.0 to 5 on 0.69.2), and the
+  release notes list more branches now witnessed (membership guards, `Optional` presence in
+  `when_related:`, long first-match chains, related rows read through stored references). No suite
+  format moves. 0.69.1 brought synthesis time back to 0.68.0's where 0.69.0 was slow on chains of
+  related rows (from the release notes). Re-run `ess verify conform author`: a document whose
+  `type:` is not an `ess-scenario/N` format is `ESS-AUTHOR-002` (a repository's own trace format
+  stays out of `--scenarios` and `ess-inputs.yaml`), an act expecting a `when_related:` branch that
+  an earlier branch with an implied guard answers is `ESS-AUTHOR-041`, and `.nan` or `.inf` is
+  `ESS-AUTHOR-015`. A view assertion now reads an absent member and `null` as one value
+  (`ess:testing-conformance`). Raising a header to `ess/31` admits the constructs in
+  [later-formats.md](../specifying/references/later-formats.md#ess31).
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
   accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused

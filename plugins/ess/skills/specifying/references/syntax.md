@@ -4,7 +4,7 @@ A small lending library in three files, with every section a specification usual
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
 Keep each domain’s first segment equal to `system` and update every qualified reference together.
-It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/30` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
+It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/31` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
 
 ## `system.yaml`
 
@@ -338,7 +338,9 @@ views:
 ```
 
 State names start with an upper-case letter (`OnLoan`); `validate` refuses `on_loan`. Enum
-variants may be written as the source spells them.
+variants may be written as the source spells them. A `kind: union` is always tagged; ESS's
+[unions guide](https://github.com/beyond10x/ess/blob/0.69.2/website/docs/guides/specify/unions.md)
+shows each variant's wire shape and when a union fits better than a struct of `Optional` fields.
 
 ## What `when` can and cannot say
 
@@ -351,7 +353,11 @@ The compact form is one string: a comparison (`pages > 0`, `format == Hardcover`
 inside that string are refused; write a conjunction, a disjunction or a set in the structured form.
 A string that does not parse is refused at its line as `unparsable_predicate` (`ESS-SPEC-012`), and
 an unquoted `null` as `null_comparison` (`ESS-SPEC-017`): write `defined(note)` or
-`not defined(note)`, or quote `"null"` to compare with that text.
+`not defined(note)`, or quote `"null"` to compare with that text. A membership test written
+`title in input.blocked` is `ESS-SPEC-012` too, and its message names the form that says it:
+`exists: {in: input.blocked, as: x, that: title == x}`, and for `not in` the same under `not:`.
+Synthesis witnesses both sides: the list holding the stored value carries another element ahead
+of it, and the list that does not is non-empty.
 
 | to say | structured form |
 |---|---|

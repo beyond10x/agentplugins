@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.56.0](https://github.com/beyond10x/connectors/releases/tag/v0.56.0).
+[v0.59.0](https://github.com/beyond10x/connectors/releases/tag/v0.59.0).
 
 ## Install in either host
 
@@ -51,7 +51,10 @@ supervised local owner/adapter. Missing capability or access is reported explici
 For onboarding, the operator enters the credential document through protected terminal, file or
 stdin acquisition. The skill reads safe status, not secret values. External writes need the
 user's authorization and the adapter's admission, exact approval subject and protected proof.
-The current CLI has a separate explicit service interface; MCP runtime integration remains deferred.
+The current CLI has a separate explicit service interface. Since v0.57.0 `connectors server
+--transport stdio` is a local MCP server on Linux that offers admitted read-only operations as
+tools; it serves no writes, resources or prompts. Since v0.58.0 an OAuth2 profile signs in by
+browser or device code, and `connections token` hands its access token to the operator.
 
 ## Upgrade
 

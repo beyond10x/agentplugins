@@ -107,7 +107,9 @@ Drive mode uses `metaharness aep drive` with a planning executable matching the 
 by that runner. [Install](../install.md) explains the pairing. Governed Codex steps preserve model
 and endpoint selection across resume. Capped runs use the operator's budget; uncapped mode requires
 an explicit spending authorization reference. Native process completion and the task's terminal
-verdict are reported separately.
+verdict are reported separately. A step map's `commands:` names the programs each model step's
+shell may run, and the refusal of any other names that list. Before a launch, `metaharness doctor`
+says whether the installed harness is one the adapter pins.
 
 `b10x` treats both `metaharness` and `b10x-harness`, the Beyond10x agent loop that Metaharness's
 `b10x` adapter runs, as optional CLIs of this plugin: it reports them, and `b10x install <cli>` adds
