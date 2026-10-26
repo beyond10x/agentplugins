@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: story:track-releases-1026
 kind: story
-status: active
+status: implemented
 title: Track AEP 0.78.0, ESS 0.69.2, Metaharness 0.19.0 and Connectors v0.59.0
 summary: Move verified.json, the eval pins and the protocols pin to the newest releases and re-verify the skills
-revision: 5
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-26T19:14:43Z", actor: "human:timo", revision: 3}
 - {from: "proposed", to: "active", at: "2026-10-26T19:14:44Z", actor: "human:timo", revision: 4}
+- {from: "active", to: "implemented", at: "2026-10-26T21:30:37Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 
