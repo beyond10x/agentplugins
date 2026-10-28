@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Track ESS 0.72.0: `verified.json`, the eval workflow and the tutorial set move to 0.72.0, and the tutorial's specification to `ess/32`
+
 ## [0.24.2] - 2026-10-26
 
 ### Changed

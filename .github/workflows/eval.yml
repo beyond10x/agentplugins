@@ -54,7 +54,7 @@ jobs:
       # an installed planning executable from a different release.
       AEP_VERSION: '0.77.0'
       METAHARNESS_VERSION: '0.19.0'
-      ESS_VERSION: '0.69.2'
+      ESS_VERSION: '0.72.0'
       CONNECTORS_VERSION: 'v0.59.0'
       WORKTREE_VERSION: '0.18.2'
       CLAUDE_VERSION: '2.1.305'
