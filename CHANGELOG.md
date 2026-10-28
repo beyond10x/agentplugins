@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-28
+
 ### Added
 
 - `b10x guard bash`: a Claude Code `PreToolUse` hook, registered by the `b10x` plugin, that refuses the commands `~/.config/b10x/guard.toml` switches on (`gh_writes`, `tmp_writes`, `read_dev_zero`, `pgrep_loops`, `heredoc_stdin`, `commit_message_flag`) with one line naming the replacement; without a file only the three hang and crash guards are on, and anything it cannot read is allowed
