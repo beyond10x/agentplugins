@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/31`. The binary says which one that
+`format:` that release implements; the example below uses `ess/32`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/31
+format: ess/32
 system: warehouse
 version: v1
 
@@ -281,7 +281,9 @@ is `unknown_root`. An enum's variants are named after their declared names (`in_
 `InReview` renamed to its wire spelling, Go `<Type>InReview`, a TypeScript constant member); an
 enum whose names do not each give a distinct `PascalCase` identifier, or one from a schema bundle,
 keeps `V0`, `V1`, …. The Rust `Cargo.toml` takes compatible ranges (`serde = "^1.0.229"`), so a
-workspace that locks newer patches keeps them.
+workspace that locks newer patches keeps them. Since 0.70.0 `ess generate types … --out <dir>
+--check`, with the arguments that wrote the library, writes nothing and exits 1 with one line per
+file that is missing, differs or is recorded in `.ess-output` and no longer generated.
 A Rust library whose types hold JSON numbers declares a default-on `exact-numbers` Cargo feature
 that enables `serde_json/arbitrary_precision`; a consumer depending on it with
 `default-features = false` gets binary64 numbers. `types-report.json` names each such value under

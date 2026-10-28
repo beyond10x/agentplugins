@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-28T19:02:13Z",
+  "actor": "human:timo",
+  "artifact": "task:guard-bash-hook",
+  "kind": "task",
+  "revision": 4,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "https://github.com/beyond10x/agentplugins/pull/98 merged by b10x-bot[bot] as f1a0e41; CI 40644950707 and Shared source gates 40644951349 green on f1a0e41 (Tools 40644951076 red only on ESS, Worktree and Metaharness releases newer than verified.json, story:track-releases-1028); release https://github.com/beyond10x/agentplugins/releases/tag/0.25.0 published by b10x-bot[bot] on 8fa4a3a with 6 assets, Release run 40645807869 green"
+  }
+}

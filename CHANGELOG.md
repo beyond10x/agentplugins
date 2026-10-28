@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.25.1] - 2026-10-28
+
+### Changed
+
+- Track ESS 0.75.0: the ESS skills describe `ess/32` (a named-row guard beside a row-set guard, `fields: []`, a lifecycle state's `wire:`), `ess generate types --check`, `Decimal` view fields in `ess-conformance/58`, seeds for caller attributes and a variant's `code:` in generated code; the tutorial set moves with it and its specification to `ess/32`
+- Track Worktree 0.19.0: `worktree:managing-worktrees` describes a `.worktreekeep` in a subdirectory
+- Track Metaharness 0.22.0; the eval workflow runs it with AEP 0.77.0, the revision it still links, ESS 0.75.0 and Worktree 0.19.0; the drive reference says an off-pin harness version is advisory from Metaharness 0.20.0
+
 ## [0.25.0] - 2026-10-28
 
 ### Added
@@ -940,7 +948,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins
 - Publish adopter documentation for discovering, selecting, and installing each plugin
 
-[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.24.2...HEAD
+[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.25.1...HEAD
+[0.25.1]: https://github.com/beyond10x/agentplugins/compare/0.25.0...0.25.1
+[0.25.0]: https://github.com/beyond10x/agentplugins/compare/0.24.2...0.25.0
 [0.24.2]: https://github.com/beyond10x/agentplugins/compare/0.24.1...0.24.2
 [0.24.1]: https://github.com/beyond10x/agentplugins/compare/0.24.0...0.24.1
 [0.24.0]: https://github.com/beyond10x/agentplugins/compare/0.23.2...0.24.0

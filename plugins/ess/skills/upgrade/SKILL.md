@@ -26,8 +26,8 @@ changed yet.
   `ess generate cli … --check` name every file whose bytes the release changed. Regenerate those,
   regenerate the conformance suite, and rebuild generated implementation code: a release can add a
   context port method (such as `generate_optional_<t>`) the implementation must then supply.
-  Regenerated Rust type libraries (`ess generate types`, which has no `--check`) can change
-  `Cargo.toml` and `types-report.json`.
+  Regenerated Rust type libraries can change `Cargo.toml` and `types-report.json`; from 0.70.0
+  `ess generate types … --out <directory> --check` names them, where 0.69.x had no `--check`.
 - Run `ess specify validate --path <specification>` with the new release first: a release can
   refuse a specification an older one accepted, such as an accepting `when:` or `external:`
   branch declared before a held-state branch (`ESS-COMMAND-004`); reorder as its hint says. A
@@ -53,7 +53,10 @@ changed yet.
   `/57`); from 0.68.0 a specification on `ess/30`, which 0.67.0 refuses as `ESS-SPEC-009`
   ("this build implements specification format(s) [1, …, 29], not `ess/30`"); from 0.69.0 a
   specification on `ess/31`, which 0.68.0 refuses the same way ("[1, …, 30], not `ess/31`"), and
-  at parse time for `presence: omitted_or_null` ("unknown variant `omitted_or_null`"). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  at parse time for `presence: omitted_or_null` ("unknown variant `omitted_or_null`"); from 0.70.0
+  a specification on `ess/32`, which 0.69.2 refuses the same way ("[1, …, 31], not `ess/32`"), and
+  at parse time for a state's `wire:` ("invalid type: map, expected a string"), and a suite with a
+  `Decimal` view field (`ess-conformance/58`, `/59`). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -110,6 +113,25 @@ changed yet.
   `ESS-AUTHOR-015`. A view assertion now reads an absent member and `null` as one value
   (`ess:testing-conformance`). Raising a header to `ess/31` admits the constructs in
   [later-formats.md](../specifying/references/later-formats.md#ess31).
+- From 0.70.0 regenerate synthesized Rust, Web and Go code of a model whose enum variant declares
+  `code:`: that variant's generated identifier moves to the code written (beyond10x/ess#662), and a
+  code the target cannot use is `invalid-identifier`. The synthesized Rust server's decoders refuse
+  a field with a wire name sent under its model name, where an optional one was dropped, and gain
+  `decode_system_event`, per-event `decode_event_<name>`, `dispatch_with_events` and
+  `handle_with_events`; `ess-conformance` gains `interpret::values` (`mint`, `order_view_rows`).
+  Raising a header to `ess/32` admits the constructs in
+  [later-formats.md](../specifying/references/later-formats.md#ess32) and refuses two enum
+  variants spelled alike on the wire. 0.71.0 through 0.75.0 widen what synthesis arranges (set
+  updates over related rows, bindings with several publishers or per-row triggers, predicate
+  refusal policies, set guards) and change no source or suite format: regenerate committed suites
+  and read the change with `ess verify conform diff`. From 0.74.0 `--synthesis-seed` admits seeds
+  for a model whose actors declare caller attributes, where every one was `caller-model`; a row
+  that needs two values of one attribute is `caller-contradiction`. The `ess-conformance` library
+  replaces `SeedAdmissionError::CallerModel` with `CallerContradiction` (0.74.0) and changes
+  `Note::CrossCallerUnswapped` and `ChangedRowCause` (0.75.0). From 0.75.0 the ESS crates build
+  on rustc 1.85 again; a consumer resolving its own lock there may need
+  `cargo update -p instability --precise 0.3.10` and `cargo update -p darling --precise 0.20.11`
+  (from the release notes).
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
   accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused

@@ -42,7 +42,9 @@ repository's `.worktreekeep` keeps it, archives everything else the tree holds t
 recovers, and finishes. `.worktreekeep` sits at the tree root and holds Git exclude patterns; a path
 is kept when a pattern matches it or one of its ancestors, and an invalid keep file (a symbolic
 link, a directory, an unreadable file) refuses as `keep-file-invalid` and deletes nothing. Nested
-repositories, mount points and unreadable entries are always kept. Records written into `target/`
+repositories, mount points and unreadable entries are always kept. Since worktree 0.19.0 a
+`.worktreekeep` in a subdirectory adds keeps for paths at and below it, matched relative to it.
+Records written into `target/`
 or any other ignored directory are deleted unless `.worktreekeep` names them; worktree 0.17.1 and
 older kept every ignored entry it did not recognise as cache. Each deleted entry is named by its
 rule: Cargo profiles in a tagged target and its `tmp/` test scratch, `node_modules` below a tracked

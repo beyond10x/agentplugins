@@ -60,6 +60,9 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | a list input synthesis sends as given | `ess/31` | `example:` on a `List` input, a list of element values (structs naming their required members) |
 | one element added to a stored list | `ess/31` | `sets: {tags: {append: input.tag}}` on an existing subject; the element is `input.<path>` of the list's element type |
 | a member that may be left out or sent as `null` | `ess/31` | `presence: omitted_or_null` on an `Optional` field; a view field over it carries the policy into its row |
+| rows the input names and a row set, guarded on one command | `ess/32` | `when_related: {via: input.<f>, exists: false \| predicate: …}` beside `when_related: {entity, where, exists \| count \| forall}`; [below](#ess32) |
+| a struct with no declared fields | `ess/32` | `fields: []`; open (`undeclared_fields: ignored`) any object, closed only `{}` |
+| a lifecycle state spelled differently on the wire | `ess/32` | `states: [{name: Indexing, wire: indexing}, Ready]`; guards, transitions and suites keep the declared name |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -266,7 +269,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/31`
+## From `ess/16` through `ess/32`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -291,6 +294,7 @@ With current ESS:
 | `ess/29` | `coalesce(<fact>, <default>)` on the left of a guard's comparison; `when_subject:` beside `external:`; a guarded branch declared below one a later precedence step answers is refused |
 | `ess/30` | no `exists: false` branch on a stored reference every writer checks and nothing deletes; `coalesce(<field>, <literal>)` in a selector's `where:`; `state` in the `where:` of `instances:` and `affects:`; `compensates: true` on an `external:` race narrowed by `when_subject:`; an authored exact value on a `{generated: true}` field; a view `filter:` ordering a `Timestamp` against `now` |
 | `ess/31` | the empty list `[]` in `sets:` over a required `List<…>`; an `example:` on a `List` input; `{append: input.<field>}` in `sets:` over a stored list; `presence: omitted_or_null`; a view field carries its `Optional` source field's `presence:` |
+| `ess/32` | a named-row `when_related: {via: input.<f>, …}` beside a row-set `when_related: {entity, where, …}` on one command; a struct with `fields: []`; a lifecycle state's `wire:` spelling; two enum variants spelled alike on the wire are refused |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -892,6 +896,77 @@ null)`), and a suite admits both spellings. On a field that is no `Optional<…>
 carries that field's `presence:` (not a computed field, one read through a reference, or a view with
 `shape:` or an aggregate): the probe's `Notes` row typed `colour` as `"colour"?: (string | null)`
 where the same view field over a field without a policy is `"note"?: string`.
+
+## `ess/32`
+
+A probe on 0.75.0 with the excerpts below validated and synthesized 7 scenarios with 0 refusals
+for the wiring model (every `Connect` branch, `source-taken` included) and 5 for the job queue,
+both at `ess-conformance/34`; the `interpreted` target passed all 12. Under `ess/31` each construct
+is refused at its line with a hint naming `ess/32`: the pair of guards as `ESS-COMMAND-009`
+(`unsupported_construct`), the empty struct as `ESS-TYPE-007` (`empty_declaration`) and the
+spelled state as `ESS-ENTITY-009` (`unsupported_format_version`).
+
+```yaml
+types:
+  - {name: wiring.board.Meta, kind: struct, undeclared_fields: ignored, fields: []}
+commands:
+  - name: wiring.board.Connect
+    input:
+      - {name: from_port, type: wiring.board.PortId}
+      - {name: to_port, type: wiring.board.PortId}
+    outcomes:
+      - name: no-source                        # a missing named row answers first
+        when_related: {via: input.from_port, exists: false}
+        error: wiring.board.SourceNotFound
+      - name: no-sink
+        when_related: {via: input.to_port, exists: false}
+        error: wiring.board.SinkNotFound
+      - name: source-not-output                # then the refusals, in declaration order
+        when_related: {via: input.from_port, predicate: direction != output}
+        error: wiring.board.SourceNotOutput
+      - name: source-taken
+        when_related: {entity: wiring.board.Wire, where: from_port == input.from_port, exists: true}
+        error: wiring.board.SourceTaken
+      - name: connected
+        creates: wiring.board.Wire
+        instance: wire_id
+        emits: [wiring.board.Connected]
+        payload: {wiring.board.Connected: {wire_id: {generated: true}}}
+        sets: {from_port: input.from_port, to_port: input.to_port}
+entities:
+  - name: jobs.queue.Job
+    identity: {name: job_id, type: jobs.queue.JobId}
+    fields:
+      - {name: title, type: String}
+    lifecycle:
+      initial: Indexing
+      states: [{name: Indexing, wire: indexing}, Ready]
+      terminal: [Ready]
+      transitions:
+        - {name: finish, from: [Indexing], to: Ready}
+```
+
+**A named row beside a row set** follows one precedence rule: a missing named row answers first,
+in declaration order, then every refusal over a present named row or a row set in declaration
+order, then the accepting branches. A `when_subject:` guard beside a row set keeps its
+`unsupported_construct` at every format. Generated Rust and Go keep such a command an obligation,
+and Entity Runtime lowering refuses it by name (from the release notes).
+
+**`fields: []`** declares a struct with no members. Open (`undeclared_fields: ignored`), any object
+is a value and the schemas admit any member; closed, only `{}` is, and TypeScript realizes it as
+`Record<string, never>`. An enum or a union with no variants is still refused at every format.
+
+**A state's `wire:`** is the wire value of that state in `<Entity>.State`: JSON Schema, OpenAPI,
+AsyncAPI and generated Rust, Go and TypeScript spell it `indexing` and refuse `Indexing`, while
+guards, transitions, `moves:` and conformance suites keep `Indexing`. Two states spelled alike are
+`conflicting_declaration`, and so are two enum variants spelled alike by name or `wire:`, which
+validated below `ess/32`. `ess verify diff` reports a changed spelling as `VariantWireNameChanged`,
+and Entity Runtime lowering refuses a spelled state (`StateWireNameUnsupported`).
+
+From 0.70.0 a variant's `code:` (`{name: call.started, code: Begun}`) names its identifier in the
+Rust, Web and Go code `ess generate synthesize` writes, as `naming: {code: …}` does; before, every
+target ignored it. A variant or union label that is a wire spelling, such as `call.started`, no
+longer needs `code:`: those targets derive `CallStarted` from it (from the release notes).
 
 ## What validates and still gets no scenario
 
