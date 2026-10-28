@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-28T20:00:42Z",
+  "actor": "human:timo",
+  "artifact": "story:track-releases-1028",
+  "kind": "story",
+  "revision": 5,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "https://github.com/beyond10x/agentplugins/pull/100 merged by b10x-bot[bot] as 919e507; Gate, Build Docusaurus, Security and privacy and Tools green on the PR head 1609543; on 919e507 CI 40757921497, Tools 40757921415 and Shared source gates 40757922061 green; release https://github.com/beyond10x/agentplugins/releases/tag/0.25.1 published by b10x-bot[bot], tag on 919e507, 6 assets match SHA256SUMS of Release run 40758373896"
+  }
+}

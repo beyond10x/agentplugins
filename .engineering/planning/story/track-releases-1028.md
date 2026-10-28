@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:track-releases-1028
 kind: story
-status: active
+status: implemented
 title: Track ESS 0.75.0, Worktree 0.19.0 and Metaharness 0.22.0
 summary: Move verified.json and the eval pins to the newest releases and re-verify the skills
 scope:
@@ -24,10 +24,11 @@ scope:
   path: verified.json
 - confidence: cited
   path: website/docs
-revision: 5
+revision: 6
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-28T19:01:57Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-10-28T19:01:57Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-10-28T20:00:42Z", actor: "human:timo", revision: 6, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 
