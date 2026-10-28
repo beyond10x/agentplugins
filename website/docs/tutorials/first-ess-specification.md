@@ -8,7 +8,7 @@ description: Specify a lending library and hold a Rust implementation to its gen
 
 An Executable System Specification describes records, commands, refusals, events and readable views.
 ESS validates that model and generates checks that an implementation must answer. This tutorial
-uses **ESS 0.69.2 and Rust**, verified on 2026-10-26. The
+uses **ESS 0.75.0 and Rust**, verified on 2026-10-28. The
 [2026-09-28 Go recording](./first-ess-specification-2026-09-28.md) is retained as historical evidence.
 
 You finish with a specification, generated documentation and OpenAPI, a small Rust library and
@@ -53,10 +53,10 @@ show those capabilities without changing this tutorial's lifecycle checks.
 
 ## 3. Read the specification
 
-`spec/system.yaml` selects the newest source language, `ess/31` on ESS 0.69.2:
+`spec/system.yaml` selects the newest source language, `ess/32` on ESS 0.75.0:
 
 ```yaml
-format: ess/31
+format: ess/32
 system: library
 version: v1
 domains:
@@ -67,7 +67,7 @@ domains:
 
 ```yaml
 format: ess-inputs/2
-requires: ess 0.69.2
+requires: ess 0.75.0
 specification:
   - system.yaml
   - components.yaml
@@ -135,8 +135,8 @@ publish = false
 [workspace]
 
 [dev-dependencies]
-ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.69.2" }
-ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.69.2" }
+ess-conformance = { git = "https://github.com/beyond10x/ess", tag = "0.75.0" }
+ess-primitives = { git = "https://github.com/beyond10x/ess", tag = "0.75.0" }
 serde_json = "1"
 
 [profile.dev]

@@ -2,13 +2,14 @@
 format: aep.planning-md/3
 id: task:guard-bash-hook
 kind: task
-status: active
+status: implemented
 title: 'b10x guard bash: a PreToolUse hook that refuses commands the operator rules forbid'
 summary: b10x guard bash reads one PreToolUse event and refuses six configured command classes with the replacement named
-revision: 4
+revision: 5
 transitions:
 - {from: "draft", to: "proposed", at: "2026-10-28T06:16:00Z", actor: "human:timo", revision: 3}
 - {from: "proposed", to: "active", at: "2026-10-28T06:16:00Z", actor: "human:timo", revision: 4}
+- {from: "active", to: "implemented", at: "2026-10-28T19:02:13Z", actor: "human:timo", revision: 5, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 

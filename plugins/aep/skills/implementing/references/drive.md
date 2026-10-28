@@ -45,6 +45,9 @@ Then `metaharness doctor <claude|codex|b10x>` for the harness the map's `llm` st
 the installed harness with the versions the adapter pins and exits 1 on one `OFF the adapter's pin`.
 Every version-pinned claim of the adapter is unverified on that harness, so relay the line and let
 the operator install a pinned version or accept the unverified run. Do not launch on it unasked.
+In a run an off-pin binary is reported, not refused: H9 reads `gap advisory` and no
+longer moves the control verdict or the exit code, and only `--strict-version` refuses it before
+the spawn (from the release notes). `doctor` still exits 1 on it.
 
 ## 2. Point the driver at the story
 

@@ -341,7 +341,7 @@ outside the module has no `go.mod` to import from. The package's
 `ErrUnsupported`, never a made-up result. From entity setup or a clock reading the Go runner
 counts that as `skipped`; from an observation such as `ObserveInvocations` it records
 `unsupported`, a verdict of its own that is not a pass. The Rust runner has no skipped status:
-every unsupported answer is `unsupported`, and conformance fails on it. A refused command still sets `Outcome` to the
+every unsupported answer is `unsupported`, and conformance fails on it, except a `held/<field>` boundary scenario a target without `hold_now` reports (below). A refused command still sets `Outcome` to the
 refusing outcome’s name beside `Error`: the runner compares both. Successful mutations return a
 backend-issued consistency token; a view honors `AtLeast(token)` before returning rows. An adapter
 that cannot meet freshness returns a failure, never a successful weaker read.
@@ -413,7 +413,22 @@ The current runner contract:
   the runners now read a `<command>/grant/denied` scenario's `read_your_writes` view at the token
   of the last command before the refusal, and an awaited system-issued command that leaves an
   `Optional` input out (or sends `null`) as leaving it out, so a target that changes the row on a
-  refused send, or relays a value it never issued, fails (from the release notes). Since 0.66.0, under report format 2, the generated Go and
+  refused send, or relays a value it never issued, fails (from the release notes). From
+  `ess-conformance/58` (`/59` with coverage, since 0.70.0) a view may publish a `Decimal` field:
+  a wrong-state scenario's complete subject and a retained result compare it by numeric value
+  (`1.5` equals `1.50`); the Rust runner reads a non-integer through binary64, Go and TypeScript
+  compare the exact token, and a suite without such a field keeps its format and bytes. An
+  `ess/32` probe on 0.75.0 stayed at `ess-conformance/34`
+  ([later formats](../specifying/references/later-formats.md#ess32)). From 0.74.0
+  `--synthesis-seed` admits a seed for a model whose actors declare caller attributes: a seed row
+  field only a caller-attribute branch writes gives the seeded run its caller, and a row needing
+  two values of one attribute is refused as `caller-contradiction`; from 0.75.0 a seeded scenario
+  not run again with the callers swapped carries a `CrossCallerUnswapped` note, and a seed cannot
+  serve a set move's filter (`instances:` or `affects:`), which the ESS-SYNTH-001 refusal now says
+  and answers with an authored scenario (from the release notes). A synthesis note that a scenario
+  "retains its mixed-caller witness without an appended reversed-role run: the declared grants do
+  not permit the reversed caller assignment" is a note, not a refusal: the scenario is written and
+  runs, and the note names the reversed-caller run the grants rule out. Since 0.66.0, under report format 2, the generated Go and
   TypeScript runners show an unsupported required scenario as a skipped subtest or case carrying
   the reason (Go `t.Skipf`, TypeScript `t.skip`) instead of a failed one; the enclosing test still
   fails once, naming how many were unsupported, and the process exits nonzero. The JSON report is
