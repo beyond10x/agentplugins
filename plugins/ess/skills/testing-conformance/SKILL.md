@@ -341,7 +341,7 @@ outside the module has no `go.mod` to import from. The package's
 `ErrUnsupported`, never a made-up result. From entity setup or a clock reading the Go runner
 counts that as `skipped`; from an observation such as `ObserveInvocations` it records
 `unsupported`, a verdict of its own that is not a pass. The Rust runner has no skipped status:
-every unsupported answer is `unsupported`, and conformance fails on it. A refused command still sets `Outcome` to the
+every unsupported answer is `unsupported`, and conformance fails on it, except a `held/<field>` boundary scenario a target without `hold_now` reports (below). A refused command still sets `Outcome` to the
 refusing outcome’s name beside `Error`: the runner compares both. Successful mutations return a
 backend-issued consistency token; a view honors `AtLeast(token)` before returning rows. An adapter
 that cannot meet freshness returns a failure, never a successful weaker read.
@@ -425,7 +425,10 @@ The current runner contract:
   two values of one attribute is refused as `caller-contradiction`; from 0.75.0 a seeded scenario
   not run again with the callers swapped carries a `CrossCallerUnswapped` note, and a seed cannot
   serve a set move's filter (`instances:` or `affects:`), which the ESS-SYNTH-001 refusal now says
-  and answers with an authored scenario (from the release notes). Since 0.66.0, under report format 2, the generated Go and
+  and answers with an authored scenario (from the release notes). A synthesis note that a scenario
+  "retains its mixed-caller witness without an appended reversed-role run: the declared grants do
+  not permit the reversed caller assignment" is a note, not a refusal: the scenario is written and
+  runs, and the note names the reversed-caller run the grants rule out. Since 0.66.0, under report format 2, the generated Go and
   TypeScript runners show an unsupported required scenario as a skipped subtest or case carrying
   the reason (Go `t.Skipf`, TypeScript `t.skip`) instead of a failed one; the enclosing test still
   fails once, naming how many were unsupported, and the process exits nonzero. The JSON report is

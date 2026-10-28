@@ -272,7 +272,8 @@ into `--out` itself. With `--kind schema`, `--schema-id-base <URI>` (absolute, e
 `ess generate schema validate` takes the documents as registry resources as written; that
 command and `validate-bundle` also read a `.yaml` or `.yml` instance as the JSON it denotes.
 Since 0.63.0 a `String` newtype's `alphabet:` projects as an anchored `pattern` beside
-`x-ess-alphabet`. Type libraries come from `ess generate types --target rust|go|typescript`.
+`x-ess-alphabet`. Type libraries come from `ess generate types --target rust|go|typescript --out <dir>`;
+Rust and Go also require `--package <name>`, and Go `--module <path>`.
 Select what they hold with `--root <type-or-event>`, `--root <command>.input`,
 `--root <command>.response` or `--root <view>.row` (repeatable; a body is the one the OpenAPI
 document publishes, so HTTP request and response types need not be kept by hand), or with
