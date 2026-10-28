@@ -10,6 +10,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v b10x >/dev/null 2>&1 && b10x guard --help >/dev/null 2>&1; then b10x guard bash; fi",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }

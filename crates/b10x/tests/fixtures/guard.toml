@@ -1,0 +1,712 @@
+[config]
+orgs = ["example-org"]
+workspace_roots = ["/work/example"]
+home = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr create --title "Add x" --body-file body.md'
+cwd = "/work/example/repo"
+message = "b10x-gates api"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr comment 12 --body "looks good"'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr merge 12 --squash'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr review 12 --approve'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr ready 12'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr edit 12 --add-label x'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr close 12'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh issue create --title t --body b'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh issue comment 3 -b hi'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh issue close 3'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh release create v1.0.0 --notes x'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh release upload v1.0.0 dist/a.tar.gz'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh run rerun 123 --failed'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh run cancel 123'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh workflow run ci.yml --ref main'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh secret set TOKEN --org example-org < token.txt'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh repo create example-org/new --public'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh label create bug --color red'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh pr create -R example-org/repo --title x --body y'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh --repo=example-org/repo issue edit 4 --title x'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh api -X POST repos/example-org/repo/issues -f title=x'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh api --method=PATCH /repos/example-org/repo/pulls/3 -f state=closed'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh api repos/example-org/repo/issues/3/comments -f body=hi'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'gh api graphql -f query="mutation { addStar(input: {}) { clientMutationId } }"'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'cd /work/example/repo && gh pr create --fill'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'env GH_PAGER= gh pr merge 3'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "refuse"
+command = 'url=$(gh pr create --fill) && echo "$url"'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh pr view 12 --json state,mergeable'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh pr checks 12 --watch'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh run view 123 --log-failed | tail -50'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh release view v1.0.0 --json assets'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh api repos/example-org/repo/actions/secrets'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh api -X GET repos/example-org/repo/issues -f state=open'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh api graphql -f query="query { viewer { login } }"'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh pr create -R other-org/repo --title x --body y'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh api -X POST repos/other-org/repo/issues -f title=x'
+cwd = "/srv/agent"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'gh pr create --fill'
+cwd = "/srv/agent/elsewhere"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'b10x-gates gh --repo . -- pr create --fill'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'b10x-gates api --method POST --path /repos/example-org/repo/pulls --input req.json --output resp.json --repository example-org/repo --policy policy.json'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+defaults = true
+command = 'gh pr create --fill'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "gh_writes"
+expect = "allow"
+command = 'git log --oneline | grep "gh pr create"'
+cwd = "/work/example/repo"
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'echo hi > /tmp/out.txt'
+message = "/dev/shm"
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'cargo test 2>&1 >> /tmp/log.txt'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'make 2>&1 | tee /tmp/build.log'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'make 2>&1 | tee -a "/dev/shm/build.log"'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'curl -sL https://example.com/a.tar.gz -o /tmp/a.tar.gz'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'tool render --output /tmp/report.html'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'b10x upgrade --out /tmp/plan.json'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'f=$(mktemp -p /tmp)'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'd=$(mktemp -d /tmp/work.XXXXXX)'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'cd /tmp && git clone https://example.com/r.git'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'cp target/release/tool /tmp/'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'mv report.json /dev/shm/report.json'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'mkdir -p /tmp/probe'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = '{ date; uptime; } > /tmp/state.txt'
+
+[[case]]
+group = "tmp_writes"
+expect = "refuse"
+command = 'timeout 60 cargo build &> /tmp/build.log'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'cat /tmp/build.log | tail -20'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'grep -c error < /tmp/build.log'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'cp /tmp/report.json ~/.cache/x/report.json'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'echo hi > "$TMPDIR/out.txt"'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'f=$(mktemp) && d=$(mktemp -d) && t=$(mktemp -t x.XXXX)'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'ls -la /tmp /dev/shm; df -h /tmp'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'cargo build 2>/dev/null > ~/.cache/x/build.log'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+command = 'echo hi > /tmpfoo/x; echo hi > /var/tmp/x'
+
+[[case]]
+group = "tmp_writes"
+expect = "allow"
+defaults = true
+command = 'echo hi > /tmp/out.txt'
+
+[[case]]
+group = "read_dev_zero"
+expect = "refuse"
+command = 'read -t 5 < /dev/zero'
+message = "until grep -q"
+
+[[case]]
+group = "read_dev_zero"
+expect = "refuse"
+command = 'read -rt 30 _ < /dev/zero || true'
+
+[[case]]
+group = "read_dev_zero"
+expect = "refuse"
+defaults = true
+command = 'until test -f done.txt; do read -t 1 < /dev/zero; done'
+
+[[case]]
+group = "read_dev_zero"
+expect = "allow"
+command = 'read -t 5 answer < /dev/tty'
+
+[[case]]
+group = "read_dev_zero"
+expect = "allow"
+command = 'while read -r line; do echo "$line"; done < list.txt'
+
+[[case]]
+group = "read_dev_zero"
+expect = "allow"
+command = 'head -c 16 /dev/zero | od -An -tx1'
+
+[[case]]
+group = "pgrep_loops"
+expect = "refuse"
+command = 'pkill -f "cargo test"'
+message = "wait $!"
+
+[[case]]
+group = "pgrep_loops"
+expect = "refuse"
+defaults = true
+command = 'while pgrep -f "task check" >/dev/null; do sleep 5; done'
+
+[[case]]
+group = "pgrep_loops"
+expect = "refuse"
+command = 'until ! pgrep -fl build; do sleep 2; done'
+
+[[case]]
+group = "pgrep_loops"
+expect = "refuse"
+command = 'for i in $(seq 60); do [ -z "$(pgrep -f server)" ] && break; sleep 1; done'
+
+[[case]]
+group = "pgrep_loops"
+expect = "refuse"
+command = 'pkill -9 -f "worker --id 3"'
+
+[[case]]
+group = "pgrep_loops"
+expect = "allow"
+command = 'pgrep -fa "cargo test"'
+
+[[case]]
+group = "pgrep_loops"
+expect = "allow"
+command = 'pid=$(pgrep -f server) && kill -0 "$pid"'
+
+[[case]]
+group = "pgrep_loops"
+expect = "allow"
+command = 'while kill -0 "$pid" 2>/dev/null; do sleep 1; done'
+
+[[case]]
+group = "pgrep_loops"
+expect = "allow"
+command = 'pkill -x server; while pgrep -x server >/dev/null; do sleep 1; done'
+
+[[case]]
+group = "pgrep_loops"
+expect = "allow"
+command = 'for p in $(pgrep -x cargo) $(pgrep -f "target/debug/deps" | head -20); do readlink /proc/$p/cwd; done'
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+python3 - <<'EOF'
+print("hi")
+EOF'''
+message = "Write tool"
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+python <<EOF
+print(1)
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+cat > notes.md <<'EOF'
+# Notes
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+cat <<EOF >> notes.md
+more
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+bash -s <<'EOF'
+echo hi
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+zsh -s <<-EOF
+	echo hi
+	EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+node - <<'EOF'
+console.log(1)
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+ruby - <<'EOF'
+puts 1
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = "python3 - <<< 'print(1)'"
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+git commit -F - <<'EOF'
+title
+
+- body
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+cat <<'EOF' | python3 -
+print(1)
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = '''
+cd repo && python3 - <<'EOF' | tee out.txt
+print(1)
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+command = 'python3 -c "import json; print(`cat x`)"'
+
+[[case]]
+group = "heredoc_stdin"
+expect = "refuse"
+defaults = true
+command = '''
+python3 - <<'EOF'
+print(1)
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = '''
+cat <<'EOF'
+Plain text printed to the terminal.
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = '''
+psql "$URL" -f query.sql <<'EOF'
+\q
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = '''
+jq . <<'EOF'
+{"a": 1}
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = "grep -c x <<< \"$text\""
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = 'python3 scripts/check.py --input data.json'
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = "python3 -c 'print(`x`)'"
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = 'python3 -c "print(1)"'
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = '''
+python3 script.py <<'EOF'
+data
+EOF'''
+
+[[case]]
+group = "heredoc_stdin"
+expect = "allow"
+command = 'git commit -F "$msg"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git commit -m "fix: x"'
+message = "git commit -F <file>"
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git commit -am "fix: x"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git commit --message="fix: x"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git commit --message "fix: x"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git -C /work/example/repo commit -s -m "fix: x"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git add -A && git commit -qm wip'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'b10x-gates bot --repo . -- git commit -m "fix: x"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = "bash -c 'git commit -m x'"
+
+[[case]]
+group = "commit_message_flag"
+expect = "refuse"
+command = 'git commit --amend -m "new title"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'f=$(mktemp) && git commit -F "$f"'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'b10x-gates bot --repo . -- git commit -F /srv/agent/.cache/msg.txt'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'git commit --amend --no-edit'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'git commit -C HEAD~1'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'git commit -c ORIG_HEAD'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'git -c user.name=x commit -F msg.txt'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+command = 'git log -m --first-parent; git tag -m "v1" v1'
+
+[[case]]
+group = "commit_message_flag"
+expect = "allow"
+defaults = true
+command = 'git commit -m "fix: x"'

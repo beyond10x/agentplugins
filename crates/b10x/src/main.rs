@@ -3,6 +3,7 @@
 mod apply;
 mod catalog;
 mod check;
+mod guard;
 mod install;
 mod inventory;
 mod pins;
@@ -111,6 +112,19 @@ enum Top {
         #[arg(long, value_enum)]
         method: Option<MethodArg>,
     },
+    /// Hooks that refuse commands the operator's rules forbid, configured in
+    /// `~/.config/b10x/guard.toml`.
+    Guard {
+        #[command(subcommand)]
+        command: Guard,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum Guard {
+    /// Claude Code `PreToolUse` hook for `Bash`: reads the event on stdin; exit 0 allows, exit 2
+    /// refuses with one line on stderr naming the replacement. Anything unreadable is allowed.
+    Bash,
 }
 
 #[derive(Debug, Subcommand)]
@@ -192,6 +206,9 @@ impl Hosts {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let result = match cli.command {
+        Top::Guard {
+            command: Guard::Bash,
+        } => return guard::run(),
         Top::Check => {
             check::run(&Catalog::embedded());
             Ok(ExitCode::SUCCESS)
