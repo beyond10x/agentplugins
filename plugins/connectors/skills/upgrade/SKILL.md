@@ -68,10 +68,22 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    `--connector <connector> --instance <alias>`. After a provider executable change alone, a
    catalog connection validates its stored credential once on the next call; republish the
    approval policy, which binds the executable selection. `v0.55.0` to `v0.59.0` need no upgrade step.
+   From `v0.60.0` `operations invoke`, the top-level `describe --endpoint`, `invoke --endpoint`
+   and `serve` forms are removed (parse refusals, exit 2): rewrite each caller's command line as
+   `connectors invoke <connector>[/<instance>] <operation>`, and reach a standalone service over
+   HTTP. `instances list` items no longer carry `adapter`, an invoke result names `connector` and
+   `instance`, and a legacy entry is named `<connector>/<alias>`, not `catalog/<alias>`. From
+   `v0.63.0` an MCP client of `connectors server --transport stdio` reads each tool's operation
+   output schema from `_meta["io.beyond10x.connectors/operation"].output_schema`, not from
+   `outputSchema`, and the selections that gain a declared walk (Zendesk, Gmail, Google Calendar,
+   Google Drive, Confluence, Jira, HubSpot, Slack) move their instances' configuration revision:
+   recover a pinned instance as the integrating skill's setup reference says. `v0.65.0` moves a
+   `connectors-local/2` file with no legacy entries to `/5` with `setup migrate --mode apply`
+   (a backup is kept).
    An owner the previous binary started keeps running, and a command that needs it answers
    `owner_build_mismatch` with `next_action = stop_owner`: `connectors --output json setup owner-stop`
    asks it to drain and exit, and the next command starts one from the new binary (the release's
-   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.59.0/website/docs/guides/upgrade-the-cli.md)
+   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.65.0/website/docs/guides/upgrade-the-cli.md)
    guide).
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.
