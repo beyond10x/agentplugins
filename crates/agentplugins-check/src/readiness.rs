@@ -56,7 +56,8 @@ fn check_text(text: &str) -> Result<(), String> {
                     }
                 }
                 Some(
-                    "system" | "result" | "user" | "session_meta" | "turn_context" | "event_msg",
+                    "system" | "result" | "user" | "rate_limit_event" | "session_meta"
+                    | "turn_context" | "event_msg",
                 ) => {}
                 _ => return Err(format!("line {}: unknown transcript record", line + 1)),
             },
@@ -188,6 +189,7 @@ fn inspect_words(words: &[String]) -> Result<bool, String> {
         (Some("setup"), Some("check")) => Ok(true),
         (Some("adapters" | "instances" | "connections"), Some("list" | "describe" | "status"))
         | (Some("operations"), Some("list" | "describe"))
+        | (Some("list"), None)
         | (Some("help"), _) => Ok(false),
         _ => {
             Err("diagnosis-did-not-mutate: non-diagnostic connectors command requested".to_owned())
@@ -234,6 +236,7 @@ mod tests {
                 "connectors serve local --help",
                 "connectors setup connect -h",
                 "connectors --help operations invoke",
+                "connectors --output json list",
             ] {
                 check_text(&stream(
                     tool,
@@ -316,5 +319,8 @@ mod tests {
         let codex = json!({"type":"response_item", "payload":{"type":"function_call", "name":"exec_command", "arguments":json!({"cmd":"connectors setup check"}).to_string()}});
         check_text(&claude.to_string()).unwrap();
         check_text(&codex.to_string()).unwrap();
+        let rate_limit = json!({"type":"rate_limit_event", "rate_limit_info":{"status":"allowed"}});
+        check_text(&format!("{rate_limit}\n{claude}")).unwrap();
+        assert!(check_text(&json!({"type":"unheard_of"}).to_string()).is_err());
     }
 }

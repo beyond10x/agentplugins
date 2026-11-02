@@ -131,7 +131,13 @@ may be the ordinary one ESS writes by default (an even `ess-conformance/<N>` wit
 block) or a coverage suite, and the report may come from a generated Go or TypeScript runner
 (`producer_profile: go-scenario-status/2`). An older `aep` refuses the first as `MissingField at
 $suite.coverage`, the second as `UnsupportedProducerProfile` and a suite major newer than it reads
-as `UnsupportedSuiteVersion`: upgrade it (`aep:upgrade`). A `--suite-input` lineage whose suites
+as `UnsupportedSuiteVersion`: upgrade it (`aep:upgrade`). Since 0.79.0 `aep` admits
+the ordinary `ess-conformance/58` and the coverage `/59` (0.78.0 refused those two); `/60` and
+later are still refused by name, before any member of the suite is read. A suite's major follows
+the features its specification uses, so ESS writes `/60` or above only for a specification using
+a feature those majors lack: when the current `aep` refuses that major, the record cannot be made
+yet. Report the refusal and the major; do not
+rewrite the suite's `suite_version`. A `--suite-input` lineage whose suites
 carry a suite-level catalog is refused as `UnsupportedVocabulary`, naming the catalog: record a
 run of the complete, unselected suite with `--suite` instead.
 That record is what moves an `executable-system-specification` to `conforming` — its ladder is
@@ -400,6 +406,16 @@ The two values, for a project that follows the published protocols:
 ```console
 $ git ls-remote https://github.com/beyond10x/aep "refs/tags/$(aep --version | awk '{print $NF}')^{}"
 ```
+
+A pinned `git+` revision is fetched into the protocol cache (`AEP_CACHE_DIR`) the first time a
+command needs it. Since 0.79.0 that fetch stops after `AEP_FETCH_TIMEOUT_SECS` (default 60, a
+positive whole number of seconds; anything else is refused before Git starts) and is refused
+naming the pin, the cache and `AEP_CACHE_DIR`, where it used to hang with no route to the source.
+On a machine without network, fill the cache where there is one, or point `AEP_CACHE_DIR` at a
+filled one. A snapshot its group can write, as on a Kubernetes volume with `fsGroup`, is refused
+naming `AEP_CACHE_GROUP_WRITABLE`; set `AEP_CACHE_GROUP_WRITABLE=1` only for such a volume (every
+byte is still checked against the sealed manifest). A snapshot or stamp others can write is
+always refused. Relay either refusal; do not loosen the cache's modes to get past it.
 
 Where a backlog exists, `reverse init` is still the command that creates the store; `aep:migrating`
 then moves the backlog into it. `reverse scan`

@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.59.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.59.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.65.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.65.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -15,18 +15,33 @@ configuration, credentials and admission remain deployment prerequisites.
 1. Run `connectors --version` and `connectors --help`. If absent, use `connectors:init`;
    if the installed command tree differs, use `connectors:upgrade` before proceeding.
 2. Preserve the user's configuration and state placement. The local groups accept absolute
-   `--config` and `--state-dir` paths; otherwise they use the configured XDG/home placement.
+   `--config` and `--state-dir` paths; otherwise the configuration is
+   `$XDG_CONFIG_HOME/connectors/config.toml` (else `$HOME/.config/connectors/config.toml`) and
+   the state `$XDG_STATE_HOME/connectors` (else `$HOME/.local/state/connectors`).
    Run `connectors --output json setup check`, then `connectors --output json instances list`.
    Both inspect without authenticating or starting services. Report each failed prerequisite
    even if the process exits successfully. Read safe metadata, not credential/configuration dumps.
-   `setup check` names the build's `os` and its `custody_backend` (`secret_service` on Linux,
-   `macos_keychain` on macOS); a locked macOS login keychain is unavailable custody, never a prompt.
+   With no configuration file both exit 2 with `invalid_configuration`, rule `config_missing`:
+   that is the whole answer, and no other prerequisite was checked. Report it and name
+   `connectors setup init` ([references/setup.md](references/setup.md)) as the next setup action.
+   Otherwise `setup check` names the build's `os` and its `custody_backend` (`secret_service` on
+   Linux, `macos_keychain` on macOS); a locked macOS login keychain is unavailable custody, never
+   a prompt.
 3. Select an instance from that inventory: its `connector` and `instance` fields. An instance
    name is unique within its connector only, so a command names both. Inspect it with
    `connectors --output json instances describe --connector '<connector>' --instance '<instance>'`
    and, when needed,
    `connectors --output json instances status --connector '<connector>' --instance '<instance>'`.
    Cached descriptors are explicitly stale; an absent owner or cached entry is not readiness.
+   Since `v0.65.0` `instances status` of an instance whose program failed to start names the step
+   in `start_failure` (`admission`, `digest`, `copy`, `spawn`, `exited_before_handshake`,
+   `handshake_deadline` or `handshake_mismatch`), with `start_exit_code` or `start_signal` and
+   `start_log`, an owner-only file holding the first 64 KiB the program wrote to standard error
+   before its handshake (none on Windows). Quote the step and point the operator at the file; do
+   not read it into the session unasked. A catalog provider installed beside the CLI that cannot
+   run answers `unavailable` at stage `installed_provider`, with `installed_provider_path` and
+   `installed_provider_failure`; on macOS that is how a quarantined download shows. `setup check`
+   lists the `installed_provider` prerequisite.
    A diagnostic-only request ends here with the observed prerequisites and next setup action.
 
 To see what can be connected at all, `connectors --output json list` (since `v0.57.0`) prints
@@ -39,9 +54,11 @@ Since `v0.54.0` the adapter-named command group, its alias selection flag, the o
 `connections reconnect` and a legacy `[adapters.<alias>]` configuration entry are deprecated:
 they still run and say so once (on standard error, or as a `deprecations` member of the JSON
 envelope). Spell only the current names this skill uses.
-A legacy entry lists as connector `adapter_id`, instance `<alias>` until `connectors:upgrade`
-moves it with `setup migrate`; inventory results keep `adapter` beside `connector` and `instance`
-during the deprecation window.
+Since `v0.60.0` inventory items are `connector`, `instance`, `instance_id`, `startup` and
+`restart`, with no `adapter`. A legacy entry is named by the connector `setup migrate` derives for
+it, as `<connector>/<alias>`; `catalog/<alias>` is `not_found`. One no connector is derived for is
+listed under `unmigrated` and refused as `legacy_entry_unmigrated` until `connectors:upgrade`
+moves it.
 
 An empty inventory or missing operation is a capability gap. Report it before considering
 another integration client under the session's instructions. There is no implicit switch to a
@@ -53,9 +70,12 @@ Since `v0.57.0`, `connectors server --transport stdio` is a local MCP server on 
 instance's admitted read-only operations as tools through the same protected owner, custody and
 bounded reads, configured by `CONFIG.mcp-stdio.json` and `CONFIG.operation-curation.json` beside
 the configuration (the release's
-[`docs/local-mcp-stdio.md`](https://github.com/beyond10x/connectors/blob/v0.59.0/docs/local-mcp-stdio.md)).
+[`docs/local-mcp-stdio.md`](https://github.com/beyond10x/connectors/blob/v0.65.0/docs/local-mcp-stdio.md)).
 It serves one instance and connection per process, and no resources, prompts, writes or outbound
-MCP. On macOS and Windows, and when its prerequisites are missing, it exits 1 with `mcp_unavailable`
+MCP. Since `v0.63.0` `tools/call` takes `fields`, `each`, `walk` and `max_pages` beside `input`,
+with the CLI's semantics below (a walk returns its records as `items`, bounded by the response
+size), and `tools/list` gives each tool's `outputSchema.properties.result` as any JSON: the
+operation's own output schema is under `_meta["io.beyond10x.connectors/operation"].output_schema`. On macOS and Windows, and when its prerequisites are missing, it exits 1 with `mcp_unavailable`
 on standard error. Register it with an MCP host only when the operator asks for that.
 
 ## Discover and invoke
@@ -68,11 +88,11 @@ connectors --output json operations list --connector '<connector>' --instance '<
 connectors --output json operations describe --connector '<connector>' --instance '<instance>' --operation '<listed operation>'
 ```
 
-Since `v0.54.0` `operations list`, `describe` and `invoke` start the configured, digest-pinned
-provider when no description is cached and the instance holds a current, usable connection; they
-read no credential and ask for none. Since `v0.56.0` `operations list` and `operations describe`
-take `--connection` to describe the binding that connection uses, on an instance with
-`bindings` ([references/setup.md](references/setup.md)). Under a binding, `operations invoke`
+Since `v0.54.0` `operations list`, `operations describe` and `invoke` start the configured,
+digest-pinned provider when no description is cached and the instance holds a current, usable
+connection; they read no credential and ask for none. Since `v0.56.0` `operations list` and
+`operations describe` take `--connection` to describe the binding that connection uses, on an
+instance with `bindings` ([references/setup.md](references/setup.md)). Under a binding, `invoke`
 answers an operation the bound binding does not serve as `not_found` before any request, and a
 description read from another binding as `stale_description`: describe again with `--connection`.
 Since `v0.56.0` a feed watermark that can no longer be resumed answers `stale_cursor` (starting
@@ -99,20 +119,52 @@ as values from the one parsed answer; never decode them a second time. Follow th
 exactly, including required fields, limits and pagination inputs. Keep the returned schema identity and revision; guessing either
 makes the invocation invalid. Use only input values requested by the operation contract.
 
-For an authorized read:
+For an authorized read, `invoke` takes the target as one positional `<connector>/<instance>` and
+the operation as the next (since `v0.60.0`; `operations invoke` is removed and is a parse
+refusal, exit 2):
 
 ```bash
-connectors --output json operations invoke \
-  --connector '<connector>' --instance '<instance>' --connection '<connection id>' \
-  --operation '<listed operation>' \
+connectors --output json invoke '<connector>/<instance>' '<listed operation>' --describe
+connectors --output json invoke '<connector>/<instance>' '<listed operation>' \
+  --connection '<connection id>' \
   --schema '<schema from description>' --revision '<revision from description>' \
   --input-file '<JSON input file>'
 ```
 
-Since `v0.54.0` `operations invoke --definition '<file.yaml>' --operation '<key>'` runs an
-operation of a hand-written `connectors-definition/1` file with no configured instance, instead
-of `--connector` and `--instance` (`--definitions-root` names the tree holding its vendored source;
-`--schema` and `--revision` default to the description's). With no connection it asks once
+`--describe` prints the operation's `description`, `effect` (`read` or `write`), `schema`,
+`revision` and `input_schema`, and invokes nothing. `invoke` takes no `--connector`, `--instance`
+or `--adapter`. The instance may be left out when the connector has only one; with several it is
+refused as `instance_ambiguous` (exit 2), whose `instances` lists each `<connector>/<instance>`.
+Without `--connection` the instance's one ready connection is used, else its one usable one;
+none or several is `connection_unresolved`, naming `create_connection`, `repair_connection` or
+`none` (name one with `--connection`). `--schema` and `--revision` left out are the current
+description's; given, they are pins, and a differing description is `stale_description`. With no
+input flag, `invoke` reads the document from standard input when that is not a terminal.
+
+Since `v0.63.0` `invoke --fields '<paths>'` prints only the named members of the provider result
+(comma-separated dotted paths, `[]` over an array, `alias:path`, or an RFC 6901 pointer such as
+`/page[after]` for a key holding `.`, `[`, `]`, `:`, `/` or `~`); unmatched paths are listed in
+`result.missing`, and `--fields status` is a status-only probe. `--each '<path>'` prints one JSON
+line per element of an array, the envelope last; it is refused on a write. A refusal and a
+non-2xx catalog result are printed whole, and a write's `request_id`, `mutation` and
+`source_audit` always are. Shaping happens after the audit and is never sent to the provider.
+Prefer `--fields` over printing a large result into context.
+
+A read whose description carries `x-connectors-walk` in its input schema (`invoke --describe`
+shows it) is read page by page with `invoke … --walk --out '<new file>|-' [--max-pages <n>]`
+(1 to 10,000, default 20). Each page is one admitted read; records go to a new owner-only NDJSON
+file (or stdout with `-`) and a summary (`pages`, `records`, `complete`, `end`, `stopped`,
+`resume`) is printed last. `complete: false` is not exhaustion: report `stopped`, and give
+`resume` back as the input of the next `--walk` to continue. `--walk` without `--out`, on a write
+or beside `--each` or `--describe` is refused before any call; an operation that declares no walk
+is `unsupported`. Without a declared walk, follow the described pagination contract yourself.
+
+Since `v0.54.0` `invoke --definition '<file.yaml>' '<operation>'` (before `v0.60.0`
+`operations invoke --definition … --operation …`) runs an operation of a hand-written
+`connectors-definition/1` file with no configured instance; the target may be left out, since the
+file names the connector and instance (`--definitions-root` names the tree holding its vendored
+source; `--schema` and `--revision` default to the description's). With `--describe` it answers
+from the file's lowering and connects nothing. With no connection it asks once
 whether to connect, naming the provider endpoint, and may offer a stored credential of the same
 connector at the same provider authority; without a terminal it refuses with a `next_action`.
 Use it only when the user supplies the definition and the connection is authorized. Since
