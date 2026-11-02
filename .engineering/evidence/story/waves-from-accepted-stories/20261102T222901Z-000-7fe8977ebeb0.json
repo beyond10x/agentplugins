@@ -1,0 +1,12 @@
+{
+  "at": "2026-11-02T22:29:01Z",
+  "actor": "human:timo",
+  "artifact": "story:waves-from-accepted-stories",
+  "kind": "story",
+  "revision": 9,
+  "change": {
+    "change": "evidence",
+    "kind": "test_result",
+    "source": "task check at 8203bbea: fmt, clippy, 213 tests and the offline check passed; agentplugins-check tools and release verify 0.26.0 exit 0"
+  }
+}

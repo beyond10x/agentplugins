@@ -2,7 +2,7 @@
 format: aep.planning-md/3
 id: story:waves-from-accepted-stories
 kind: story
-status: active
+status: implemented
 title: Waves are derived up front from accepted stories; findings wait in the backlog
 summary: The wave skill runs predefined waves of accepted stories and files pre-existing findings as backlog drafts no wave takes before the plan is delivered
 scope:
@@ -18,10 +18,11 @@ scope:
   path: website/docs/plugins/aep.md
 - confidence: cited
   path: website/docs/tutorials/first-governed-plan.md
-revision: 9
+revision: 10
 transitions:
 - {from: "draft", to: "proposed", at: "2026-11-02T21:17:55Z", actor: "human:timo", revision: 2}
 - {from: "proposed", to: "active", at: "2026-11-02T21:17:55Z", actor: "human:timo", revision: 3}
+- {from: "active", to: "implemented", at: "2026-11-02T22:29:01Z", actor: "human:timo", revision: 10, decided_on: {"recorded":{"test_result":1}}}
 ---
 ## Context
 
