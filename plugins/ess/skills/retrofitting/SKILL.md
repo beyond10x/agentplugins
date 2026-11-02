@@ -27,9 +27,15 @@ Use every source that exists. Where two disagree, the draft records both and mar
 carry each gap into the draft as an `UNMAPPED:` marker, or, where the contract says the key is
 always sent and may be `null`, declare it `Optional<T>` with `presence: null_when_absent`
 (`ess/15`), which publishes exactly that; where the key may also be left out (nullable and not
-`required`), `presence: omitted_or_null` (`ess/31`). An object schema must be closed with
-`additionalProperties: false`, or the import refuses it; that refusal is a finding about the
-contract, so report it rather than editing the contract to pass.
+`required`), `presence: omitted_or_null` (`ess/31`). From 0.77.0 the import also admits an open
+object (no `additionalProperties`, or `additionalProperties: true`) with `additional_properties`
+of kind `json`, the empty schema `{}` and the `true` schema as JSON values, and a nullable
+`anyOf`/`oneOf` pair (`[{type: string}, {type: 'null'}]`) as an `optional` value: on 0.83.0 such a
+document imported with no refusal, where 0.75.0 refused each ("supported objects must be closed
+with `additionalProperties: false`", "boolean schemas are valid but unsupported"). Declare an open
+object `undeclared_fields: ignored` (`ess/24`) and the free value `Json`. A 3.1
+`type: [string, 'null']` is still a coverage gap at its pointer. Any refusal the import still
+makes is a finding about the contract, so report it rather than editing the contract to pass.
 
 `aep` is optional. Without it, write the domain by hand from the schemas, in the shape the `ess:specifying`
 skill shows.
@@ -138,6 +144,10 @@ Retrofit-specific rules:
   | inserts a row with an empty list column (`tags: Vec::new()`, `DEFAULT '{}'`) | `sets: {tags: []}` on the creator (`ess/31`) |
   | pushes one request value onto a stored list (`tags.push(tag)`, `array_append(tags, $1)`) | `sets: {tags: {append: input.tag}}` (`ess/31`) |
   | reads a missing member and `null` alike (`Option<T>` under serde, a nullable property not in `required`) | `presence: omitted_or_null` on the `Optional` field (`ess/31`) |
+  | reads rows another system or a migration writes, and never inserts one (a tenants or sites table) | `provided: true` on the entity (`ess/33`); a `when_related: {via: input.<f>}` guard still reads its rows |
+  | takes a structured, map or free-JSON request field (a nested object, `HashMap`, `serde_json::Value`) | an `example:` of that shape on the input (`ess/33`), so synthesis sends a value the handler accepts |
+  | documents what a status or a status change means (a doc comment on an enum variant or a handler) | `summary:` on the state (`{name, summary}`) or on the transition (`ess/33`) |
+  | serves an `operationId`, base URLs, two errors on one status with one body, plain-text answers or a bare JSON array | an `ess-http/1` binding: `operation_id`, `servers`, `alike:`, `encoding: text`, `body: array` ([current features](../specifying/references/current-features.md#http-routes-ess-http1)) |
 - **An entity the code gives no status still needs a lifecycle.** The language requires one, so
   declare a single state that is both `initial` and `terminal` (`Stocked`), and say in a comment
   that it is structural, not read from the code. That is the one state a retrofit may name.

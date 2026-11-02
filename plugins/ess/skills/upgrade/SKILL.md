@@ -56,7 +56,12 @@ changed yet.
   at parse time for `presence: omitted_or_null` ("unknown variant `omitted_or_null`"); from 0.70.0
   a specification on `ess/32`, which 0.69.2 refuses the same way ("[1, …, 31], not `ess/32`"), and
   at parse time for a state's `wire:` ("invalid type: map, expected a string"), and a suite with a
-  `Decimal` view field (`ess-conformance/58`, `/59`). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  `Decimal` view field (`ess-conformance/58`, `/59`); from 0.76.0 an `ess-composition/5`; from
+  0.78.0 a specification on `ess/33`, which 0.77.0 refuses the same way ("[1, …, 32], not
+  `ess/33`") and 0.75.0 at parse time for `provided:` ("unknown field `provided`"), a suite with an
+  entity fixture (`ess-conformance/60`, `/61`) and a spec diff naming a summary move
+  (`ess-diff/22`); from 0.79.0 an `ess-scenario/6` document and a suite with a response member path
+  or a `Binary64` (`ess-conformance/62`, `/63`). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -131,6 +136,36 @@ changed yet.
   `Note::CrossCallerUnswapped` and `ChangedRowCause` (0.75.0). From 0.75.0 the ESS crates build
   on rustc 1.85 again; a consumer resolving its own lock there may need
   `cargo update -p instability --precise 0.3.10` and `cargo update -p darling --precise 0.20.11`
+  (from the release notes).
+- From 0.76.0 through 0.83.0, re-run `ess specify validate` first. A `when:` branch whose guard
+  implies an earlier input-guarded refusal's guard is `unreachable_branch` (`ESS-COMMAND-012`,
+  0.77.0): drop it or narrow the refusal, as the hint says. A flat `summary:`, `wire:`, `display:`
+  or `code:` on a named type is refused naming `naming: {…}` (0.78.0). A `defined(x)` /
+  `not defined(x)` pair over one `Optional` value now validates without a default (0.76.0), and a
+  `when_subject:` predicate reading the identity that addresses the row names the
+  `unknown_instance: true` idiom that replaces it. Raising a header to `ess/33` admits the
+  constructs in [later-formats.md](../specifying/references/later-formats.md#ess33). Regenerate
+  committed projections: an entity's JSON Schema and OpenAPI entry gain `x-ess-invariants`,
+  `Integer`, `Binary64` and `.count` bounds become `minimum`/`maximum`/`minLength`/`maxLength`, a
+  scalar `distinct:` becomes `uniqueItems` (0.76.0), and a component not `reached_by: network`
+  gains a sentence in `info.description`, so `ess generate --check` names those files. A Rust type
+  library is unchanged without the new options (`--declared-field-order`,
+  `--rust-box-only-recursion`, `--http`); `--root <command>.response` on a command with no response
+  is `unknown_root` (0.81.0), where it generated an empty object. Regenerate committed suites: the
+  synthesis fixes of 0.79.0 through 0.83.0 change bytes and add checks (binding identities, the
+  arranged half of input refusals, `!=` and `==` guards against an `example:`), and each release's
+  notes name the fixture models whose bytes moved; read the change with `ess verify conform diff`.
+  Re-run `ess verify conform author`: a repeated key in a scenario mapping is `ESS-AUTHOR-047`, and
+  a partial nested literal in `response:` is `ESS-AUTHOR-014` (was `ESS-AUTHOR-001`). The generated
+  Rust `whole_number` and Go `wholeNumber` refuse a number outside the JSON grammar, and
+  `integer_at`/`integerAt` read `3.0` or `3e0` as an Integer (0.79.0); `ess generate synthesize`
+  for Rust and web no longer refuses a response field named like an input field, and refuses two
+  response fields with one wire name as `wire-collision` (0.77.0). Library API changes:
+  `ess-domain` `Case.presence`, `FieldCase.fields_presence`/`input_presence` (0.76.0),
+  `Transition.summary`, `RawState::Spelled` (0.78.0); `ess-http` `Empty` no longer `Copy`,
+  `Route`/`RouteSpec` gain `alike` and `refusals`, `ViewBody::Array`; `schema-contract`
+  `TargetConfiguration::Typescript` becomes a struct variant (0.77.0); `ess-diff`
+  `EntityChange::TransitionSummaryChanged` (0.78.0); `Specification::assemble_traced` (0.82.0)
   (from the release notes).
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0

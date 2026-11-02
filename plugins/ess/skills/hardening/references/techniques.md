@@ -46,7 +46,13 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `identical_answer`. A failed scenario still kills such a swap; the runner compares the outcome
    name too. Since 0.60.0 a swap is also `equivalent` when every input both branches select is taken
    by branches answered before both; the entry lists them in `overlap_taken_by`. A swap of two
-   refusals a binding's failure policy treats differently is no longer `identical_answer`.
+   refusals a binding's failure policy treats differently is no longer `identical_answer`. From
+   0.77.0 a swap of two input guards no input selects together is `equivalent`
+   (`unsatisfiable_guard`, the reason naming the contradicting part), also for an `Optional` input
+   compared with two literals, pinned values beside an ordering or a text match, enum attributes or
+   membership lists that rule the pair out, and an overlap above 64 combinations; guards that can
+   both hold keep their scoring. A model that reaches a `Binary64` runs a conformance suite from
+   0.79.0, but the mutation audit still refuses it (from the release notes).
    `guard-negate`, `guard-connective` and `guard-boundary` now also mutate `when_subject:` and
    `when_related:` predicates (`guard-negate/<command>/<outcome>/when_subject`), so a model with
    those guards gains mutants. Where `sets-drop` has no site, a `note:` on stderr says why

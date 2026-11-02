@@ -23,6 +23,7 @@ newer format a change needs, which earlier readers refuse:
 | `ess-diff/19` | a view's `absent:` default row (`ess/25`) added, removed or changed is `view/<name>/absent-changed`, breaking for readers, with the rows `before` and `after` (reproduced on 0.60.0) |
 | `ess-diff/20` | a struct's `shorthand:` (`ess/27`) declared (`expanded`), dropped or moved (`narrowed`) is `type/<name>/shorthand-changed`; an actor becoming the system is `actor/<name>/system-changed`, breaking for callers (the reverse compatible); a moved `await_within:` is `command/<name>/await-within-changed`, compatible; a domain's display name or summary edit is `domain/<name>/display-name-changed` or `summary-changed`, compatible, where it was `unclassified-changed` and `unknown` (from the 0.63.0 release notes) |
 | `ess-diff/21` | a view field whose source moves, such as to a read through a reference (`ess/28`), is `field-source-changed` (from the 0.64.0 release notes) |
+| `ess-diff/22` | a moved lifecycle transition `summary:` (`ess/33`) is `transition-summary-changed` and a moved state summary the state enum's `variant-summary-changed`, both compatible (a 0.83.0 probe passed `--fail-on breaking-or-unknown`); adding or removing `provided: true` is `system/<name>/unclassified-changed`, unknown, which fails the default gate (exit 4 in the probe) |
 
 Of the other `ess/25` keys, `before_row:` gained or lost is
 `outcome-condition-changed`, and `outcome-set-effect-changed` names each per-row event (`each:
