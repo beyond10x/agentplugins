@@ -7,6 +7,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-11-02
+
+### Changed
+
+- `aep:implementing` and `aep:wave`: waves are derived once, up front, from the accepted stories by `aep plan artifact waves --status <accepted>`, and run in the plan's order; the coordinator takes the plan's next wave, adds no story to it and never accepts one
+- A `pre-existing` finding becomes one draft story in the backlog, tagged `from-finding` and linked to its review result; the coordinator never proposes or accepts it, and once the operator accepts it, it waits for the plan derived after every planned wave is delivered. An `introduced` finding, or one the unit's acceptance needs, goes back to the implementor; the adversary, security-reviewer and adversary-panel procedures, the wave close and the eval case follow
+- The governed-plan tutorial, the golden path and the aep plugin page describe planned waves and the backlog
+- Track AEP 0.79.0: `aep:planning` names `AEP_FETCH_TIMEOUT_SECS`, `AEP_CACHE_GROUP_WRITABLE` and evidence against suite majors `ess-conformance/58` and `/59`, with later majors refused by name; the planning protocols pin moves to 0.79.0
+- Track Connectors v0.65.0: `connectors invoke <connector>[/<instance>] <operation>` replaces `operations invoke` and the removed service commands, with `--describe`, `--fields`, `--each` and declared page walks; `agentplugins-check` reads a contract's `hidden_tty` flag
+- Track Metaharness 0.26.2; the eval workflow runs it with AEP 0.77.0, the revision it still links, ESS 0.83.0, Connectors v0.65.0 and Worktree 0.19.0
+- The website builds with Docs System 0.14.1
+
 ## [0.25.1] - 2026-10-28
 
 ### Changed
@@ -948,7 +960,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins
 - Publish adopter documentation for discovering, selecting, and installing each plugin
 
-[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.25.1...HEAD
+[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.26.0...HEAD
+[0.26.0]: https://github.com/beyond10x/agentplugins/compare/0.25.1...0.26.0
 [0.25.1]: https://github.com/beyond10x/agentplugins/compare/0.25.0...0.25.1
 [0.25.0]: https://github.com/beyond10x/agentplugins/compare/0.24.2...0.25.0
 [0.24.2]: https://github.com/beyond10x/agentplugins/compare/0.24.1...0.24.2
