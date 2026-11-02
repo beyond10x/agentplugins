@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.59.0](https://github.com/beyond10x/connectors/releases/tag/v0.59.0).
+[v0.65.0](https://github.com/beyond10x/connectors/releases/tag/v0.65.0).
 
 ## Install in either host
 
@@ -48,12 +48,21 @@ and describes one before invocation. The returned schema identity and revision b
 its JSON input must match the described schema. Invocation rechecks admission and may start the
 supervised local owner/adapter. Missing capability or access is reported explicitly.
 
+Since v0.60.0 one command invokes an operation:
+`connectors invoke <connector>[/<instance>] <operation>`, with the instance, connection, schema
+and revision defaulting to the only ones that fit and `--describe` printing the description
+without calling anything. Since v0.63.0 `--fields` prints only the named members of a result,
+`--each` prints one line per array element, and `--walk --out <file>` follows a page sequence the
+operation declares, so an agent neither reads a whole result into context nor writes its own
+cursor loop.
+
 For onboarding, the operator enters the credential document through protected terminal, file or
 stdin acquisition. The skill reads safe status, not secret values. External writes need the
 user's authorization and the adapter's admission, exact approval subject and protected proof.
-The current CLI has a separate explicit service interface. Since v0.57.0 `connectors server
---transport stdio` is a local MCP server on Linux that offers admitted read-only operations as
-tools; it serves no writes, resources or prompts. Since v0.58.0 an OAuth2 profile signs in by
+Since v0.60.0 the CLI has no command for a standalone service: a service is called over HTTP,
+or a local instance is given its endpoint with `connections connect --endpoint`. Since v0.57.0
+`connectors server --transport stdio` is a local MCP server on Linux that offers admitted
+read-only operations as tools; it serves no writes, resources or prompts. Since v0.58.0 an OAuth2 profile signs in by
 browser or device code, and `connections token` hands its access token to the operator.
 
 ## Upgrade
@@ -110,3 +119,12 @@ that carries its own selection file rewrites each as `{"boolean": …}` when it 
 that load it. Since
 v0.48.0 the CLI and its local host run on macOS, with weaker platform guarantees than on Linux,
 and releases carry prebuilt archives.
+
+v0.60.0 removes `operations invoke` and the top-level service commands (`describe --endpoint`,
+`invoke --endpoint`, `serve`); each is now a parse refusal, so a script that called them is
+rewritten to `connectors invoke <connector>[/<instance>] <operation>` or to HTTP. Instance
+listings no longer carry `adapter`. From v0.63.0 an MCP client reads a tool's operation output
+schema from `_meta`, and selections that declare a page walk move their configuration revision.
+v0.65.0 makes `setup init` write `connectors-local/5`; `setup migrate --mode apply` moves a
+`connectors-local/2` file with no legacy entries to it. Its archives also carry the Grafana,
+Prometheus, Loki and Kubernetes provider programs.

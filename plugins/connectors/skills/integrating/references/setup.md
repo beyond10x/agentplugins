@@ -15,9 +15,13 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    instance's supported acquisition profile. An instance holds at most one connection: `connect`
    on one that already holds a live or stale connection is refused before it asks for a
    credential, so a second account is a second instance. For an authorized connection, inspect
-   `connections connect --help`, then use the selected `--connector`, `--instance` and
-   `--profile` with one protected entry option: `--credential-prompt`,
-   `--credential-file` or `--credential-stdin`. The operator supplies the documented credential
+   `connections connect --help`, then name the target `<connector>/<instance>` (or the selected
+   `--connector` and `--instance`) and `--profile` with one protected entry option:
+   `--credential-prompt`, `--credential-file` or `--credential-stdin`. Since `v0.60.0`
+   `--endpoint <url>` writes the instance's endpoint into the configuration before a credential
+   is asked for, creating the instance and its connector's table when absent and keeping every
+   other byte of the file; a connector without a default endpoint needs it, and a different
+   endpoint on an existing instance is refused `lifecycle_conflict` naming `endpoint`. The operator supplies the documented credential
    document directly to that protected channel. Never read secret bytes into model context or
    put them in chat, command arguments, logs or configuration. OAuth acquisition uses the
    adapter's returned safe next action; do not invent an authorization URL or copy tokens. A
@@ -75,7 +79,7 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    an `oauth2_grant` connection (since `v0.58.0`) descriptor 3 carries only the current access
    token, never the stored entry or its refresh token.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.59.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.65.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
@@ -182,7 +186,8 @@ name under `[connectors.<connector>]` and names their instances under
 `description` and, where its connector declares more than one auth profile, `profile`; the
 executable, its SHA-256, the configuration revision and the operations come from the
 `connectors-catalog-provider` installed beside `connectors`, and `default_instance` selects one
-for a command that names none. `setup init` still writes the older format; the release's README
+for a command that names none (`invoke` reads no `default_instance` since `v0.60.0`). Until
+`v0.65.0` `setup init` wrote the older format; the release's README
 (*Configure instances*) shows the file. A legacy `[adapters.<alias>]` entry keeps working and is
 moved by `connectors setup migrate`, as `connectors:upgrade` says. The same release adds
 approved Zendesk ticket writes, Jira issue writes with `issue.create_meta.fields`, and Slack
@@ -214,10 +219,36 @@ person's own subscription: `chatgpt` (profile `chatgpt.subscription`, browser or
 `claude.subscription-pasted`, read `account.profile`). Neither ships a client id: the operator pins
 an instance whose native configuration names its own `oauth2_client_id`, and an instance without
 one is refused as `InvalidConfiguration`. Whether a client may use a plan is the provider's terms'
-question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.59.0/website/docs/connectors/chatgpt.md),
-[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.59.0/website/docs/connectors/claude-subscription.md)).
+question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.65.0/website/docs/connectors/chatgpt.md),
+[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.65.0/website/docs/connectors/claude-subscription.md)).
 Both sign-ins are verified against a local fake authorization server only, never live.
 `v0.59.0` changes no setup step.
+
+`v0.60.0` replaces `operations invoke` with `invoke <connector>[/<instance>] <operation>` and
+lets `connections connect --endpoint` create an instance (step 3). Zendesk gains the read
+`ticket.audits`, a changed descriptor: a derived instance takes it from the installed provider,
+and a pinned or legacy entry adds it to its `operations` only when the operator authorizes that
+access. `v0.61.0` adds `connectors definitions install --source <source> --tag <tag>`: it checks
+every file of a connectors-definitions release against its `index.json` and writes a read-only
+cache entry and `definitions.lock` beside the configuration, refusing `digest_mismatch`,
+`unknown_format_version`, `unmet_feature` or `release_invalid` with nothing changed. Installing
+grants nothing and starts nothing, and no instance resolves through the lock yet. `v0.63.0`
+declares page walks for the Zendesk, Gmail, Google Calendar, Google Drive, Confluence, Jira
+`issues.search`, HubSpot `objects.list` and Slack selections, which moves those instances'
+configuration revision: recover as step 4 describes. `v0.63.1` ships a `slack` connector
+declaration for the bot selection (profile `slack.bot`), so `--connector slack --instance <name>`
+derives the bot configuration and `setup migrate` moves a legacy Slack bot or user entry to a
+pinned instance; a user-token instance stays pinned. `v0.64.0` lets an instance table state
+`alias` and `instance_id`, so a migrated instance keeps its old id, connections, approval policy
+and audits. `v0.65.0` makes `setup init` write `connectors-local/5`, and
+`setup migrate --mode apply` moves a `connectors-local/2` file with no legacy entries to `/5`, with a
+backup. Its archives carry `connectors-grafana`, `connectors-prometheus`, `connectors-loki` and
+`connectors-kubernetes` beside `connectors` and `connectors-catalog-provider` for every target;
+`b10x` installs `connectors` alone, so pin a provider program from the same archive as its README
+shows (on macOS, after removing the quarantine attribute). A Kubernetes `exec` credential plugin
+such as `aws eks get-token` runs on macOS when its pin names the plugin's real file (not a
+symbolic link on `PATH`) and every directory on that path is owned by root or the user and not
+writable by group or others.
 
 For a 0.7.x deployment, preserve the old configuration/state and identify each consumer's contract
 before replacement. Current local groups use a different configuration and state model; there is

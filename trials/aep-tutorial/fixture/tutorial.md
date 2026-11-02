@@ -16,7 +16,7 @@ change before drafting stories, sends those stories to four critics, and impleme
 approved wave with an independent adversary. Counts and identifiers depend on the resulting model;
 do not copy scenario counts from a different run.
 
-These instructions target AEP 0.78.0 and ESS 0.75.0. The complete
+These instructions target AEP 0.79.0 and ESS 0.83.0. The complete
 [2026-09-28 recording](./first-governed-plan-2026-09-28.md) preserves the earlier Go session and its
 costs as historical evidence.
 
@@ -140,8 +140,8 @@ instead of dropping those baseline obligations.
 
 ```text
 Commit the specification and reviewed plan. Accept the ready stories, record their file scopes,
-and propose the first wave with aep:implementing. Name the stories, evidence, managed worktrees
-and model budget required. Stop for my approval of that concrete wave.
+and propose the wave plan and its first wave with aep:implementing. Name the stories, evidence,
+managed worktrees and model budget required. Stop for my approval of that concrete wave.
 ```
 
 ```bash
@@ -183,6 +183,7 @@ only to the exact reviewed ID. Follow the Worktree skill if a lease or recovery 
 
 ## Keep going
 
-Ask for the next proposed wave when ready. Keep unanswered questions and remaining feature
-scenarios in the store. See the [golden path](../golden-path.md) for a longer recorded example and
+Ask for the next wave of the plan when ready. Keep unanswered questions and remaining feature
+scenarios in the store; findings the adversary filed wait there as backlog drafts until every
+planned wave is delivered. See the [golden path](../golden-path.md) for a longer recorded example and
 [the AEP plugin](../plugins/aep.md) for governed engine delivery.

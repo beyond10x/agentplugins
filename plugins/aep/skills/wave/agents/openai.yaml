@@ -1,4 +1,4 @@
 interface:
   display_name: "Start a Wave"
-  short_description: "Propose an AEP implementation wave and stop for approval"
-  default_prompt: "Use $wave to scope the accepted stories, propose one implementation wave, and stop for my approval."
+  short_description: "Propose the next planned AEP wave and stop for approval"
+  default_prompt: "Use $wave to take the next wave of the wave plan, check its stories, propose it, and stop for my approval."

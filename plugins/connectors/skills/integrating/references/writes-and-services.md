@@ -16,7 +16,19 @@ private absolute path.
 
 When the exact effect and target are authorized, `approvals issue` takes the same request,
 `--approve-subject` from preparation and a new `--proof-output` protected path. Invoke with that
-same request, `--approval-file` pointing to the proof and the required `--idempotency-key`.
+same request, `--approval-file` pointing to the proof and the required `--idempotency-key`
+(since `v0.60.0` through `invoke`; `approvals` still selects with `--connector` and `--instance`):
+
+```bash
+connectors --output json invoke '<connector>/<instance>' '<operation>' --connection '<id>' \
+  --schema '<schema>' --revision '<revision>' --input-file '<file>' \
+  --approval-file '<proof>' --idempotency-key '<key>'
+```
+
+A write without `--approval-file` is refused `approval_required` before any
+provider call, and its `approval_steps` names the commands that issue the proof: `approvals
+prepare`, `approvals clock-check`, `approvals issue`. `--each` and `--walk` are refused on a write;
+`--fields` is admitted and never hides `request_id`, `mutation` or `source_audit`.
 Keep proof bytes out of model context. Never invent approval evidence, signing keys, a subject or
 a revision. The current CLI rejects approval files and idempotency keys on read operations.
 
@@ -76,22 +88,40 @@ before any new attempt.
 
 ## Explicit services
 
-For an existing supplied service endpoint, read `connectors describe --help` and
-`connectors invoke --help`. These top-level commands form a separate compatibility interface;
-only the global `--output` selection applies. Select the configured `--endpoint` and protected
-`--token-file`, describe that service, then construct invocation from its descriptor and the
-installed command's input options. Its operations' `input_schema` and `output_schema` are JSON
-Schema objects; its `configuration_schema` is still JSON text. Keep service credentials in the
-protected file.
-Enable plaintext only when the deployment and task explicitly authorize it.
+Since `v0.60.0` the CLI has no command for a standalone service: the top-level `describe
+--endpoint`, `invoke --endpoint --token-file` and `serve --config` forms are removed and are parse
+refusals (exit 2) that contact nothing. A supplied service endpoint is reached one of two ways:
 
-`connectors serve --help` describes the federation service; start it only for an authorized
-service task and report the process lifecycle. The current release has no hosted login mode,
-and its only MCP runtime is the read-only local stdio server the skill describes; it serves no
-write. Since `v0.35.0` a service whose configuration names a private
-`state` directory also answers `POST /v1alpha2/invoke` for library clients
-(`connectors_client::Client::invoke_v1alpha2`): each admitted invocation carries `audit_ref` and
-`audit_status`, and a write carries its recorded `mutation` attempt; a write answered
-`outcome_unknown` is never sent again. The CLI's explicit `invoke` keeps the `/v1/invoke`
-binding. Local placement uses `--config`/`--state-dir`; explicit service placement uses the
-endpoint. Neither interface uses v1 target flags or description leases.
+- Give a local instance its endpoint with `connections connect` and a protected credential
+  source ([setup.md](setup.md), step 3), then `invoke` it as the skill shows:
+  `connectors connections connect '<connector>/<instance>' --endpoint '<url>' --profile '<profile>' --credential-prompt`. The endpoint is written into
+  the configuration before a credential is asked for; a different endpoint on an existing instance
+  is refused `lifecycle_conflict` naming `endpoint`.
+- Call the service over HTTP (`GET /v1/describe`, `POST /v1/invoke`, and `POST /v1alpha2/invoke`
+  for library clients), as the release's
+  [`docs/running-services.md`](https://github.com/beyond10x/connectors/blob/v0.65.0/docs/running-services.md)
+  shows, with the bearer in a protected file. Its operations' `input_schema` and `output_schema`
+  are JSON Schema objects. Enable plaintext only when the deployment and task explicitly
+  authorize it.
+
+The federation host is a library (`connectors_host::federation`) a Rust program embeds; no
+command starts it. `connectors-catalog-provider --config <file>` serves one catalog instance on
+the HTTP host (since `v0.62.0`); start it only for an authorized service task and report the
+process lifecycle. The current release has no hosted login mode, and its only MCP runtime is the
+read-only local stdio server the skill describes; it serves no write. A served host's
+`POST /v1alpha2/invoke` carries `audit_ref` and `audit_status`, and a write its recorded
+`mutation` attempt; a write answered `outcome_unknown` is never sent again. Since `v0.64.0` a
+write the provider definitely refuses (a 4xx the catalog classifies, such as 405, 409 or 422 to a
+merge) answers `refused` with the provider's `message` (`forbidden` for 405, `invalid_input` for
+409 and 422) and settles `Failed`; a 5xx, a cut connection and a timeout stay `outcome_unknown`.
+
+Served-host deployment features are the operator's to configure and are documented in that
+release file: admission by a Kubernetes service account token (`admission:
+service-account-token`, with `principal`, `principals` or `service_accounts`), a GitHub App
+installation credential (`github_app`), a git smart-HTTP relay that pushes with the instance's
+own token after quarantine checks, a `catalog.repositories` list that keeps `owner`/`repo`
+operations inside the listed repositories, and keyed writes under `standing_grants`, where every
+write needs `idempotency_key` and a covering grant (`approval_required`, `rate_limited` or
+`idempotency_conflict` otherwise, none sent). Never write or widen a grant, a principal or a
+repository list to make a call work. Local placement uses `--config`/`--state-dir`; a service
+is placed by its endpoint.

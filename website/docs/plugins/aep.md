@@ -54,7 +54,8 @@ delivery skills say so before their first write and name the upgrade; `aep:upgra
 
 It provides:
 
-- the `implementing` skill, in wave mode: coordination guidance for several stories at once;
+- the `implementing` skill, in wave mode: coordination guidance for running a planned wave of
+  accepted stories at once;
 - a story scoper that turns an accepted story into bounded implementation units;
 - an implementor role for an assigned unit;
 - an adversary role that checks the result against scope, evidence, and repository invariants;
@@ -65,8 +66,21 @@ each hands off to `aep:implementing`:
 
 | command | what it does |
 |---|---|
-| `/aep:wave [story-id…]` | scopes the candidates, writes the wave page, proposes the wave and stops for your approval |
+| `/aep:wave [story-id…]` | takes the next wave of your wave plan (or the ids you name), checks and scopes its stories, writes the wave page, proposes it and stops for your approval |
 | `/aep:drive <story-id>` | says what a driven run costs, starts one governed run, prints its run id and stops |
+
+### Waves are planned up front, and findings wait
+
+A wave runs only accepted stories, and accepting a story is yours, never the agent's. Before the
+first wave, the waves are derived once from the accepted stories with
+`aep plan artifact waves --kind story --status active` and written to a plan page in order. The
+coordinating agent runs the next undelivered wave of that page; it adds no story to it and accepts
+none.
+
+A review finding the unit introduced, or that its acceptance needs, goes back to the implementor. A
+finding that was already there before the unit is recorded in the review and filed as one `draft`
+story in the backlog. No backlog story enters a wave until you have accepted it and every planned
+wave is delivered: a defect that predates the wave has no claim to go before the planned work.
 
 ## Diagnosis
 

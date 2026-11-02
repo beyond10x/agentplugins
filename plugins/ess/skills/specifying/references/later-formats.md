@@ -63,6 +63,9 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | rows the input names and a row set, guarded on one command | `ess/32` | `when_related: {via: input.<f>, exists: false \| predicate: …}` beside `when_related: {entity, where, exists \| count \| forall}`; [below](#ess32) |
 | a struct with no declared fields | `ess/32` | `fields: []`; open (`undeclared_fields: ignored`) any object, closed only `{}` |
 | a lifecycle state spelled differently on the wire | `ess/32` | `states: [{name: Indexing, wire: indexing}, Ready]`; guards, transitions and suites keep the declared name |
+| a struct, map or JSON input synthesis sends as given | `ess/33` | `example:` on an input typed by a struct (open or closed), a `Map<…>` or `Json`, through any newtype or `Optional`; [below](#ess33) |
+| rows the deployment holds and no command creates | `ess/33` | `provided: true` on the entity; a `when_related: {via: input.<f>}` guard reads one through an entity fixture |
+| one line on what a state or a move means | `ess/33` | `summary:` on a transition, and on a state in its mapping form `{name, wire?, summary?}` |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -269,7 +272,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/32`
+## From `ess/16` through `ess/33`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -295,6 +298,7 @@ With current ESS:
 | `ess/30` | no `exists: false` branch on a stored reference every writer checks and nothing deletes; `coalesce(<field>, <literal>)` in a selector's `where:`; `state` in the `where:` of `instances:` and `affects:`; `compensates: true` on an `external:` race narrowed by `when_subject:`; an authored exact value on a `{generated: true}` field; a view `filter:` ordering a `Timestamp` against `now` |
 | `ess/31` | the empty list `[]` in `sets:` over a required `List<…>`; an `example:` on a `List` input; `{append: input.<field>}` in `sets:` over a stored list; `presence: omitted_or_null`; a view field carries its `Optional` source field's `presence:` |
 | `ess/32` | a named-row `when_related: {via: input.<f>, …}` beside a row-set `when_related: {entity, where, …}` on one command; a struct with `fields: []`; a lifecycle state's `wire:` spelling; two enum variants spelled alike on the wire are refused |
+| `ess/33` | an `example:` on a struct, `Map<…>` or `Json` input; `provided: true` on an entity; a `summary:` on a lifecycle transition and on a state |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -783,11 +787,11 @@ creates the related row first ([beyond10x/ess#682](https://github.com/beyond10x/
 the issue's two-command shape (`AddParcel` behind `no-shelf`, `CheckShelf` refusing an empty
 shelf) synthesized 5 scenarios with 0 refusals on 0.69.2, `CheckShelf/outcome/holds-parcels`
 included (4 on 0.68.0), and all 5 passed on `interpreted`. An `instances:` selection over the rows
-that creator makes is still refused on 0.69.2: an `updates:` with
-`instances: {where: shelf_id == input.shelf_id}` got `ESS-SYNTH-001` ("no three rows the filter
-selects that the arranging commands can produce"), whose help to write the filtered field from an
-input does not apply, since the creator already does; without the guard it got its scenario. Keep
-the guard where the system has it and report that refusal.
+that creator makes was still refused on 0.69.2 (`ESS-SYNTH-001`, "no three rows the filter selects
+that the arranging commands can produce"). A probe on 0.83.0 (`AddParcel` behind `no-shelf`,
+`NoteShelf` an `updates:` with `instances: {where: shelf_id == input.shelf_id}`) synthesized 4
+scenarios with 0 refusals, `NoteShelf/outcome/noted` included, and all 4 passed on `interpreted`
+(0.75.0 gave the same 4): keep the guard where the system has it.
 
 **`coalesce` in a selector** reads the default where the candidate's field is absent. Under
 `ess/29` it is `unsupported_construct`. Generated Rust and Go keep the command an obligation named
@@ -967,6 +971,114 @@ From 0.70.0 a variant's `code:` (`{name: call.started, code: Begun}`) names its 
 Rust, Web and Go code `ess generate synthesize` writes, as `naming: {code: …}` does; before, every
 target ignored it. A variant or union label that is a wire spelling, such as `call.started`, no
 longer needs `code:`: those targets derive `CallStarted` from it (from the release notes).
+
+## `ess/33`
+
+A probe on 0.83.0 with the excerpt below validated and synthesized 7 scenarios with 0 refusals at
+`ess-conformance/60`; the `interpreted` target passed all 7. Under `ess/32` each construct is
+refused at its line with a hint naming `ess/33`: each summary and `provided: true` as
+`ESS-ENTITY-009` (`unsupported_format_version`), each struct, map or `Json` example as
+`ESS-COMMAND-002` (`type_mismatch`, "an example sits on a scalar or list input below ess/33").
+0.75.0 does not parse the document ("unknown field `provided`").
+
+```yaml
+types:
+  - name: depot.racks.Label
+    kind: struct
+    fields: [{name: code, type: String}, {name: size, type: Integer}]
+  - name: depot.racks.Extra
+    kind: struct
+    undeclared_fields: ignored
+    fields: [{name: note, type: String}]
+entities:
+  - name: depot.racks.Site                     # rows the deployment holds; nothing here creates one
+    provided: true
+    identity: {name: site_id, type: depot.racks.SiteId}
+    fields: [{name: city, type: String}]
+    lifecycle: {initial: Active, states: [Active], terminal: [Active]}
+  - name: depot.racks.Shelf
+    # identity, a references relation to Site, fields site_id, label, tags, meta, extra
+    lifecycle:
+      initial: Open
+      states:
+        - {name: Open, summary: Takes parcels.}
+        - {name: Sealed, wire: sealed, summary: Takes nothing more.}
+      terminal: [Sealed]
+      transitions:
+        - {name: seal, from: [Open], to: Sealed, summary: Close the shelf for good.}
+commands:
+  - name: depot.racks.AddShelf
+    input:
+      - {name: site_id, type: depot.racks.SiteId}
+      - {name: label, type: depot.racks.Label, example: {code: A1, size: 3}}
+      - {name: tags, type: "Map<String, String>", example: {aisle: "4"}}
+      - {name: meta, type: Json, example: {colour: red, slots: [1, 2]}}
+      - {name: extra, type: depot.racks.Extra, example: {note: fragile, carrier: north}}
+    outcomes:
+      - name: too-big
+        when: input.label.size > 10
+        error: depot.racks.LabelTooBig
+      - name: no-site
+        when_related: {via: input.site_id, exists: false}
+        error: depot.racks.SiteNotFound
+      - name: added                            # creates the Shelf, sets every input
+```
+
+**A struct, map or `Json` example** is held as a precondition literal is: a struct names every
+required member, each of its type, a map keys and values of its types, and a `Json` example is any
+value but `null`. Synthesis sends it at the plain instance. A struct example reaches synthesis
+through its declared members, so a guard on one keeps the scenario that refutes it: the probe sent
+`size: 3` and, for `too-big`, `size: 11`. An open struct's undeclared members are sent as written
+(`carrier: north`); a closed struct refuses them as `undeclared_reference`. A union example stays
+refused.
+
+**`provided: true`** says the deployment holds the entity's rows, so no command need create one.
+Where a `when_related: {via: input.<field>}` guard reads such a row, the scenario opens with a
+`resolve_fixtures` step naming an entity fixture `{name, type, entity, state}` and sends its
+identity; the `exists: false` branch is sent a fresh identity. That suite is `ess-conformance/60`
+(`/61` with coverage), and every scenario reading the row carries a note that no second provided
+row stands beside it, so a target reading another row of the entity is not failed by it. The
+target supplies the row: the `interpreted` target creates it in the named state, the Rust
+`ConformanceTarget::fixture_values` receives a `fixtures::Contract` whose `FixtureField` carries
+`entity` and `state`, and the generated Go and TypeScript providers get the same
+(`ess:testing-conformance`). A subject, an owner or a view population that needs a provided row
+nothing creates, and a guard over a provided row's fields, are refused by name (from the release
+notes). `ess verify diff` reports adding or removing the marker as
+`system/<name>/unclassified-changed`, unknown for every dimension, so the default gate fails
+(exit 4 in the probe).
+
+**A `summary:`** on a state is the summary of its variant of `<Entity>.State`; guards, `moves:`
+and suites keep naming states and transitions by name. A state written `{name: Open}` with nothing
+beside its name is refused naming the bare form. `ess verify diff` reports a moved transition
+summary as `transition-summary-changed` and a moved state summary as the state enum's
+`variant-summary-changed`, both compatible, in `ess-diff/22` (the probe's changed transition
+summary passed `--fail-on breaking-or-unknown`). At every format, a flat `summary:`, `wire:`,
+`display:` or `code:` on a named type is refused naming `naming: {summary: …}`, the spelling that
+reads it.
+
+### At every format, from 0.76.0 through 0.83.0
+
+- **A `defined(x)` / `not defined(x)` pair needs no default** over one `Optional` input (`when:`),
+  stored field (`when_subject:`) or related field (`when_related:`). On 0.83.0, `when: defined(memo)`
+  beside `when: not defined(memo)` validated at `ess/20` and `ess/33`, synthesized 2 scenarios and
+  passed on `interpreted`; 0.75.0 refused it as `non_exhaustive_branches` (`ESS-COMMAND-005`). The
+  probe found two limits the release notes do not state: spelled `defined(input.memo)`, and beside an
+  input refusal on another field (`when: input.size > 10`), the pair is still
+  `non_exhaustive_branches`; write the bare input name and, beside such a refusal, keep a default.
+  A value comparison on the same path and a `when_subject_state:` partition need a default too.
+- **A branch an earlier input refusal always answers is refused** (0.77.0): a `when:` branch whose
+  guard implies the guard of an input-guarded refusal the precedence order reads first, equal guards
+  included, is `unreachable_branch` (`ESS-COMMAND-012`) at the later branch, naming both. On 0.83.0,
+  `urgent == true` under a refusal on `urgent == true` was refused: "`with-memo` is unreachable:
+  every input satisfying `urgent == true` is answered first by `too-large`". Implication is decided
+  by the finite prover, which declines integer orderings: `size > 20` below a refusal on
+  `size > 10` validated, and synthesis refused it as `ESS-SYNTH-003` ("no candidate of the 9 tried
+  satisfies `size > 20 outside too-large (size > 10), the input-guarded refusal taken first`").
+- **A refusal only out-of-type inputs meet** (outside the field type's `alphabet:`, `prefix:` or
+  invariants) is `ESS-SYNTH-003` from 0.79.0, naming the field, the type and the constraint: a
+  decoder refuses such an input before the command runs (from the release notes).
+- `validate` on a specification of several files names the file a refusal was read from (0.82.0),
+  where it named `<document>` when the refused name was written in more than one file.
 
 ## What validates and still gets no scenario
 

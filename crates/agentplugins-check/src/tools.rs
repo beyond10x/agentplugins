@@ -816,7 +816,7 @@ fn connector_commands(text: &str) -> Result<BTreeMap<Vec<String>, BTreeSet<Strin
         let mut flags = globals.clone();
         if let Some(arguments) = command["arguments"].as_sequence() {
             for argument in arguments {
-                for name in ["long", "inline", "file", "stdin"] {
+                for name in ["long", "inline", "file", "stdin", "hidden_tty"] {
                     if let Some(flag) = argument["source"][name].as_str() {
                         flags.insert(format!("--{flag}"));
                     }
@@ -1259,7 +1259,7 @@ mod tests {
     #[test]
     fn connector_release_contract_admits_groups_and_rejects_removed_commands() {
         let paths = connector_commands(
-            "globals: {config: config, state: state-dir}\ncommands:\n  - path: [setup, check]\n  - path: [operations, describe]\n    arguments:\n      - source: {kind: option, long: operation}\n      - source: {kind: document, inline: input-json, file: input-file, stdin: input-stdin}\n",
+            "globals: {config: config, state: state-dir}\ncommands:\n  - path: [setup, check]\n  - path: [operations, describe]\n    arguments:\n      - source: {kind: option, long: operation}\n      - source: {kind: document, inline: input-json, file: input-file, stdin: input-stdin}\n  - path: [connections, connect]\n    arguments:\n      - source: {kind: protected, file: credential-file, stdin: credential-stdin, hidden_tty: credential-prompt}\n",
         )
         .unwrap();
         assert!(paths.contains_key(&vec!["setup".to_owned()]));
@@ -1282,6 +1282,8 @@ mod tests {
             )
         );
         assert!(!paths[&vec!["setup".to_owned(), "check".to_owned()]].contains("--operation"));
+        assert!(paths[&vec!["connections".to_owned(), "connect".to_owned()]]
+            .contains("--credential-prompt"));
         assert!(connector_commands("commands: []").is_err());
     }
 

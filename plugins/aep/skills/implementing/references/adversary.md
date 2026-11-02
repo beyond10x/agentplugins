@@ -194,9 +194,9 @@ one verdict and one origin:
 | `INFEASIBLE` | it holds and cannot be fixed here, or it holds only in a state you could not show anybody reaches; either way the reason is stated |
 
 The verdict answers *does it hold?*. It cannot answer *whose is it?*, which is the axis the
-coordinator routes on — back to the implementor, or out of this unit and into its own story. So every
-row carries an origin as well, and the two are independent: `CONFIRMED` / `pre-existing` is an
-ordinary combination and not a contradiction.
+coordinator routes on — back to the implementor, or out of the wave into a backlog draft that waits
+behind the planned waves. So every row carries an origin as well, and the two are independent:
+`CONFIRMED` / `pre-existing` is an ordinary combination and not a contradiction.
 
 | Origin | Means |
 |---|---|
@@ -212,9 +212,10 @@ anything; if your brief assigned you a base worktree, run there. With neither, t
 wave, which is the one error here that nothing downstream catches.
 
 State the commit or working tree your findings cover, so the coordinator can record them against
-something. What it does with them — a story, a blocker, a route back to the implementor — is its
-call and not yours. It records the pass itself as a `review-result` holding your report as you
-returned it, which is why the next section exists.
+something. What it does with them — a route back to the implementor, or a draft in the backlog
+that no wave takes before the planned waves are delivered — is its call and not yours. It records
+the pass itself as a `review-result` holding your report as you returned it, which is why the next
+section exists.
 
 ## The same findings, once more, in a fenced block
 

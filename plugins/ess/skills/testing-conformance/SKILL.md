@@ -189,6 +189,42 @@ scenario input and stays out of `--scenarios` and `ess-inputs.yaml`. A `.nan`, `
 value is `ESS-AUTHOR-015`: `Decimal` and `Binary64` hold finite values only, and refusing a
 non-finite number belongs to the decoder or the binding's `malformed` refusal.
 
+From `type: ess-scenario/6` (0.79.0) a claim may name one member of a nested value by its dotted
+path, in an act's `response:`, an event's `payload:`, an error's `fields:` and a view row's
+`contains`, `excludes` and `at`; the path is compared alone, through `Optional` and newtypes, and
+the members it does not name are not read. A field is claimed whole or by its paths, not both. A
+probe on 0.83.0 against a `returns: true` command whose response holds `receipt: Receipt
+{code, counter}` compiled this act into an `ess-conformance/62` suite with `expected:
+{"receipt.code": "T-7"}`:
+
+```yaml
+type: ess-scenario/6
+# domain, scenario, summary as before
+timeline:
+  - at: 2026-11-02T09:00:00Z
+    command: desk.front.Issue
+    input: {code: T-7}
+    outcome: issued
+    response: {receipt.code: T-7}
+```
+
+A response path needs suite pair `ess-conformance/62` (`/63` with coverage); event, error and row
+paths compile to dotted keys older suites already read, so those suites keep their format. A path
+naming no member is `ESS-AUTHOR-013`; under `ess-scenario/5` the probe's dotted key was refused
+that way, its help naming `ess-scenario/6`. A path through a list, map, union, enum or primitive,
+and a path in `input:`, `setup:`, `caller:` or `params:`, are refused by name. In the same probe:
+
+- `response: {receipt: {code: T-8}}`, a nested literal leaving `counter` out, is `ESS-AUTHOR-014`
+  ("requires `counter`, and nothing supplies it, at `receipt`"): a nested value is compared whole,
+  so write every member or claim the one you mean by its path.
+- `input: {code: X-7}` for a `code` whose type declares `prefix: "T-"` is `ESS-AUTHOR-015` under
+  `ess-scenario/6` ("a decoder refuses it before the command runs, so no implementation reaches the
+  outcome the act claims"); below `/6` an input is checked for its shape only. An authored
+  `Binary64` literal of magnitude 2^53 or more is `ESS-AUTHOR-015` too.
+- `input: {code: T-9, code: T-10}`, a repeated key, is `ESS-AUTHOR-047` at every scenario format
+  ("duplicate entry with key \"code\" at line 17 column 12"), as are two keys that differ only in
+  YAML type (`1` and `"1"`); before, the map kept the last value without a word.
+
 ## Building a double for an upstream plane
 
 Most skips on a real suite are not missing constructs — they are planes the target does not drive. A
@@ -425,7 +461,31 @@ The current runner contract:
   two values of one attribute is refused as `caller-contradiction`; from 0.75.0 a seeded scenario
   not run again with the callers swapped carries a `CrossCallerUnswapped` note, and a seed cannot
   serve a set move's filter (`instances:` or `affects:`), which the ESS-SYNTH-001 refusal now says
-  and answers with an authored scenario (from the release notes). A synthesis note that a scenario
+  and answers with an authored scenario (from the release notes). From `ess-conformance/60` (`/61`
+  with coverage, since 0.78.0) a scenario that reads a row of a `provided: true` entity
+  ([later formats](../specifying/references/later-formats.md#ess33)) opens with a
+  `resolve_fixtures` step naming an entity fixture `{name, type, entity, state}`: the target
+  answers the identity of a row of that entity resting in that state, through
+  `ConformanceTarget::fixture_values` (Rust, `FixtureField::entity` and `state` in the
+  `fixtures::Contract` it receives), `FixtureField` in the Go and TypeScript providers, or by
+  creating the row (`interpreted`); a target with no provider answers `unsupported`. An `ess/33`
+  probe on 0.83.0 wrote 7 scenarios at `/60`, all passing on `interpreted`. From
+  `ess-conformance/62` (`/63`, since 0.79.0) a response observation may name a nested member by its
+  dotted path, and a model reaching a `Binary64` in fields, inputs, responses or views runs a suite:
+  synthesis witnesses the `n`-th instance as `n + 0.5`, the Rust, Go and TypeScript runners compare
+  by nearest binary64 (`-0` equals `0`) and refuse a token with no finite image (`1e400`); a
+  `Binary64` in an identity, a view parameter, an actor attribute, a binding or a conversion is
+  still `ESS-AUTHOR-036`. Older readers refuse each of these suites by version, and a suite without
+  such a construct keeps its format and bytes. 0.80.0 through 0.83.0 add no suite format but
+  tighten what scenarios check, so regenerate and read the diff: binding scenarios compare the
+  identity fields of the trigger's event with the instances the invocation was sent, the binding
+  refusal scenarios too from 0.83.0, so a target publishing another identity fails; the arranged
+  half of an input refusal on a command addressing an existing record, where no identity view
+  shows that row, sends after the refused send the sends that tell the arranged state apart from
+  every other, so a target that moves the record on refusal and publishes nothing fails, and where
+  no send does it is withdrawn as `ESS-SYNTH-001` naming the states left; the interpreted target
+  appends `null` for an absent element of `{append: input.<field>}` over a `List<Optional<T>>`
+  (from the release notes). A synthesis note that a scenario
   "retains its mixed-caller witness without an appended reversed-role run: the declared grants do
   not permit the reversed caller assignment" is a note, not a refusal: the scenario is written and
   runs, and the note names the reversed-caller run the grants rule out. Since 0.66.0, under report format 2, the generated Go and

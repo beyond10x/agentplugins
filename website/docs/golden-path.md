@@ -352,6 +352,9 @@ $ aep plan artifact move story:commercial-client-record --to active
 story:commercial-client-record moved proposed -> active (revision 4)
 ```
 
+Accepting the story is your move, not the wave's: a wave runs only accepted stories and accepts
+none itself, and a draft it files from a review finding waits in the backlog.
+
 ```text
 Take story:commercial-client-record through the aep wave: scope it into units, implement the units,
 and have the adversary review the result against the story's acceptance and this repository's gate.
