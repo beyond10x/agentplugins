@@ -65,7 +65,7 @@ each hands off to `aep:implementing`:
 
 | command | what it does |
 |---|---|
-| `/aep:wave [story-id…]` | scopes the candidates, writes the wave page, proposes the wave and stops for your approval |
+| `/aep:wave [story-id…]` | takes the next wave of your wave plan (or the ids you name), checks and scopes its stories, writes the wave page, proposes it and stops for your approval |
 | `/aep:drive <story-id>` | says what a driven run costs, starts one governed run, prints its run id and stops |
 
 ## Diagnosis

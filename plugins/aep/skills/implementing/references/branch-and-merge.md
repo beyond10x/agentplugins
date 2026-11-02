@@ -87,14 +87,15 @@ parked item stops looking like a moving one
 The wave is bracketed by two store commits, and they are the pair a reader looks for:
 
 ```
-chore(store): wave of five picked up — five stories active, each serving an objective
-chore(store): wave of five implemented on the gate's record, and one finding filed
+chore(store): wave 2 of 4 opened — five accepted stories, each serving an objective
+chore(store): wave 2 of 4 implemented on the gate's record, and one finding filed to the backlog
 ```
 
-**The opening commit carries the selection and its reasoning**: the pool it was chosen from, the
-three properties it was chosen on, one line per story naming the objective it serves and what it
-does, and the statement that each is implemented on its own branch and closed on the gate's record.
-That commit is the only durable record of *why these five and not five others*.
+**The opening commit carries the wave and its checks**: which wave of the plan it is, the three
+properties each story was checked on, every story of the planned wave that left it and why, one
+line per story naming the objective it serves and what it does, and the statement that each is
+implemented on its own branch and closed on the gate's record. That commit is the only durable
+record of *why these five ran and the planned sixth did not*.
 
 **The closing commit carries the evidence**: the gate run that closed them — its step count, suite
 count, test count and exit status — the commit that evidence was recorded against, and anything

@@ -11,15 +11,15 @@ what happens to each of the two stops when there is not.
 ## The cycle a wave is one turn of
 
 ```
-   replan ──▶ dispatch ──▶ integrate ──▶ release ──▶ (replan)
-      │           │            │            │
-   approve     N agents    gate once     STOPS FOR
-   the wave    in parallel  on the       A PERSON
-   ▲           adversary    merge, then
-   │           per unit     merge to base
-   │
-   STOPS FOR A PERSON (once; may be granted standing)
-   └── the loop
+   wave plan ──▶ check ──▶ dispatch ──▶ integrate ──▶ release ──▶ (next wave of the plan)
+   (ordered,      │           │            │            │
+   up front)   approve     N agents    gate once     STOPS FOR
+               the wave    in parallel  on the       A PERSON
+               ▲           adversary    merge, then
+               │           per unit     merge to base
+               │
+               STOPS FOR A PERSON (once; may be granted standing)
+               └── the loop
 ```
 
 **Two stops, and they are the only two.** Everything between them runs without checking in.
@@ -33,14 +33,58 @@ at the first step read as green and two commits were pushed claiming a gate that
 that cut its own releases would industrialise that. So the cycle has **one mandatory human stop**,
 and the wave's own approval is a second one that the operator may choose to grant standing.
 
-**Between turns, replan rather than continue.** The store after a wave is not the store before it:
-stories closed, findings filed, surfaces moved. A loop that selected its next wave from the
-selection it made last time is a loop running on stale facts, and the second turn is where that
-starts to cost something.
+**Between turns, take the next wave of the plan and re-check it against the store.** The store
+after a wave is not the store before it: stories closed, surfaces moved. The re-check can take a
+story out of the next wave; it never adds one, and it never reorders the plan.
 
 **What each turn owes the next.** A wave that ran and recorded nothing has produced code and no
-knowledge. Each turn writes back: the scope it learned (below), the findings it filed, and the
-numbers its pre-flight measured — so the next replan starts from a better store than this one did.
+knowledge. Each turn writes back: the scope it learned (below), the backlog drafts it filed from
+findings, and the numbers its pre-flight measured — so the next wave's check starts from a better
+store than this one did.
+
+## The wave plan and the backlog
+
+**Only accepted stories are waved, and accepting a story is never the coordinator's act.** A story
+is accepted when the store shows it at its lifecycle's accepted status — `active` in an `adp/1`
+store; `aep plan artifact lifecycle story` names the statuses. The operator, or whoever owns the
+plan, moves it there, outside any wave. A story the store shows as `draft` or `proposed` is not
+accepted, however ready it looks, and every story filed from a review finding starts as a `draft`.
+
+**The waves are defined up front, once, from the accepted stories.** Before the first wave runs,
+whoever plans the work — the operator, or the coordinating agent planning for them — derives the
+**wave plan** and writes it to the plan page:
+
+```console
+$ aep plan artifact waves --kind story --status active --format json
+```
+
+Pass the accepted status every time: without `--status` the verb sequences every story of the kind,
+drafts included. Its waves come back in the order they must run; the planner may reorder them by the
+plan's priorities, never against a printed collision or a `depends_on`. The page then holds the waves
+in order, each a list of story ids and the objective each serves, and every wave page links back to
+it. A coordinator runs the next undelivered wave of that page, adds no story to it, and lets no story
+from anywhere else take a place in it.
+
+Every accepted story that is not on the page, and every story that is not accepted, is the
+**backlog**. The backlog is where new work waits, and it waits behind the plan.
+
+| | the wave plan | the backlog |
+|---|---|---|
+| holds | the accepted stories the plan was derived from, in waves, in order | every other story, and every draft filed from a finding |
+| written by | whoever plans the work, before the first wave | anyone, at any time |
+| a wave draws from it | always, the next undelivered wave first | never while a wave of the plan is undelivered |
+
+**A story accepted after the plan was written waits for the next plan.** That includes a finding
+draft the operator has since accepted: it joins the plan derived after every wave of this one is
+delivered, and not before.
+
+**When every wave of the plan is delivered, the plan is done.** Say so in the closing report. The
+next plan is derived the same way, from what is accepted then.
+
+Why: a pre-existing defect was there before the wave and is there after it, so it has no claim to
+go first. Where coordinators accepted finding drafts themselves and waved them, one repository filed
+23 stories from findings at wave close over three days and implemented 35 stories, and 0 of its 29
+issues were closed.
 
 ## What you are, and what you are not
 
@@ -48,11 +92,13 @@ You sequence and dispatch. **You never decide that work is done.**
 
 | You do | You never |
 |---|---|
-| select candidates and propose them | decide a story is finished — the gate's exit code decides |
+| take the plan's next wave, check it and propose it | add a story to a wave the plan did not put there, or draw one from the backlog |
+| file a pre-existing finding as a backlog draft | decide a story is finished — the gate's exit code decides |
 | arrange worktrees and branches | evaluate a gate, or restate one's verdict as your own |
 | dispatch, route red and green, merge | let an implementor write to the planning store |
 | own **every** `aep plan artifact` call | share one build directory between two worktrees |
-| record the evidence and move the stories | report a process killed without having watched it die |
+| record the evidence and move each wave story to its terminal status | report a process killed without having watched it die |
+| run the moves the operator names | accept a story yourself: move one out of `draft` or `proposed`, or into the accepted status |
 | take the worktrees and their build directories down | remove a tree whose records nobody has read, or force one that is dirty |
 | merge the wave into the base branch when the gate is green | ask the operator to do a step this table gives you |
 
@@ -89,30 +135,36 @@ impossible. It is also the division that works: one agent, one surface; the shar
 
 ## Stage 1 — propose, then stop
 
-### Read the store before you propose anything
+### Start from the wave plan
+
+**The wave is the plan's next undelivered wave, or the story ids the operator named as the wave.**
+Read the plan page first. With no plan, derive one as *The wave plan and the backlog* says and
+propose it with its first wave. Either way the stories of the wave are fixed before you read the store, and
+nothing you read there adds to them.
+
+### Read the store for the wave's stories
 
 ```console
-$ aep plan artifact list --kind story --status draft --format json
-$ aep plan artifact list --kind story --status proposed --format json
+$ aep plan artifact show <story-id>
 $ aep plan artifact graph --format json
 $ aep plan artifact blocked
 ```
 
-A candidate is **ready** when its status is `draft` or `proposed`, its `blocked_by` is empty, and
-every `depends_on` it carries points at something terminal. Nothing computes this for you — compose
-it from `graph` and `list`.
+A story of the wave is **ready** when the store shows it accepted, its `blocked_by` is empty, and every
+`depends_on` it carries points at something terminal or at a story in an earlier wave of the plan.
+Nothing computes this for you — compose it from `show`, `graph` and `blocked`.
 
-Expect readiness to prune almost nothing. In a real backlog most drafts depend on nothing, so
-`depends_on` is a tiebreaker and not a filter. **The selection is a judgement, which is exactly why
-it is proposed rather than performed.**
+**A story of the wave that is not ready leaves the wave, and nothing takes its place.** Name it in
+the proposal with the reason. The wave shrinks; a later wave's story stays where the plan put it, and
+no backlog draft is promoted to fill the gap.
 
-### Scope the candidates before you choose between them
+### Scope the wave's stories
 
-**You cannot select on non-overlap using a store that does not record what its stories touch.** In
-a real backlog most bodies cite no path at all, so the disjointness a wave rests on is an assertion
+**You cannot check non-overlap using a store that does not record what its stories touch.** In a
+real backlog most bodies cite no path at all, so the disjointness a wave rests on is an assertion
 unless somebody establishes it.
 
-Fan out `story-scoper`, one agent per candidate, and run them at once. They are read-only by
+Fan out `story-scoper`, one agent per story of the wave, and run them at once. They are read-only by
 charter — which is what makes running many safe: the store takes one writer at a time, and that is
 you. **They return `## Scope` sections; you write them**, one at a
 time, through `aep plan artifact body` with the complete body.
@@ -140,52 +192,59 @@ the typed entries could not be written and why. Do not hand-edit a store file to
 is the store's only writer, here as everywhere.
 
 **A story whose scope cannot be established is not thereby safe.** It is unassessed. Say so, and
-either scope it properly or leave it out — those are the two honest options and *assume it is
+either scope it properly or it leaves the wave — those are the two honest options and *assume it is
 fine* is not among them. The verb below returns the unassessed set by name; **dispatch a scoper for
 every id in it and write what comes back, before you propose anything.** An unassessed story in a
 proposal is a story the coordinator declined to scope, not a story that could not be scoped.
 
-### Choose on three properties, in this order
+### Check the wave on three properties, in this order
 
 1. **Implementable in this tree.** No credential, no paid run, no second harness, no third party.
-   A story that cannot be finished tonight is not a candidate however good it is.
-2. **Surfaces that do not overlap.** This is the one that decides whether a wave is possible at
-   all. Two agents editing one file is a merge conflict whichever order they finish in, and no
-   amount of disk or parallelism helps. **The verb above answers this property**; the other two are
-   still yours, and a set the verb returned is a set of candidates rather than a wave.
+   A story that cannot be finished tonight does not run in this wave however good it is.
+2. **Surfaces that do not overlap.** This is the one that decides whether the wave can run at once.
+   Two agents editing one file is a merge conflict whichever order they finish in, and no amount of
+   disk or parallelism helps. **The verb below answers this property**; the other two are still
+   yours.
 3. **Blast radius of one package.** The first wave's point is the loop, not the difficulty.
 
-**A wave of one is a wave.** If exactly one candidate passes those three properties, propose it
-alone and run it. The loop is the same at N=1 — propose, dispatch, attack, gate once, merge, record
-— and the loop is the part that has to keep running. Holding a ready story back until a second one
-arrives stops the loop and buys nothing; padding the set with a candidate that failed a property is
-worse than that. Say in the proposal that N is one, and why the others were left out.
+**A story that fails a property leaves the wave, and you add none in its place.** Name it and the
+property in the proposal. Two stories of the wave that collide cannot both run: propose which one
+moves to a later wave of the plan, and the operator approves that split with the wave. A gap in the
+wave is never filled from a later wave, the backlog or the store at large.
 
-### Ask the store which sets are disjoint, before you judge a single pair
+**A wave of one is a wave.** If exactly one story of the wave passes the three properties, propose
+it alone and run it. The loop is the same at N=1 — propose, dispatch, attack, gate once, merge,
+record — and the loop is the part that has to keep running. Say in the proposal that N is one, and
+which stories of the planned wave left it and why.
+
+### Ask the store whether the wave is disjoint, before you judge a single pair
 
 **Run the verb first.** It reads the typed scope entries the step above wrote and returns the
-disjoint sets, the pairs it had to exclude, and the stories it could not place:
+disjoint sets, the pairs it had to keep apart, and the stories it could not place:
 
 ```console
-$ aep plan artifact waves --kind story --status draft --format json
+$ aep plan artifact waves --kind story --status active --format json
 ```
 
-Three lists come back — the waves, the collisions, and the unassessed — and **all three go into the
-proposal verbatim.** Not summarised, not filtered to the set you liked: a collision the verb
-excluded is the reason the wave is the size it is, and an operator who cannot see it is approving a
-selection rather than reading one. Paste the ids as the verb printed them.
+**Its answer covers every accepted story, not your wave: read it for the wave's ids.** The verb
+has no id filter, and a story accepted since the plan was written is in its answer. Every placement, collision and
+unassessed entry that names a story of the wave goes into the proposal **verbatim**, with the ids as
+the verb printed them: a collision is the reason the wave is the size it is, and an operator who
+cannot see it is approving a selection rather than reading one. A story the verb places that is not
+in the wave is not a candidate, whatever wave number the verb gives it: it is on a later wave of the
+plan, or it waits for the next plan.
 
 Exit status 2 is a **cycle** in the declared dependencies, not an empty answer. Relay it, name the
 ids, and stop — a cycle is a defect in the plan and the fix is an edge somebody removes, not a wave
 you assemble by hand around it.
 
 **The fallback is the old pairwise reading, and it is announced.** Where the installed binary
-answers `unrecognized subcommand`, the verb does not exist yet: read each candidate's body for the
-paths it cites, say for every pair in the proposed set whether they touch the same package, and
-**write in the proposal that the selection was made by reading pairs because `aep plan artifact waves`
-was not available, with the version `aep --version` printed.** A proposal that does not say which
-path it took leaves the operator unable to tell a computed selection from a judged one, and those
-carry different weight.
+answers `unrecognized subcommand`, the verb does not exist yet: read each story's body for the
+paths it cites, say for every pair in the wave whether they touch the same package, and **write in
+the proposal that the check was made by reading pairs because `aep plan artifact waves` was not
+available, with the version `aep --version` printed.** A proposal that does not say which path it
+took leaves the operator unable to tell a computed check from a judged one, and those carry
+different weight.
 
 **Where a story cites no path, write *blast radius unknown* — do not guess.** A story that names no
 file is not thereby safe; it is unassessed, and saying so is the finding. A proposal that quietly
@@ -197,26 +256,29 @@ spent.
 
 ### Check what the store will demand on the way out
 
-Before a story can leave its initial status, the store may require edges it does not yet have — in
-this repository, that every non-draft story `serves` a declared objective. Find out rather than
-assume:
+Before a story can reach its terminal status, the store may require evidence or edges it does not
+yet have. Find out rather than assume:
 
 ```console
 $ aep plan artifact lifecycle story
 $ aep plan artifact validate
 ```
 
-Whatever the store requires, add it **as part of the proposal**, so the operator sees which
-objective each story is being claimed to serve and can disagree before anything runs.
+Name in the proposal what each story's move to its terminal status will need, so the operator sees
+it before anything runs. **The wave's stories are accepted already, and you accept none.** A story
+of the wave the store does not show as accepted leaves the wave; never move it there to make the wave
+whole. Where the operator names a story and tells you to walk it to the accepted status, the move is
+theirs and you only run it: record their words in an `approval-record` that `decides:` the story,
+and the story joins the next plan, not this one, unless the operator named it as part of this wave.
 
 ### Write the wave page, then stop
 
-Write the proposal where this repository's plans live, in the shape its existing plan pages use.
-Then **stop and report**. A plan is not a work order, and a wave nobody approved is a wave that
+Write the proposal where this repository's plans live, in the shape its existing plan pages use,
+linking the wave plan it is one wave of. Then **stop and report**. A plan is not a work order, and a wave nobody approved is a wave that
 spends real time and money on a guess.
 
-**Approval removes the stop. It never removes the page.** An operator who pre-approves — *pick a
-wave and run it* — has waived the stop and nothing else. A wave that read the two as one step wrote
+**Approval removes the stop. It never removes the page.** An operator who pre-approves — *run the
+next wave* — has waived the stop and nothing else. A wave that read the two as one step wrote
 no page at all, and that session compacted twice: the integration branch, both worktree paths, both
 build directory paths, which unit was at which stage and why a third story was excluded existed only
 in a context window that was summarised and discarded. Write the page before you dispatch, whether
@@ -229,9 +291,11 @@ it when a unit changes stage. It is then the input the cleanup step reads and th
 coordinator recovers from after a compaction, instead of both of those living in a context window
 that may not last the wave.
 
-Report: the units with the objective each serves, the verb's three lists verbatim — the waves, every
-collision it excluded and every unassessed story — which selection path you took, whether each
-unit's scope is **cited** or **inferred**, what you deliberately left out and why, the pre-flight
+Report: which wave of the plan this is (*wave k of n*, linking the plan page, or the proposed plan
+when there was none), the units with the objective each serves, the verb's lines for the wave's
+stories verbatim — placements, every collision and every unassessed story — which check path you
+took, whether each unit's scope is **cited** or **inferred**, every story of the planned wave that
+left it and why, the pre-flight
 numbers from below so the operator approves a wave whose cost is known, and **one line naming the
 commits approval authorises** — N unit commits, the merges, the closing store commit, the merge to
 the base branch, and nothing else. If the operator's standing rule is *never commit unasked*, that
@@ -276,8 +340,9 @@ $ aep plan artifact new approval-record wave-proposal-2026-09-03 \
 ```
 
 The kind and the two commands that settle it are the planning skill's to explain. What is specific
-to a wave is what the body has to hold, and it is the proposal's own load-bearing half: the units
-and the objective each serves, the verb's three lists verbatim, which selection path you took, the
+to a wave is what the body has to hold, and it is the proposal's own load-bearing half: which wave
+of the plan it is (or the plan it proposed), the units and the objective each serves, the verb's
+lines for the wave verbatim, which check path you took, the stories that left the wave, the
 pre-flight numbers, and **the line naming the commits the bypass authorises** — the same line stage
 1 states, now standing on a record instead of on an operator's sentence. **The page is still
 written.** Approval never removed the page, and a bypass removes less than an approval does.
@@ -359,7 +424,7 @@ of those paths any unit's surface touches, and leave the changes where they are.
 never commit them, never branch them away. They may belong to another session.
 
 **Gate your own opening commit before the first worktree exists.** The pre-flight above runs before
-you have written anything; the commit that creates the wave page and moves the stories is the first
+you have written anything; the commit that creates the wave page is the first
 change on the integration branch, and nothing has checked it. One wave's opening commit put an
 absolute path from the machine's home directory into a plan page, which the repository's own check
 rejects — and it judges the index as well as the tree, so the integration branch was red from its
@@ -413,8 +478,9 @@ pointing at a symbol the other renamed, which no conflict marker shows you. It i
 needs no worktree and no build, and running it at integration time instead is running it after both
 agents' work is already spent.
 
-Move each story out of `draft` yourself, in the managed integration tree, after adding whatever edge the store
-requires. The implementors never touch it.
+The wave's stories are already accepted, so nothing moves at the start of stage 2. Every move you make
+later — each story to its terminal status at the close — runs in the managed integration tree. The
+implementors never touch the store.
 
 ### Dispatch
 
@@ -478,19 +544,34 @@ reading.
 | **red, and a case failed again after being fixed** | a **fresh** implementor, handed the findings, the previous diff, and what has already been tried |
 | **red after two full attacks** | stop attacking. It goes to a person |
 
-**Route each finding on its `origin` column before you route the unit.** The adversary's findings
-table says whether a defect was `introduced` by this unit, is `pre-existing`, or is `undecided`.
+**Route each finding on the unit's acceptance and its `origin` before you route the unit.** The
+findings table of an adversary or security-reviewer pass says whether a defect was `introduced` by
+this unit, is `pre-existing`, or is `undecided`. Every finding is first a row in that pass's
+`review-result` (below); the route decides only what happens next.
 
-| `origin` | Do |
+| The finding | Do |
 |---|---|
-| `introduced` | back to the implementor, with the finding |
-| `pre-existing` | file a story. It does not block the unit |
-| `undecided` | you decide, and you record why in the artifact you write |
+| `introduced`, or the unit's acceptance does not hold until it is fixed | back to the implementor, with the finding |
+| `pre-existing`, and the acceptance holds without it | one draft story in the backlog, outside this wave and outside the plan. It does not block the unit |
+| `undecided` | you decide which of the two rows above it is, and record why in the review outcome you write |
 
-Before that column existed, both adversaries of one wave supplied the distinction in prose anyway —
-"CONFIRMED (out of scope of this change)", "pre-existing rather than introduced" — and routing cost
-a judgement per finding, read out of paragraphs. The column makes the common case mechanical. The
-`undecided` row is the one you may not push back onto an agent.
+**A pre-existing finding is filed, and then it waits.** One draft per defect, tagged and linked to
+the pass that found it:
+
+```console
+$ aep plan artifact new story <defect-slug> --title "<the defect, in one line>" \
+    --tag from-finding --relate informed_by:review-result:<the pass> --from <body.md>
+```
+
+You never move it out of `draft`, never propose it for acceptance, and never add it to this wave or
+a later one. Accepting it is the operator's act, outside the wave; once accepted it joins the plan
+derived after every predefined wave is delivered. Why: it was there before the wave and is there
+after it, so it has no claim on the planned work's turn.
+
+Before the `origin` column existed, both adversaries of one wave supplied the distinction in prose
+anyway — "CONFIRMED (out of scope of this change)", "pre-existing rather than introduced" — and
+routing cost a judgement per finding, read out of paragraphs. The column makes the common case
+mechanical. The `undecided` row is the one you may not push back onto an agent.
 
 **Record each adversary pass as one `review-result` before you route it**, holding that pass's
 report as it returned — including the fenced ` ```findings ` block the adversary closes with, byte
@@ -524,8 +605,8 @@ $ aep plan artifact evidence story:credential-store --kind review_outcome \
 | The row you took | The outcome you record |
 |---|---|
 | back to the implementor, and the correction landed | `fixed` |
-| filed as its own story, or the unit shipped without changing for it | `no-op` |
-| it went to a person — a `pre-existing` defect nobody will take, an `undecided` you could not settle, a unit that left the wave | `escalated` |
+| filed as a draft in the backlog, or the unit shipped without changing for it | `no-op` |
+| it went to a person — an `undecided` you could not settle, a unit that left the wave | `escalated` |
 
 Write them at the same time as you route, not at the close: a wave that batches them writes them
 from memory two hours later, and the one it forgets is the one it argued about. Where the binary
@@ -660,7 +741,7 @@ proves the code does what the case says under the conditions the case builds. It
 anybody ever builds them.** Whether they do is the coordinator's to establish, and it is the step
 that is easy to skip because the failing test is right there and looks like the whole argument.
 
-So before a finding becomes a blocker, a story or a held unit, separate two things and write both:
+So before a finding becomes a blocker, a backlog draft or a held unit, separate two things and write both:
 
 | | |
 |---|---|
@@ -717,15 +798,23 @@ a defect is severe from how bad it would be if it happened.
 3. **Rewrite each unit's `## Scope` section from its implementor's confirmation table**, through
    `aep plan artifact body`, with the corrections visible rather than deleted. The implementor
    checks every `inferred` line before building on it; one returned five rows and found two of them
-   wrong, and both wrong lines are still in the store today. The next wave selects on overlap by
+   wrong, and both wrong lines are still in the store today. The next wave checks overlap by
    reading that section, so a scope the wave learned and did not write back is a wave that taught
    the store nothing and left it misleading. It is two commands.
 4. Record the evidence the store requires for each story against the merge commit, then move each
    one to its terminal status through `aep plan artifact move`.
-5. `aep plan artifact validate`, and relay its output **verbatim**.
-6. **Merge the integration branch into the base branch.** This is integration, not release, and it
+5. **Mark the wave delivered on the plan page**, and list under *backlog* the id of every draft this
+   wave filed from a finding. They stay in `draft`; the close does not propose, accept or schedule
+   any of them.
+6. `aep plan artifact validate`, and relay its output **verbatim**.
+7. **Merge the integration branch into the base branch.** This is integration, not release, and it
    is yours — the same step as merging a unit, one level up. Do not stop here to ask; the gate
    already decided, and stopping strands finished work on a branch nobody asked you to leave it on.
+
+**The next wave is the next one in the plan.** Not a wave assembled from this one's findings, and
+not a fresh selection from the store. When the plan has no undelivered wave left, say in the closing
+report that the plan is delivered; the next plan is derived from what is accepted then, and only
+then may a finding draft the operator has accepted enter a wave.
 
 **Record what the wave cost, per agent: tokens, tool uses, wall duration.** The harness reports all
 three when an agent completes; copy them into the closing report and the wave page. Nothing else
@@ -838,7 +927,7 @@ two conclusions each rests on.
 
 The reason it is not a tie: the verb reads the typed scope entries, which are a record somebody
 wrote deliberately and that anybody can re-read; your reading is one agent's inference over prose,
-made once, in a context that will not survive the session. Deferring to it would make the selection
+made once, in a context that will not survive the session. Deferring to it would make the check
 unreproducible, which is the property the verb was added to get.
 
 **Reporting it is not optional, and it is the useful half.** A disagreement is one of exactly two
@@ -848,11 +937,18 @@ which is a finding about the story's `## Scope` section and belongs in the propo
 following the verb loses both.
 
 **The verb is not there.** `unrecognized subcommand` means the installed binary predates it. Fall
-back to the pairwise reading and say so, with the version — the selection step above states this
+back to the pairwise reading and say so, with the version — the check step above states this
 in full.
 
 **The verb exits 2.** A cycle in the declared dependencies. Relay the ids and stop; do not assemble
 a wave around it.
+
+**Every story of the planned wave left it.** Report the wave as empty, with each story's reason, and
+take the plan's next wave through stage 1. Do not fill the empty wave from the backlog.
+
+**A pre-existing finding looks more urgent than the plan.** A live security defect, say. Put it in
+the backlog like any other, and name its id to the operator in one line with why. Reordering the
+plan is the operator's change, never the coordinator's.
 
 ## Reference
 

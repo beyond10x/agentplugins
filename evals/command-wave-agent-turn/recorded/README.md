@@ -16,7 +16,7 @@ $ METAHARNESS_LIVE=1 metaharness aep drive eval run \
     --arm plugin \
     --harness claude \
     --plugin-dir plugins/aep \
-    --cwd <a checkout with an AEP store holding two ready stories and no recorded scope> \
+    --cwd <a checkout with a wave plan naming two ready stories and no recorded scope> \
     --budget-usd 5 \
     --observed-at <the date it was observed> \
     --redact \
@@ -27,6 +27,8 @@ Copy `<out>/<name>.events.jsonl` in with the manifest's `observed_at`, harness v
 
 ## What it needs in the working tree
 
-A Git checkout on its base branch with an AEP store holding two stories that the wave reference
-treats as ready (`draft` or `proposed`, nothing blocking, no unfinished `depends_on`), each serving a
-declared objective, neither with a recorded scope, and a small source tree each would touch.
+A Git checkout on its base branch with a wave plan page whose first wave names two accepted stories
+the wave reference treats as ready (nothing blocking, no unfinished `depends_on`), each serving a
+declared objective, neither with a recorded scope, and a small source tree each would touch. The
+store also holds one draft tagged `from-finding` that is in no wave, so a run that proposes it has
+drawn from the backlog.

@@ -44,8 +44,11 @@ families that raised it:
 | **dismissed** | it is wrong or missing context; one line says why |
 
 Two findings worded differently at one `file:line` with one verdict are one finding raised by two
-families: merge them and list both. Then route the unit on the **act on** bucket exactly as a single
-adversary's findings are routed in [wave.md](wave.md) § *Route the result*.
+families: merge them and list both. Then route each **act on** finding exactly as a single
+adversary's are routed in [wave.md](wave.md) § *Route the result*: back to the implementor when the
+unit introduced it or its acceptance needs it, otherwise one draft in the backlog that no wave takes
+before the planned waves are delivered. **consider**, **noted** and **dismissed** stay rows in the
+seats' `review-result`s; none of them becomes a story.
 
 The report adds one table, the agreement map: per finding, which families raised it, and every
 place one family said the opposite of another.
