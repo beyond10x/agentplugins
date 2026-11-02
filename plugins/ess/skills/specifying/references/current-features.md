@@ -162,6 +162,67 @@ These routes validated and projected to OpenAPI on 0.69.2 against a `Ticket` spe
       no-ticket: {status: 404, body: {error: error}}
 ```
 
+From 0.76.0 and 0.77.0 a binding also names operation ids and servers, groups outcomes answered
+alike, and states a route's own refusals, a view's bare array and a text answer. This binding
+validated ("4 route(s), 0 open, valid") and projected to OpenAPI on 0.83.0 against the `ess/33`
+depot of [later-formats.md](later-formats.md#ess33) with a `Ping` command returning `word: String`:
+
+```yaml
+servers:
+  depot-service:                              # a reached_by: network component
+    - {url: 'https://depot.example.test/v1', description: Production}
+    - {url: /v1}
+routes:
+  - command: depot.racks.AddShelf
+    operation_id: addShelf
+    method: post
+    path: /shelves
+    refusals:                                 # this route only, in place of the top-level ones
+      malformed: {status: 400, body: {error: {literal: bad_shelf}}}
+    outcomes:
+      added: {status: 201, body: none}
+  - command: depot.racks.SealShelf
+    operation_id: sealShelf
+    method: post
+    path: /shelves/seal
+    alike: [[no-shelf, already]]
+    outcomes:
+      sealed: {status: 204, body: none}
+      no-shelf: {status: 409, body: none}
+      already: {status: 409, body: none}
+  - command: depot.racks.Ping
+    method: get
+    path: /ping
+    request: {encoding: query}
+    outcomes:
+      pong: {status: 200, body: response.word, encoding: text}
+  - view: depot.racks.Shelves
+    method: get
+    path: /shelves
+    body: array
+```
+
+- `operation_id` is the operation's `operationId` (`addShelf`); a route without one keeps the
+  qualified name. It starts with a letter or `_`, is unique in the binding and is no other
+  operation's qualified name (`ESS-HTTP-032`).
+- `servers` is that component's document `servers`, after `info`, first the default; each URL is
+  absolute `http(s)://` with a host, or a path from `/`, listed once (`ESS-HTTP-033`).
+- `alike:` lets two outcomes share a status and body: the document writes one `409` response whose
+  `x-ess-outcomes` names both. Without it the probe was refused as `ESS-HTTP-025` ("answers `409`
+  with `none`, and so does `already`"). A group whose members the wire tells apart, such as error
+  objects carrying different fields, is still refused.
+- A route's `refusals:` replaces the binding's on that route alone. It is still checked against the
+  route's outcomes: `malformed` at `422` collided with `too-big`'s derived `422` envelope
+  (`ESS-HTTP-025`).
+- `encoding: text` beside `body: response.<field>` on a `String` field answers the string alone as
+  `text/plain`; `body: array` answers an unpaged view's rows as a bare JSON array, `[]` when empty;
+  a `single` view's `empty:` may carry `body:` (`none` or a literal object; from the release
+  notes, not probed here).
+- A path segment carries a `String`, `Integer`, enum or unconstrained newtype of one: a newtype of
+  `Uuid` in the path is `ESS-HTTP-009`, so the probe sent `shelf_id` in the body.
+- `ess generate types --http <binding>` types each command input as this request body
+  ([SKILL.md](../SKILL.md#deterministic-projections)).
+
 ## Composition roles (`ess-composition/4`)
 
 `roles:` says that the component one imported service selects plays the component another selects,
@@ -191,6 +252,15 @@ local input the contract lacks is `Optional`; otherwise `role_input_drift`, nami
 `conflicting_role` (a service playing itself, a repeated role or command entry). `/1` to `/3`
 refuse `roles`, even empty, as an unknown field. `--service` takes the specification source, and a
 composition digest is bare hex, without the `sha256:` prefix the HTTP binding writes.
+
+From 0.76.0 `format: ess-composition/5` lets a conformance end name an `event`, an `error` or a
+`command` with `part: input | response`, compared as a struct against another payload or a struct
+type, and a type conformance also compares newtype `alphabet`, `prefix` and invariants, struct
+invariants and enum variant attributes with their values (as sets: spelling, order and grouping do
+not matter). `reader: true` admits a wider alphabet, a shorter prefix and a subset of the
+invariants and attributes. `/1` to `/4` refuse the new keys and keep their results (from the
+release notes; not probed here). `reference_outside_component` names the domain and service
+declaring the name and which component exports, publishes or raises it.
 
 ## Finite protocol checks
 

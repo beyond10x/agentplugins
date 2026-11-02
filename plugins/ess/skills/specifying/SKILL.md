@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/32`. The binary says which one that
+`format:` that release implements; the example below uses `ess/33`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/32
+format: ess/33
 system: warehouse
 version: v1
 
@@ -272,13 +272,36 @@ into `--out` itself. With `--kind schema`, `--schema-id-base <URI>` (absolute, e
 `ess generate schema validate` takes the documents as registry resources as written; that
 command and `validate-bundle` also read a `.yaml` or `.yml` instance as the JSON it denotes.
 Since 0.63.0 a `String` newtype's `alphabet:` projects as an anchored `pattern` beside
-`x-ess-alphabet`. Type libraries come from `ess generate types --target rust|go|typescript --out <dir>`;
+`x-ess-alphabet`. From 0.76.0 an entity's JSON Schema document and its `x-ess-entities` entry in
+OpenAPI publish its invariants under `x-ess-invariants`; an `Integer` or `Binary64` comparison with
+a literal becomes `minimum`, `maximum`, their exclusive forms or both for `==`, a `.count` bound on
+a `String` becomes `minLength`/`maxLength`, and `distinct:` over a list of scalars `uniqueItems`
+(from the release notes). The OpenAPI document of a component not `reached_by: network` says in
+its first `info.description` paragraph that no request reaches its paths. Type libraries come from `ess generate types --target rust|go|typescript --out <dir>`;
 Rust and Go also require `--package <name>`, and Go `--module <path>`.
 Select what they hold with `--root <type-or-event>`, `--root <command>.input`,
 `--root <command>.response` or `--root <view>.row` (repeatable; a body is the one the OpenAPI
 document publishes, so HTTP request and response types need not be kept by hand), or with
 `--all-types`, `--all-events`, `--all-commands` and `--all-views`, which combine; any other root
-is `unknown_root`. An enum's variants are named after their declared names (`in_review` is Rust
+is `unknown_root`, and from 0.81.0 so is `<command>.response` on a command that declares no
+response, which `--all-commands` leaves out. From 0.80.0 `--http <binding>` (with `--refines`
+where the binding refines another) makes each `<command>.input` the request body the bound OpenAPI
+document publishes, without the fields its route carries in the path; a command whose route
+publishes no body (encoded `query`, or every field in the path) has no input root, so
+`--root <command>.input` is `unpublished_body` and `--all-commands` leaves it out. `--names short`
+names a declaration by its last segment and now combines with `--all-commands` and `--all-views`:
+`depot.racks.AddShelf.input` is `AddShelfInput`, `depot.racks.Shelves.row` is `ShelvesRow`, and two
+declarations sharing a short name are refused as `short_name_collision`. A probe on 0.83.0 with an
+`ess-http/1` binding routing a `Ping` command `get` with `encoding: query` wrote `AddShelfInput`,
+`PingResponse`, `SealShelfInput` and no `PingInput`; without `--http`, `PingInput` is
+`Record<string, never>` in TypeScript. From 0.77.0 `--declared-field-order` (Rust, Go, TypeScript)
+emits a model type's fields in declaration order, so Rust also encodes them and a derived
+`PartialOrd`/`Ord` compares them in it (a schema bundle has no declaration order and is refused),
+and `--rust-box-only-recursion` holds a named type by value and boxes a reference only where it
+closes a cycle of by-value fields, such as `Optional<Self>`; the report's `configuration` records
+each (`declared_field_order`, `box_only_recursion`). `ess generate schema types-bundle
+--integer-format-widths` realizes OpenAPI `int32`/`int64` formats at native width, off by
+default. An enum's variants are named after their declared names (`in_review` is Rust
 `InReview` renamed to its wire spelling, Go `<Type>InReview`, a TypeScript constant member); an
 enum whose names do not each give a distinct `PascalCase` identifier, or one from a schema bundle,
 keeps `V0`, `V1`, …. The Rust `Cargo.toml` takes compatible ranges (`serde = "^1.0.229"`), so a
