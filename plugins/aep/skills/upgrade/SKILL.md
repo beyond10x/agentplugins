@@ -1,6 +1,6 @@
 ---
 name: upgrade
-description: Check whether the AEP plugin and the `aep` CLI are current, and upgrade them with the user's confirmation. Use when the user asks whether AEP is up to date or to upgrade or update it, when a session-start line starting with `b10x:` names `aep`, or when a `aep` command behaves differently from what a AEP skill describes or names the planning store's `aep.project` version.
+description: Check whether the AEP plugin and the `aep` CLI are current and upgrade them on the user's confirmation. Use when asked whether AEP is up to date or to update it, when a `b10x:` session-start line names `aep`, or when `aep` behaves differently from an AEP skill or names the store's `aep.project` version.
 ---
 
 # Upgrade AEP

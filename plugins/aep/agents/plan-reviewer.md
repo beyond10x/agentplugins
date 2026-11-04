@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer
-description: Read-only semantic audit of the planning store — the problems `aep plan artifact validate` cannot see. Invoke when the operator asks whether the backlog is still honest, to review or audit the plan, to find stale or drifted artifacts, or before a planning session. Produces a report proposing moves; it performs none and changes no files.
+description: Read-only semantic audit of the planning store for what `aep plan artifact validate` cannot see (stale or drifted artifacts), when asked to review or audit the plan or before planning. Proposes moves, performs none.
 tools: [Read, Grep, Glob, Bash]
 ---
 

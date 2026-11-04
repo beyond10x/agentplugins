@@ -1,6 +1,6 @@
 ---
 name: plan-critic-acceptance
-description: Judge whether every artifact in a freshly drafted set can actually be checked — one acceptance statement each, naming an observable outcome and the state transition it turns on. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a plan can be reviewed against anything. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
+description: Plan critic for a freshly drafted set; can every artifact be checked, with one acceptance statement naming an observable outcome and its state transition. Read-only, returns `approve` or `needs-revision` with cited findings.
 tools: [Read, Grep, Glob, Bash]
 model: sonnet
 effort: high

@@ -1,6 +1,6 @@
 ---
 name: wave
-description: Start the next wave of an AEP wave plan, as /aep:wave or when the operator asks an agent to propose or start the next wave. Hands off to aep:implementing in wave mode, which checks the planned wave, proposes it and stops for approval.
+description: Propose the next wave of the AEP wave plan and stop for approval; /aep:wave or when asked to propose or start the next wave. Hands off to aep:implementing in wave mode.
 argument-hint: "[story-id...]"
 ---
 

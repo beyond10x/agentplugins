@@ -1,6 +1,6 @@
 ---
 name: adversary
-description: Try to break a change that already passes its own tests — edge cases, property violations, contract drift, a mutant the suite would not catch. Invoke after an implementation is green, or when the operator asks for an adversarial review, a red-team pass or a second look at work that says it is done. Writes failing test cases and returns judgement findings for the caller to record; it never writes to the planning store, never edits the implementation it is attacking and never approves anything.
+description: Try to break a change that already passes its tests (edge cases, property violations, contract drift, a mutant the suite misses). Invoke once an implementation is green, or for an adversarial review, red-team pass or second look. Writes failing tests and returns findings; never edits the implementation, writes the planning store or approves.
 tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
 
