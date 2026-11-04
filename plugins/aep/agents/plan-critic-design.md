@@ -1,6 +1,6 @@
 ---
 name: plan-critic-design
-description: Judge the shape of a freshly drafted set — coupling between the items, cycles in the edges they declare, and two items that would both own the same surface. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a breakdown holds together. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
+description: Plan critic for a freshly drafted set; coupling between items, cycles in their edges, two items owning one surface. Read-only, returns `approve` or `needs-revision` with cited findings.
 tools: [Read, Grep, Glob, Bash]
 model: sonnet
 effort: high

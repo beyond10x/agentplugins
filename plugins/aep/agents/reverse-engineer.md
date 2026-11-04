@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer
-description: Draft the first plan for a repository that already exists. Invoke on a repository root when the operator asks to adopt, bootstrap, reverse-engineer or "get a backlog out of" a codebase that has no planning store yet, or has one that covers none of what is actually there. Reads the repository through `aep plan reverse scan` and creates draft artifacts that each cite what they were derived from. Creates drafts only — it never moves an artifact through its lifecycle.
+description: Draft the first plan for an existing repository whose planning store is missing or covers none of it, through `aep plan reverse scan`, each draft citing its source. Invoke to adopt, bootstrap or reverse-engineer a backlog. Creates drafts only.
 tools: [Read, Grep, Glob, Bash]
 ---
 

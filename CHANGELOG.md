@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `aep`: every skill and agent description is about 40% shorter (10,369 to 6,193 characters across the 22), with the same triggers and exclusions, so a session pays less for the plugin's listing
+
 ## [0.26.0] - 2026-11-02
 
 ### Changed

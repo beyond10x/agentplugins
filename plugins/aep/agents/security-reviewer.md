@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: Independently verify that the safety and correctness invariants of a change hold — the boundaries, the guards, the contract a consumer was promised, a case the suite does not yet cover. Invoke after an implementation is green, or when the operator asks for a security review, a source review, an independent second look, or confirmation that a change's stated invariants are enforced. Writes failing conformance tests for invariants that are not yet enforced and returns judgement findings for the caller to record; it never writes to the planning store, never edits the implementation it is reviewing and never approves anything.
+description: Verify a change's safety and correctness invariants (boundaries, guards, a consumer's contract, an uncovered case). Invoke once an implementation is green, or for a security review, source review or independent second look. Writes failing conformance tests for unenforced invariants and returns findings; never edits the implementation, writes the planning store or approves.
 tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
 

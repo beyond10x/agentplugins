@@ -1,6 +1,6 @@
 ---
 name: plan-critic-parallel-safety
-description: Judge whether a freshly drafted set could be worked at the same time — which items land on one file, whether the plan says so, and which items name no surface at all and are therefore unassessed rather than safe. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a set can be parallelised. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
+description: Plan critic for a freshly drafted set; can it be worked in parallel, which items share a file and whether the plan says so, which name no surface (unassessed, not safe). Read-only, returns `approve` or `needs-revision` with cited findings.
 tools: [Read, Grep, Glob, Bash]
 model: sonnet
 effort: high
