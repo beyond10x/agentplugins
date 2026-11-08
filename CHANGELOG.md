@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Track ESS 0.90.0: `ess:specifying` describes `ess/34` (a compensation that deletes its row, the stricter row snapshot) and `ess/35` (`repeated: last_wins`, probed), the `ess-http/1` bare body and literal-segment precedence and `ess-output-state/4`; `ess:upgrade`, `ess:hardening` (`grant-drop`, `grant-add`, `unmutated_sites`, `ess-mutation-report/8`, probed) and `ess:testing-conformance` (0.84.0 to 0.90.0 synthesis checks and the known list-negation gap) follow. The ESS tutorial set moves to 0.90.0 and `ess/35`
+- Track Metaharness 0.30.0: the drive reference says `metaharness aep drive resume --evidence` answers an `operator` step from 0.27.0; the eval workflow runs it with AEP 0.79.0, the revision it now links
+- Track Connectors v0.69.0: `connectors:integrating` describes the MCP revision binding of v0.66.0 and v0.68.0 and the owner's bounded-read rule of v0.69.0
+- Track Worktree 0.19.4: `worktree:managing-worktrees` says how `gc --apply` reports an id that stopped being a candidate
+- `verified.json` and the eval workflow move to ESS 0.90.0, Worktree 0.19.4, Metaharness 0.30.0, Connectors v0.69.0 and AEP 0.79.0
+
 ## [0.26.0] - 2026-11-02
 
 ### Changed

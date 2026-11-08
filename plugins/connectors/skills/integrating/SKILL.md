@@ -6,7 +6,7 @@ description: Use the Beyond10x connectors CLI to set up providers, diagnose conn
 # Connectors
 
 Use the installed CLI's help and returned contracts as the authority for commands and access.
-These instructions follow the current Connectors lineage, verified against the [Connectors `v0.65.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.65.0).
+These instructions follow the current Connectors lineage, verified against the [Connectors `v0.69.0` release](https://github.com/beyond10x/connectors/releases/tag/v0.69.0).
 The plugin supplies instructions; `b10x` installs the separate CLI. Adapter artifacts,
 configuration, credentials and admission remain deployment prerequisites.
 
@@ -70,12 +70,19 @@ Since `v0.57.0`, `connectors server --transport stdio` is a local MCP server on 
 instance's admitted read-only operations as tools through the same protected owner, custody and
 bounded reads, configured by `CONFIG.mcp-stdio.json` and `CONFIG.operation-curation.json` beside
 the configuration (the release's
-[`docs/local-mcp-stdio.md`](https://github.com/beyond10x/connectors/blob/v0.65.0/docs/local-mcp-stdio.md)).
+[`docs/local-mcp-stdio.md`](https://github.com/beyond10x/connectors/blob/v0.69.0/docs/local-mcp-stdio.md)).
 It serves one instance and connection per process, and no resources, prompts, writes or outbound
 MCP. Since `v0.63.0` `tools/call` takes `fields`, `each`, `walk` and `max_pages` beside `input`,
 with the CLI's semantics below (a walk returns its records as `items`, bounded by the response
 size), and `tools/list` gives each tool's `outputSchema.properties.result` as any JSON: the
-operation's own output schema is under `_meta["io.beyond10x.connectors/operation"].output_schema`. On macOS and Windows, and when its prerequisites are missing, it exits 1 with `mcp_unavailable`
+operation's own output schema is under `_meta["io.beyond10x.connectors/operation"].output_schema`.
+Since `v0.66.0` a read `tools/call` without `_meta["io.beyond10x.connectors/revision"]` runs against
+the revision the server currently advertises; a stale revision is still refused
+`stale_description` before any provider request, and a malformed one is invalid params (`-32602`).
+Since `v0.68.0` a listed mutating tool called without a revision is invalid params, and the owner
+refuses a projected read of an operation declaring semantic effects as `unsupported`; since
+`v0.69.0` the owner's bounded read serves only a resource operation with inline input and output
+schemas, as the projection does (from the release notes). On macOS and Windows, and when its prerequisites are missing, it exits 1 with `mcp_unavailable`
 on standard error. Register it with an MCP host only when the operator asks for that.
 
 ## Discover and invoke

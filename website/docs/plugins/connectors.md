@@ -6,7 +6,7 @@ title: Connectors
 
 The `connectors` plugin guides setup, connection diagnostics and governed integration calls in
 Claude Code and Codex. It follows the current Connectors CLI, verified against
-[v0.65.0](https://github.com/beyond10x/connectors/releases/tag/v0.65.0).
+[v0.69.0](https://github.com/beyond10x/connectors/releases/tag/v0.69.0).
 
 ## Install in either host
 

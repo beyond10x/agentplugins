@@ -61,7 +61,10 @@ changed yet.
   `ess/33`") and 0.75.0 at parse time for `provided:` ("unknown field `provided`"), a suite with an
   entity fixture (`ess-conformance/60`, `/61`) and a spec diff naming a summary move
   (`ess-diff/22`); from 0.79.0 an `ess-scenario/6` document and a suite with a response member path
-  or a `Binary64` (`ess-conformance/62`, `/63`). Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  or a `Binary64` (`ess-conformance/62`, `/63`); from 0.85.0 a specification on `ess/34` and a
+  mutation report or manifest listing unmutated sites or grant mutants (`ess-mutation-report/8`,
+  `ess-mutation-manifest/7`); from 0.89.0 a specification on `ess/35` and an
+  `ess-output-state/4` record. Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -167,6 +170,21 @@ changed yet.
   `TargetConfiguration::Typescript` becomes a struct variant (0.77.0); `ess-diff`
   `EntityChange::TransitionSummaryChanged` (0.78.0); `Specification::assemble_traced` (0.82.0)
   (from the release notes).
+- From 0.84.0 through 0.90.0, the one breaking change is the output record: 0.89.0 writes
+  `.ess-output/state.json` as `ess-output-state/4`, which every earlier release refuses, so move
+  every `ess` that generates into or checks that root in the same change (`ess:specifying`). A
+  specification keeps validating unchanged; raising its header to `ess/34` makes a named `when:` or
+  `when_related:` refusal of a command addressing an existing row require that row unchanged, which
+  changes its suite's bytes. Regenerate committed suites and read the change with
+  `ess verify conform diff`: an authored act claiming a success branch also requires no error
+  (`expect_no_error`, 0.84.0), a deleting branch's further witness requires the row absent and a
+  non-refusing `unknown_instance:` branch requires no row stored (0.85.0), and list-identity guards
+  are witnessed by rows the branch arranges (0.90.0). Regenerate generated servers: the Rust codecs
+  refuse a non-RFC 3339 `Timestamp` and an undeclared member of a closed object at decode, and the
+  Go server an undeclared top-level member (0.84.0), so a client that sent either now gets `400`.
+  Library API changes: `ess_http::Request` is no longer `Copy` (0.89.0); a hand-assembled authored
+  suite runs through `select_fresh_format_for` and `Runner::run_admitted` (0.84.0) (from the
+  release notes).
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
   accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused
@@ -192,7 +210,7 @@ changed yet.
   (from the release notes). A model with an immediate view over the guarded fields keeps its suite
   byte for byte. Authored scenarios that state `caller:` need `type: ess-scenario/5`.
 - Regeneration that rewrites `.ess-output/state.json` to a newer record format (such as
-  `ess-output-state/3`) breaks every older `ess` that reads it: move a CI job's `ess` pin in the
+  `ess-output-state/4`) breaks every older `ess` that reads it: move a CI job's `ess` pin in the
   same change that commits the regenerated record. A refusal that an owned file differs from its
   `.ess-output` record names the re-enroll route; `ess:specifying` walks it.
 

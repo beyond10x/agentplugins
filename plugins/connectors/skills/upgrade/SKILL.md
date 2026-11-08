@@ -83,7 +83,7 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    An owner the previous binary started keeps running, and a command that needs it answers
    `owner_build_mismatch` with `next_action = stop_owner`: `connectors --output json setup owner-stop`
    asks it to drain and exit, and the next command starts one from the new binary (the release's
-   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.65.0/website/docs/guides/upgrade-the-cli.md)
+   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.69.0/website/docs/guides/upgrade-the-cli.md)
    guide).
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.

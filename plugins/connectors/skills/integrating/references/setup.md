@@ -79,7 +79,7 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    an `oauth2_grant` connection (since `v0.58.0`) descriptor 3 carries only the current access
    token, never the stored entry or its refresh token.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.65.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.69.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
@@ -219,8 +219,8 @@ person's own subscription: `chatgpt` (profile `chatgpt.subscription`, browser or
 `claude.subscription-pasted`, read `account.profile`). Neither ships a client id: the operator pins
 an instance whose native configuration names its own `oauth2_client_id`, and an instance without
 one is refused as `InvalidConfiguration`. Whether a client may use a plan is the provider's terms'
-question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.65.0/website/docs/connectors/chatgpt.md),
-[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.65.0/website/docs/connectors/claude-subscription.md)).
+question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.69.0/website/docs/connectors/chatgpt.md),
+[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.69.0/website/docs/connectors/claude-subscription.md)).
 Both sign-ins are verified against a local fake authorization server only, never live.
 `v0.59.0` changes no setup step.
 
