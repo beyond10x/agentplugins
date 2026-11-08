@@ -1,6 +1,6 @@
 ---
 name: decomposer
-description: Decompose one epic into draft stories that jointly cover it. Invoke with a single epic id (for example `epic:passkey-login`) when the operator asks to break down, split or decompose an epic, or to draft the stories under it. Creates draft stories only — it never moves an artifact through its lifecycle and never edits an artifact it did not create.
+description: Decompose one epic (e.g. `epic:passkey-login`) into draft stories that jointly cover it, when asked to break down, split or decompose it. Creates draft stories only; moves no artifact and edits none it did not create.
 tools: [Read, Grep, Glob, Bash]
 ---
 

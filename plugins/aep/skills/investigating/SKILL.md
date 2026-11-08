@@ -1,6 +1,6 @@
 ---
 name: investigating
-description: >-
+description: Investigate a production incident, an outage or a running system from citable evidence; state captured before remediation, a sourced UTC timeline, a healthy-peer comparison, every claim labelled verified or inferred. Use for investigate, "what happened", "when did this start", "is it still happening", "has this shipped", "is this deployed", an alert, an outage, a hung or crashing process, a customer-visible failure, an incident report or postmortem. Not for a reproducible defect (aep:diagnosing) or a pre-merge check (aep:implementing).
   Investigate a production incident, an outage or a question about a running system from evidence that can be cited — capture state before anyone remediates, build a sourced UTC timeline, date an onset from an instrument that can see a negative, compare against a healthy peer, and label every claim verified or inferred, with a catalogue of ten techniques. Use when the user says investigate, "what happened", "when did this start", "is it still happening", "has this shipped", "is this deployed", reports an alert, an outage, a hung or crashing process or a customer-visible failure, or asks for an incident report or a postmortem. Not for a defect that can be reproduced on demand, which is `aep:diagnosing`; not for checking a change before it merges, which is `aep:implementing`.
 ---
 

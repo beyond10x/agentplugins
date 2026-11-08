@@ -1,6 +1,6 @@
 ---
 name: review-plan
-description: Audit the AEP planning store for what `aep plan artifact validate` cannot see, as /aep:review-plan or when the operator asks an agent to review the plan. Hands off to aep:planning and its plan-reviewer role; read-only, it proposes moves and makes none.
+description: Audit the AEP planning store for what `aep plan artifact validate` cannot see; /aep:review-plan or when asked to review the plan. Read-only, proposes moves and makes none. Hands off to aep:planning.
 argument-hint: "[artifact-id...]"
 ---
 

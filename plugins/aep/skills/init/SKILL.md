@@ -1,6 +1,6 @@
 ---
 name: init
-description: Start with AEP in this project — make sure the `aep` CLI is available and take the first step. AEP is governed planning in a repository-local artifact store, and delivery of accepted work in reviewed waves. Use when the user wants to plan or deliver governed work, asks what AEP is or how to adopt it, asks to set up or install AEP, or when an AEP skill reports that `aep` is missing. Installs CLIs only after the user confirms the plan.
+description: Set up AEP (governed planning in a repository-local store, delivery in reviewed waves); make sure the `aep` CLI is installed and take the first step. Use when asked what AEP is, to adopt, set up or install it, or when an AEP skill reports `aep` missing. Installs CLIs only after the user confirms.
 ---
 
 # Start with AEP

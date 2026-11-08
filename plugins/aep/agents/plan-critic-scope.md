@@ -1,6 +1,6 @@
 ---
 name: plan-critic-scope
-description: Judge a freshly drafted set against the artifact it was drafted from — every outcome the parent promises is claimed by something, and nothing is drafted that the parent did not ask for or explicitly excluded. Invoke as one of the plan-time critic panel, after a decomposition is drafted and before an operator reads it, or when the operator asks whether a breakdown still covers what it came from. Read-only: it returns `approve` or `needs-revision` with cited findings, records nothing, and moves nothing.
+description: Plan critic for a freshly drafted set; is every outcome its parent promises claimed, and is nothing drafted the parent did not ask for or excluded. Read-only, returns `approve` or `needs-revision` with cited findings.
 tools: [Read, Grep, Glob, Bash]
 model: sonnet
 effort: high
