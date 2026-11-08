@@ -142,8 +142,11 @@ A run stopped at an `operator` step prints who may answer it and names
 `aep drive resume <run> --evidence <file>`, which submits the file's evidence records to the run
 before it continues. The approval is a person's: relay the pause verbatim and write no record
 for it. `aep drive resume` continues only a map without `llm` steps. On a model-backed map it
-refuses and names `metaharness aep drive resume`, which takes no `--evidence`, so tell the
-operator that and stop. `aep govern evaluate --evidence --state` writes nothing back to a run.
+refuses and names `metaharness aep drive resume`, which takes `--evidence <file>` too
+(repeatable): the records reach the run's restored execution before the owed `operator` step is
+settled, and the settle decides whether one answers it and whether its giver may.
+`aep govern evaluate --evidence --state` writes nothing back to a run; if the installed
+`metaharness aep drive resume --help` lists no `--evidence`, upgrade it rather than resuming.
 
 When reporting an adapter's outcome, read the terminal verdict and `stream.closed.process`
 separately. A native process exit, signal, or unknown status is an observation of process completion;

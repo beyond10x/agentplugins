@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/33`. The binary says which one that
+`format:` that release implements; the example below uses `ess/35`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/33
+format: ess/35
 system: warehouse
 version: v1
 
@@ -350,10 +350,14 @@ generate the same kind into a fresh directory as the reference, run
 per owner the refusal names (such as `projection:schema`), then regenerate. A leftover
 `.ess-output/state.next` makes `--check` exit 1; plain `ess generate` removes it.
 
-The record is `ess-output-state/3`. A write-mode run rewrites an older `/1` or `/2` record as `/3`
-once, even when no file changes; `--check` passes it with one warning. An `ess` that writes `/2`
-refuses a `/3` record in both modes (`error: invalid output state: missing field` naming `root`,
-exit 1), so move a CI job's `ess` pin in the same change that commits the regenerated record.
+The record is `ess-output-state/4` from 0.89.0 (`/3` before; a probe on 0.90.0 wrote `/4`). A
+write-mode run rewrites an older `/1` to `/3` record as `/4` once, even when no file changes;
+`--check` passes it with one warning. A release before 0.89.0 refuses a `/4` record as an
+unsupported output-state version (and one that writes `/2` refuses `/3`, `error: invalid output
+state: missing field` naming `root`, exit 1), so move every CI job's `ess` pin in the same change
+that commits the regenerated record. A file an earlier release generated keeps the `model digest`
+line or `source_digest` key the 0.89.0 stamp no longer carries, so `--check` reports it as
+differing until the root is generated again (from the release notes).
 
 ## Implementation code comes from the specification
 

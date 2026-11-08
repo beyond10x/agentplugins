@@ -17,7 +17,8 @@ ess specify compile --path <specification> --format json --out <ir.json>
 
 `ess verify conform mutate` derives one mutant per site in named classes (`sets-drop`, `precedence-swap`, `emit-swap`, comparison flips, `from-drop`,
 `transition-to`, `guard-boundary`, `sets-retarget`, `guard-negate`, `guard-connective`,
-`error-swap`, `emit-drop`, `order-flip`; `--class` selects), synthesizes each mutant's suite and
+`error-swap`, `emit-drop`, `order-flip`, and from 0.85.0 `grant-drop` and `grant-add`, which drop one
+command from an actor's `may:` or add one it lacks; `--class` selects), synthesizes each mutant's suite and
 scores it against an implementation of the unchanged specification. `--target` runs only the
 built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own implementation:
 
@@ -31,7 +32,8 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
 3. `ess verify conform mutate --collect <dir> --report-out <mutation-report.json>` scores them into
    `ess-mutation-report/3` (`/4` for a component, a known-failures declaration or unavailable
    sites, `/5` where an entry names an `identical_answer`, `/6` where it names `overlap_taken_by`,
-   `/7` where it names `unchanged_suite`):
+   `/7` where it names `unchanged_suite`, `/8` where it lists an unmutated site or scores a grant
+   mutant; the manifest is `ess-mutation-manifest/7` then):
    exit 0 every mutant killed, 1 a survivor, 3 the baseline did not pass (`ESS-MUTATE-001`), no site
    (`ESS-MUTATE-003`) or only inconclusive or stillborn mutants. A mutant whose synthesized suite
    asks what the baseline's asks is `unwitnessed` (`ESS-MUTATE-004`, "the suite does not change"),
@@ -57,6 +59,15 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `when_related:` predicates (`guard-negate/<command>/<outcome>/when_subject`), so a model with
    those guards gains mutants. Where `sets-drop` has no site, a `note:` on stderr says why
    (`creates_row`, `source_not_input`, `optional_field`).
+   From 0.85.0 every selected site a class excludes or leaves without a live mutant is listed under
+   `unmutated_sites` with its reason (`no_admissible_state`, `no_retarget_source`,
+   `unobserved_field`, `no_compatible_error_alternative`, `system_actor`, `command_not_served`,
+   `attributed_holder`), and the summary line ends `; S of N site(s) scored`. Listed sites do not
+   change the exit status; `--fail-on-unmutated` makes one, or a stillborn mutant, exit 3. A probe
+   on 0.90.0 against the tutorial's specification with `--class grant-drop --class grant-add` and
+   `--target interpreted` killed 6 of 6 `grant-drop` mutants by their `<command>/grant/denied`
+   scenarios ("6 of 6 site(s) scored", `ess-mutation-report/8`); its one actor holds every command,
+   so `grant-add` found no site.
 4. Answer each survivor by declaring what makes the rule observable — a view publishing the field a
    `sets` entry writes, a `wrong_state:` outcome for a dropped `from` state — then re-run and see
    it killed; or file a synthesis gap on beyond10x/ess. An authored scenario in a mutant's suite

@@ -66,6 +66,8 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | a struct, map or JSON input synthesis sends as given | `ess/33` | `example:` on an input typed by a struct (open or closed), a `Map<…>` or `Json`, through any newtype or `Optional`; [below](#ess33) |
 | rows the deployment holds and no command creates | `ess/33` | `provided: true` on the entity; a `when_related: {via: input.<f>}` guard reads one through an entity fixture |
 | one line on what a state or a move means | `ess/33` | `summary:` on a transition, and on a state in its mapping form `{name, wire?, summary?}` |
+| an external race whose compensation removes the row | `ess/34` | `deletes:` with `instance:` on a `compensates: true` refusal beside `external:`; [below](#ess34) |
+| a list that may name one row more than once, applied in order | `ess/35` | `each: {in: input.<list>, as: <name>, repeated: last_wins}` on an `affects:` entry, no `distinct:`; [below](#ess35) |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -272,7 +274,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/33`
+## From `ess/16` through `ess/35`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -299,6 +301,8 @@ With current ESS:
 | `ess/31` | the empty list `[]` in `sets:` over a required `List<…>`; an `example:` on a `List` input; `{append: input.<field>}` in `sets:` over a stored list; `presence: omitted_or_null`; a view field carries its `Optional` source field's `presence:` |
 | `ess/32` | a named-row `when_related: {via: input.<f>, …}` beside a row-set `when_related: {entity, where, …}` on one command; a struct with `fields: []`; a lifecycle state's `wire:` spelling; two enum variants spelled alike on the wire are refused |
 | `ess/33` | an `example:` on a struct, `Map<…>` or `Json` input; `provided: true` on an entity; a `summary:` on a lifecycle transition and on a state |
+| `ess/34` | a compensating `external:` refusal may delete its addressed row (`deletes:`, `instance:`); a named `when:` or `when_related:` refusal of a command addressing an existing row requires that row unchanged |
+| `ess/35` | `repeated: last_wins` on an `affects:` entry's `each:` |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -1079,6 +1083,76 @@ reads it.
   decoder refuses such an input before the command runs (from the release notes).
 - `validate` on a specification of several files names the file a refusal was read from (0.82.0),
   where it named `<document>` when the refused name was written in more than one file.
+
+## `ess/34`
+
+From 0.85.0 (`ess specify formats --since ess/33` on 0.90.0, and the release notes):
+
+- **A compensation may remove its row.** A `compensates: true` refusal beside `external:` may
+  declare `deletes:` with `instance:`, as an accepting branch spells a delete. The interpreted
+  target removes the row and answers the error; the scenario forces the branch and requires the
+  error, no event, and the row absent from every immediate view of the entity. `creates:`,
+  `affects:` and `emits:` beside the marker stay refused. Below `ess/34` the delete is
+  `refusal_mutated_state` naming `ess/34`; a compensation declaring no change is
+  `missing_declaration` whose hint names `deletes:` (beyond10x/ess#585).
+- **Stricter:** a named `when:` or `when_related:` refusal that names no subject of its own, on a
+  command whose other branches address an existing row through the input, snapshots that row and
+  requires it unchanged, as a held-state, `when_subject:` or `external:` refusal does. Raising a
+  header to `ess/34` therefore changes such a suite's bytes; below it the suite keeps them
+  (beyond10x/ess#587).
+
+## `ess/35`
+
+From 0.89.0. A probe on 0.90.0 added to the tutorial's specification a command whose `affects:`
+entry writes one `Book` per element of `List<Arrival>` with `repeated: last_wins`: it validated,
+synthesized 19 scenarios with 0 refusals at `ess-conformance/34`, and the `interpreted` target
+passed all 19. Under `ess/34` the key is `unsupported_format_version` (`ESS-COMMAND-009`, "requires
+specification format ess/35"); without the key and without a `distinct:` the entry is
+`missing_declaration` (`ESS-COMMAND-005`), whose hint now names `repeated: last_wins`.
+
+```yaml
+      - name: shelved
+        updates: library.lending.Member
+        instance: member_id
+        sets: {name: "shelver"}
+        emits: [library.lending.ArrivalsShelved]
+        payload:
+          library.lending.ArrivalsShelved: {member_id: input.member_id}
+        affects:
+          - entity: library.lending.Book
+            each: {in: input.arrivals, as: arrival, repeated: last_wins}
+            instance: arrival.book_id
+            sets: {title: arrival.title, author: arrival.author, borrower_id: {cleared: true}}
+```
+
+The elements apply in list order, each to the row as the earlier ones left it: an upsert repeat
+writes over an earlier one, so the last values stay; a move repeat takes its transition only from a
+state in its `from` and is skipped otherwise; a delete repeat is skipped; `where:` inside `each:`
+selects the elements first. `last_wins` is the only value. Another `each:` entry of the same outcome
+writing the same entity is `conflicting_declaration`. Synthesis sends a list naming the held row
+twice and reads back the last element's values. Generated Rust and Go keep the command an
+obligation naming the key, Entity Runtime lowering refuses it by name, and `ess verify diff`
+reports declaring it as widening and dropping it as narrowing (from the release notes).
+
+### At every format, from 0.84.0 through 0.90.0
+
+- **`ess-http/1` bare request body** (0.89.0): a command route may take one input field as its
+  whole body, `request: {encoding: json, body: input.<field>}`, the field not `Optional` and every
+  other input field carried by the path. OpenAPI publishes the field's own schema as the request
+  body; the generated servers read the body as that field. Any other placement is `ESS-HTTP-020`.
+- **A literal path segment wins** (0.89.0): two nested templates of one component and method,
+  one holding the literal at every segment they differ, are admitted and the more specific answers
+  (`/boards/{board_id}/cards/priority` beside `/boards/{board_id}/cards/{card_id}`). Crossed
+  templates stay `ESS-HTTP-011`, which now names a path both match.
+- **Generated servers refuse what their OpenAPI refuses** (0.84.0): the generated Rust codecs
+  refuse at decode a `Timestamp` that is not RFC 3339 and a member a closed object does not declare,
+  answering `400` or the binding's `refusals.malformed`; the Go server refuses an undeclared
+  top-level member. A log an older Rust server wrote with such values no longer decodes.
+- **`ess generate ui --http <binding>`** (0.84.0) makes a generated UI call the routes the binding
+  declares; `ess-ui/1` gained pagers, value labels, toggle state, duration and byte formats, host
+  slots (0.90.0, refused by the React and terminal generators until 0.91.0) and journey steps for
+  every control (`ess ui test`, 0.88.0). These are UI documents, not the specification format
+  (from the release notes).
 
 ## What validates and still gets no scenario
 
