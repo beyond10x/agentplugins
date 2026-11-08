@@ -99,7 +99,7 @@ refusals (exit 2) that contact nothing. A supplied service endpoint is reached o
   is refused `lifecycle_conflict` naming `endpoint`.
 - Call the service over HTTP (`GET /v1/describe`, `POST /v1/invoke`, and `POST /v1alpha2/invoke`
   for library clients), as the release's
-  [`docs/running-services.md`](https://github.com/beyond10x/connectors/blob/v0.65.0/docs/running-services.md)
+  [`docs/running-services.md`](https://github.com/beyond10x/connectors/blob/v0.69.0/docs/running-services.md)
   shows, with the bearer in a protected file. Its operations' `input_schema` and `output_schema`
   are JSON Schema objects. Enable plaintext only when the deployment and task explicitly
   authorize it.

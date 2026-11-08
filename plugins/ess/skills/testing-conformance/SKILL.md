@@ -485,7 +485,19 @@ The current runner contract:
   every other, so a target that moves the record on refusal and publishes nothing fails, and where
   no send does it is withdrawn as `ESS-SYNTH-001` naming the states left; the interpreted target
   appends `null` for an absent element of `{append: input.<field>}` over a `List<Optional<T>>`
-  (from the release notes). A synthesis note that a scenario
+  (from the release notes). 0.84.0 through 0.90.0 add no suite format either and tighten again:
+  an authored act whose outcome declares no error also requires that no error came back
+  (`expect_no_error`), so a target answering the success name with an error fails (0.84.0); a
+  further witness of a deleting branch requires the row absent, a non-refusing `unknown_instance:`
+  branch reads every immediate view and requires no row with the sent identity, and from `ess/34`
+  a named `when:`/`when_related:` refusal snapshots the addressed row (0.85.0); a refusal over a
+  list of identities beside a branch acting on a named row is sent for a row that branch arranges,
+  and a guard needing several text literals in one list is witnessed by one list holding them all
+  instead of `ESS-SYNTH-003` (0.90.0). Known gap in 0.90.0: the negated side of a list guard with a
+  negated child (`all: [exists a: …, not exists b: …]`) is not tested, so a target ignoring the
+  negation passes; hold it with an authored scenario until ESS fixes it (from the release notes).
+  On 0.90.0 the tutorial's specification still synthesizes 17 scenarios with 0 refusals and the
+  `interpreted` target passes them all. A synthesis note that a scenario
   "retains its mixed-caller witness without an appended reversed-role run: the declared grants do
   not permit the reversed caller assignment" is a note, not a refusal: the scenario is written and
   runs, and the note names the reversed-caller run the grants rule out. Since 0.66.0, under report format 2, the generated Go and

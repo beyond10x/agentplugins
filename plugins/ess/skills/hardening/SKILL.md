@@ -76,7 +76,7 @@ somewhere nobody looked.
 ## What `ess` ships for techniques 1 and 2
 
 - **Mutation audit:** `ess verify conform mutate` mutates the specification in named
-  classes (including `sets-drop`, `precedence-swap`, comparison flips and `emit-swap`) and writes `ess-mutation-report/3` (`/4` for a component, a declaration or unavailable sites; `/5` where a `precedence-swap` names an `identical_answer`; `/6` where its overlap is `overlap_taken_by` earlier branches; `/7` where a mutant's suite is unchanged). Against your own implementation, `--emit DIR` writes
+  classes (including `sets-drop`, `precedence-swap`, comparison flips, `emit-swap` and the actor-grant classes `grant-drop` and `grant-add`) and writes `ess-mutation-report/3` (`/4` for a component, a declaration or unavailable sites; `/5` where a `precedence-swap` names an `identical_answer`; `/6` where its overlap is `overlap_taken_by` earlier branches; `/7` where a mutant's suite is unchanged; `/8` where it lists `unmutated_sites` or scores a grant mutant). Against your own implementation, `--emit DIR` writes
   the baseline's and every mutant's suite, your runner writes `report.json` beside each, and
   `--collect DIR` scores them. [references/techniques.md](references/techniques.md) § 1.
 - **Reference model and random sequences:** the Go and TypeScript packages
