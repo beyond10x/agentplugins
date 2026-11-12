@@ -1,0 +1,20 @@
+{
+  "name": "slot",
+  "version": "0.26.0",
+  "description": "Run every build on one shared pool of build slots through the slot CLI: one jobserver for all sessions, a live queue, local or on a build server.",
+  "author": {
+    "name": "Beyond10x"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/beyond10x/agentplugins",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Slot",
+    "shortDescription": "Share one pool of build slots across every agent session.",
+    "longDescription": "Prefix builds with the slot CLI so cargo, go, make and task runs from every session draw from one GNU-make jobserver pool, queue instead of oversubscribing the machine, and show live in one web view; remote mode moves them to a build server.",
+    "developerName": "Beyond10x",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use the slot building skill to run this build through the shared slot pool."
+  }
+}

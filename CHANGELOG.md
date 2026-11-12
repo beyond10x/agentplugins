@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `slot` plugin for the `slot` CLI (one shared pool of build slots for every build on a machine): `slot:init` installs the CLI through `b10x` and runs the daemon as a systemd user service, `slot:building` says which commands get the `slot` prefix, how to check the daemon and read the queue, when to use `--local` and what remote mode changes, and `slot:upgrade` restarts the daemon only when no build is active. `catalog.json` lists the optional, Linux-only `slot` product (release archive or the `b10x-slot-cli` Cargo package); `agentplugins-check tools` checks slot's own subcommands and options against its newest release and never runs a wrapped build command
+
 ### Changed
 
 - `aep`: every skill and agent description is about 40% shorter (10,369 to 6,193 characters across the 22), with the same triggers and exclusions, so a session pays less for the plugin's listing

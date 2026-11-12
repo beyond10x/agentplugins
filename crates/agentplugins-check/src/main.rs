@@ -85,6 +85,7 @@ const PLUGINS: &[(&str, &[&str])] = &[
             "agents/conformance.md",
         ],
     ),
+    ("slot", &["skills/building/SKILL.md"]),
 ];
 
 fn json(path: &Path) -> Result<serde_json::Value, String> {

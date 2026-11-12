@@ -36,7 +36,7 @@ enum Top {
     /// Plan the named products (`aep,ess`): their plugins and CLIs, installed or brought current.
     /// Nothing else is touched. Writes nothing but the plan file; apply it after confirmation.
     Init {
-        /// Products, comma separated: aep, ess, worktree, connectors.
+        /// Products, comma separated: aep, ess, worktree, connectors, slot.
         #[arg(value_delimiter = ',')]
         products: Vec<String>,
         /// How to install CLIs; default: prebuilt, cargo when a release has no archive for this machine.
@@ -229,7 +229,7 @@ fn main() -> ExitCode {
             out,
         } => {
             if products.is_empty() {
-                Err("name the products: aep, ess, worktree, connectors (the /b10x:init skill asks the user which)".to_owned())
+                Err("name the products: aep, ess, worktree, connectors, slot (the /b10x:init skill asks the user which)".to_owned())
             } else {
                 emit(
                     make_plan(

@@ -13,11 +13,13 @@ Use the narrowest link that answers the request.
 | [ess plugin](https://beyond10x.github.io/docs/agentplugins/plugins/ess/) | ESS specification, retrofit, validation, projection and conformance guidance |
 | [worktree plugin](https://beyond10x.github.io/docs/agentplugins/plugins/worktree/) | Managed Git worktree lifecycle and cleanup guidance |
 | [connectors plugin](https://beyond10x.github.io/docs/agentplugins/plugins/connectors/) | Provider setup and governed integrations through the `connectors` CLI |
+| [slot plugin](https://beyond10x.github.io/docs/agentplugins/plugins/slot/) | Building through one shared pool of build slots with the `slot` CLI |
 | [AEP](https://beyond10x.github.io/docs/aep/) | Protocol concepts, commands, and adopter documentation |
 | [AEP Service](https://beyond10x.github.io/docs/aep-service/) | Hosted AEP service boundary and operations |
 | [ESS](https://beyond10x.github.io/docs/ess/) | Executable System Specification model, CLI, and adapters |
 | [Entity Runtime](https://beyond10x.github.io/docs/entity-runtime/) | Deterministic entity kernel and provider documentation |
 | [Worktree](https://github.com/beyond10x/worktree) | Embeddable Rust worktree lifecycle service and CLI |
+| [slot](https://beyond10x.github.io/slot/) | Shared build slots: the daemon, agent integration, remote mode and CLI reference |
 | [Marketplace source](https://github.com/beyond10x/agentplugins) | Plugin manifests, skills, agents, releases, and license |
 
 Do not route adopters to internal planning records or private operational material.
