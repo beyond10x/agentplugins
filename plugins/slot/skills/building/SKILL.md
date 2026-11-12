@@ -37,11 +37,16 @@ nothing, so a script or Taskfile that prefixes its own builds is safe to run thr
 | `slot cargo test -p foo`, `slot cargo build`, `slot cargo clippy` | cargo and rustc draw their parallelism from the pool |
 | `slot go test ./...` | holds a fixed share (4 slots by default), and go's `-p` is set to match |
 | `slot task check`, `slot make` | the wrapper holds one slot and passes the pool down; cargo and make inside share it |
+| `slot yarn vitest run --maxWorkers=4`, `slot npx playwright test --workers=2` | holds one slot per worker; always pass the worker flag, since without it the runner starts about one worker per core while holding 4 slots |
 | anything else | holds one slot |
 
+Test binaries in rust, go and wrapper jobs get `RUST_TEST_THREADS`, `NEXTEST_TEST_THREADS` and
+`GOMAXPROCS` from the daemon (a quarter of the pool; go jobs their slot count). Set them yourself
+only when a suite needs a specific value; yours is kept.
+
 Leave out commands that do not build: `git`, `cargo fmt`, `cargo metadata`, editors and
-rust-analyzer. When the command's own name is a slot subcommand (`serve`, `proxy`, `run`), use
-`slot run <command…>`.
+rust-analyzer. When the command's own name is a slot subcommand (`serve`, `proxy`, `run`,
+`status`), use `slot run <command…>`.
 
 The job's standard input is empty: an interactive command (a prompt, a REPL) does not work through
 slot. Interrupting `slot` (Ctrl-C, a tool timeout, killing it) cancels the job, kills its process
@@ -53,8 +58,9 @@ A job that has to wait prints one line on stderr before it starts:
 `slot: job N queued for K slot(s): F free, A request(s) ahead`. Until its output begins it is
 waiting, not hung. Queue wait
 adds to the wall time: give a build through slot the same generous timeout as a long build, or run
-it in the background. To see where it stands, open <http://127.0.0.1:7411/> (live timeline, slot
-usage, cores per toolchain, each job's output), or read the state:
+it in the background. To see where it stands, run `slot status` (the pool and every queued and
+running job, one line each), open <http://127.0.0.1:7411/> (live timeline, slot usage, cores per
+toolchain, each job's output), or read the state:
 
 ```bash
 curl -fsS http://127.0.0.1:7411/api/state
