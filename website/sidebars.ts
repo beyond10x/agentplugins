@@ -15,7 +15,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Plugin reference',
-      items: ['plugins/b10x', 'plugins/aep', 'plugins/ess', 'plugins/worktree', 'plugins/connectors', 'plugins/slot'],
+      items: ['plugins/b10x', 'plugins/aep', 'plugins/ess', 'plugins/worktree', 'plugins/connectors'],
     },
     'trust-and-scope',
   ],

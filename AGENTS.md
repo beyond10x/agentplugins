@@ -12,7 +12,7 @@ CLIs. Serves O2 (decisions as data) and O3 (any harness).
 
 | path | what |
 |---|---|
-| `plugins/<name>/` | every plugin: `b10x`, `aep`, `ess`, `worktree`, `connectors`, `slot` ([structure](website/docs/structure.md)) |
+| `plugins/<name>/` | every plugin: `b10x`, `aep`, `ess`, `worktree`, `connectors` ([structure](website/docs/structure.md)) |
 | `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json` | the two marketplace files |
 | `catalog.json` | products, plugins, binaries, retired names — no versions |
 | `verified.json` | per CLI, the release the skills were last verified against; `tools` fails when a newer one is out |

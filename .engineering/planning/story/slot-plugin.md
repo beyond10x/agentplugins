@@ -2,10 +2,12 @@
 format: aep.planning-md/3
 id: story:slot-plugin
 kind: story
-status: draft
+status: archived
 title: A slot plugin lets Claude Code and Codex sessions build through the shared slot pool
 summary: Add the slot plugin, its catalog entry, checker rosters and docs; tools passes once slot 0.1.0 is released
-revision: 1
+revision: 3
+transitions:
+- {from: "draft", to: "archived", at: "2026-11-12T13:04:46Z", actor: "human:timo", revision: 2}
 ---
 # Story: A slot plugin lets Claude Code and Codex sessions build through the shared slot pool
 
@@ -42,3 +44,7 @@ Changes to slot itself; a trial round, which follows the first release.
 ## Open Questions
 
 - `tools` and `upstream` cannot pass until beyond10x/slot exists and has released 0.1.0.
+
+## Archived
+
+Archived 2026-11-12: the slot plugin moved to the slot repository, which is its own Claude Code marketplace (`plugin/` there, `slot@slot`). This repository no longer carries a slot plugin, catalog product, checker roster entry or docs page; the plugin was never in a release of this repository.

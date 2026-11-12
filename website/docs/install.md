@@ -22,14 +22,14 @@ manual route.
 ## The marketplace
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
-identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree`, `connectors` and `slot`,
+identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree` and `connectors`,
 in both hosts; every one lives in this repository. The CLIs come from their own repositories'
 releases, prebuilt or with `cargo install`. The [Connectors guide](plugins/connectors.md) covers its
 platforms, macOS notes and separate provider configuration.
 
 ## The command-line tools
 
-The `aep`, `ess`, `worktree`, `connectors` and `slot` plugins drive command-line tools they do not ship.
+The `aep`, `ess`, `worktree` and `connectors` plugins drive command-line tools they do not ship.
 `b10x` installs each at its newest release, from a published archive checked against its
 `SHA256SUMS`, or with `cargo`. Connectors publishes archives from v0.48.0; an older Connectors
 release is source only and builds with `cargo` on Rust 1.91 or newer:
@@ -41,7 +41,7 @@ $ b10x setup apply --plan plan.json --yes
 
 `b10x init` prints the plan and changes nothing; `b10x setup apply` carries it out after you have
 read it, and snapshots every file it changes first. Archives exist for x86-64 and ARM64 Linux and
-macOS (`slot`: Linux only); elsewhere `--method cargo` builds from the release tag. The
+macOS; elsewhere `--method cargo` builds from the release tag. The
 [tutorial](tutorials/first-ess-specification.md) shows the output of both commands. The `b10x`
 front door itself needs none of these product CLIs.
 
@@ -73,8 +73,8 @@ archive where the release has one for the machine, otherwise built with `cargo`.
 /reload-plugins
 ```
 
-Add `/plugin install ess@b10x`, `/plugin install worktree@b10x`,
-`/plugin install connectors@b10x` or `/plugin install slot@b10x` as needed. The marketplace follows the default branch, whose
+Add `/plugin install ess@b10x`, `/plugin install worktree@b10x` or
+`/plugin install connectors@b10x` as needed. The marketplace follows the default branch, whose
 gate keeps every entry installable; `/reload-plugins` activates new plugins. Claude Code reads
 `.claude-plugin/marketplace.json` and each plugin's `.claude-plugin/plugin.json`. See
 [Claude Code's plugin documentation](https://code.claude.com/docs/en/discover-plugins) for the host
@@ -88,7 +88,7 @@ codex plugin add b10x@b10x
 codex plugin add aep@b10x
 ```
 
-Add `ess@b10x`, `worktree@b10x`, `connectors@b10x` or `slot@b10x` the same way. `codex plugin marketplace upgrade`
+Add `ess@b10x`, `worktree@b10x` or `connectors@b10x` the same way. `codex plugin marketplace upgrade`
 refreshes the marketplace. Start a new Codex thread afterwards;
 plugin instructions are injected when a thread starts, not retroactively into a running thread.
 The same plugins remain available from the Plugins surface. The authoritative description of what

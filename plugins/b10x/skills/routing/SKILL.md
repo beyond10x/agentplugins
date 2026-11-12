@@ -24,8 +24,8 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 |---|---|
 | Install or repair the Beyond10x plugins and their binaries | `b10x:init` |
 | Check whether the Beyond10x plugins and CLIs are current, or upgrade them | `b10x:upgrade` |
-| Set up one product and take its first step | `aep:init`, `ess:init`, `worktree:init`, `connectors:init`, `slot:init` |
-| Check or upgrade one product's plugin and CLI | `aep:upgrade`, `ess:upgrade`, `worktree:upgrade`, `connectors:upgrade`, `slot:upgrade` |
+| Set up one product and take its first step | `aep:init`, `ess:init`, `worktree:init`, `connectors:init` |
+| Check or upgrade one product's plugin and CLI | `aep:upgrade`, `ess:upgrade`, `worktree:upgrade`, `connectors:upgrade` |
 | Choose a plugin, understand the ecosystem, or find public documentation | `b10x:routing` (this skill) |
 | Create, update, review, or port an installable plugin | `b10x:authoring-plugins` |
 | Plan or decompose work, review a plan, or reverse-engineer a backlog | `aep:planning` |
@@ -39,7 +39,6 @@ Route the request; do not reproduce a specialist plugin's full workflow.
 | Harden a specification once its suite is green | `ess:hardening` |
 | Create, inspect, finish, or safely clean Git worktrees | `worktree:managing-worktrees` |
 | Set up providers, inspect Connector readiness, or invoke configured integrations through the CLI | `connectors:integrating` |
-| Run builds and tests on the machine's shared slot pool, read the build queue, or build on a build server | `slot:building` |
 
 Five entry points are commands: the operator starts one by name, or an agent starts it on the
 operator's request, and any approval it needs is a step in its body or the activity it hands off

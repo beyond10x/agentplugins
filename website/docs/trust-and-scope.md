@@ -18,8 +18,6 @@ Every published plugin is intentionally narrow:
 - `worktree` creates, leases and safely cleans isolated Git worktrees.
 - `connectors` sets up providers and invokes governed integrations; credentials stay with the
   Connector.
-- `slot` runs builds through one shared pool of build slots; it never sets a build's parallelism
-  by hand and never forwards credentials to a build server.
 
 The repository gate checks that the two marketplace formats agree in their declared order, plugin
 and directory names match, required skills and agents exist, and no retired marketplace or

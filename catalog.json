@@ -83,23 +83,6 @@
           }
         }
       ]
-    },
-    {
-      "id": "slot",
-      "optional": true,
-      "intent": "Share one pool of build slots across parallel agent builds",
-      "summary": "Run every build on one shared pool of build slots, with a live queue, locally or on a build server.",
-      "plugins": ["slot"],
-      "binaries": [
-        {
-          "name": "slot",
-          "platforms": ["linux"],
-          "install": {
-            "archive": { "repository": "beyond10x/slot" },
-            "cargo": { "repository": "beyond10x/slot", "package": "b10x-slot-cli" }
-          }
-        }
-      ]
     }
   ],
   "retired_plugins": {

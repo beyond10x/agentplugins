@@ -48,11 +48,5 @@ Use **`connectors`** to set up providers, diagnose readiness, and list, describe
 admitted operations through the standalone `connectors` CLI. Both hosts load the same skill;
 credentials and grants remain owned by the Connector. See [installation](plugins/connectors.md).
 
-## Sharing one machine between parallel builds
-
-Use **`slot`** when several agent sessions build on one Linux machine. Agents prefix builds with
-`slot`, and every build draws from one shared pool of build slots instead of sizing itself to the
-whole machine; a build server takes them over with `SLOT_HOST`. See [the slot plugin](plugins/slot.md).
-
 Installing more than one is reasonable when the work crosses those boundaries. Their scopes are
 complementary. The `b10x` front door routes to them; it does not absorb their instructions.
