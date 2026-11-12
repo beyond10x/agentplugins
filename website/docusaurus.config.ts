@@ -65,6 +65,7 @@ const config: Config = {
           {label: 'Worktree', to: '/docs/plugins/worktree'},
           {label: 'AEP', to: '/docs/plugins/aep'},
           {label: 'Connectors', to: '/docs/plugins/connectors'},
+          {label: 'Slot', to: '/docs/plugins/slot'},
         ]},
         {title: 'Project', items: [
           {label: 'GitHub repository', href: 'https://github.com/beyond10x/agentplugins'},

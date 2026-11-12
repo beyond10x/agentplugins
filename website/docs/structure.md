@@ -11,7 +11,7 @@ tools` checks the skills against the newest CLI releases. A change that breaks a
 | rule | what it says |
 |---|---|
 | **R1 marketplace** | One marketplace, `b10x`, in both the Claude Code and Codex formats. Every plugin lives in this repository. |
-| **R2 plugin** | One plugin per product. The plugin, the product and the CLI it drives share one name: `aep`, `ess`, `worktree`, `connectors`. The front door is `b10x`, with the `b10x` CLI. |
+| **R2 plugin** | One plugin per product. The plugin, the product and the CLI it drives share one name: `aep`, `ess`, `worktree`, `connectors`, `slot`. The front door is `b10x`, with the `b10x` CLI. |
 | **R3 skill** | Every plugin has two lifecycle skills: `init` (set it up and take the first step) and `upgrade` (check it and offer the upgrade). Every other skill is an activity or a command. An activity is named in `-ing` form, one or two words: `aep:planning`. A command is an entry point the operator starts by name, or an agent starts on the operator's request: named with a verb, one or two words (`worktree:cleanup`); it has at most 20 lines of body and names the one activity skill of its plugin it hands off to. Any approval a skill needs is a step in its body or its activity skill, so an agent that started it stops there. A skill kept operator-only sets `disable-model-invocation: true`, its `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`, the Codex form of the same flag, and its description gives the reason in a sentence starting `Operator-only:`. No skill is named after its plugin. |
 | **R4 agent** | An agent is a role: `implementor`, `author`. Exactly one skill of the same plugin owns it and lists it under `## Agents`. The agent file is a thin Claude Code adapter: at most 20 lines of body, naming its owning skill as `<plugin>:<skill>`, and every file it links exists. The role's procedure lives in that skill or in its `references/<role>.md`, because Codex loads skills and not `agents/`; the skill says to run the role directly where the host has no subagents. |
 | **R5 content** | A skill describes its CLI's newest release and quotes no CLI version. `agentplugins-check tools` runs every spelled command against that release. A `**Skill version X**` line names the version in its plugin's `.claude-plugin/plugin.json`. |
@@ -28,6 +28,7 @@ tools` checks the skills against the newest CLI releases. A change that breaks a
 | `ess` | `init`, `upgrade` | `specifying`, `retrofitting`, `testing-conformance`, `hardening` | — | `specifying`: author · `retrofitting`: retrofitter · `testing-conformance`: conformance |
 | `worktree` | `init`, `upgrade` | `managing-worktrees` | `cleanup` (hands off to `managing-worktrees`) | — |
 | `connectors` | `init`, `upgrade` | `integrating` | — | — |
+| `slot` | `init`, `upgrade` | `building` | — | — |
 
 Every plugin carries this repository's version. The CLIs have their own versions; `b10x` installs
 their newest release and `b10x check` says at session start when one is behind.

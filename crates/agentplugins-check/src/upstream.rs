@@ -8,7 +8,7 @@
 //! Three kinds of dependency:
 //!
 //! - **Releases.** Each CLI a plugin drives, at the release this repository last verified or names:
-//!   `verified.json` for `aep`, `ess` and `worktree`, and the `*_VERSION` pins of
+//!   `verified.json` for `aep`, `ess`, `worktree` and `slot`, and the `*_VERSION` pins of
 //!   `.github/workflows/eval.yml` or a release named in a skill for the rest. A newer release gets
 //!   its `CHANGELOG.md` sections from the pinned release (exclusive) to the newest (inclusive).
 //! - **Workflow pins.** Every `uses: beyond10x/<repo>/…@<commit>` against that repository's `main`.
@@ -120,6 +120,11 @@ const TRACKED: &[Tracked] = &[
             file: "plugins/connectors/skills/integrating/SKILL.md",
             prefix: "[Connectors `",
         },
+    },
+    Tracked {
+        name: "slot",
+        repository: "beyond10x/slot",
+        pin: Pin::Verified,
     },
 ];
 

@@ -7,7 +7,7 @@ description: The curated b10x marketplace for focused engineering-agent guidance
 
 # Focused guidance, explicit scope
 
-The `b10x` marketplace publishes a front door and four specialist plugins. Install the front
+The `b10x` marketplace publishes a front door and five specialist plugins. Install the front
 door when you want routing, ecosystem resources, or portable plugin creation. Install a specialist
 directly when the work is already clear.
 
@@ -18,6 +18,7 @@ directly when the work is already clear.
 | [`ess`](./plugins/ess.md) | Executable System Specifications | `specifying`, `retrofitting`, `testing-conformance` and `hardening` skills; author, conformance, retrofitter agents |
 | [`worktree`](./plugins/worktree.md) | Git workspaces | managed worktrees, leases, recovery proof, and safe cleanup |
 | [`connectors`](./plugins/connectors.md) | Integrations | the `integrating` skill for the `connectors` CLI: set up providers and invoke governed integrations |
+| [`slot`](./plugins/slot.md) | Shared builds | the `building` skill for the `slot` CLI: every build on one shared pool of build slots, locally or on a build server |
 
 Every plugin starts with `/<plugin>:init` and checks itself with `/<plugin>:upgrade`; `/b10x:init`
 asks what you want to do and installs the matching plugins and CLIs.

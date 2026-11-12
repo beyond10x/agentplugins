@@ -44,6 +44,7 @@ const CLIS: &[&str] = &[
     "worktree",
     "metaharness",
     "b10x-harness",
+    "slot",
     "protocol",
 ];
 
