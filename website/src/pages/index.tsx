@@ -10,7 +10,6 @@ const plugins = [
   ['AEP', 'Plan governed work, then scope and deliver it in waves with adversarial review.', '/docs/plugins/aep'],
   ['Worktree', 'Manage isolated Git worktrees with explicit recovery proof.', '/docs/plugins/worktree'],
   ['Connectors', 'Set up providers and invoke governed integrations through the connectors CLI.', '/docs/plugins/connectors'],
-  ['Slot', 'Run every build on one shared pool of build slots, locally or on a build server.', '/docs/plugins/slot'],
 ];
 
 export default function Home(): ReactNode {
@@ -21,7 +20,7 @@ export default function Home(): ReactNode {
           <p className={styles.eyebrow}>Curated marketplace · b10x</p>
           <Heading as="h1">Give each agent only the engineering guidance it needs.</Heading>
           <p className={styles.lead}>
-            A lightweight front door routes work to five focused specialists and helps create
+            A lightweight front door routes work to four focused specialists and helps create
             portable plugins—without bundling credentials or hidden authority.
           </p>
           <div className={styles.actions}>

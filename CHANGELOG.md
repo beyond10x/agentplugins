@@ -7,13 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Added
+### Removed
 
-- `slot` plugin for the `slot` CLI (one shared pool of build slots for every build on a machine): `slot:init` installs the CLI through `b10x` and runs the daemon as a systemd user service, `slot:building` says which commands get the `slot` prefix, how to check the daemon and read the queue, when to use `--local` and what remote mode changes, and `slot:upgrade` restarts the daemon only when no build is active. `catalog.json` lists the optional, Linux-only `slot` product (release archive or the `b10x-slot-cli` Cargo package); `agentplugins-check tools` checks slot's own subcommands and options against its newest release and never runs a wrapped build command
+- The `slot` plugin added on the default branch after 0.26.0, never released here: it ships from the slot repository, its own marketplace (`claude plugin marketplace add beyond10x/slot`, then `slot@slot`). Its catalog product, checker entries and docs page go with it
 
 ### Changed
 
-- `slot`: verified against slot 0.2.0. `slot:building` names `slot status`, says to pass the worker flag to playwright, vitest and jest (each job holds one slot per worker), and that the daemon sets the test-thread variables
 - `aep`: every skill and agent description is about 40% shorter (10,369 to 6,193 characters across the 22), with the same triggers and exclusions, so a session pays less for the plugin's listing
 - Track ESS 0.90.0: `ess:specifying` describes `ess/34` (a compensation that deletes its row, the stricter row snapshot) and `ess/35` (`repeated: last_wins`, probed), the `ess-http/1` bare body and literal-segment precedence and `ess-output-state/4`; `ess:upgrade`, `ess:hardening` (`grant-drop`, `grant-add`, `unmutated_sites`, `ess-mutation-report/8`, probed) and `ess:testing-conformance` (0.84.0 to 0.90.0 synthesis checks and the known list-negation gap) follow. The ESS tutorial set moves to 0.90.0 and `ess/35`
 - Track Metaharness 0.30.0: the drive reference says `metaharness aep drive resume --evidence` answers an `operator` step from 0.27.0; the eval workflow runs it with AEP 0.79.0, the revision it now links

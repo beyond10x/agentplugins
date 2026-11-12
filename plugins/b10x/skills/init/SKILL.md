@@ -1,6 +1,6 @@
 ---
 name: init
-description: Guided onboarding for Beyond10x — ask what the user wants to do (plan and deliver work, write specifications, isolated Git worktrees, integrations, shared build slots), then install the matching plugins and their CLIs in Claude Code or Codex, migrating any earlier Beyond10x install. Use when the user wants to set up, install or onboard Beyond10x, points at github.com/beyond10x/agentplugins, asks which Beyond10x plugins exist, or when a session-start line starting with `b10x:` says nothing is set up.
+description: Guided onboarding for Beyond10x — ask what the user wants to do (plan and deliver work, write specifications, isolated Git worktrees, integrations), then install the matching plugins and their CLIs in Claude Code or Codex, migrating any earlier Beyond10x install. Use when the user wants to set up, install or onboard Beyond10x, points at github.com/beyond10x/agentplugins, asks which Beyond10x plugins exist, or when a session-start line starting with `b10x:` says nothing is set up.
 ---
 
 # Set up Beyond10x
@@ -27,14 +27,11 @@ Ask **one** multi-select question: *What do you want to do with Beyond10x?*
 | Write specifications of a system or API (schemas, OpenAPI, conformance) | `ess` |
 | Work in isolated Git checkouts that clean up safely | `worktree` |
 | Connect external tools and providers | `connectors` |
-| Share one pool of build slots across parallel agent builds (Linux) | `slot` |
 
 Preselect what the user already named ("I want to write specs" → specifications). When planning is
 chosen, preselect specifications too and say why: AEP planning models every new noun as an ESS
 domain before writing stories around it, so `aep` without `ess` stops at the first new entity. Use the host's
-question tool when it has one (Claude Code: `AskUserQuestion` with `multiSelect: true`; it holds at
-most four options, so the fifth goes in a second question of the same call). Offer `slot` only on
-Linux.
+question tool when it has one (Claude Code: `AskUserQuestion` with `multiSelect: true`).
 
 ## 3. Ask how to install the CLIs
 
@@ -87,5 +84,5 @@ first one; follow it as if it were loaded.
 ## Next
 
 - Each installed product starts with its own `init`: `/aep:init`, `/ess:init`, `/worktree:init`,
-  `/connectors:init`, `/slot:init`.
+  `/connectors:init`.
 - `/b10x:upgrade` checks everything later; the session-start `b10x:` line says when it is due.

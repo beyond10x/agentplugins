@@ -31,11 +31,6 @@
       "name": "ess",
       "source": "./plugins/ess",
       "description": "Write, retrofit, validate and project ESS specifications, and hold implementations to them with conformance suites."
-    },
-    {
-      "name": "slot",
-      "source": "./plugins/slot",
-      "description": "Run every build on one shared pool of build slots through the slot CLI: one jobserver for all sessions, a live queue, local or on a build server."
     }
   ]
 }

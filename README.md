@@ -13,7 +13,6 @@ Codex: `codex plugin marketplace add beyond10x/agentplugins` — then install wh
 | [`aep`](website/docs/plugins/aep.md) | governed planning and delivery | `/plugin install aep@b10x` | `codex plugin add aep@b10x` |
 | [`worktree`](website/docs/plugins/worktree.md) | isolated Git worktrees | `/plugin install worktree@b10x` | `codex plugin add worktree@b10x` |
 | [`connectors`](website/docs/plugins/connectors.md) | integrations | `/plugin install connectors@b10x` | `codex plugin add connectors@b10x` |
-| [`slot`](website/docs/plugins/slot.md) | shared build slots | `/plugin install slot@b10x` | `codex plugin add slot@b10x` |
 | [`b10x`](website/docs/plugins/b10x.md) | setup, upgrades, routing | `/plugin install b10x@b10x` | `codex plugin add b10x@b10x` |
 
 What each plugin ships:
@@ -29,8 +28,6 @@ What each plugin ships:
   - skills: [`init`](plugins/worktree/skills/init/SKILL.md) · [`upgrade`](plugins/worktree/skills/upgrade/SKILL.md) · [`cleanup`](plugins/worktree/skills/cleanup/SKILL.md) · [`managing-worktrees`](plugins/worktree/skills/managing-worktrees/SKILL.md)
 - [`connectors`](plugins/connectors/) · [docs](website/docs/plugins/connectors.md)
   - skills: [`init`](plugins/connectors/skills/init/SKILL.md) · [`upgrade`](plugins/connectors/skills/upgrade/SKILL.md) · [`integrating`](plugins/connectors/skills/integrating/SKILL.md)
-- [`slot`](plugins/slot/) · [docs](website/docs/plugins/slot.md)
-  - skills: [`init`](plugins/slot/skills/init/SKILL.md) · [`upgrade`](plugins/slot/skills/upgrade/SKILL.md) · [`building`](plugins/slot/skills/building/SKILL.md)
 - [`b10x`](plugins/b10x/) · [docs](website/docs/plugins/b10x.md)
   - skills: [`init`](plugins/b10x/skills/init/SKILL.md) · [`upgrade`](plugins/b10x/skills/upgrade/SKILL.md) · [`authoring-plugins`](plugins/b10x/skills/authoring-plugins/SKILL.md) · [`routing`](plugins/b10x/skills/routing/SKILL.md)
 <!-- plugin-tree:end -->
@@ -42,7 +39,8 @@ https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md"*.
 New to ESS: [your first ESS specification](https://beyond10x.github.io/docs/agentplugins/tutorials/first-ess-specification/),
 a Rust tutorial from an empty directory to a passing conformance suite.
 
-More: [install guide](website/docs/install.md) · [evals](evals/README.md) · [changelog](CHANGELOG.md) · [contributing](AGENTS.md)
+More: [install guide](website/docs/install.md) · [evals](evals/README.md) ·
+[changelog](CHANGELOG.md) · [contributing](AGENTS.md)
 
 <!-- b10x-docs:start -->
 ## Documentation

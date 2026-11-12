@@ -27,7 +27,6 @@ const TOOLS: &[(&str, &str, &str)] = &[
     ("worktree", "worktree", "beyond10x/worktree"),
     ("aep", "metaharness", "beyond10x/metaharness"),
     ("connectors", "connectors", "beyond10x/connectors"),
-    ("slot", "slot", "beyond10x/slot"),
 ];
 
 /// Most subcommand words taken from one spelled command.
@@ -637,10 +636,6 @@ pub fn verify(root: &Path) -> Result<(), String> {
             {
                 problems.push(line);
             }
-            if *cli == "slot" {
-                verify_slot(root, &binary, &tag, &mut problems)?;
-                continue;
-            }
             let mut checked = 0;
             let files = command_files(root);
             for file in files {
@@ -698,97 +693,6 @@ pub fn verify(root: &Path) -> Result<(), String> {
     })();
     let _ = std::fs::remove_dir_all(&scratch);
     result
-}
-
-/// The subcommand names a clap help lists under `Commands:`, without `help`.
-fn help_commands(help: &str) -> BTreeSet<String> {
-    help.lines()
-        .skip_while(|line| line.trim() != "Commands:")
-        .skip(1)
-        .take_while(|line| !line.trim().is_empty())
-        .filter_map(|line| line.split_whitespace().next())
-        .filter(|name| *name != "help")
-        .map(str::to_owned)
-        .collect()
-}
-
-/// The spelled `slot` commands of `text` that name one of slot's own `subcommands`, with the flags
-/// to check against that subcommand's help, and how many wrap another command instead.
-///
-/// `slot <command…>` runs any other command as a build, so `slot cargo test` spells cargo, not
-/// slot: it is counted and never executed. Flags after `slot run` belong to the wrapped command.
-fn slot_commands(
-    text: &str,
-    subcommands: &BTreeSet<String>,
-) -> (BTreeSet<(String, BTreeSet<String>)>, usize) {
-    let mut own = BTreeSet::new();
-    let mut wrapped = 0;
-    for (path, flags) in invocations(text, "slot") {
-        match path.first() {
-            Some(first) if subcommands.contains(first) => {
-                let flags = if first == "run" {
-                    BTreeSet::new()
-                } else {
-                    flags
-                };
-                own.insert((first.clone(), flags));
-            }
-            _ => wrapped += 1,
-        }
-    }
-    (own, wrapped)
-}
-
-/// Check every spelled `slot` subcommand, its flags and `slot --local` against the release's help.
-fn verify_slot(
-    root: &Path,
-    binary: &Path,
-    tag: &str,
-    problems: &mut Vec<String>,
-) -> Result<(), String> {
-    let program = binary.to_string_lossy();
-    let top = run(&program, &["--help"])?;
-    let subcommands = help_commands(&top);
-    if subcommands.is_empty() {
-        return Err(format!("slot {tag}: `slot --help` lists no subcommands"));
-    }
-    let words = |help: &str| -> BTreeSet<String> {
-        help.split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
-            .map(str::to_owned)
-            .collect()
-    };
-    let top_words = words(&top);
-    let (mut checked, mut wrapped) = (0, 0);
-    for file in command_files(root) {
-        let text = std::fs::read_to_string(&file).map_err(|error| error.to_string())?;
-        let shown = file
-            .strip_prefix(root)
-            .unwrap_or(&file)
-            .display()
-            .to_string();
-        if text.contains("slot --local") && !top_words.contains("--local") {
-            problems.push(format!(
-                "{shown}: `slot --local` is not an option of slot {tag}"
-            ));
-        }
-        let (own, others) = slot_commands(&text, &subcommands);
-        wrapped += others;
-        for (subcommand, flags) in own {
-            checked += 1;
-            let help = run(&program, &[&subcommand, "--help"])
-                .map_err(|error| format!("{shown}: `slot {subcommand} --help`: {error}"))?;
-            let known = words(&help);
-            for flag in flags.iter().filter(|flag| !known.contains(*flag)) {
-                problems.push(format!(
-                    "{shown}: `slot {subcommand}` has no {flag} option in {tag}"
-                ));
-            }
-        }
-    }
-    println!(
-        "tools `slot` {tag}: {checked} spelled subcommand(s) checked against {subcommands:?}; {wrapped} wrapped build command(s) not run"
-    );
-    Ok(())
 }
 
 fn command_files(root: &Path) -> Vec<PathBuf> {
@@ -1231,39 +1135,6 @@ fn advanced_examples(dir: &Path, ess: &Path, scratch: &Path) -> Result<(), Strin
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    const SLOT_HELP: &str = "Run builds on one shared pool of build slots.\n\nUsage: slot [OPTIONS]\n       slot <COMMAND>\n\nCommands:\n  serve  Run the daemon: the slot pool, the job queue and the web UI\n  proxy  Bridge stdin/stdout to the daemon's socket (remote clients run this over ssh)\n  run    Run a build command; use this when the command's name is also a slot subcommand\n  help   Print this message or the help of the given subcommand(s)\n\nOptions:\n      --local\n          Run the command here, without the daemon\n";
-
-    #[test]
-    fn slot_subcommands_are_read_from_its_help() {
-        assert_eq!(
-            help_commands(SLOT_HELP),
-            BTreeSet::from(["serve".to_owned(), "proxy".to_owned(), "run".to_owned()])
-        );
-        assert!(help_commands("Usage: slot\n\nOptions:\n  -h\n").is_empty());
-    }
-
-    #[test]
-    fn a_wrapped_build_is_counted_and_only_slot_subcommands_are_checked() {
-        let text = "Run `slot cargo test -p foo --workspace`, `slot go test ./...` or\n\
-                    `slot --local cargo build`.\n\n```bash\nslot serve --tokens 16 --go-tokens 4\n\
-                    slot run serve --tokens 2\nslot task check\n```\n";
-        let (own, wrapped) = slot_commands(text, &help_commands(SLOT_HELP));
-        assert_eq!(
-            own,
-            BTreeSet::from([
-                (
-                    "serve".to_owned(),
-                    BTreeSet::from(["--tokens".to_owned(), "--go-tokens".to_owned()])
-                ),
-                ("run".to_owned(), BTreeSet::new()),
-            ])
-        );
-        assert_eq!(
-            wrapped, 3,
-            "cargo, go and task are wrapped builds; `--local` spells no path"
-        );
-    }
 
     #[test]
     fn current_commands_include_global_options_and_continuations() {
