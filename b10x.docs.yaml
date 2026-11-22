@@ -44,9 +44,6 @@ surfaces:
     discoverability: public
   relationships:
   - kind: supports
-    label: Adds schema and projection guidance
-    target: ess/docs
-  - kind: supports
     label: Adds governed planning guidance
     target: aep/docs
   routeBase: /docs/agentplugins/
