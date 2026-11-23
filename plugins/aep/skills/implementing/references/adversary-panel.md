@@ -28,7 +28,9 @@ must be told distinct test-file names in their briefs, so two seats never edit o
 
 Each seat's report is its own `review-result`, created with `new --from` from the report as it
 returned, fenced findings block included, and related to the story with `reviews:`. One record per
-seat, written one at a time: the store takes one writer. Record every finding's outcome with
+seat, written one at a time: the store takes one writer. Every seat's block uses the adversary's
+verdict words, `CONFIRMED`, `NEEDS-CHANGE` or `INFEASIBLE`, and no other (the store refuses `open`
+and the like); the four buckets below are yours to sort by and never go into a block. Record every finding's outcome with
 `--kind review_outcome` as the routing table in [wave.md](wave.md) says.
 
 ## Synthesise, then route

@@ -11,6 +11,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - The `slot` plugin added on the default branch after 0.26.0, never released here: it ships from the slot repository, its own marketplace (`claude plugin marketplace add beyond10x/slot`, then `slot@slot`). Its catalog product, checker entries and docs page go with it
 
+### Fixed
+
+- `aep`: the adversary, security-reviewer and critic texts now name the verdict words a findings block accepts (`CONFIRMED`, `NEEDS-CHANGE`, `INFEASIBLE` for the two reviewers; `approve`, `needs-revision` for the plan critics) and say that any other word, `open` included, is refused, so a first report no longer bounces
+
 ### Changed
 
 - `aep`: every skill and agent description is about 40% shorter (10,369 to 6,193 characters across the 22), with the same triggers and exclusions, so a session pays less for the plugin's listing

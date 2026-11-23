@@ -230,7 +230,7 @@ comparison produces it.
 | `file`, `line` | the `file:line` the finding's *what was measured* row already carries. Where a finding is about a document rather than a line, `file` is the document and there is no `line` |
 | `category` | which row of *Where to focus* it came from, one word — `acceptance`, `boundary`, `mutant`, `contract-drift`, `property`, `concurrency`, `integrity`, `judgement` |
 | `severity` | `blocker` when the unit must not merge with it standing, `warning` when it should be fixed and does not hold the unit, `note` for the residue you would not have raised alone |
-| `verdict` | `CONFIRMED`, `NEEDS-CHANGE` or `INFEASIBLE` — the same word as the table row, unchanged |
+| `verdict` | exactly `CONFIRMED`, `NEEDS-CHANGE` or `INFEASIBLE`, in capitals — the same word as the table row, unchanged. The store refuses any other word (`open`, `fixed`, `high`, a lowercase `confirmed`) with "not a verdict" and the report comes back to you; `approve` and `needs-revision` parse but are the plan critics' words, not yours. Whether the finding is still open is not a verdict: *does it hold?* is the verdict, *whose is it?* is the `origin` |
 | `origin` | `introduced`, `pre-existing` or `undecided` — the same word as the table row. A guessed `pre-existing` routes a live defect out of the wave, and the block makes the guess durable |
 | `message` | one sentence, the finding itself. Not a second wording of the row you already wrote |
 
