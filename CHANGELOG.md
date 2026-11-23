@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Docs site UX gates (`website/ux/`, `task site-ux`, run by `task site-build` and the `Documentation validation` workflow): every page of the built site at 1366x768 and 1280x720 in both themes has no sideways scroll, nothing past its box, the navbar, theme toggle and sidebar in view, and no serious or critical axe-core violation; a lower-is-better ratchet in `website/ux/baseline.json`, round reports in `website/ux/rounds/` and findings in `website/ux/findings/`
+- Docs site search: a local search box in the navbar (`@easyops-cn/docusaurus-search-local` 0.55.3), held on every page at the gating sizes by the UX gates and `website/ux/search.spec.ts`
 
 ### Changed
 
@@ -17,6 +18,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Docs site: the two 2026-09-28 tutorial recordings show the docs sidebar (`displayed_sidebar: docs`), and the search box's shortcut hint passes WCAG AA contrast in the light theme
 - Docs site: the site's own colours in `website/src/css/custom.css` now apply. The build turned Infima's CSS cascade layers into selectors stronger than `custom.css` for the default browser list, so Infima's blue showed everywhere and failed WCAG AA contrast on active navbar, sidebar and breadcrumb links in both themes; `website/package.json` now names browsers with native `@layer` support. Links in running text are underlined, so they are told from the text by more than colour. A Markdown table that scrolls sideways takes keyboard focus, and the landing page actions wrap on a phone
 
 ## [0.26.1] - 2026-11-23

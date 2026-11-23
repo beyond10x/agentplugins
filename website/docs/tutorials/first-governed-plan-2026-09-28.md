@@ -1,6 +1,7 @@
 ---
 title: Governed plan recording (2026-09-28)
 sidebar_label: Historical governed plan recording
+displayed_sidebar: docs
 description: Continue the ESS tutorial's lending library with AEP. Adopt a planning store, plan a feature that adds a new state, have four critics review the plan, and implement the first story in a reviewed wave.
 ---
 

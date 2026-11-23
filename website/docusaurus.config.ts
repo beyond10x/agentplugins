@@ -34,6 +34,19 @@ const config: Config = {
     ],
   ],
   plugins: [docsSystemPlugin],
+  themes: [
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        hashed: true,
+        indexDocs: true,
+        indexBlog: false,
+        indexPages: false,
+        docsRouteBasePath: 'docs',
+        language: ['en'],
+      },
+    ],
+  ],
   themeConfig: {
     image: 'img/social-card.svg',
     metadata: [{name: 'keywords', content: 'agent plugins, AEP, ESS, planning, schema validation'}],

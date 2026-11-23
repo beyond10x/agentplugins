@@ -92,10 +92,7 @@ export interface KnownProblem {
   problem: RegExp;
 }
 
-export const KNOWN_PROBLEMS: KnownProblem[] = [
-  { finding: 'UXF-002', problem: /^always-visible: (top|end): search: missing$/ },
-  { finding: 'UXF-003', route: /-2026-09-28$/, problem: /^always-visible: (top|end): sidebar: missing$/ },
-];
+export const KNOWN_PROBLEMS: KnownProblem[] = [];
 
 export const knownFinding = (route: string, problem: string): string | undefined =>
   KNOWN_PROBLEMS.find((k) => (!k.route || k.route.test(route)) && k.problem.test(problem))?.finding;

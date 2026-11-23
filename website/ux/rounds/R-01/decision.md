@@ -17,4 +17,4 @@ both.
 Why it is a question: this session's permission check refused `npm install` of the new
 dependency, so it was not added in R-01.
 
-Answer: open
+Answer: yes, 2026-11-23 (Timo, relayed by host-operator about 15:05 CET: "A: yes, add it (Recommended)"); built in the R-01 follow-up.

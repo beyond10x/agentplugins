@@ -40,7 +40,8 @@ async function measure(page: Page, route: string, vp: Viewport, theme: Theme, sh
   const top = await layout(page, always);
   const cls = (await layoutShift(page)) - shiftBefore;
   const name = `${slug(route)}@${vpName(vp)}-${theme}`;
-  if (vpName(vp) === RATCHET_VIEWPORT || !vp.gating) await page.screenshot({ path: join(out, 'shots', `${name}.png`) });
+  // Shots are for a round's report; a merge gate does not take them.
+  if (process.env.UX_ALL && (vpName(vp) === RATCHET_VIEWPORT || !vp.gating)) await page.screenshot({ path: join(out, 'shots', `${name}.png`) });
   const axe = runAxe ? await axeSerious(page) : [];
   await scrollToContentEnd(page);
   const bottom = await layout(page, always);
