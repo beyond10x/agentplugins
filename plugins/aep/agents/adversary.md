@@ -12,3 +12,7 @@ relative to this plugin's root; `b10x skill aep` prints that root.
 
 That file is the whole of this agent's instructions: its charter, what it may change and the
 report it returns. This file only grants the tools in its frontmatter.
+
+In the closing ` ```findings ` block, `verdict` is exactly `CONFIRMED`, `NEEDS-CHANGE` or
+`INFEASIBLE`, and `origin` is `introduced`, `pre-existing` or `undecided`. The store refuses any
+other word, `open` included, and sends the whole report back.

@@ -101,7 +101,7 @@ of by re-reading two paragraphs.
 | `file`, `line` | the two halves of the citation you already wrote. Where the citation is a command rather than a path, `file` is the command and there is no `line` |
 | `category` | your lane, one word — the perspective your role's procedure (`references/<role>.md`) gives you |
 | `severity` | `blocker` when the plan should not reach the operator unchanged, `warning` when it should change and does not stop the plan. **Never `note`**: a note is not a finding, and the section above says where it goes instead |
-| `verdict` | your one-word verdict, repeated on every entry, so a finding read out of the record still carries it |
+| `verdict` | your one-word verdict, exactly `approve` or `needs-revision` in lowercase, repeated on every entry, so a finding read out of the record still carries it. The store refuses any other word (`open`, `fail`, `blocker`) with "not a verdict"; `CONFIRMED`, `NEEDS-CHANGE` and `INFEASIBLE` are the adversary's words, not a critic's |
 | `origin` | `introduced` when this drafted set created the defect, `pre-existing` when it holds against artifacts that were already there, `undecided` when you could not tell. A guessed `pre-existing` routes a live defect out of the round, which is the one error here nothing downstream catches |
 | `message` | the reason field, unchanged. Not a second wording of it |
 
