@@ -1,6 +1,7 @@
 ---
 title: First ESS specification — September 2026 recording
 sidebar_label: Historical ESS recording
+displayed_sidebar: docs
 description: With an agent, write an Executable System Specification for a small lending library, validate it, and hold a Go implementation to the conformance suite it generates.
 ---
 

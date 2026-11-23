@@ -9,7 +9,7 @@ tags:
 - ux
 relations:
 - derived_from: story:docs-site-ux-loop
-revision: 2
+revision: 3
 ---
 ## Intent
 
@@ -31,8 +31,11 @@ can fix.
 
 ## Left open
 
-- UXF-002 search: waits for decision R-01 D1 (a local search plugin).
-- UXF-003 no sidebar on the two dated tutorial recordings: front matter in `website/docs` (prose owner).
+- UXF-002 search: decision D1 answered yes (Timo, 2026-11-23); built in the R-01 follow-up with
+  `@easyops-cn/docusaurus-search-local` 0.55.3 and `website/ux/search.spec.ts`. Closed.
+- UXF-003 no sidebar on the two dated tutorial recordings: `displayed_sidebar: docs` in the R-01
+  follow-up. Closed.
+- UXF-008 search shortcut hint contrast, introduced by the UXF-002 fix: fixed in the same follow-up. Closed.
 - UXF-004 layout shift on load: measured only; diagnose in R-02.
 
 ## Acceptance

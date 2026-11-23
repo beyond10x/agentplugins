@@ -25,3 +25,7 @@
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
+
+.navbar kbd {
+  color: var(--ifm-color-emphasis-700);
+}
