@@ -3,7 +3,7 @@ name: planning
 description: Plan work in the governed AEP artifact store; create, relate, move and validate epics, stories, tasks and initiatives with the `aep` CLI. Use for planning, a backlog, epic, story or task, breaking down work, an artifact's status ("move this to active", "why can't this be implemented?"), adopting AEP or replacing the track plugin, a first backlog (§ 5), and before editing any file under `.engineering/planning/`.
 ---
 
-**Skill version 0.26.0** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.26.1** — the version in `.claude-plugin/plugin.json`.
 
 # Planning in a governed artifact store
 
