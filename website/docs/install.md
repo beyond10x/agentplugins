@@ -11,19 +11,19 @@ Tell Claude Code or Codex:
 
 > Set up Beyond10x: follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md
 
-The agent installs the `b10x` binary and runs `/b10x:init`: it asks what you want to do (plan and
+The agent installs the `b10x` binary and runs `/b10x:init`. It asks what you want to do (plan and
 deliver work, write specifications, isolated Git checkouts, integrations) and how to install the
-command-line tools (prebuilt archives by default, or `cargo`), lists every change — including
-earlier installs it replaces — and applies them only after you confirm. It snapshots every file it
-changes; `b10x setup undo` restores them. Each product then starts with its own `/<plugin>:init`,
-and `/b10x:upgrade` or `/<plugin>:upgrade` checks for newer versions. The rest of this page is the
-manual route.
+command-line tools (prebuilt archives by default, or `cargo`). It lists every change, including
+the earlier installs it replaces, and applies them only after you confirm. It snapshots every file
+it changes, and `b10x setup undo` restores them. Each product then starts with its own
+`/<plugin>:init`. `/b10x:upgrade` or `/<plugin>:upgrade` checks for newer versions. The rest of this
+page is the manual route.
 
 ## The marketplace
 
 The marketplace source is the GitHub repository `beyond10x/agentplugins` and the marketplace
 identity is `b10x`. The installable names are `b10x`, `aep`, `ess`, `worktree` and `connectors`,
-in both hosts; every one lives in this repository. The CLIs come from their own repositories'
+in both hosts. Every one lives in this repository. The CLIs come from their own repositories'
 releases, prebuilt or with `cargo install`. The [Connectors guide](plugins/connectors.md) covers its
 platforms, macOS notes and separate provider configuration.
 
@@ -31,7 +31,7 @@ platforms, macOS notes and separate provider configuration.
 
 The `aep`, `ess`, `worktree` and `connectors` plugins drive command-line tools they do not ship.
 `b10x` installs each at its newest release, from a published archive checked against its
-`SHA256SUMS`, or with `cargo`. Connectors publishes archives from v0.48.0; an older Connectors
+`SHA256SUMS`, or with `cargo`. Connectors publishes archives from v0.48.0. An older Connectors
 release is source only and builds with `cargo` on Rust 1.91 or newer:
 
 ```shell-session
@@ -39,16 +39,16 @@ $ b10x init ess --host claude --out plan.json  # use --host codex in Codex
 $ b10x setup apply --plan plan.json --yes
 ```
 
-`b10x init` prints the plan and changes nothing; `b10x setup apply` carries it out after you have
+`b10x init` prints the plan and changes nothing. `b10x setup apply` carries it out after you have
 read it, and snapshots every file it changes first. Archives exist for x86-64 and ARM64 Linux and
-macOS; elsewhere `--method cargo` builds from the release tag. The
+macOS. Elsewhere `--method cargo` builds from the release tag. The
 [tutorial](tutorials/first-ess-specification.md) shows the output of both commands. The `b10x`
 front door itself needs none of these product CLIs.
 
 ### The `aep:implementing` skill's drive mode also needs Metaharness
 
 Drive mode hands one story to `metaharness aep drive run`. Metaharness is optional in the `aep`
-product, so `b10x init aep` does not install it; install it on its own:
+product, so `b10x init aep` does not install it. Install it on its own:
 
 ```shell-session
 $ b10x install metaharness
@@ -75,7 +75,7 @@ archive where the release has one for the machine, otherwise built with `cargo`.
 
 Add `/plugin install ess@b10x`, `/plugin install worktree@b10x` or
 `/plugin install connectors@b10x` as needed. The marketplace follows the default branch, whose
-gate keeps every entry installable; `/reload-plugins` activates new plugins. Claude Code reads
+gate keeps every entry installable. `/reload-plugins` activates new plugins. Claude Code reads
 `.claude-plugin/marketplace.json` and each plugin's `.claude-plugin/plugin.json`. See
 [Claude Code's plugin documentation](https://code.claude.com/docs/en/discover-plugins) for the host
 commands and supported marketplace sources.
@@ -89,12 +89,12 @@ codex plugin add aep@b10x
 ```
 
 Add `ess@b10x`, `worktree@b10x` or `connectors@b10x` the same way. `codex plugin marketplace upgrade`
-refreshes the marketplace. Start a new Codex thread afterwards;
-plugin instructions are injected when a thread starts, not retroactively into a running thread.
+refreshes the marketplace. Start a new Codex thread afterwards, because plugin instructions are
+injected when a thread starts and not into a running thread.
 The same plugins remain available from the Plugins surface. The authoritative description of what
 Codex will find is
 [`.agents/plugins/marketplace.json`](https://github.com/beyond10x/agentplugins/blob/main/.agents/plugins/marketplace.json)
-in this repository; Codex reads it together with the selected plugin's `.codex-plugin/plugin.json`.
+in this repository. Codex reads it together with the selected plugin's `.codex-plugin/plugin.json`.
 The command-line tools above apply unchanged.
 
 ## Upgrading
@@ -110,7 +110,7 @@ previous registration for undo.
 
 After installation, invoke the skill by its displayed name or ask the agent for the capability the
 plugin describes. Start with `b10x:routing` if you want the front door to select a specialist.
-Installation does not grant filesystem, network, credential, or approval authority; the host and
+Installation does not grant filesystem, network, credential, or approval authority. The host and
 repository rules still decide those boundaries.
 
 ## Pin a version
@@ -123,14 +123,14 @@ b10x pin aep 0.68     # the newest 0.68.x
 b10x unpin aep
 ```
 
-The pins go into `b10x.toml` in the current directory (or the nearest one above); commit it.
+The pins go into `b10x.toml` in the current directory, or the nearest one above it. Commit it.
 `b10x init`, `b10x upgrade`, `b10x setup plan` and `b10x install` then use the pinned release,
 `upgrade` names a newer one without installing it, and `b10x check` says when the CLI on `PATH`
 does not match the pin.
 
 To hold a CLI back on one machine, in every directory, write a local pin file instead:
-`~/.config/b10x/pins.toml` (`$XDG_CONFIG_HOME/b10x/pins.toml` when that is set; `$B10X_PINS`
-names another file by its absolute path). It takes the same versions, with an optional reason:
+`~/.config/b10x/pins.toml`, or `$XDG_CONFIG_HOME/b10x/pins.toml` when that is set. `$B10X_PINS`
+names another file by its absolute path. It takes the same versions, with an optional reason:
 
 ```toml
 [pins]
@@ -139,11 +139,11 @@ ess = "0.59"
 ```
 
 A local pin wins over a repository's `b10x.toml` for the same CLI. The session-start check then
-says the CLI is held back by a local pin, with the reason, instead of inviting `/b10x:upgrade`;
+says the CLI is held back by a local pin, with the reason, instead of inviting `/b10x:upgrade`.
 `b10x upgrade` skips it and says which pin holds it. A local pin file that does not parse makes the
 check print one warning line and makes `b10x init`, `b10x upgrade` and `b10x install` refuse until
 it is fixed. Remove a line to follow the newest release again.
 
-Beyond10x product repositories keep ESS on its newest release; they do not hold it back with a
+Beyond10x product repositories keep ESS on its newest release and do not hold it back with a
 `b10x.toml` pin. Update the specification's toolchain requirement and validate its generated outputs
 when moving to a new release.

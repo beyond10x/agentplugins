@@ -8,7 +8,7 @@ description: With an agent, write an Executable System Specification for a small
 
 This is the preserved ESS 0.38.0 and Go transcript, not current instructions. Its one-record and
 related-guard limitations describe that recording only. Use [the current Rust tutorial](./first-ess-specification.md)
-for ESS 0.60.0; it tests consistency tokens and explains current cross-record support.
+for ESS 0.60.0. It tests consistency tokens and explains current cross-record support.
 
 An **Executable System Specification** (ESS) says what a system does: its records, the commands that
 change them, the answers a command may refuse with, the events it publishes and the views it serves.
@@ -29,8 +29,8 @@ implementation is held to the suite. It takes about 30 minutes.
 Every output block on this page is what the command printed when this page was recorded, on
 2026-09-28, with `ess` 0.38.0, the `ess` plugin from this marketplace and Go 1.27. Paths are
 shortened to `~` for the home directory. The files are in the
-[repository](https://github.com/beyond10x/agentplugins/tree/main/website/docs/tutorials/first-ess-specification);
-copy them if you want to follow without an agent.
+[repository](https://github.com/beyond10x/agentplugins/tree/main/website/docs/tutorials/first-ess-specification).
+Copy them if you want to follow without an agent.
 
 ## What you need
 
@@ -46,7 +46,7 @@ Give your agent one sentence:
 Set up Beyond10x: follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md
 ```
 
-It installs the `b10x` setup tool and asks what you want to do; answer *write specifications*. It
+It installs the `b10x` setup tool and asks what you want to do. Answer *write specifications*. It
 lists every change before it makes one. If you prefer to run it
 yourself, with `b10x` already on your `PATH`:
 
@@ -83,8 +83,8 @@ Next:
 Apply after the user confirms this list: b10x setup apply --plan plan.json --yes
 ```
 
-`b10x` shows the plan first and changes nothing. (This recording registered a local copy of the
-marketplace; the lines above show the name yours registers, `beyond10x/agentplugins`.) Apply it
+`b10x` shows the plan first and changes nothing. This recording registered a local copy of the
+marketplace. The lines above show the name yours registers, `beyond10x/agentplugins`. Apply it
 after you have read the list:
 
 ```shell-session
@@ -199,7 +199,7 @@ record. No ISBN. Go ahead: write the specification in spec/, validate it, and te
 ```
 
 Q2 matters most. With a separate loan record, a borrow changes two records, and an ESS command
-changes one; see [When a rule spans two records](#when-a-rule-spans-two-records) at the end.
+changes one. See [When a rule spans two records](#when-a-rule-spans-two-records) at the end.
 
 The agent then wrote the specification, validated it and reported one decision back: the
 specification cannot check that the member in `BorrowBook` is registered, because a command can only
@@ -208,8 +208,8 @@ agent recorded that as a comment on `BorrowBook`.
 
 ## 3. Read what it wrote
 
-Four files; `validate` counts the three that make up the specification, and `ess-inputs.yaml` lists
-them. `system.yaml` names the system and its one domain:
+There are four files. `validate` counts the three that make up the specification, and
+`ess-inputs.yaml` lists them. `system.yaml` names the system and its one domain:
 
 ```yaml title="spec/system.yaml"
 format: ess/15
@@ -248,7 +248,7 @@ components:
 ```
 
 `ess-inputs.yaml` lists the files that make up the specification, so nothing generated is ever read
-back in as input. Its `requires:` line pins the `ess` release; [step 8](#8-keep-it-true) explains it:
+back in as input. Its `requires:` line pins the `ess` release. [Step 8](#8-keep-it-true) explains it:
 
 ```yaml title="spec/ess-inputs.yaml"
 format: ess-inputs/2
@@ -265,7 +265,7 @@ scenarios: []
 - **`entities`**: `Book` and `Member`. A book's `lifecycle` lists its states (`OnShelf`, `OnLoan`,
   `Withdrawn`) and the three `transitions` between them. `borrower_id` is a `references` relation
   to `Member`: the book points at a member and does not own one.
-- **`commands`**: each one has `outcomes`. `borrowed` moves the book through `lend`; `wrong-state`
+- **`commands`**: each one has `outcomes`. `borrowed` moves the book through `lend`. `wrong-state`
   refuses with `BookStateConflict` when the book is not on the shelf. That refusal is the rule *a
   book on loan can't be lent again*, written once.
 - **`events`** and **`views`**: what the service publishes, and what a caller can read back.
@@ -621,9 +621,8 @@ spec was refused:
   --> domains/lending.yaml:22:5
 ```
 
-It names the file, the line where the declaration starts, what is wrong, and what the book does
-declare. It also reports the
-consequence: nothing takes the `lend` transition any more. Change it back, and `validate` prints
+It prints the file, the line where the declaration starts, what is wrong, and what the book does
+declare. It also reports the consequence: nothing takes the `lend` transition any more. Change it back, and `validate` prints
 `valid` again.
 
 ## 5. Generate from it
@@ -690,8 +689,8 @@ $ ess verify conform synthesize --path spec --target go --out impl
 17 scenario(s) (0 authored), 0 refusal(s), 7 file(s) written to impl
 ```
 
-`0 refusal(s)` means every rule in the specification became a check. A refusal would name a rule the
-suite cannot test; read those before trusting a green run.
+`0 refusal(s)` means every rule in the specification became a check. A refusal would list a rule the
+suite cannot test. Read those before trusting a green run.
 
 The package, `impl/essconform`, holds the scenarios and a runner. You supply a `Target`: the methods
 that let the runner send a command to your implementation and read a view back. Ask the agent:
@@ -1130,18 +1129,18 @@ FAIL	example.com/library	0.046s
 FAIL
 ```
 
-The failing scenario names the rule, the step, and what the implementation did instead
+The failing scenario reports the rule, the step, and what the implementation did instead
 (`took borrowed`, where the specification says `wrong-state`). Undo the change and the suite passes
 again.
 
-To test the suite itself, rather than one bug you thought of, the `ess:hardening` skill runs
-`ess verify conform mutate`: it changes the specification one rule at a time and checks that the
+To test the suite itself and not one bug you thought of, the `ess:hardening` skill runs
+`ess verify conform mutate`. It changes the specification one rule at a time and checks that the
 suite notices each change.
 
 ## 8. Keep it true
 
 Pin the `ess` release the specification was written against. The `ess-inputs.yaml` in step 3
-already carries the pin; on your own project, add `requires:`, which needs `format: ess-inputs/2`:
+already carries the pin. On your own project, add `requires:`, which needs `format: ess-inputs/2`:
 
 ```yaml title="spec/ess-inputs.yaml"
 format: ess-inputs/2
@@ -1184,12 +1183,14 @@ Regenerating the suite in the build means a changed specification is always test
 
 The first recording of this page asked for one more rule: *a member can hold at most three books at
 a time*, with a separate loan record. The agent's model was valid, but each borrow became three
-commands (one per record it changes: the member's count, the book, the loan), and synthesis refused
+commands, one per record it changes: the member's count, the book and the loan.
+
+Synthesis refused
 3 scenarios with `ESS-SYNTH-003`, because it cannot arrange a member who already holds three books.
 The agent said so in its report instead of bending the model to make the number zero.
 
 That is how ESS treats a rule across two records today: one command changes one record, and a check
-it cannot build is named, not skipped in silence. When your domain has such a rule, expect the agent
+it cannot build is reported, not skipped. When your domain has such a rule, expect the agent
 to show you the split and the refusals, and decide with it whether the rule belongs in the
 specification or in the implementation.
 

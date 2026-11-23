@@ -19,9 +19,9 @@ or audits old linked worktrees.
 /plugin install worktree@b10x
 ```
 
-Codex: `codex plugin add worktree@b10x`. Then `/worktree:init` installs the CLI — the prebuilt,
-checksummed archive from the [worktree release](https://github.com/beyond10x/worktree/releases), or with `cargo` on request —
-and runs:
+Codex: `codex plugin add worktree@b10x`. Then `/worktree:init` installs the CLI, from the prebuilt,
+checksummed archive of the [worktree release](https://github.com/beyond10x/worktree/releases) or
+with `cargo` on request, and runs:
 
 ```bash
 worktree activate --profile <profile.toml> --workspace <workspace-root>
@@ -29,7 +29,9 @@ worktree doctor --check
 ```
 
 The skill teaches agents to create trees outside the primary repository collection, maintain live
-session leases, and publish wanted commits before finishing. Cleanup is review-bound: inspect
+session leases, and publish wanted commits before finishing.
+
+Cleanup is review-bound: inspect
 `worktree gc --repo <primary> --dry-run`, then pass only ids from that review to
 `worktree gc --repo <primary> --apply --id <reviewed-id>`. Locked, live, offline, unmanaged, and
 out-of-policy trees are retained, and so are dirty and local-only trees unless `worktree archive`
@@ -39,15 +41,17 @@ an advertised ref carries every unique commit's exact patch.
 Agents end their work with `worktree finish --discard-cache --archive <tree>` (worktree 0.9.0 or
 later). Since worktree 0.18.0 it deletes every ignored entry, file or directory, unless the
 repository's `.worktreekeep` keeps it, archives everything else the tree holds that no remote ref
-recovers, and finishes. `.worktreekeep` sits at the tree root and holds Git exclude patterns; a path
-is kept when a pattern matches it or one of its ancestors, and an invalid keep file (a symbolic
-link, a directory, an unreadable file) refuses as `keep-file-invalid` and deletes nothing. Nested
-repositories, mount points and unreadable entries are always kept. Since worktree 0.19.0 a
-`.worktreekeep` in a subdirectory adds keeps for paths at and below it, matched relative to it.
-Records written into `target/`
-or any other ignored directory are deleted unless `.worktreekeep` names them; worktree 0.17.1 and
-older kept every ignored entry it did not recognise as cache. Each deleted entry is named by its
-rule: Cargo profiles in a tagged target and its `tmp/` test scratch, `node_modules` below a tracked
+recovers, and finishes.
+
+`.worktreekeep` sits at the tree root and holds Git exclude patterns. A path is kept when a pattern
+matches it or one of its ancestors. An invalid keep file, such as a symbolic link, a directory or an
+unreadable file, refuses as `keep-file-invalid` and deletes nothing. Nested repositories, mount
+points and unreadable entries are always kept. Since worktree 0.19.0 a `.worktreekeep` in a
+subdirectory adds keeps for paths at and below it, matched relative to it.
+
+Records written into `target/` or any other ignored directory are deleted unless `.worktreekeep`
+names them. Worktree 0.17.1 and older kept every ignored entry it did not recognise as cache. Each
+deleted entry is labelled with its rule: Cargo profiles in a tagged target and its `tmp/` test scratch, `node_modules` below a tracked
 lockfile, a virtual environment beside a tracked Python manifest, a Flutter app's `build/` and
 `.dart_tool/` (since 0.17.0), tagged tool caches, and `ignored-output` for everything else.
 `worktree discard-cache --dry-run` shows the classification without deleting anything.
@@ -59,12 +63,13 @@ repository are still refused as `archive-unsupported-entry`. Plain `worktree fin
 dirty tree unless its archive holds exactly the current state.
 
 `worktree sweep --all-profiles` (worktree 0.10.0 or later) does the same for trees nobody
-finished. Run daily from a timer, it discards the ignored entries `.worktreekeep` does not keep of every tree idle for a
-day or more without a live lease, and archives what an expired or finished tree still holds. It
+finished. Run daily from a timer, it discards the ignored entries `.worktreekeep` does not keep of
+every tree idle for a day or more without a live lease, and archives what an expired or finished
+tree still holds. It
 never changes lifecycle, removes a tree or applies GC: a swept tree shows as eligible in
 `worktree gc --dry-run`, and removal stays an exact-id apply. `--dry-run` shows what it would do.
 
-Since worktree 0.13.0, `worktree gc` without `--id` assesses only the current repository's trees;
+Since worktree 0.13.0, `worktree gc` without `--id` assesses only the current repository's trees.
 `--scope profile` assesses every repository in the profile. `finish`, `discard-cache`, `archive`,
 `gc --id` and `reconcile --id` all accept a tree's id, its path or its unique directory name, and
 `finish` prints `finished <id> <path>`, either of which `gc --id` takes.
@@ -74,27 +79,27 @@ with its bytes and verdict (`--scope profile` for every archive). Only a `Remova
 deleted, with `worktree prune-archives --repo <primary> --apply --id <reviewed-directory>`: its
 tree is gone, it holds no `dirty.patch` and no nested image, and HEAD and every unique commit it
 records are ancestors of a ref a remote freshly advertises. Every other verdict is kept and no flag
-forces a removal; deleting such an archive by hand loses the only copy of its work.
+forces a removal. Deleting such an archive by hand loses the only copy of its work.
 
-Since worktree 0.15.0, `worktree archive` (and `finish --archive`, and `sweep`) leaves cargo's
-build layout below a recognised target out of `dirty.patch` and records it as `build_output` in a
-`worktree.archive/3` manifest; other files under `target/` stay archived. An older archive kept as
+Since worktree 0.15.0, `worktree archive`, `finish --archive` and `sweep` leave cargo's
+build layout below a recognised target out of `dirty.patch` and record it as `build_output` in a
+`worktree.archive/3` manifest. Other files under `target/` stay archived. An older archive kept as
 `UncommittedState` only because its patch holds build output shrinks with
 `worktree prune-archives --strip-build-output --repo <primary> --dry-run`, then `--apply --id
-<reviewed-directory>`; it rewrites the patch, verifies it over HEAD and never deletes an archive.
-Since worktree 0.17.0 a Flutter app's `build/` and `.dart_tool/` beside a `pubspec.yaml` count as
-build layout too. Since worktree 0.18.0 `archive` keeps every path `.worktreekeep` keeps in
-`dirty.patch`, and the strip also removes ignored output (an untracked file both HEAD's and the
-archived tree's `.gitignore` files ignore), never what `.worktreekeep` keeps.
+<reviewed-directory>`. The strip rewrites the patch, verifies it over HEAD and never deletes an
+archive. Since worktree 0.17.0 a Flutter app's `build/` and `.dart_tool/` beside a `pubspec.yaml`
+count as build layout too. Since worktree 0.18.0 `archive` keeps every path `.worktreekeep` keeps in
+`dirty.patch`, and the strip also removes ignored output: an untracked file that both HEAD's and the
+archived tree's `.gitignore` files ignore. The strip never removes what `.worktreekeep` keeps.
 
 `/worktree:cleanup [--repo <primary>] [--id <id>…]` starts that review by name. It is a command:
 you start it, or an agent starts it when you ask, and it hands off to `worktree:managing-worktrees`
-for every step — `inspect`, `archive` for work that must not be published, `finish`,
+for every step: `inspect`, `archive` for work that must not be published, `finish`,
 `gc --dry-run --id`, then `gc --apply --id` for the eligible ids. Your request authorizes that
-apply; without one it stops after the dry-run. It never forces a removal.
+apply. Without one it stops after the dry-run. It never forces a removal.
 
 `worktree inspect --repo <primary>` reports actual Git state, storage, ignored files, leases and
-retention blockers. It defaults to one repository; use `--workspace` to inspect the wider profile.
+retention blockers. It defaults to one repository. Use `--workspace` to inspect the wider profile.
 Add `--refresh` for current remote recovery evidence. Inspection does not infer story completion
 or authorize removal.
 
@@ -106,5 +111,5 @@ repository was deleted (`repository-missing`), is retired only with
 `--acknowledge-unrecoverable <recorded-commit>`, which the command refuses while any ref still
 contains that commit.
 
-The plugin contains no cleanup script and no independent policy copy; `agentplugins-check tools`
+The plugin contains no cleanup script and no independent policy copy. `agentplugins-check tools`
 checks every command it spells against the newest `worktree` release.

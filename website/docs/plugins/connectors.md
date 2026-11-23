@@ -25,15 +25,17 @@ b10x setup apply --plan ~/.local/state/b10x/plan.json --yes
 Since v0.48.0 each release carries checksummed prebuilt archives for x86-64 and ARM64 Linux
 and macOS, which setup installs by default. An older, source-only release, `--method cargo` or
 another target builds the `connectors` Cargo package from its exact release tag with locked
-dependencies and needs Rust 1.91 or newer. There is no Windows release binary; since v0.49.0 the
-CLI builds and runs on Windows from that source build. Credentials live in the Secret Service on
-Linux, the login keychain on macOS and the Credential Manager on Windows. The macOS binary is
-not signed yet: one downloaded through a browser needs `xattr -d com.apple.quarantine connectors`,
-and an upgraded binary cannot read keychain credentials an earlier build stored, so they are
-entered again.
-Adapter executables, configuration and credentials are separate prerequisites. [Setup](../install.md) preserves other installed plugins and snapshots changes.
+dependencies and needs Rust 1.91 or newer. There is no Windows release binary. Since v0.49.0 the
+CLI builds and runs on Windows from that source build.
 
-A new session loads the installed skills. In Claude Code invoke `/connectors:integrating`; in
+Credentials live in the Secret Service on Linux, the login keychain on macOS and the Credential
+Manager on Windows. The macOS binary is not signed yet: one downloaded through a browser needs
+`xattr -d com.apple.quarantine connectors`, and an upgraded binary cannot read keychain credentials
+an earlier build stored, so they are entered again. Adapter executables, configuration and
+credentials are separate prerequisites. [Setup](../install.md) preserves other installed plugins
+and snapshots changes.
+
+A new session loads the installed skills. In Claude Code invoke `/connectors:integrating`. In
 Codex select `integrating` or invoke `$connectors:integrating`. Both hosts load the same skill
 files. `b10x skill connectors:integrating` prints the current instructions without a reload.
 
@@ -59,11 +61,13 @@ cursor loop.
 For onboarding, the operator enters the credential document through protected terminal, file or
 stdin acquisition. The skill reads safe status, not secret values. External writes need the
 user's authorization and the adapter's admission, exact approval subject and protected proof.
+
 Since v0.60.0 the CLI has no command for a standalone service: a service is called over HTTP,
 or a local instance is given its endpoint with `connections connect --endpoint`. Since v0.57.0
 `connectors server --transport stdio` is a local MCP server on Linux that offers admitted
-read-only operations as tools; it serves no writes, resources or prompts. Since v0.58.0 an OAuth2 profile signs in by
-browser or device code, and `connections token` hands its access token to the operator.
+read-only operations as tools. It serves no writes, resources or prompts. Since v0.58.0 an OAuth2
+profile signs in by browser or device code, and `connections token` hands its access token to the
+operator.
 
 ## Upgrade
 
@@ -74,10 +78,10 @@ within the user's authorization. An unresolved release check is reported as unch
 Moving from 0.7.x changes CLI and configuration contracts. Preserve the old state, inspect the
 consumer operations, then establish current connections through protected acquisition. No v1
 configuration or credential migration occurs automatically. After any upgrade, inspect help,
-check prerequisites and validate the operations the application actually needs.
+check prerequisites and validate the operations the application needs.
 
 Since v0.32.0, `--output json` carries an invocation's provider result and each operation's input
-and output schemas as JSON values rather than JSON text; a caller that decoded them twice reads
+and output schemas as JSON values and no longer as JSON text. A caller that decoded them twice reads
 them directly. The upgrade also moves the configuration revision of instances using the shipped
 GitLab selection set: print the bootstrap again, revalidate their connections and issue their
 approval policies again, as the skill's setup reference describes.
@@ -92,7 +96,7 @@ never `retry_status`. Since v0.36.0, a local read whose deadline passes after it
 `timeout` at `stage = dispatch`, and an invoke whose answer never arrives reports
 `outcome_unknown`.
 
-Since v0.39.0, a catalog selection may name `credential` parameters, which are never sent; a
+Since v0.39.0, a catalog selection may name `credential` parameters, which are never sent. A
 release before v0.39.0 refuses such a selection file, so upgrade every binary that loads the
 adapter first.
 
@@ -100,12 +104,14 @@ From v0.41.0 to v0.43.0, the shipped catalog selection sets use members that ear
 refuse, and the GitLab, Jira and SQL descriptors gain operations. Upgrade every binary that builds
 or loads the adapter first. An existing adapter entry keeps the operations it permits. An instance
 that takes a shipped selection set or GitLab bundle from the new release has a new configuration
-revision; recover as the setup reference describes.
+revision. Recover as the setup reference describes.
 
 In v0.44.0 the GitLab selection set grows from 42 to 51 operations, and in v0.45.0 the Slack bot
-set from 7 to 10 and the Jira set from 8 to 9; each has a new configuration revision, so copy it
+set from 7 to 10 and the Jira set from 8 to 9. Each has a new configuration revision, so copy it
 again from the adapter's bootstrap output and add new operations to the adapter's `operations` only
-when they are authorized. Since v0.44.0 a source amendment may correct a request media type
+when they are authorized.
+
+Since v0.44.0 a source amendment may correct a request media type
 (`correct_media_type`). Since v0.45.0 a catalog connection may admit further origins in `hosts`
 for binary reads such as Slack file downloads, which changes its revision, and a Kubernetes
 configuration may enable `pod_logs`, `kubeconfig` and `pod_exec`. Pod exec is a write on the
@@ -116,15 +122,16 @@ Slack bot set gains two writes under approval, `conversations.open` and `chat.po
 catalog guard can expect a JSON boolean (`{"boolean": true}`). The same release refuses a guard
 written `{"literal": "true"}` or `{"literal": "false"}` when the selection loads: a configuration
 that carries its own selection file rewrites each as `{"boolean": …}` when it upgrades the binaries
-that load it. Since
-v0.48.0 the CLI and its local host run on macOS, with weaker platform guarantees than on Linux,
-and releases carry prebuilt archives.
+that load it.
+
+Since v0.48.0 the CLI and its local host run on macOS, with weaker platform guarantees than on
+Linux, and releases carry prebuilt archives.
 
 v0.60.0 removes `operations invoke` and the top-level service commands (`describe --endpoint`,
-`invoke --endpoint`, `serve`); each is now a parse refusal, so a script that called them is
+`invoke --endpoint`, `serve`). Each is now a parse refusal, so a script that called them is
 rewritten to `connectors invoke <connector>[/<instance>] <operation>` or to HTTP. Instance
 listings no longer carry `adapter`. From v0.63.0 an MCP client reads a tool's operation output
 schema from `_meta`, and selections that declare a page walk move their configuration revision.
-v0.65.0 makes `setup init` write `connectors-local/5`; `setup migrate --mode apply` moves a
+v0.65.0 makes `setup init` write `connectors-local/5`. `setup migrate --mode apply` moves a
 `connectors-local/2` file with no legacy entries to it. Its archives also carry the Grafana,
 Prometheus, Loki and Kubernetes provider programs.

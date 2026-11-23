@@ -37,8 +37,9 @@ b10x setup apply --plan plan.json --yes
 
 Review the plan before applying it, then restart the host so it loads the installed plugins.
 Confirm that the Worktree plugin and `worktree` CLI are available before starting a wave. If
-either is missing, finish setup first; the host's built-in worktree isolation does not provide
-the managed leases and recovery records required by this workflow.
+either is missing, finish setup first, because the host's built-in worktree isolation does not
+provide the managed leases and recovery records this workflow requires.
+
 Confirm the starting point:
 
 ```bash
@@ -83,13 +84,13 @@ change, with its ESS specification first. Ask me for the decisions you need befo
 
 For this walkthrough, use these decisions:
 
-- One reservation per book; a second reservation is refused.
+- One reservation per book. A second reservation is refused.
 - Reservations apply only to on-loan books and cannot name the current borrower.
 - Returning a reserved book puts it on hold. Only its reserving member may collect it.
-- A librarian may cancel an on-loan reservation or release a hold; no timed expiry.
+- A librarian may cancel an on-loan reservation or release a hold. There is no timed expiry.
 - A held book cannot be withdrawn until the hold is released.
 - The librarian acts on a member's behalf. Keep registered-member enforcement as explicit
-  separate work; do not claim the existing suite verifies it.
+  separate work, and do not claim the existing suite verifies it.
 - Expose the reservation in the catalogue and add a view of books on hold.
 
 Then ask:
@@ -103,13 +104,15 @@ Record unsupported semantics and unresolved questions in the store instead of gu
 The agent may use separate commands for collecting a hold and borrowing a shelf book. The exact
 command and guard structure must be supported by the released ESS validator and synthesis path.
 In ESS 0.56, an existence-only input-related guard cannot accompany `wrong_state`, and
-identity-addressed related guards cannot accompany `unknown_instance`. Some present-row predicate refusals can accompany
-`wrong_state` in `ess/22`; see the ESS tutorial's qualified examples. Keep the intended rule
-visible; do not remove lifecycle assertions or invent predicates to obtain a green synthesis.
+identity-addressed related guards cannot accompany `unknown_instance`. Some present-row predicate
+refusals can accompany `wrong_state` in `ess/22`. See the ESS tutorial's qualified examples. Keep
+the intended rule visible, and do not remove lifecycle assertions or invent predicates to obtain a
+green synthesis.
+
 The reservation's member must differ from the borrower. Give `ReserveBook.member_id` a distinct
-valid `example:` value when synthesizing this model; otherwise the generated second-reservation
-probe can select the borrower and fail to reach the intended refusal. This supplies a witness
-for the actual rule rather than removing the borrower guard.
+valid `example:` value when synthesizing this model. Otherwise the generated second-reservation
+probe can select the borrower and fail to reach the intended refusal. The value supplies a witness
+for the actual rule and does not remove the borrower guard.
 
 ## 4. Review the plan and its evidence
 
@@ -123,18 +126,20 @@ aep plan artifact validate
 
 Ask the agent to show which story owns each new scenario and which existing scenarios must stay
 green. The four critics cover acceptance, design, scope and parallel safety. Their findings and
-resolutions belong in review records; an approval word alone does not describe what was checked.
+resolutions belong in review records, because an approval word alone does not describe what was
+checked.
 The unimplemented feature should produce a visible coverage gap or failure in the baseline target.
 Preserve that evidence before changing the implementation.
 
-Plan the partial-wave gate before implementation. Name the scenarios owed by the selected story
-and the baseline scenarios it must preserve; require all of them to pass. If later stories own
+Plan the partial-wave gate before implementation. Name the scenarios required by the selected story
+and the baseline scenarios it must preserve, and require all of them to pass. If later stories own
 unimplemented scenarios, retain an explicit reviewed list of those IDs and report their actual
 statuses separately. Unexpected failures or unsupported results must fail the gate. Review every
-change to that list, and remove it when the feature is complete. A passing partial-wave gate is
-not complete conformance; retain the full suite's actual report. Adding a view can initially make
-existing scenarios unsupported because the runner observes the declared views; repair the adapter
-instead of dropping those baseline obligations.
+change to that list, and remove it when the feature is complete.
+
+A passing partial-wave gate is not complete conformance. Retain the full suite's actual report.
+Adding a view can initially make existing scenarios unsupported because the runner observes the
+declared views. Repair the adapter instead of dropping those baseline obligations.
 
 ## 5. Accept the stories and propose a wave
 
@@ -174,16 +179,17 @@ aep plan artifact board --kind story
 
 A completed wave records executed scenario counts, remaining skips or refusals, the adversary's
 findings and fixes, and the merge gate. Worktree cleanup needs published recovery proof or an
-archive; local merge alone does not make a managed checkout disposable.
-Have each owner end their own lease, then run `worktree finish --discard-cache --archive <tree>`:
-it deletes every ignored entry the tree root's `.worktreekeep` does not keep, archives anything
-else no remote ref holds (all of it, in a local tutorial without a remote), and finishes. Inspect
-`worktree gc --dry-run`; apply cleanup
-only to the exact reviewed ID. Follow the Worktree skill if a lease or recovery check refuses.
+archive. A local merge alone does not make a managed checkout disposable.
+
+Have each owner end their own lease, then run `worktree finish --discard-cache --archive <tree>`.
+It deletes every ignored entry the tree root's `.worktreekeep` does not keep, archives anything
+else no remote ref holds, and finishes. In a local tutorial without a remote, that is all of it.
+Inspect `worktree gc --dry-run`, and apply cleanup only to the exact reviewed ID. Follow the
+Worktree skill if a lease or recovery check refuses.
 
 ## Keep going
 
 Ask for the next wave of the plan when ready. Keep unanswered questions and remaining feature
-scenarios in the store; findings the adversary filed wait there as backlog drafts until every
+scenarios in the store. Findings the adversary filed wait there as backlog drafts until every
 planned wave is delivered. See the [golden path](../golden-path.md) for a longer recorded example and
 [the AEP plugin](../plugins/aep.md) for governed engine delivery.

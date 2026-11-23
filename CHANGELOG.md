@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Docs: the prose of the README and ten website pages (install, golden path, the aep, b10x, connectors and worktree pages, both tutorials and their 2026-09-28 recordings) is tighter: semicolon chains split, em-dash asides and house-dialect phrases such as `names the` replaced by the plain verb, long paragraphs split. No command, number, link, code block or status label changed
+
 ## [0.26.1] - 2026-11-23
 
 ### Removed
