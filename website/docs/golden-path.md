@@ -6,22 +6,23 @@ description: One worked run, from a feature idea to a critiqued plan, on a repos
 
 # From a feature idea to a critiqued plan
 
-You type the prompts on this page; the agent runs the commands. It is one run end to end, on a
+You type the prompts on this page and the agent runs the commands. It is one run end to end, on a
 repository that already exists and has never been planned. If nobody is going to be there to type
-them — a batch run, an eval case, anything with no operator turn — read [Running it without an
-operator](#running-it-without-an-operator) at the foot of the page first: it is one extra sentence in
-front of step 1, and without it the run ends at the first stop.
+them, as in a batch run, an eval case or anything with no operator turn, read [Running it without an
+operator](#running-it-without-an-operator) at the foot of the page first.
+
+It is one extra sentence in front of step 1, and without it the run ends at the first stop.
 
 Every console block below is the output of actually running the command shown above it. None of it
 is written by hand; the only edit is that the recording machine's absolute paths are shortened to
 `…`. What the agents *say* is described in prose instead of quoted, because yours will not say it
-the same way. The recorded outputs below use AEP `0.44.0` and ESS `0.5.1`; they remain dated
+the same way. The recorded outputs below use AEP `0.44.0` and ESS `0.5.1`. They remain dated
 evidence of that run. Use [Install](./install.md) for current release requirements. Model-backed
 driving now uses `metaharness aep drive`, as described in step 8.
 
-The worked feature is deliberately small: a **commercial client** record that belongs to exactly one
-**account**, with create, read, update and delete. The interesting part is the one thing about it
-nobody has decided, and what the plan does with that instead of guessing.
+The worked feature is small: a **commercial client** record that belongs to exactly one
+**account**, with create, read, update and delete. One thing about it is undecided, and the plan
+records that instead of guessing.
 
 ## Prerequisites
 
@@ -46,7 +47,7 @@ ess 0.5.1
 ```
 
 That build produced every output on this page. It printed `protocol` in `--version` and in its
-`--help` usage lines; current releases print `aep`, the command you install and type.
+`--help` usage lines. Current releases print `aep`, the command you install and type.
 
 ## 1. Adopt the repository
 
@@ -60,8 +61,8 @@ git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45 an
 development.standard, then run `aep plan reverse scan`. Report what the scan found, and file nothing yet.
 ```
 
-Two commands and a report is the whole of this step. A scan is evidence, not a plan, and an agent
-that starts drafting artifacts out of one has skipped the part where you get to disagree with it.
+This step is two commands and a report. A scan is evidence, not a plan. An agent that drafts
+artifacts from one has skipped the part where you get to disagree with it.
 
 ```shell-session
 $ aep plan reverse init --protocols 'git+https://github.com/beyond10x/aep#8b4342a41fdd914341d9a479627ed76240f88d45' --profile development.standard
@@ -70,9 +71,8 @@ $ aep plan reverse init --protocols 'git+https://github.com/beyond10x/aep#8b4342
   profile development.standard
 ```
 
-`reverse init` refuses the two things that break quietly later — an absolute path, and a `git+`
-source pinned to a branch rather than a commit — which is why the source above carries a full commit
-hash. A current `aep` writes the project as `aep.project/5` (`store: {git: {}}`) and prints one more
+`reverse init` refuses an absolute path and a `git+` source pinned to a branch rather than a
+commit. That is why the source above carries a full commit hash. A current `aep` writes the project as `aep.project/5` (`store: {git: {}}`) and prints one more
 line saying so: the artifact files under `.engineering/planning/` are the store, and a move appends
 one line to the artifact's `transitions`.
 
@@ -95,10 +95,9 @@ api surfaces: 0
 root documents: 0
 ```
 
-`scan` reads and interprets nothing. It writes nothing, has no clock and no network, so two runs
-over one tree print the same bytes — which is what makes it evidence you can cite. Read what came
-back as exactly that: three README headings, one unfinished-work marker at `src/accounts.py:30`, no
-CI jobs, no disabled tests. That marker matters in a minute.
+`scan` reads and interprets nothing. It writes nothing and has no clock and no network, so two runs
+over one tree print the same bytes. That makes it evidence you can cite. It found three README
+headings, one unfinished-work marker at `src/accounts.py:30`, no CI jobs and no disabled tests.
 
 ## 2. File the feature as an epic
 
@@ -116,16 +115,16 @@ $ aep plan artifact new epic commercial-clients --title "Commercial clients on a
 created epic:commercial-clients (draft) at …/.engineering/planning/epic/commercial-clients.md
 ```
 
-The agent writes the body to a file and hands it to `--from`, because the CLI is the store's only
-writer: it owns the frontmatter, and it placed the epic at its kind's initial status without anybody
-typing one. Which statuses your store has is a question for the CLI, not for a page — `aep plan artifact
-kinds` and `aep plan artifact lifecycle epic` answer it, and they answer for *your* store.
+The agent writes the body to a file and passes it with `--from`, because the CLI is the store's only
+writer. It owns the frontmatter and placed the epic at its kind's initial status without anybody
+typing one. `aep plan artifact kinds` and `aep plan artifact lifecycle epic` list the statuses
+*your* store has.
 
 ## 3. Model the new noun before decomposing it
 
 *Commercial client* is a noun this repository has never typed. The planning skill's domain-first
-guardrail stops here rather than letting three stories be written around a shape nobody agreed on:
-a noun with no typed home is the relation nobody can check later.
+guardrail stops here, before three stories are written around a shape nobody agreed on. A noun with
+no typed home is a relation nobody can check later.
 
 ```text
 epic:commercial-clients introduces a noun with no typed home. Draft the smallest ess/1 domain that
@@ -133,8 +132,8 @@ declares it and its relation to the account, validate it, and mark anything you 
 this repository as UNMAPPED rather than guessing it.
 ```
 
-The relation is the point of the step. *Belongs to exactly one account* is a sentence in the epic;
-in the domain it is an entry a compiler checks:
+*Belongs to exactly one account* is a sentence in the epic. In the domain it is an entry a compiler
+checks:
 
 ```yaml
 # system.yaml
@@ -190,22 +189,21 @@ entities:
 
 `via: account_id` sits on the **target** because the relation is `owns`: the child carries the field
 typed by the owner's identity. `ess specify validate` refuses a target that is not declared, a `via` that is
-missing or of the wrong type, and a second entity claiming to own the same one — which is what makes
-this worth writing down rather than asserting in a story body.
+missing or of the wrong type, and a second entity claiming to own the same one. That is why the
+relation is written in the domain and not asserted in a story body.
 
 ```shell-session
 $ ess specify validate --path <specification>
 accounts v1 — 2 file(s), valid
 ```
 
-ESS `0.5.1` validated both files and the ownership relation end to end. That validation is what lets
-the next step cite the domain as evidence rather than treating the YAML as illustrative prose.
+ESS `0.5.1` validated both files and the ownership relation end to end, so the next step cites the
+domain as evidence.
 
-The `UNMAPPED:` marker is doing the same job here that the blocker does two steps down, one level
-lower: it is the question written where the answer would go, so the next reader finds it instead of
-finding a guess. Note what the relation entry *did* settle — with `owns` in the document, *leave the
-clients with no account* is no longer one of the answers, and the open question is down from three
-options to two.
+The `UNMAPPED:` marker does at the domain level what the blocker does two steps down: it writes the
+question where the answer would go, so the next reader finds it and not a guess. The relation entry
+did settle one thing. With `owns` in the document, *leave the clients with no account* is no longer
+an answer, and the open question is down from three options to two.
 
 ## 4. Decompose it
 
@@ -226,8 +224,8 @@ The decomposer enumerates the relations before it drafts anything. For this epic
 
 The first two citations point at a document `ess specify validate` accepted, not at a sentence in a story and
 not at a foreign key in `src/`. A `path:line` into code is admissible for a relation only when the
-classification carries the word `inferred` — because a constraint in code says what this
-implementation currently does, and says nothing about whether anybody decided it.
+classification carries the word `inferred`, because a constraint in code says what this
+implementation currently does and nothing about whether anybody decided it.
 
 Two are settled, so three stories are drafted against them:
 
@@ -244,10 +242,10 @@ Each `inferable` relation is written into the body of the story that rests on it
 so the next reader can check it instead of re-deriving it.
 
 The third relation is not settled, and the decomposer does not settle it. Deleting an account could
-refuse while clients remain, or delete them with it; each answer produces a different story, and
-neither can be read out of the tree. So it becomes an artifact with an edge, rather than a sentence
-in a report nobody re-reads — or an `UNMAPPED:` comment that only somebody opening the domain file
-would find:
+refuse while clients remain, or delete them with it. Each answer produces a different story, and
+neither can be read out of the tree. So it becomes an artifact with an edge, not a sentence in a
+report nobody re-reads or an `UNMAPPED:` comment that only somebody opening the domain file would
+find:
 
 ```shell-session
 $ aep plan artifact lifecycle decision-blocker
@@ -258,9 +256,8 @@ $ aep plan artifact new decision-blocker account-deletion-cascade --title "Nobod
 created decision-blocker:account-deletion-cascade (open) at …/.engineering/planning/decision-blocker/account-deletion-cascade.md
 ```
 
-The `blocks` edge is the point of the whole exercise. A question in a report is read once; a blocker
-with an edge is found by a command, and `--withholds` names the evidence nobody can produce while it
-stands:
+A question in a report is read once. A blocker with a `blocks` edge is found by a command, and `--withholds`
+records the evidence nobody can produce while it stands:
 
 ```shell-session
 $ aep plan artifact blocked
@@ -268,8 +265,8 @@ decision-blocker:account-deletion-cascade  decision  open, withholding approval 
   blocks epic:commercial-clients  draft  Commercial clients on an account
 ```
 
-The decomposer reports in four parts. The third lists what it deliberately did not cover, each with
-the question that blocked it — here, that blocker. **The fourth is the one to read first:** the
+The decomposer reports in four parts. The third lists what it did not cover, each with
+the question that blocked it, here that blocker. **The fourth is the one to read first:** the
 complete output of `aep plan artifact validate`, verbatim, with its exit status. If it exited 1, nothing
 else in the report is safe to act on. Here it did not:
 
@@ -290,17 +287,16 @@ every line as cited or inferred, say what you could not establish, and write eac
 its story's body.
 ```
 
-The scopers are read-only, so run one per story and run them at once. The write-back is serial — the
-store takes one writer at a time, and each write bumps the story's revision — and it goes through
-the CLI like every other change to a body:
+The scopers are read-only, so run one per story, all at once. The write-back is serial, because the
+store takes one writer at a time and each write bumps the story's revision. It goes through the CLI
+like every other change to a body:
 
 ```shell-session
 $ aep plan artifact body story:commercial-client-record --from record-body.md
 story:commercial-client-record body replaced (revision 2) at …/.engineering/planning/story/commercial-client-record.md
 ```
 
-Read the cited-or-inferred marking, not just the file list. A scope that mixes what was read with
-what was guessed gets trusted exactly where it is weakest.
+Read the cited-or-inferred marking, not just the file list.
 
 ## 6. Run the critic panel
 
@@ -309,14 +305,20 @@ Run the plan critics over epic:commercial-clients and its stories. Record every 
 drafts that come back needing revision, stop after two rounds, and list what is still open.
 ```
 
-Two to four read-only critics read the drafted plan at once, each with one job: acceptance (is every
-story's acceptance observable, and does it cover the state transitions), design (coupling, cycles,
-stories sharing a surface), scope (is the epic's outcome covered, and is anything drafted that sits
-outside it), parallel safety (name the pairs that touch one file). Each returns `approve` or
-`needs-revision` plus a list of *artifact — reason — citation* lines; a verdict with no citation is
-not a verdict. On `needs-revision` the drafts are revised through `aep plan artifact body` and the panel
-runs again, at most twice, and whatever is still open after that is listed rather than argued away.
-With fewer than two stories under the epic the step is skipped, and says so.
+Two to four read-only critics read the drafted plan at once, each with one job:
+
+| critic | question |
+|---|---|
+| acceptance | is every story's acceptance observable, and does it cover the state transitions |
+| design | coupling, cycles, stories sharing a surface |
+| scope | is the epic's outcome covered, and is anything drafted that sits outside it |
+| parallel safety | name the pairs that touch one file |
+
+Each returns `approve` or `needs-revision` plus a list of lines that each hold an artifact, a reason
+and a citation. A verdict with no citation is not a verdict. On `needs-revision` the drafts are
+revised through `aep plan artifact body` and the panel runs again, at most twice, and whatever is
+still open after that is listed and not argued away. With fewer than two stories under the epic the
+step is skipped, and says so.
 
 Every verdict is recorded as an artifact carrying a `reviews` edge to what it judged, so the plan
 you end up with also carries the argument that produced it:
@@ -328,12 +330,12 @@ review-result starts at active
   archived -> nothing
 ```
 
-There is no draft rung there and no way back: a verdict is written once and later archived, never
-edited. That is what makes it evidence rather than an opinion somebody kept updating.
+There is no draft status and no way back. A verdict is written once and later archived, and is never
+edited. That makes it evidence, not an opinion somebody kept updating.
 
 ## 7. Implement one story through the wave
 
-A draft is not implementable, and the store says so rather than letting you pretend otherwise:
+A draft is not implementable, and the store says so:
 
 ```shell-session
 $ aep plan artifact move story:commercial-client-record --to implemented
@@ -342,8 +344,7 @@ $ echo $?
 1
 ```
 
-That refusal is the answer, not an obstacle: it names every status legal from where the artifact
-stands. Walk it, deliberately, and say that you did:
+The refusal lists every status legal from where the artifact stands. Walk it, and say that you did:
 
 ```shell-session
 $ aep plan artifact move story:commercial-client-record --to proposed
@@ -365,36 +366,36 @@ implementor owns exactly one unit, and an adversary checks the result against th
 evidence recorded, and the repository's own invariants. None of it replaces your repository gate,
 and none of it gives an implementor authority beyond its unit.
 
-When the run produces an observation that a later move needs — a test run, a review — record it with
-`aep plan artifact evidence` before the move, naming the source and where to look. `aep plan artifact move`
-finds evidence recorded against the artifact without being told. If it still refuses, the refusal
-names what is missing, and that sentence is what to relay.
+When the run produces an observation that a later move needs, such as a test run or a review, record
+it with `aep plan artifact evidence` before the move, with the source and where to look.
+`aep plan artifact move` finds evidence recorded against the artifact without being told. If it
+still refuses, the refusal says what is missing. Relay that sentence.
 
 ## 8. Drive the first story
 
 Everything in step 7 is an **instruction** an agent follows. The same story handed to the reference
-driver is walked by an engine that decides each transition instead — every state entered through a
-transition the engine returned, every gate it refuses printed with one reason per unmet requirement,
-and every status move made by the CLI and by nothing else.
+driver is walked by an engine that decides each transition. Every state is entered through a
+transition the engine returned, every refused gate is printed with one reason per unmet requirement,
+and every status move is made by the CLI and by nothing else.
 
 ```text
 Drive story:commercial-client-record. Run aep doctor first and stop if anything fails, tell me what
 the run will cost before you launch it, and print the run id and how to follow it.
 ```
 
-The drive mode of `aep:implementing` checks the checkout, points `metaharness aep drive run` at the task document that names the
-story, launches it against the project's step map, and prints the run id. It moves no artifact
-itself — the moves are the driver's, which is the whole property being tested — and it relays a
-refusal (a held lock, missing evidence, two step maps that both fit) verbatim and stops.
+The drive mode of `aep:implementing` checks the checkout, points `metaharness aep drive run` at the
+task document that names the story, launches it against the project's step map, and prints the run
+id. It moves no artifact itself, because the moves are the driver's. It relays a refusal, such as a
+held lock, missing evidence or two step maps that both fit, verbatim and stops.
 
 :::caution The walk has not reached `complete` yet
 
 This step is real and it does not finish. `aep`'s own `story:governed-dogfood-run` records two
 driven runs against real stories of its backlog: one stopped in `establish_verifiers` at $15.42, the
 other in `adversarial_verify` at $31.46, neither reaching the review step. **A run that wedges is a
-recorded result**, which is why those two are written down rather than retried until they worked —
-and it is what to expect from this step today. The skill says so before it launches anything, and
-the model spend is real, so it asks you for a budget rather than choosing one.
+recorded result**, which is why those two are written down and not retried until they worked,
+and it is what to expect from this step today. The skill says so before it launches anything. The
+model spend is real, so it asks you for a budget and does not choose one.
 
 :::
 
@@ -410,16 +411,14 @@ story:commercial-client-record             story             active  Create and 
 ```
 
 Five artifacts: an epic the store knows is blocked, three stories, one open decision. One story is
-active and on its way through a wave; the account-deletion question is on somebody's desk rather
-than guessed at in a story nobody would have re-read. That last part is the difference between this
-plan and one written straight through.
+active and on its way through a wave. The account-deletion question is on somebody's desk and not
+guessed at in a story nobody would have re-read.
 
 :::note In Codex
 
 The prompts are identical. Claude Code dispatches the decomposer, the scopers and the critics as
-sub-agents; in Codex the same behaviour runs from the shared skill directly, because current OpenAI
-guidance is to express a reusable role as a skill rather than as an agent wrapper. What you type,
-and what lands in the store, is the same.
+sub-agents. In Codex the same behaviour runs from the shared skill directly, because current OpenAI
+guidance is to express a reusable role as a skill and not as an agent wrapper.
 
 :::
 
@@ -427,12 +426,14 @@ and what lands in the store, is the same.
 
 Every step above hands the run back to you: it stops, you read what came back, you type the next
 prompt. A run with nobody there has nobody to hand it to, so it stops once and is finished. One did,
-on 2026-09-03: a single headless session over these eight prompts adopted the repository, scanned it,
-wrote *step 1 — adopted, scanned* and ended — no wave, no fan-out, no blocker with an edge, no
-verdicts recorded, and the store never validated. Ten of the checks this page is held to came back as
-gaps and seven held, and nothing the run did was wrong; there was just nobody to continue it.
+on 2026-09-03. A single headless session over these eight prompts adopted the repository, scanned it,
+wrote *step 1 — adopted, scanned* and ended. It made no wave, no fan-out, no blocker with an edge
+and no recorded verdicts, and the store never validated. Ten of the checks this page is held to came
+back as gaps and seven held.
 
-**One sentence in front of step 1 fixes it.** This is the instruction to give:
+Nothing the run did was wrong. There was nobody to continue it.
+
+**One sentence in front of step 1 fixes it.** Give this instruction:
 
 ```text
 Run this without stopping: no operator is present, so at every point you would pause for one — the
@@ -447,9 +448,9 @@ The eight prompts then follow unchanged.
 ### What gets recorded at each stop
 
 One record per stop, written **at** the stop and through the CLI like every other change to the
-store — `aep plan artifact kinds` lists `approval-record`, and `aep plan artifact lifecycle approval-record`
+store. `aep plan artifact kinds` lists `approval-record`, and `aep plan artifact lifecycle approval-record`
 answers that it declares no lifecycle, so creating it is the whole of the bypass. Afterwards,
-`aep plan artifact list --kind approval-record` is the list of every place the run decided something you
+`aep plan artifact list --kind approval-record` lists every place the run decided something you
 would have decided.
 
 | Where the page waits | What the run records | What it does next |
@@ -462,8 +463,7 @@ would have decided.
 
 ### What a headless run cannot do
 
-These are not stops it may record its way past. They are the four things the absence of an operator
-does not supply:
+These are not stops it may record its way past. The absence of an operator supplies none of the four:
 
 | | Why |
 |---|---|
@@ -472,7 +472,7 @@ does not supply:
 | **release** | the wave's second stop, and the one that is not bypassable. Nothing mechanical enforces a release procedure, so a run nobody is watching is the case that stop exists for. The run closes at the merge and leaves the release |
 | **turn a refusal into a pass** | a move whose evidence does not exist is still refused and a red gate is still red. A bypass record is not an exit status, and evidence is never recorded for an observation the run did not make |
 
-So a headless run ends roughly where step 8 ends anyway — the driven walk has not reached `complete`
-yet either. The difference is everything steps 2 through 7 produce: an epic, a validated domain,
-three stories, a blocker with an edge, four verdicts, one story through a wave — in the store, with
-every stop it passed sitting beside them as an artifact somebody can read.
+So a headless run ends roughly where step 8 ends anyway, because the driven walk has not reached
+`complete` yet either. The difference is everything steps 2 through 7 produce: an epic, a validated
+domain, three stories, a blocker with an edge, four verdicts and one story through a wave. They are
+in the store, with every stop the run passed beside them as an artifact somebody can read.

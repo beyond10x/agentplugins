@@ -9,8 +9,6 @@ the Agentic Development Protocol profile. Both halves drive the `aep` CLI.
 
 ## Planning
 
-Use it to work with AEP's governed planning substrate.
-
 It provides:
 
 - a planning skill that discovers the repository-local store and uses the canonical `aep` command;
@@ -22,16 +20,16 @@ It provides:
 - an acceptance critic for checking that each drafted item states an outcome somebody can observe;
 - a design critic for checking the shape of a decomposition: coupling, cycles, split abstractions;
 - a scope critic for checking that the set covers what it was drafted from, and nothing beyond it;
-- a parallel-safety critic for naming the items that would land on the same file.
+- a parallel-safety critic for finding the items that would land on the same file.
 
 The four critics are a panel, not four separate reviews. After a decomposition is reported, the
 planning skill dispatches them at once, records each verdict as an immutable review result related
 to the artifacts it judged, revises the drafts on every verdict that asks for it, and stops after
-two rounds with whatever is still open named in its report. None of them writes to the store.
+two rounds with whatever is still open listed in its report. None of them writes to the store.
 
 Planning also refuses to decompose an epic or story that introduces an entity no ESS domain
-declares. The domain is drafted and cited from the artifact first, and any relation that could not
-be read from code, an OpenAPI document or an existing artifact is marked unmapped, never guessed.
+declares. The domain is drafted and cited from the artifact first. Any relation that could not
+be read from code, an OpenAPI document or an existing artifact is marked unmapped and not guessed.
 
 Two commands start planning work by name. You start one, or an agent starts it when you ask, and
 each hands off to `aep:planning`:
@@ -48,7 +46,7 @@ route around.
 The store is `aep.project/5`: each artifact file under `.engineering/planning/` is the authority, a
 move appends one line to its `transitions`, and each evidence record is one file under
 `.engineering/evidence/`. When a repository's store is on an older version, the planning and
-delivery skills say so before their first write and name the upgrade; `aep:upgrade` runs it.
+delivery skills say so before their first write and name the upgrade. `aep:upgrade` runs it.
 
 ## Delivery
 
@@ -71,7 +69,7 @@ each hands off to `aep:implementing`:
 
 ### Waves are planned up front, and findings wait
 
-A wave runs only accepted stories, and accepting a story is yours, never the agent's. Before the
+A wave runs only accepted stories, and only you accept a story. Before the
 first wave, the waves are derived once from the accepted stories with
 `aep plan artifact waves --kind story --status active` and written to a plan page in order. The
 coordinating agent runs the next undelivered wave of that page; it adds no story to it and accepts
@@ -95,23 +93,25 @@ The `investigating` skill handles what cannot be re-run: a production incident, 
 question about a running system such as "when did this start" or "is the fix deployed". It
 captures the process state before anyone restarts it, builds a UTC timeline where every row names
 its source, dates an onset from an instrument that can see a negative, and checks each anomaly
-against a healthy peer. Every claim is labelled verified or inferred. The investigation is an
+against a healthy peer. Every claim is labelled verified or inferred.
+
+The investigation is an
 `incident-report` artifact, its observations are `health_observation` evidence, and each
 follow-up is a draft story. Ten techniques cover the work, from capture before remediation to the
 postmortem.
 
 Every role above, in both halves, is written once, as `references/<role>.md` of the skill that
-owns it. Claude Code runs it as a subagent through a thin `agents/<role>.md` adapter; Codex, which
-loads skills but not `agents/`, runs the same file directly.
+owns it. Claude Code runs it as a subagent through a thin `agents/<role>.md` adapter. Codex loads
+skills but not `agents/`, and runs the same file directly.
 
 This plugin builds on AEP's planning substrate. It does not replace the repository gate, invent lifecycle
 moves, or give implementors authority beyond their assigned unit.
 
-### Two ways to deliver a story, and they enforce differently
+### Wave and drive enforce differently
 
-The wave coordinates an interactive session: its rules are instructions the coordinating agent
-follows. `drive` hands one story to the reference driver, where the step map's bounds are decided by
-the engine rather than obeyed by an agent.
+The wave coordinates an interactive session, and its rules are instructions the coordinating agent
+follows. `drive` hands one story to the reference driver, where the engine decides the step map's
+bounds and no agent obeys them.
 
 The recorded dogfood attempts stopped before the review step. Those historical observations do
 not qualify later releases: drive mode checks the current evidence before claiming readiness,
@@ -119,10 +119,12 @@ prints the run id and how to follow it, and moves no artifact itself.
 
 Drive mode uses `metaharness aep drive` with a planning executable matching the AEP source linked
 by that runner. [Install](../install.md) explains the pairing. Governed Codex steps preserve model
-and endpoint selection across resume. Capped runs use the operator's budget; uncapped mode requires
+and endpoint selection across resume. Capped runs use the operator's budget. Uncapped mode requires
 an explicit spending authorization reference. Native process completion and the task's terminal
-verdict are reported separately. A step map's `commands:` names the programs each model step's
-shell may run, and the refusal of any other names that list. Before a launch, `metaharness doctor`
+verdict are reported separately.
+
+A step map's `commands:` lists the programs each model step's
+shell may run, and the refusal of any other program cites that list. Before a launch, `metaharness doctor`
 says whether the installed harness is one the adapter pins.
 
 `b10x` treats both `metaharness` and `b10x-harness`, the Beyond10x agent loop that Metaharness's

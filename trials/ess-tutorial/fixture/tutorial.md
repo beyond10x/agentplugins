@@ -13,7 +13,7 @@ uses **ESS 0.90.0 and Rust**, verified on 2026-11-08. The
 
 You finish with a specification, generated documentation and OpenAPI, a small Rust library and
 17 generated scenarios running against that library. The target adapter reports actual commands,
-events and views; the ESS runner makes the assertions.
+events and views, and the ESS runner makes the assertions.
 
 Install Rust and Cargo, and use Claude Code or Codex with the ESS plugin. The complete
 [example directory](https://github.com/beyond10x/agentplugins/tree/main/website/docs/tutorials/first-ess-specification)
@@ -77,7 +77,7 @@ scenarios: []
 
 In `domains/lending.yaml`, read `Book`'s lifecycle, then `BorrowBook`'s outcomes. `borrowed`
 moves the book through `lend`, stores `input.member_id` and emits `BookBorrowed`. `wrong-state`
-answers `BookStateConflict`; `no-such-book` answers `BookNotFound`. `ReturnBook` clears the
+answers `BookStateConflict`, and `no-such-book` answers `BookNotFound`. `ReturnBook` clears the
 optional borrower field. The three views expose enough state for the suite to check these rules.
 `components.yaml` declares the network component and its command and event surfaces.
 
@@ -107,7 +107,7 @@ Regenerate these when the specification changes.
 ## 6. Hold the Rust library to it
 
 The Rust runner consumes canonical suite IR. The CLI's conformance package targets are `go` and
-`typescript`; **there is no `--target rust` for conformance synthesis**. Generate the IR instead:
+`typescript`. **There is no `--target rust` for conformance synthesis.** Generate the IR instead:
 
 ```bash
 ess verify conform synthesize --path spec --target ir --out impl/suite.json
@@ -122,8 +122,8 @@ The synthesis summary is:
 
 `impl/src/lib.rs` implements the library independently of the suite. `impl/tests/conformance.rs`
 implements `ess_conformance::target::ConformanceTarget`, reads `suite.json`, admits it, and runs it
-through `Runner`. Use this standalone manifest (the `[workspace]` keeps the tutorial independent of an enclosing
-repository workspace):
+through `Runner`. Use this standalone manifest. Its `[workspace]` table keeps the tutorial
+independent of an enclosing repository workspace:
 
 ```toml title="impl/Cargo.toml"
 [package]
@@ -145,7 +145,7 @@ debug = 0
 
 The example includes its lockfile. If writing the example afresh, run
 `cargo generate-lockfile --manifest-path impl/Cargo.toml` before the locked test command.
-These crates come from the exact Git tag; a registry search or separate ESS checkout is unnecessary.
+These crates come from the exact Git tag, so no registry search or separate ESS checkout is needed.
 
 The native integration harness uses this API, with `Target` implemented in the same test file:
 
@@ -168,9 +168,9 @@ fn conforms_to_generated_suite() {
 }
 ```
 
-The complete adapter is in the example’s `impl/tests/conformance.rs`; it maps only the five
-commands and three views. Use `Node::Text` for string values, `Node::Null` for an optional field
-with no value (a view row still carries `borrower_id` after `ReturnBook` clears it), and
+The complete adapter is in the example’s `impl/tests/conformance.rs`. It maps only the five
+commands and three views. Use `Node::Text` for string values and `Node::Null` for an optional field
+with no value, because a view row still carries `borrower_id` after `ReturnBook` clears it. Use
 `OutcomeRef::new(req.command.clone(), outcome.parse().unwrap())` for a command-qualified outcome.
 
 Every scenario starts with an empty library. A mutation advances the store's revision. Every
@@ -180,7 +180,7 @@ checks that revision before reading the same synchronous store. An invalid or fu
 error, never permission to return a weaker read. Returning rows alone without a command token
 caused 14 of the original tutorial's 17 scenarios to fail in a run recorded on 2026-10-05.
 
-The integration-test portion of Cargo’s output is below; Cargo also prints zero-test unit and
+The integration-test portion of Cargo’s output is below. Cargo also prints zero-test unit and
 documentation lanes for this example:
 
 ```text
@@ -205,11 +205,10 @@ In `impl/src/lib.rs`, change only `borrow`'s state guard:
 +        if book.state == "Withdrawn" {
 ```
 
-Change only `borrow`: `return_book` still requires `OnLoan`, and `withdraw` still requires
-`OnShelf`. Run the same Cargo command. The scenario
-`library.lending.Book/state/OnLoan/refuses/library.lending.BorrowBook` must fail: the library now
-answers `borrowed` where the model requires `wrong-state`. Restore the guard and rerun; all
-17 scenarios must pass again. A compile failure does not prove the suite catches the defect.
+`return_book` still requires `OnLoan` and `withdraw` still requires `OnShelf`. Run the same Cargo
+command. The scenario `library.lending.Book/state/OnLoan/refuses/library.lending.BorrowBook` must
+fail, because the library now answers `borrowed` where the model requires `wrong-state`. Restore
+the guard and rerun. All 17 scenarios must pass again. A compile failure does not prove the suite catches the defect.
 
 ## 8. Keep it true
 
@@ -223,9 +222,9 @@ ess verify conform synthesize --path spec --target ir --out impl/suite.json
 cargo test --locked --manifest-path impl/Cargo.toml -- --nocapture
 ```
 
-`--check` regenerates in memory and writes nothing. It exits 1 naming each file in `out` that no
-longer matches the specification, so commit `out` only if you hold it with these two lines; it
-passes when plain `ess generate` would change nothing.
+`--check` regenerates in memory and writes nothing. It exits 1 and lists each file in `out` that no
+longer matches the specification. It passes when plain `ess generate` would change nothing. Commit
+`out` only if you hold it with these two lines.
 
 Keep `suite.json` generated and commit the source model, implementation and lockfile. When ESS
 releases, upgrade the CLI and both Rust dependencies together, regenerate the lockfile, and run
@@ -234,11 +233,13 @@ these checks before claiming verification against the new release.
 ## Beyond one record
 
 Use `when_related` for a decision about another row, and `instances` or `affects` for selected
-record effects. `affects` can also move selected records in `ess/22`; from `ess/23` it can write one
+record effects. `affects` can also move selected records in `ess/22`. From `ess/23` it can write one
 record per element of an input list (`each:`), and `deletes:` can remove every row a filter selects.
 These declarations do not by themselves promise atomic multi-record transactions. Validation,
-synthesis and code generation have different supported subsets; keep each refusal visible and
-distinguish generated suite coverage from implementation coverage. Below `ess/27`, an
+synthesis and code generation have different supported subsets. Keep each refusal visible and
+distinguish generated suite coverage from implementation coverage.
+
+Below `ess/27`, an
 identity-addressed related guard beside `unknown_instance` is refused, and so is an
 existence-only input-related guard beside `wrong_state`. With `ess/22`, `wrong_state` can
 coexist with related guards when at least one present-row predicate is declared and every such

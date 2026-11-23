@@ -29,9 +29,10 @@ it from a question to a merged, reviewed change. It takes about an hour, most of
 
 Every output block on this page is what the command printed when this page was recorded, on
 2026-09-28, with `aep` 0.64.0, `ess` 0.39.0, the `aep` and `ess` plugins 0.17.0 and Claude Code.
-Your run will differ in ids, counts and wording (another agent names a vision differently, or asks
-six questions instead of five); the steps and what each one records are what repeat. Paths are shortened to `~`. The recorded session cost $5.48 for the plan and critics, $6.34 for
-accepting the stories, and $13.19 for the wave.
+Your run will differ in ids, counts and wording: another agent names a vision differently, or asks
+six questions instead of five. The steps and what each one records are what repeat. Paths are
+shortened to `~`. The recorded session cost $5.48 for the plan and critics, $6.34 for accepting the
+stories, and $13.19 for the wave.
 
 ## What you need
 
@@ -46,7 +47,7 @@ If you did the ESS tutorial through `b10x`, add the `aep` product:
 $ b10x init aep,ess --host claude --out plan.json
 ```
 
-The actions it plans (the rest of the plan lists what is already installed):
+It plans these actions. The rest of the plan lists what is already installed:
 
 ```text
 Actions (6):
@@ -90,10 +91,11 @@ story:borrow-member-check-tested         story                            draft 
 vision:lending-library                   vision                           draft  A small lending library, specified in ESS and implemented in Go
 ```
 
-It also found a real gap: the check that a borrower is a registered member is never exercised
-(`impl/conformance_test.go:90` always passes `false`), and filed it as a story instead of fixing it
-unasked. It ended with five questions the code could not answer, such as whether a network service
-is owed (your run may ask a different number). Commit the store before you go on: it is a plan, and a plan belongs in version control.
+It also found a gap: the check that a borrower is a registered member is never exercised
+(`impl/conformance_test.go:90` always passes `false`). It filed the gap as a story and did not fix
+it unasked. It ended with five questions the code could not answer, such as whether a network
+service is owed. Your run may ask a different number. Commit the store before you go on, because a
+plan belongs in version control.
 
 ## 3. Ask for a feature
 
@@ -199,12 +201,18 @@ warning: spec/ess-inputs.yaml requires ess 0.38.0 and this is ess 0.39.0, which 
 
 **Then the plan.** An epic, `epic:book-reservations`, and six stories drafted by the
 `aep:decomposer` agent. Each story's acceptance names the exact scenarios it turns from skipped to
-passing; together they cover all 55 once.
+passing. Together they cover all 55 once.
 
 **Then the critics.** Four agents read the drafted set at once, none seeing another's verdict:
-acceptance (can each story be checked?), design (coupling, cycles, a split abstraction), scope
-(everything the epic promised is claimed, nothing else), and parallel safety (which stories land on
-one file). All four approved in the first round, and each verdict is stored word for word as a
+
+| critic | checks |
+|---|---|
+| acceptance | can each story be checked |
+| design | coupling, cycles, a split abstraction |
+| scope | everything the epic promised is claimed, nothing else |
+| parallel safety | which stories land on one file |
+
+All four approved in the first round, and each verdict is stored word for word as a
 `review-result` that cannot be edited afterwards.
 
 ```shell-session
@@ -287,12 +295,12 @@ collision: story:reserve-book-on-loan story:return-reserved-book-to-hold impl/li
 5 wave(s), 20 collision(s), 0 unassessed
 ```
 
-Every pair of stories lands on the same two Go files, so each wave holds one story. (This listing
-was taken after wave 1, which held the sixth story, `reservations-suite-baseline`.) The agent
-proposed that wave, named every commit your approval would authorise and nothing more (no push, no
-tag, no second wave), and asked three things: which branch to use as the base, whether plain
-`git worktree` is acceptable (the `worktree` plugin, `b10x init worktree`, gives it managed
-worktrees instead), and how much model budget is left.
+Every pair of stories lands on the same two Go files, so each wave holds one story. This listing
+was taken after wave 1, which held the sixth story, `reservations-suite-baseline`. The agent
+proposed that wave and named every commit your approval would authorise, and nothing more: no push,
+no tag, no second wave. It asked three things: which branch to use as the base, whether plain
+`git worktree` is acceptable, and how much model budget is left. The `worktree` plugin,
+`b10x init worktree`, gives managed worktrees instead.
 
 ## 6. Run the wave
 

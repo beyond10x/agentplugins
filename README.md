@@ -4,8 +4,8 @@ Agent plugins for Claude Code and Codex, from one marketplace: `b10x`.
 
 [Documentation](https://beyond10x.github.io/docs/agentplugins/) · [Setup guide](https://beyond10x.github.io/docs/agentplugins/install/)
 
-Add the marketplace once — Claude Code: `/plugin marketplace add beyond10x/agentplugins` ·
-Codex: `codex plugin marketplace add beyond10x/agentplugins` — then install what you need:
+Add the marketplace once, then install what you need. Claude Code: `/plugin marketplace add beyond10x/agentplugins`.
+Codex: `codex plugin marketplace add beyond10x/agentplugins`.
 
 | plugin | for | Claude Code | Codex |
 |---|---|---|---|
