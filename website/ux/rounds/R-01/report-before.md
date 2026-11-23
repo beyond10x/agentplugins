@@ -1,0 +1,287 @@
+# R-01 (before) measurement
+
+16 pages, sizes 1280x720, 1366x768, themes light, dark. Metrics at 1366x768, both themes summed; lower is better.
+
+| scenario | layout.doc_hscroll | layout.past_box | layout.scroll_boxes | always_visible.hidden | axe.serious | axe.serious_nodes | layout_shift.per_load |
+|---|---|---|---|---|---|---|---|
+| page:docs_choose-a-plugin | 0 | 0 | 0 | 4 | 2 | 18 | 0.025 |
+| page:docs_install | 0 | 0 | 0 | 4 | 2 | 24 | 0.089 |
+| page:docs_plugins_aep | 0 | 0 | 0 | 4 | 2 | 16 | 0.117 |
+| page:docs_tutorials_first-ess-specification | 0 | 0 | 0 | 4 | 2 | 22 | 0.057 |
+| page:landing | 0 | 0 | 0 | 4 | 2 | 11 | 0.005 |
+| site:all | 0 | 0 | 0 | 72 | 32 | 287 | 0.219 |
+
+## Problems (64 page loads)
+
+- `docs` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/choose-a-plugin` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/choose-a-plugin` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/choose-a-plugin` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/choose-a-plugin` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/golden-path` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/golden-path` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/golden-path` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/golden-path` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/install` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/install` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/install` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/install` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU
+- `docs/plugins/aep` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/aep` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/aep` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/aep` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/b10x` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154
+- `docs/plugins/b10x` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154
+- `docs/plugins/b10x` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154
+- `docs/plugins/b10x` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154
+- `docs/plugins/connectors` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/connectors` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/connectors` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/connectors` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (9): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/ess` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/ess` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/ess` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/ess` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/worktree` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/worktree` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/worktree` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/plugins/worktree` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/structure` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/structure` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/structure` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/structure` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/trust-and-scope` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/trust-and-scope` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/trust-and-scope` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/trust-and-scope` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link
+- `docs/tutorials/first-ess-specification-2026-09-28` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target="_blank"][rel="noopener noreferrer"]
+- `docs/tutorials/first-ess-specification-2026-09-28` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target="_blank"][rel="noopener noreferrer"]
+- `docs/tutorials/first-ess-specification-2026-09-28` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target="_blank"][rel="noopener noreferrer"]
+- `docs/tutorials/first-ess-specification-2026-09-28` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target="_blank"][rel="noopener noreferrer"]
+- `docs/tutorials/first-ess-specification` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-ess-specification` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-ess-specification` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-ess-specification` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-governed-plan-2026-09-28` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a
+- `docs/tutorials/first-governed-plan-2026-09-28` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a
+- `docs/tutorials/first-governed-plan-2026-09-28` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a
+- `docs/tutorials/first-governed-plan-2026-09-28` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+  - axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a
+- `docs/tutorials/first-governed-plan` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-governed-plan` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-governed-plan` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `docs/tutorials/first-governed-plan` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current="page"] > .linkLabel_WmDU
+- `/` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (5): article:nth-child(1) > a, article:nth-child(2) > a[href$="ess"]
+- `/` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (6): .eyebrow_kY3W, article:nth-child(1) > a
+- `/` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (5): article:nth-child(1) > a, article:nth-child(2) > a[href$="ess"]
+- `/` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: color-contrast (6): .eyebrow_kY3W, article:nth-child(1) > a

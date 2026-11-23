@@ -36,6 +36,11 @@
   margin-top: 2rem;
 }
 
+.actions > a {
+  max-width: 100%;
+  white-space: normal;
+}
+
 .grid {
   display: grid;
   gap: 1rem;

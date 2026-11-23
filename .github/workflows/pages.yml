@@ -31,3 +31,16 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Build the public documentation
         run: npm --prefix website ci && npm --prefix website run typecheck && npm --prefix website run build
+      - name: Install the UX gate browser
+        working-directory: website
+        run: npx playwright install --with-deps chromium
+      - name: UX gates and ratchet against the built site
+        working-directory: website
+        run: npm run ux
+      - name: Keep the UX gate records
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ux-gates
+          path: website/ux/out
+          retention-days: 7

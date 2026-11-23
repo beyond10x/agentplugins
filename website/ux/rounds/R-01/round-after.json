@@ -1,0 +1,2352 @@
+{
+  "id": "R-01",
+  "label": "after",
+  "pages": 16,
+  "sizes": [
+    "1024x768",
+    "1280x720",
+    "1280x800",
+    "1366x768",
+    "1440x900",
+    "390x844",
+    "768x1024"
+  ],
+  "metrics": {
+    "site:all": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 72,
+      "axe.serious": 0,
+      "axe.serious_nodes": 0,
+      "layout_shift.per_load": 0.191
+    },
+    "page:docs_choose-a-plugin": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 0,
+      "axe.serious_nodes": 0,
+      "layout_shift.per_load": 0.025
+    },
+    "page:docs_install": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 0,
+      "axe.serious_nodes": 0,
+      "layout_shift.per_load": 0.066
+    },
+    "page:docs_plugins_aep": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 0,
+      "axe.serious_nodes": 0,
+      "layout_shift.per_load": 0.134
+    },
+    "page:docs_tutorials_first-ess-specification": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 0,
+      "axe.serious_nodes": 0,
+      "layout_shift.per_load": 0.057
+    },
+    "page:landing": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 0,
+      "axe.serious_nodes": 0,
+      "layout_shift.per_load": 0.003
+    }
+  },
+  "problems": [
+    {
+      "page": "docs",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1024x768",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1024x768",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1280x800",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1280x800",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1440x900",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1440x900",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "390x844",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "390x844",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "768x1024",
+      "theme": "dark",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "768x1024",
+      "theme": "light",
+      "gating": false,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing"
+      ]
+    }
+  ]
+}
