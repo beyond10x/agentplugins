@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.26.1] - 2026-11-23
+
 ### Removed
 
 - The `slot` plugin added on the default branch after 0.26.0, never released here: it ships from the slot repository, its own marketplace (`claude plugin marketplace add beyond10x/slot`, then `slot@slot`). Its catalog product, checker entries and docs page go with it
@@ -979,7 +981,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins
 - Publish adopter documentation for discovering, selecting, and installing each plugin
 
-[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.26.0...HEAD
+[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.26.1...HEAD
+[0.26.1]: https://github.com/beyond10x/agentplugins/compare/0.26.0...0.26.1
 [0.26.0]: https://github.com/beyond10x/agentplugins/compare/0.25.1...0.26.0
 [0.25.1]: https://github.com/beyond10x/agentplugins/compare/0.25.0...0.25.1
 [0.25.0]: https://github.com/beyond10x/agentplugins/compare/0.24.2...0.25.0

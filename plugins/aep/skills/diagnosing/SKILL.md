@@ -3,7 +3,7 @@ name: diagnosing
 description: Diagnose a reproducible bug or performance regression; a red-capable feedback loop first, then ranked falsifiable hypotheses, one-variable probes, a regression test, evidence in the AEP store. Use for diagnose, debug, "why is this failing", "this is slow", or broken, throwing, flaky or slower code. Not for an incident that cannot be re-run (aep:investigating), a CI failure whose log names the cause, or conformance coverage (ess:testing-conformance).
 ---
 
-**Skill version 0.26.0** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.26.1** — the version in `.claude-plugin/plugin.json`.
 
 # Diagnosing a failure
 

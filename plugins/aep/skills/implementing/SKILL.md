@@ -3,7 +3,7 @@ name: implementing
 description: Implement accepted AEP stories. Wave mode proposes the next wave of the `aep plan artifact waves` plan and stops for approval, then runs one implementor per story in its own worktree, adversary review, merges what is green, files pre-existing findings as backlog drafts. Drive mode hands one story to a governed `metaharness aep drive` run and reports its id. Use to implement or deliver planned stories, start the next wave, fan stories out to sub-agents, drive a story, or ask how a wave differs from a drive. Never moves an artifact.
 ---
 
-**Skill version 0.26.0** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
+**Skill version 0.26.1** — the version in `.claude-plugin/plugin.json`; a wave's stage-1 proposal quotes it.
 
 # Implementing accepted work
 
