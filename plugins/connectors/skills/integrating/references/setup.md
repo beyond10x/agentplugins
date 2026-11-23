@@ -17,7 +17,12 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    credential, so a second account is a second instance. For an authorized connection, inspect
    `connections connect --help`, then name the target `<connector>/<instance>` (or the selected
    `--connector` and `--instance`) and `--profile` with one protected entry option:
-   `--credential-prompt`, `--credential-file` or `--credential-stdin`. Since `v0.60.0`
+   `--credential-prompt`, `--credential-file` or `--credential-stdin`, or since `v0.72.0`
+   `--credential-env <NAME>`, which reads the credential from that environment variable (the
+   bare value for a profile of one entry field, else the JSON object), so a secret manager passes
+   it to one command (`op run --env-file <f> -- connectors connections connect …`); an unset, empty
+   or oversized variable is `protected_entry_unavailable` naming the variable, never its value.
+   Since `v0.60.0`
    `--endpoint <url>` writes the instance's endpoint into the configuration before a credential
    is asked for, creating the instance and its connector's table when absent and keeping every
    other byte of the file; a connector without a default endpoint needs it, and a different
@@ -64,6 +69,18 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    permitted operations; add them only when the operator authorizes that access. A profile's access
    read answered 401 or 403 refuses the connection as `insufficient_scope`: the credential lacks a
    scope the profile needs, and only a credential that has it fixes that.
+   Since `v0.72.0` the Gmail, Calendar and Drive connectors default to the read-only profile
+   `google.oauth.readonly`, which offers no write: an instance that writes names
+   `profile = "google.oauth"` (and `--profile google.oauth` on connect), and a connection saved
+   under `google.oauth` is read only by an instance that names that profile; otherwise revoke it
+   and connect again. A Google instance may state `allowed_domains` (one to eight lower-case
+   domains): an account of another domain is refused `insufficient_scope` before anything is
+   stored. Since `v0.74.0` a token-exchanging profile (`oauth2_client_credentials`,
+   `oauth2_refresh`) records its token endpoint as `token_recipient`; a configuration that moves
+   that endpoint is refused as a changed binding before custody is opened, and the next action is a
+   new connection, not `connections revalidate`. The configuration revisions of Calendar, Drive,
+   Gmail, Slides, HubSpot (`v0.72.0`) and Jira (`v0.73.0`) moved: copy a pinned
+   `configuration_revision` again, then revalidate.
 5. For repair, preserve connection identity: `connections reconnect` (since `v0.54.0`; its
    deprecated old name runs the same command) takes `--connector`, `--instance`,
    `--expected-revision`, one protected credential source and, optionally, `--connection` (the
@@ -79,7 +96,7 @@ Read this for a requested setup, connection or repair. First inspect the corresp
    an `oauth2_grant` connection (since `v0.58.0`) descriptor 3 carries only the current access
    token, never the stored entry or its refresh token.
 
-Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.69.0/docs/local-runtime-foundation.md)
+Use the [current local foundation](https://github.com/beyond10x/connectors/blob/v0.76.0/docs/local-runtime-foundation.md)
 and the adapter's linked guide for deployment-specific prerequisites. Credential custody is fixed
 when the binary is built: the Secret Service on Linux, the login keychain on macOS (since
 `v0.48.0`), and `setup check` reports it as `custody_backend` beside `os`. No backend falls back
@@ -100,6 +117,19 @@ tool that opens the store before using one this release created. An existing sto
 with older releases until its owner runs `setup checkpoints-enable --confirm one-way`; that is
 one-way, cannot be undone by any command, and refuses `lifecycle_conflict` (`next_action =
 stop_owner`) while an owner runs. Run it only when the operator asks for it.
+
+Since `v0.76.0` every record a write adds names its entity definition by digest (`er.record/5`),
+and `v0.75.0` and earlier no longer open a store once `v0.76.0` has written to it (they answer
+`metadata_unavailable`). The change comes with the first write and no command undoes it: upgrade
+every `connectors` binary and any other tool that opens the store together. The only way back to an
+older release is to move the state directory aside and connect again. A store that grew too large
+is reset the same way, as the release's
+[Set up the local CLI](https://github.com/beyond10x/connectors/blob/v0.76.0/website/docs/guides/set-up-the-local-cli.md#reset-a-grown-metadata-store)
+guide says: `setup owner-stop`, move `metadata.sqlite3*` aside, `setup init`, then connect again;
+do it only when the operator asks. Since `v0.71.0` `connectors setup custody-orphans` lists the
+Secret Service items no store of this state directory names; `--mode remove --authority <id>`
+deletes one authority's items, which another store of the machine may still hold, so it is the
+operator's decision.
 
 Since `v0.39.0` a catalog selection may name `credential`: parameters through which the
 provider's document passes the credential the connection already sends, such as Slack's `token`.
@@ -219,8 +249,8 @@ person's own subscription: `chatgpt` (profile `chatgpt.subscription`, browser or
 `claude.subscription-pasted`, read `account.profile`). Neither ships a client id: the operator pins
 an instance whose native configuration names its own `oauth2_client_id`, and an instance without
 one is refused as `InvalidConfiguration`. Whether a client may use a plan is the provider's terms'
-question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.69.0/website/docs/connectors/chatgpt.md),
-[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.69.0/website/docs/connectors/claude-subscription.md)).
+question, which the guides quote ([`chatgpt`](https://github.com/beyond10x/connectors/blob/v0.76.0/website/docs/connectors/chatgpt.md),
+[`claude-subscription`](https://github.com/beyond10x/connectors/blob/v0.76.0/website/docs/connectors/claude-subscription.md)).
 Both sign-ins are verified against a local fake authorization server only, never live.
 `v0.59.0` changes no setup step.
 

@@ -182,6 +182,11 @@ $ aep plan artifact scope story:credential-store --add crates/edge/aep-cli/src/p
 $ aep plan artifact scope story:credential-store --add crates/govern/aep-domain/src/lib.rs --inferred
 ```
 
+From 0.79.1 the store compares entries by path component: a directory (`roles/`) overlaps every file
+inside it (`roles/decision.yaml`), `roles`, `roles/` and `./roles` are one surface, and `.` holds
+every path. An entry with a `..` component or a glob collides with every entry, so write the exact
+path; a glob puts its story in a wave of its own.
+
 The flag is the difference between a surface somebody read out of the body and one an agent
 guessed from a noun, and it survives into the verb below — which is how the proposal can say which
 units rest on cited scope. A prose section alone leaves the next wave re-deriving what this one

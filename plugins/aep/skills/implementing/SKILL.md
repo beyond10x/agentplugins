@@ -25,8 +25,9 @@ The operator can also name the mode directly: `/aep:wave [story-id…]` (`aep:wa
 ## The store's version, first
 
 Before reading or writing the store, read `version` in `.engineering/project.yaml`. On anything but
-`aep.project/5`, tell the user once, before any store write, which version it is and its upgrade;
-do not wait for `aep` to print a notice:
+`aep.project/5` or `/6` (a store holding packs, from 0.80.0; a write to a packed
+artifact exits 1 naming `aep plan store unpack <id>`), tell the user once, before any store write,
+which version it is and its upgrade; do not wait for `aep` to print a notice:
 
 | the store | upgrade |
 |---|---|

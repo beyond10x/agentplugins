@@ -346,14 +346,26 @@ image, before claiming a number.
 
 ## Which target runs your suite
 
-`ess verify conform run --target` names a target built into the `ess` binary. None of them runs
-your implementation:
+`ess verify conform run --target` names a target built into the `ess` binary, or, from 0.97.0, a
+program of yours. Only `process` runs your implementation:
 
 | `--target` | what it is | on your own domain |
 |---|---|---|
 | `interpreted` | executes the selected specification through ESS’s reference model; requires `--path` matching the suite | checks model consistency; unsupported constructs remain explicit |
 | `oracle-fixture` | a hand-written implementation of ESS's own `examples/oracle-fixture` | every scenario `error` |
 | `billing` | a hand-written implementation of ESS's own `examples/billing` | every scenario `error` |
+| `process` (0.97.0) | `[--target-dir <dir>] [--target-timeout <seconds>] -- <program> [args…]`: starts your program without a shell and asks each question of the conformance target as one JSON line on its standard input (`ess-conformance-target/1`); the Rust runner judges the answers and writes the usual report | your implementation, in any language, through an adapter that speaks the protocol |
+
+`ess verify conform serve --target billing|oracle-fixture` answers the same protocol for a built-in
+reference, the peer to test an adapter against: on 0.98.0
+`ess verify conform run --report-format 2 --target process --suite <billing suite> -- ess verify conform serve --target billing`
+passed all 32 scenarios of a suite synthesized from ESS's `examples/billing`. A fault (the program
+exits, answers late, answers a line that is not valid, another request's `id`, or a line over
+16 MiB) ends that scenario `error` and restarts the program for the next one, which must name the
+same implementation. `--target-timeout` (1 to 3600, 30 when absent) bounds each answer. A command
+after `--` with another target, `--known-failing` and `ess verify conform mutate --target process`
+exit 2; mutate a process target through `--emit`, `run` and `--collect` (`ess:hardening`). The ESS
+guide "An implementation in any language" holds an example adapter.
 
 A green interpreted run is evidence about the model and runner, not about your implementation.
 Current ESS runs the committed related-guard example as 3 passed, 0 failed, 0 error and 0 unsupported.
@@ -493,10 +505,39 @@ The current runner contract:
   a named `when:`/`when_related:` refusal snapshots the addressed row (0.85.0); a refusal over a
   list of identities beside a branch acting on a named row is sent for a row that branch arranges,
   and a guard needing several text literals in one list is witnessed by one list holding them all
-  instead of `ESS-SYNTH-003` (0.90.0). Known gap in 0.90.0: the negated side of a list guard with a
-  negated child (`all: [exists a: …, not exists b: …]`) is not tested, so a target ignoring the
-  negation passes; hold it with an authored scenario until ESS fixes it (from the release notes).
-  On 0.90.0 the tutorial's specification still synthesizes 17 scenarios with 0 refusals and the
+  instead of `ESS-SYNTH-003` (0.90.0). 0.90.0 left the negated side of a list guard with a negated
+  child (`all: [exists a: …, not exists b: …]`) untested; from 0.93.0 synthesis fills every such
+  list in one candidate and leaves each literal out in turn, so a target ignoring a negated literal
+  child fails (from the release notes): regenerate, and keep an authored scenario written for the
+  gap until the regenerated suite holds that send.
+  From 0.93.0 suite pair `ess-conformance/64` (`/65` with coverage) is open, and the Rust, Go and
+  TypeScript readers admit it. An authored `type: ess-scenario/7` may list under `covers:` the exact
+  ids of scenarios synthesis refused (`example.review.ConfirmDecision/outcome/already-exists`): the
+  refusal stays in the coverage suite marked `covered_by`, `synthesize` exits 0 when every in-scope
+  refusal is covered (its summary ends `, N covered by authored`), and `conform run` reports
+  declared coverage complete only when the covering scenario is selected and passes; an id synthesis
+  did not refuse is `covers.unknown-scenario`, and `covers:` below `/7` is refused. From 0.95.0 a
+  branch that copies an input into an entity with no guard keeping it inside one of the entity's
+  invariants gets a refusal `ESS-SYNTH-025` (`<Entity>/invariant/after/<Command>/<outcome>`) naming
+  the invariant, the input and the repair: `validate` and `synthesize` keep exit 0 and the ordinary
+  suite its bytes, but the summary counts the refusal, `validate --format json` lists it under
+  `completeness.unscenarioed`, and a `--suite-format 5` run exits 1 and writes `/65`. Guard the
+  branch on the input, or declare the refusal branch ahead of it. The Rust runner compares a
+  `Decimal` in an exact observer by the exact token the target reported (0.95.0), as Go and
+  TypeScript did: a Rust adapter builds a JSON answer's `Node` with
+  `ess_primitives::node::Node::from_json_exact` (or `Number::from_json_token`), since serde reads a
+  non-integer through binary64 first. An await request carries each stated input value
+  (`AwaitRequest::compared` is a `BTreeMap<String, Node>` in Rust, `Compared map[string]Node` in Go,
+  0.91.0), so an adapter that read the names only must read the values. Re-pin committed suites
+  from 0.97.1 (a caller-attribute input guard beside a selector reading the same input sends other
+  values) and 0.97.3 (a read-grant scenario no longer copies other views' reads, which can lower a
+  `--component`, coverage or mutation suite's format). From 0.97.3 `--component <name>` synthesizes
+  and reports only the operations that component realises: it no longer lists other components'
+  refusals or `outside:` scenarios, prints a `scope:` line and an `unrealised:` line, and together
+  the per-component runs cover the suite minus the unrealised operations, so run synthesis once
+  without `--component` for the whole system's refusals. From 0.98.0 `--report-out` replaces an
+  existing report file in one step, so a killed run leaves the earlier report whole.
+  On 0.98.0 the tutorial's specification still synthesizes 17 scenarios with 0 refusals and the
   `interpreted` target passes them all. A synthesis note that a scenario
   "retains its mixed-caller witness without an appended reversed-role run: the declared grants do
   not permit the reversed caller assignment" is a note, not a refusal: the scenario is written and

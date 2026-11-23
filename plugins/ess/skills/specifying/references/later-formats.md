@@ -59,7 +59,7 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | a list a creator starts empty, with no input for it | `ess/31` | `sets: {tags: []}` over a required `List<…>` field; only the empty list, and not over `Optional<List<…>>`; [below](#ess31) |
 | a list input synthesis sends as given | `ess/31` | `example:` on a `List` input, a list of element values (structs naming their required members) |
 | one element added to a stored list | `ess/31` | `sets: {tags: {append: input.tag}}` on an existing subject; the element is `input.<path>` of the list's element type |
-| a member that may be left out or sent as `null` | `ess/31` | `presence: omitted_or_null` on an `Optional` field; a view field over it carries the policy into its row |
+| a member that may be left out or sent as `null` | `ess/31` | `presence: omitted_or_null` on an `Optional` field; a view field over it carries the policy into its row without a key of its own (`presence:` on a view field is "unknown field `presence`") |
 | rows the input names and a row set, guarded on one command | `ess/32` | `when_related: {via: input.<f>, exists: false \| predicate: …}` beside `when_related: {entity, where, exists \| count \| forall}`; [below](#ess32) |
 | a struct with no declared fields | `ess/32` | `fields: []`; open (`undeclared_fields: ignored`) any object, closed only `{}` |
 | a lifecycle state spelled differently on the wire | `ess/32` | `states: [{name: Indexing, wire: indexing}, Ready]`; guards, transitions and suites keep the declared name |
@@ -68,6 +68,8 @@ every field of an emitted event needs a `payload:` source, so `BranchOpened.bran
 | one line on what a state or a move means | `ess/33` | `summary:` on a transition, and on a state in its mapping form `{name, wire?, summary?}` |
 | an external race whose compensation removes the row | `ess/34` | `deletes:` with `instance:` on a `compensates: true` refusal beside `external:`; [below](#ess34) |
 | a list that may name one row more than once, applied in order | `ess/35` | `each: {in: input.<list>, as: <name>, repeated: last_wins}` on an `affects:` entry, no `distinct:`; [below](#ess35) |
+| a figure computed from each row, not one field | `ess/36` | `aggregate: {avg: {expr: "ended_at - started_at"}}`, `{sum: {expr: "duration_s * level.weight"}}`; [below](#ess36) |
+| the extreme of an enum by its declared order | `ess/36` | `ordered: true` on the enum, then `aggregate: {max: level}`; an ordering comparison (`level > Major`) stays refused at every format, so list variants with `in: [...]` |
 
 ```yaml
 # system.yaml: every scenario, and every explorer sequence, first opens this branch
@@ -274,7 +276,7 @@ nested alphabets that share no character (`AlphabetUnsupported`), and a text len
 quantifier element or a union payload (`TextLengthUnsupported`). The `ess` CLI does not run this
 lowering, so these limits come from the ESS release notes; confirm them against Entity Runtime.
 
-## From `ess/16` through `ess/35`
+## From `ess/16` through `ess/37`
 
 The source language and conformance-suite version are different contracts. Choose the source
 format for the construct; let synthesis select its required suite format.
@@ -303,6 +305,8 @@ With current ESS:
 | `ess/33` | an `example:` on a struct, `Map<…>` or `Json` input; `provided: true` on an entity; a `summary:` on a lifecycle transition and on a state |
 | `ess/34` | a compensating `external:` refusal may delete its addressed row (`deletes:`, `instance:`); a named `when:` or `when_related:` refusal of a command addressing an existing row requires that row unchanged |
 | `ess/35` | `repeated: last_wins` on an `affects:` entry's `each:` |
+| `ess/36` | an aggregate measure over an expression of the row (`{expr: …}`); `ordered: true` on an enum, for `min`/`max` over it; `Duration` measures |
+| `ess/37` | nothing yet: opened in 0.93.0 and reads exactly as `ess/36` |
 
 For related guards, selected effects, event transports, client generation, finite protocol models
 and compatibility gates, read and run [current-features.md](current-features.md). Check the actual
@@ -1154,6 +1158,92 @@ reports declaring it as widening and dropping it as narrowing (from the release 
   every control (`ess ui test`, 0.88.0). These are UI documents, not the specification format
   (from the release notes).
 
+## `ess/36`
+
+From 0.91.1 (0.91.0 was tagged and never released). A measure may compute an expression of its
+source row, and an enum may declare that its declaration order is its order. A probe on 0.98.0 of
+ESS's own fixture `aggregate-measures-over-expressions.yaml` validated, synthesized 4 scenarios with
+0 refusals, and the `interpreted` target passed all 4; the same file under `ess/35` is
+`ESS-VIEW-009` (`unsupported_format_version`, "write `format: ess/36` on the source that declares
+the system").
+
+```yaml
+types:
+  - name: demo.ledger.ImpactLevel
+    kind: enum
+    ordered: true
+    attributes:
+      - {name: weight, type: Integer}
+    variants:
+      - {name: Minor, attributes: {weight: 1}}
+      - {name: Major, attributes: {weight: 3}}
+      - {name: Critical, attributes: {weight: 10}}
+views:
+  - name: demo.ledger.Mttr
+    source: demo.ledger.Window
+    consistency: read_your_writes
+    group_by: [incident]
+    fields:
+      - {name: incident, type: String}
+      - {name: mttr, type: Optional<Decimal>, aggregate: {avg: {expr: "ended_at - started_at"}}}
+  - name: demo.ledger.Headline
+    source: demo.ledger.Window
+    consistency: read_your_writes
+    group_by: [incident]
+    fields:
+      - {name: incident, type: String}
+      - {name: worst, type: Optional<demo.ledger.ImpactLevel>, aggregate: {max: level}}
+```
+
+The expression reads the row's fields and an enum field's attribute (`level.weight`); `now`, an
+undeclared field or attribute and a path of more than two steps are refused by name. `sum` of an
+`Integer`, `Decimal` or `Duration` is that type, `avg` of any of them `Optional<Decimal>` (a
+`Duration`'s mean in seconds), `min`/`max` `Optional` of the value; a value that may be absent needs
+`skip_absent: true`. `min`/`max` over an enum without `ordered: true` is `type_mismatch` naming the
+flag. Synthesis varies every field the expression reads; an expression measure beside `skip_absent:`
+or `where:`, a `sum` of `Duration`s and an `avg` of a `Duration` field no arrangement tells from a
+truncating one are refused `ESS-SYNTH-017`. Generated Rust and Go view queries keep such a view an
+obligation, and `ess verify diff` reports a moved expression as `field-aggregate-changed` and a
+flipped flag as `ordered-changed` in `ess-diff/23` (from the release notes).
+
+## `ess/37`
+
+From 0.93.0, with no construct of its own: a specification declaring it reads and compiles exactly
+as at `ess/36`. It is the newest format through 0.98.0, so a new document starts on it. Suite pair
+`ess-conformance/64` and `/65` and `ess-diff/24` opened with it; from 0.95.0 a coverage suite whose
+inventory holds `ESS-SYNTH-025` is written at `/65` ([testing-conformance](../../testing-conformance/SKILL.md)).
+
+### At every format, from 0.91.0 through 0.98.0
+
+- **An ordering comparison over an enum is refused** (0.98.0, breaking): `<`, `<=`, `>` and `>=`
+  with an enum operand, ordered or not, are `type_mismatch` naming the enum. A probe on 0.98.0 of
+  `when: level > Major` answered "an enum has no ordering … list the admitted variants with
+  `in: [...]`, or compare with `==` or `!=`"; `when: {level: [Critical]}` validated.
+- **An `exists: false` branch answers before a related refusal over another row** (0.98.0,
+  breaking, from `ess/27`): such a branch declared below a `when_related` predicate or row-set
+  refusal that one request can satisfy too is refused. Declare it before the refusal, or use
+  `existing_instance:` for an identity that already exists.
+- **A `Decimal` literal binary64 cannot hold exactly** (`0.1000000000000000000001`) is refused as
+  `inexact_decimal_literal` in `sets:`, `payload:`, `affects:` and every guard and filter (0.95.0);
+  `0.1`, `0.5` and `1e2` validate as before.
+- **Names and wire names** (0.93.0): a command group named like a top-level command or view word of
+  its own component is `DuplicateDeclaration`, and two response fields sharing a wire name are
+  `ESS-COMMAND-006`; a response may still reuse an input field's wire name.
+- **A refusal asking for a newer format** says where the key goes (0.98.0): "write
+  `format: ess/N` on the source that declares the system", not on a domain file.
+- **`Binary64` in generated code** (0.98.0): `ess generate synthesize --target rust`, `go` and
+  `web` carry a finite `Binary64` as a field, input, response, event, error or view value; as an
+  identity, view parameter, actor attribute, delivery context or conversion it is
+  `missing-representation`, and `--target clap` refuses every `Binary64`.
+- **Kubernetes import** (0.93.0): `ess infra import kubernetes` reads Gateway API gateways and
+  HTTP routes, a service account's IRSA role and a load balancer's hostnames (`infra-ir/4`, which
+  earlier releases refuse), lists served kinds it does not read as `unobserved_kinds`, and
+  `ess infra infra graph --format dot` renders Graphviz DOT
+  ([retrofitting](../../retrofitting/SKILL.md)).
+- **`ess-ui/1`** gained tone maps and bands, record groups, collapsed sections, shared frames,
+  header badges, generated host slots (0.92.0), client pagers and `section.<name>.row`; these are UI
+  documents, not the specification format (from the release notes).
+
 ## What validates and still gets no scenario
 
 `ess verify conform synthesize` observes a record only through a view, and these limits come from
@@ -1168,6 +1258,7 @@ it.
 | a record invariant or a reading on the type of a typed `response:` field | the returning outcome has no scenario: `ESS-SYNTH-001` "record invariant on a response type … has no executable observer" |
 | `invariants:` on a type (`value.count >= 1`) with no view publishing a field of it | `ESS-SYNTH-013` "type … has no scenario"; `alphabet:` alone is checked without one |
 | `when_subject:` comparing `now` with a stored `Timestamp` the outcome set with `{generated: true}` | every scenario of the command is refused: no arranging branch sets the field from an input or a literal |
+| a view `filter:` ordering such a `Timestamp` against `now` (`{all: [state == OnLoan, due_at < now]}`, a due date the service computes from its clock) | each scenario that leaves a row in the filtered state keeps its other steps and skips its read of that view: `ESS-SYNTH-005` "`due_at` is bound by nothing a scenario knows", 3 refusals in a probe on 0.98.0 and the same 3 on 0.90.0. The hint to filter on state alone changes the rule; keep the filter and report the refusals, or set the field from an input where the service really takes one |
 | `one_time_response:` on an outcome of a command whose response declares `undeclared_fields: ignored` | the outcome and every disclosure scenario: `ESS-SYNTH-001` "one-time response … declares `undeclared_fields: ignored`, which the one-time observer does not carry" |
 | a `replays:` outcome (a retained result) over a response declared `undeclared_fields: ignored` | the replay has no scenario: `ESS-SYNTH-001` "retained result … declares `undeclared_fields: ignored`, which the exact retained-result observer does not carry" |
 | a complete-subject snapshot over an opened response or struct | refused at synthesis by name, because that observer compares a closed record (from the release notes; not reproduced here) |

@@ -24,6 +24,8 @@ newer format a change needs, which earlier readers refuse:
 | `ess-diff/20` | a struct's `shorthand:` (`ess/27`) declared (`expanded`), dropped or moved (`narrowed`) is `type/<name>/shorthand-changed`; an actor becoming the system is `actor/<name>/system-changed`, breaking for callers (the reverse compatible); a moved `await_within:` is `command/<name>/await-within-changed`, compatible; a domain's display name or summary edit is `domain/<name>/display-name-changed` or `summary-changed`, compatible, where it was `unclassified-changed` and `unknown` (from the 0.63.0 release notes) |
 | `ess-diff/21` | a view field whose source moves, such as to a read through a reference (`ess/28`), is `field-source-changed` (from the 0.64.0 release notes) |
 | `ess-diff/22` | a moved lifecycle transition `summary:` (`ess/33`) is `transition-summary-changed` and a moved state summary the state enum's `variant-summary-changed`, both compatible (a 0.83.0 probe passed `--fail-on breaking-or-unknown`); adding or removing `provided: true` is `system/<name>/unclassified-changed`, unknown, which fails the default gate (exit 4 in the probe) |
+| `ess-diff/23` | an enum's `ordered: true` (`ess/36`) flipped is the enum's `ordered-changed`; a measure's moved expression (`{avg: {expr: …}}`) is `field-aggregate-changed` (from the 0.91.0 release notes) |
+| `ess-diff/24` | opened in 0.93.0 with no change kind of its own; `ess verify diff` reads and writes it wherever it does `/23` |
 
 Of the other `ess/25` keys, `before_row:` gained or lost is
 `outcome-condition-changed`, and `outcome-set-effect-changed` names each per-row event (`each:
