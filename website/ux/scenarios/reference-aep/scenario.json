@@ -1,0 +1,7 @@
+{
+  "route": "docs/plugins/aep",
+  "anchor": true,
+  "persona": "An agent operator checking what the aep plugin provides.",
+  "task": "Find the list of what the planning half provides.",
+  "truth": "It provides:"
+}

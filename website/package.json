@@ -7,7 +7,9 @@
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",
-    "typecheck": "tsc"
+    "typecheck": "tsc && tsc --noEmit -p ux/tsconfig.json",
+    "ux": "node ux/deadline.ts 120 sh -ec \"rm -rf ux/out && node --test --disable-warning=ExperimentalWarning ux/*.test.ts && playwright test && node ux/ratchet.ts\"",
+    "ux:round": "rm -rf ux/out; UX_ALL=1 playwright test; node ux/round.ts"
   },
   "dependencies": {
     "@beyond10x/docs-system": "git+https://github.com/beyond10x/docs-system.git#296f431e4c8fc94122f84213a5f0c8b0f7ea8c00",
@@ -24,12 +26,33 @@
     "@docusaurus/module-type-aliases": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
+    "@playwright/test": "1.65.0",
+    "@types/node": "22.19.0",
     "@types/react": "^19.0.0",
+    "axe-core": "4.14.0",
     "typescript": "~6.0.2"
   },
   "overrides": {
     "serialize-javascript": "7.1.1",
     "uuid": "11.1.1"
+  },
+  "browserslist": {
+    "production": [
+      "chrome >= 99",
+      "edge >= 99",
+      "firefox >= 97",
+      "safari >= 15.4",
+      "ios_saf >= 15.4",
+      "samsung >= 18",
+      "opera >= 86",
+      "and_chr >= 99",
+      "and_ff >= 97"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "engines": {
     "node": ">=20.0"

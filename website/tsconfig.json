@@ -4,5 +4,5 @@
     "baseUrl": ".",
     "ignoreDeprecations": "6.0"
   },
-  "exclude": ["build", ".docusaurus"]
+  "exclude": ["build", ".docusaurus", "ux", "playwright.config.ts"]
 }

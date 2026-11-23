@@ -110,3 +110,16 @@ tasks:
       - npm --prefix website ci
       - npm --prefix website run typecheck
       - npm --prefix website run build
+      - task: site-ux
+
+  site-ux:
+    desc: Run the docs UX gates (layout, always-visible, axe-core, both themes) and the ratchet against the built site; fails after 120 s (website/ux).
+    dir: website
+    cmds:
+      - npm run ux
+
+  site-ux-round:
+    desc: 'Measure a docs UX round at every size and write ux/rounds/R-nn: task site-ux-round -- R-nn'
+    dir: website
+    cmds:
+      - npm run ux:round -- {{.CLI_ARGS}}

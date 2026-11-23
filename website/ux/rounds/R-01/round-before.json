@@ -1,0 +1,787 @@
+{
+  "id": "R-01",
+  "label": "before",
+  "pages": 16,
+  "sizes": [
+    "1280x720",
+    "1366x768"
+  ],
+  "metrics": {
+    "site:all": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 72,
+      "axe.serious": 32,
+      "axe.serious_nodes": 287,
+      "layout_shift.per_load": 0.219
+    },
+    "page:docs_choose-a-plugin": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 2,
+      "axe.serious_nodes": 18,
+      "layout_shift.per_load": 0.025
+    },
+    "page:docs_install": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 2,
+      "axe.serious_nodes": 24,
+      "layout_shift.per_load": 0.089
+    },
+    "page:docs_plugins_aep": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 2,
+      "axe.serious_nodes": 16,
+      "layout_shift.per_load": 0.117
+    },
+    "page:docs_tutorials_first-ess-specification": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 2,
+      "axe.serious_nodes": 22,
+      "layout_shift.per_load": 0.057
+    },
+    "page:landing": {
+      "layout.doc_hscroll": 0,
+      "layout.past_box": 0,
+      "layout.scroll_boxes": 0,
+      "always_visible.hidden": 4,
+      "axe.serious": 2,
+      "axe.serious_nodes": 11,
+      "layout_shift.per_load": 0.005
+    }
+  },
+  "problems": [
+    {
+      "page": "docs",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (14): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/choose-a-plugin",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/golden-path",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/install",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (12): .navbar__link--active, .menu__link--active > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/aep",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154"
+      ]
+    },
+    {
+      "page": "docs/plugins/b10x",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (17): .navbar__link--active, .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (8): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/connectors",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (9): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/ess",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/plugins/worktree",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (7): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(7) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/structure",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (5): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/trust-and-scope",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (4): .menu__link--active > .linkLabel_WmDU, .breadcrumbs__item--active > .breadcrumbs__link"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (10): p:nth-child(2) > a, p:nth-child(7) > a[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-ess-specification",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (11): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan-2026-09-28",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: top: sidebar: missing",
+        "always-visible: end: search: missing",
+        "always-visible: end: sidebar: missing",
+        "axe: color-contrast (6): p:nth-child(2) > a, p:nth-child(3) > a"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "docs/tutorials/first-governed-plan",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (10): .theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-1.menu__list-item:nth-child(4) > .menu__list-item-collapsible > .categoryLink_byQd.menu__link--sublist.menu__link--sublist-caret > .categoryLinkLabel_W154, a[aria-current=\"page\"] > .linkLabel_WmDU"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (5): article:nth-child(1) > a, article:nth-child(2) > a[href$=\"ess\"]"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1280x720",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (6): .eyebrow_kY3W, article:nth-child(1) > a"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1366x768",
+      "theme": "dark",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (5): article:nth-child(1) > a, article:nth-child(2) > a[href$=\"ess\"]"
+      ]
+    },
+    {
+      "page": "",
+      "viewport": "1366x768",
+      "theme": "light",
+      "gating": true,
+      "problems": [
+        "always-visible: top: search: missing",
+        "always-visible: end: search: missing",
+        "axe: color-contrast (6): .eyebrow_kY3W, article:nth-child(1) > a"
+      ]
+    }
+  ]
+}

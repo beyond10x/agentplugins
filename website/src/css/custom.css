@@ -20,3 +20,8 @@
   --ifm-background-color: #0d0b12;
   --ifm-background-surface-color: #17131f;
 }
+
+.markdown :is(p, li, td, blockquote) a:not(.hash-link) {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}

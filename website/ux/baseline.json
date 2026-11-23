@@ -1,0 +1,189 @@
+{
+  "about": "UX ratchet of the agentplugins docs site (ui-iteration-loop skill § 6) at 1366x768, light and dark summed: page:<anchor> per anchor scenario, site:all over every sitemap page. Lower is better for every key. Written by ux/ratchet.ts --update.",
+  "tolerances": {
+    "counts": "0",
+    "layout_shift.per_load": "0.01, compared only in a round (host fonts and timing)"
+  },
+  "scenarios": {
+    "site:all": {
+      "layout.doc_hscroll": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.past_box": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.scroll_boxes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "always_visible.hidden": {
+        "value": 72,
+        "tolerance": 0
+      },
+      "axe.serious": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "axe.serious_nodes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout_shift.per_load": {
+        "value": 0.191,
+        "tolerance": 0.01
+      }
+    },
+    "page:docs_choose-a-plugin": {
+      "layout.doc_hscroll": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.past_box": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.scroll_boxes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "always_visible.hidden": {
+        "value": 4,
+        "tolerance": 0
+      },
+      "axe.serious": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "axe.serious_nodes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout_shift.per_load": {
+        "value": 0.025,
+        "tolerance": 0.01
+      }
+    },
+    "page:docs_install": {
+      "layout.doc_hscroll": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.past_box": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.scroll_boxes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "always_visible.hidden": {
+        "value": 4,
+        "tolerance": 0
+      },
+      "axe.serious": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "axe.serious_nodes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout_shift.per_load": {
+        "value": 0.066,
+        "tolerance": 0.01
+      }
+    },
+    "page:docs_plugins_aep": {
+      "layout.doc_hscroll": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.past_box": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.scroll_boxes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "always_visible.hidden": {
+        "value": 4,
+        "tolerance": 0
+      },
+      "axe.serious": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "axe.serious_nodes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout_shift.per_load": {
+        "value": 0.134,
+        "tolerance": 0.01
+      }
+    },
+    "page:docs_tutorials_first-ess-specification": {
+      "layout.doc_hscroll": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.past_box": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.scroll_boxes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "always_visible.hidden": {
+        "value": 4,
+        "tolerance": 0
+      },
+      "axe.serious": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "axe.serious_nodes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout_shift.per_load": {
+        "value": 0.057,
+        "tolerance": 0.01
+      }
+    },
+    "page:landing": {
+      "layout.doc_hscroll": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.past_box": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout.scroll_boxes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "always_visible.hidden": {
+        "value": 4,
+        "tolerance": 0
+      },
+      "axe.serious": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "axe.serious_nodes": {
+        "value": 0,
+        "tolerance": 0
+      },
+      "layout_shift.per_load": {
+        "value": 0.003,
+        "tolerance": 0.01
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "route": "docs/tutorials/first-ess-specification",
+  "anchor": true,
+  "persona": "A Rust developer following the ESS tutorial step by step.",
+  "task": "Find the first command of step 1.",
+  "truth": "b10x init ess --host claude --out plan.json"
+}

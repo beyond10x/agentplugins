@@ -1,0 +1,7 @@
+{
+  "route": "docs/install",
+  "anchor": true,
+  "persona": "A Claude Code user who decided to install the marketplace.",
+  "task": "Find the one sentence to give the agent that sets everything up.",
+  "truth": "Set up Beyond10x: follow https://github.com/beyond10x/agentplugins/releases/latest/download/SETUP.md"
+}

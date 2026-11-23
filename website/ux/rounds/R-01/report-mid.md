@@ -1,0 +1,733 @@
+# R-01 (mid: UXF-001 and UXF-005 fixed) measurement
+
+16 pages, sizes 1024x768, 1280x720, 1280x800, 1366x768, 1440x900, 390x844, 768x1024, themes light, dark. Metrics at 1366x768, both themes summed; lower is better.
+
+| scenario | layout.doc_hscroll | layout.past_box | layout.scroll_boxes | always_visible.hidden | axe.serious | axe.serious_nodes | layout_shift.per_load |
+|---|---|---|---|---|---|---|---|
+| page:docs_choose-a-plugin | 0 | 0 | 0 | 4 | 0 | 0 | 0.025 |
+| page:docs_install | 0 | 0 | 0 | 4 | 0 | 0 | 0.066 |
+| page:docs_plugins_aep | 0 | 0 | 0 | 4 | 0 | 0 | 0.134 |
+| page:docs_tutorials_first-ess-specification | 0 | 0 | 0 | 4 | 0 | 0 | 0 |
+| page:landing | 0 | 0 | 0 | 4 | 0 | 0 | 0.005 |
+| site:all | 0 | 0 | 0 | 72 | 0 | 0 | 0.191 |
+
+## Problems (224 page loads)
+
+- `docs` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/choose-a-plugin` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/golden-path` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/install` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/aep` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/b10x` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/connectors` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/ess` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/plugins/worktree` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: scrollable-region-focusable (1): table:nth-child(5)
+- `docs/structure` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: scrollable-region-focusable (1): table:nth-child(5)
+- `docs/structure` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: scrollable-region-focusable (1): table:nth-child(5)
+- `docs/structure` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+  - axe: scrollable-region-focusable (1): table:nth-child(5)
+- `docs/structure` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/structure` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/trust-and-scope` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification-2026-09-28` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-ess-specification` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: top: sidebar: missing
+  - always-visible: end: search: missing
+  - always-visible: end: sidebar: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan-2026-09-28` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 390x844 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 390x844 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `docs/tutorials/first-governed-plan` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1024x768 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1024x768 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1280x720 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1280x720 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1280x800 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1280x800 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1366x768 dark:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1366x768 light:
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1440x900 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 1440x900 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 390x844 dark (measured only):
+  - past its box: div > a.button.button--secondary by 5px
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 390x844 light (measured only):
+  - past its box: div > a.button.button--secondary by 5px
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 768x1024 dark (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing
+- `/` 768x1024 light (measured only):
+  - always-visible: top: search: missing
+  - always-visible: end: search: missing

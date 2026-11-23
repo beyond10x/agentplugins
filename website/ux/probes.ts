@@ -1,0 +1,168 @@
+// Generic measurements in a page: layout contract, always-visible elements, accessibility, layout
+// shift. Takes the always-visible elements as an argument; imports nothing from the site.
+import axe from 'axe-core';
+import type { Page } from '@playwright/test';
+import { hydrated, settle, settleScript } from './settle.ts';
+
+/** DejaVu Sans on every host, so a line breaks at the same word locally and on CI. */
+export const FONT_CSS =
+  "html, body, button, input, select, .navbar, .menu, .markdown { font-family: 'DejaVu Sans', sans-serif !important; }";
+
+export interface Layout {
+  doc_hscroll: number;
+  /** Elements whose content runs past their own box, without scrolling or clipping it. */
+  past_box: string[];
+  /** Boxes the reader scrolls sideways inside (code blocks, tables). Measured, not gated. */
+  scroll_boxes: string[];
+  hidden_always_visible: string[];
+}
+
+/** Measures the page as it is now; `always` is a list of [label, selector] that must be fully in view and uncovered. */
+export async function layout(page: Page, always: Array<[string, string]>): Promise<Layout> {
+  return page.evaluate((always) => {
+    const vw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const name = (el: Element): string => {
+      const id = el.id ? `#${el.id}` : '';
+      const cls = [...el.classList].filter((c) => !/_[a-zA-Z0-9]{4,}$/.test(c)).slice(0, 2);
+      return `${el.tagName.toLowerCase()}${id}${cls.length ? `.${cls.join('.')}` : ''}`;
+    };
+    const pastBox: string[] = [];
+    const scrollBoxes: string[] = [];
+    for (const el of document.body.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.display === 'inline' || cs.display === 'contents') continue;
+      if (el.closest('svg') && el.tagName.toLowerCase() !== 'svg') continue;
+      const he = el as HTMLElement;
+      if (he.clientWidth === 0) continue;
+      const r = el.getBoundingClientRect();
+      if (cs.overflowX === 'auto' || cs.overflowX === 'scroll') {
+        if (he.scrollWidth > he.clientWidth + 1 && r.width > 0) scrollBoxes.push(`${name(el)} by ${he.scrollWidth - he.clientWidth}px`);
+        continue;
+      }
+      if (cs.overflowX !== 'visible') continue;
+      // Content of a box the reader scrolls sideways (a code block) is counted in scroll_boxes.
+      let scrolled = false;
+      for (let a = el.parentElement; a && !scrolled; a = a.parentElement) {
+        const ox = getComputedStyle(a).overflowX;
+        scrolled = ox === 'auto' || ox === 'scroll';
+      }
+      if (scrolled) continue;
+      for (const child of el.children) {
+        const ccs = getComputedStyle(child);
+        if (ccs.position === 'fixed' || ccs.position === 'absolute' || ccs.display === 'none') continue;
+        const c = child.getBoundingClientRect();
+        // A grid row's negative margin (Infima `.row`) reaches past its parent by design.
+        const allowed = Math.max(0, -parseFloat(ccs.marginRight) || 0);
+        if (c.width > 0 && c.right > r.right + allowed + 1) {
+          pastBox.push(`${name(el)} > ${name(child)} by ${Math.round(c.right - r.right)}px`);
+          break;
+        }
+      }
+    }
+    const hidden: string[] = [];
+    for (const [label, sel] of always) {
+      const el = document.querySelector(sel);
+      if (!el) {
+        hidden.push(`${label}: missing`);
+        continue;
+      }
+      const r = el.getBoundingClientRect();
+      // The sidebar is taller than the window: its top must be in view, not all of it.
+      const bottom = label === 'sidebar' ? Math.min(r.bottom, r.top + 40) : r.bottom;
+      if (r.width === 0 || r.height === 0 || r.left < 0 || r.top < 0 || r.right > vw + 0.5 || bottom > vh + 0.5) {
+        hidden.push(`${label}: outside the viewport`);
+        continue;
+      }
+      const at = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height, 40) / 2);
+      if (!at || !(el === at || el.contains(at) || at.contains(el))) hidden.push(`${label}: covered`);
+    }
+    return {
+      doc_hscroll: Math.max(0, document.documentElement.scrollWidth - vw),
+      past_box: [...new Set(pastBox)].slice(0, 10),
+      scroll_boxes: scrollBoxes.slice(0, 20),
+      hidden_always_visible: hidden,
+    };
+  }, always);
+}
+
+/** The WCAG levels the gate holds (skill § 4, gate 5). */
+export const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+
+/** The serious and critical axe-core violations of the page as it is now, `<rule> (<nodes>): <first targets>`. */
+export async function axeSerious(page: Page): Promise<string[]> {
+  const run = (): Promise<string[] | null> =>
+    page.evaluate(async (tags) => {
+      const inPage = (window as unknown as { axe?: typeof axe }).axe;
+      if (!inPage) return null;
+      const result = await inPage.run(document, { runOnly: { type: 'tag', values: tags } });
+      return result.violations
+        .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+        .map((v) => `${v.id} (${v.nodes.length}): ${v.nodes.slice(0, 2).map((n) => n.target.join(' ')).join(', ')}`);
+    }, AXE_TAGS);
+  const first = await run();
+  if (first) return first;
+  await page.evaluate(axe.source);
+  const second = await run();
+  if (!second) throw new Error('axe-core did not load into the page');
+  return second;
+}
+
+/** Installed before page scripts: sums layout shifts not caused by input. */
+export function clsObserver(): void {
+  const w = window as unknown as { __uxCls: number; __uxClsTake(): void };
+  w.__uxCls = 0;
+  const add = (entries: PerformanceEntryList): void => {
+    for (const e of entries as Array<PerformanceEntry & { value: number; hadRecentInput: boolean }>) {
+      if (!e.hadRecentInput) w.__uxCls += e.value;
+    }
+  };
+  const po = new PerformanceObserver((list) => add(list.getEntries()));
+  po.observe({ type: 'layout-shift', buffered: true });
+  w.__uxClsTake = () => add(po.takeRecords());
+}
+
+export const layoutShift = (page: Page): Promise<number> =>
+  page.evaluate(() => {
+    const w = window as unknown as { __uxCls: number; __uxClsTake(): void };
+    w.__uxClsTake();
+    return w.__uxCls;
+  });
+
+/**
+ * Opens `path` in `theme`, reduced motion, with the pinned font, and waits until the page is
+ * hydrated and at rest (`settle.ts`), not for a fixed time.
+ */
+export async function openPage(page: Page, path: string, theme: 'light' | 'dark'): Promise<void> {
+  await page.addInitScript((t) => {
+    try {
+      localStorage.setItem('theme', t);
+    } catch {
+      /* storage blocked */
+    }
+  }, theme);
+  await page.addInitScript(clsObserver);
+  await page.addInitScript(settleScript);
+  await page.addInitScript((css) => {
+    document.addEventListener('DOMContentLoaded', () => {
+      const st = document.createElement('style');
+      st.textContent = css;
+      document.head.appendChild(st);
+    });
+  }, FONT_CSS);
+  await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: theme });
+  await page.goto(path, { waitUntil: 'load' });
+  await page.evaluate(() => document.fonts.ready);
+  await hydrated(page);
+  await settle(page);
+}
+
+/** Scrolls so the end of the page's content (`article`, else `main`) is at the bottom of the window. */
+export async function scrollToContentEnd(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const end = document.querySelector('article') ?? document.querySelector('main');
+    const bottom = (end?.getBoundingClientRect().bottom ?? 0) + window.scrollY;
+    window.scrollTo(0, Math.max(0, bottom - window.innerHeight));
+  });
+  await settle(page);
+}

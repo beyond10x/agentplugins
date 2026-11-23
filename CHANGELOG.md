@@ -7,9 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Docs site UX gates (`website/ux/`, `task site-ux`, run by `task site-build` and the `Documentation validation` workflow): every page of the built site at 1366x768 and 1280x720 in both themes has no sideways scroll, nothing past its box, the navbar, theme toggle and sidebar in view, and no serious or critical axe-core violation; a lower-is-better ratchet in `website/ux/baseline.json`, round reports in `website/ux/rounds/` and findings in `website/ux/findings/`
+
 ### Changed
 
 - Docs: the prose of the README and ten website pages (install, golden path, the aep, b10x, connectors and worktree pages, both tutorials and their 2026-09-28 recordings) is tighter: semicolon chains split, em-dash asides and house-dialect phrases such as `names the` replaced by the plain verb, long paragraphs split. No command, number, link, code block or status label changed
+
+### Fixed
+
+- Docs site: the site's own colours in `website/src/css/custom.css` now apply. The build turned Infima's CSS cascade layers into selectors stronger than `custom.css` for the default browser list, so Infima's blue showed everywhere and failed WCAG AA contrast on active navbar, sidebar and breadcrumb links in both themes; `website/package.json` now names browsers with native `@layer` support. Links in running text are underlined, so they are told from the text by more than colour. A Markdown table that scrolls sideways takes keyboard focus, and the landing page actions wrap on a phone
 
 ## [0.26.1] - 2026-11-23
 

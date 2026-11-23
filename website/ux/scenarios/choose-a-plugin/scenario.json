@@ -1,0 +1,7 @@
+{
+  "route": "docs/choose-a-plugin",
+  "anchor": true,
+  "persona": "An engineer with a planning task who does not know which plugin owns it.",
+  "task": "Find the plugin to use for planning work.",
+  "truth": "Planning or understanding work"
+}

@@ -1,0 +1,7 @@
+{
+  "route": "",
+  "anchor": true,
+  "persona": "A developer who heard of Beyond10x and opens the site for the first time.",
+  "task": "Find where to start: the page that says which plugin to install.",
+  "truth": "Choose a plugin"
+}
