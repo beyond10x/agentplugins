@@ -68,6 +68,18 @@ built-in `billing`, `oracle-fixture` and `interpreted` targets, so for your own 
    `--target interpreted` killed 6 of 6 `grant-drop` mutants by their `<command>/grant/denied`
    scenarios ("6 of 6 site(s) scored", `ess-mutation-report/8`); its one actor holds every command,
    so `grant-add` found no site.
+   0.91.0 through 0.98.0 move verdicts without a format change (from the release notes): an
+   `order-flip` on a view key whose tie synthesis cannot arrange is `unwitnessed` (`ESS-MUTATE-004`,
+   exit 3) with the standing refusal under `baseline_refusals`, not `survived` (0.94.0), and every
+   later `order_by` key is pinned, so its flip is killed (0.93.0); a `precedence-swap` of two
+   `when_subject:` refusals one row satisfies together is scored killed where it was
+   `ESS-MUTATE-003`, and `equivalent` where no row can satisfy both (0.95.0), and a `distinct` list
+   overlap is sent, so its swap is killed (0.96.0). A mutant whose suite gains an
+   `ESS-SYNTH-025` refusal moves from `inconclusive` to `unwitnessed` (0.95.0). From 0.97.3
+   `--emit --component <name>` scores a mutant against that component's own refusals only, so a
+   verdict can move from `unwitnessed` to `survived` or `inconclusive` and the exit status with it.
+   `--target process` is refused (exit 2): emit the mutants' suites, run each with
+   `ess verify conform run --target process`, and collect.
 4. Answer each survivor by declaring what makes the rule observable — a view publishing the field a
    `sets` entry writes, a `wrong_state:` outcome for a dropped `from` state — then re-run and see
    it killed; or file a synthesis gap on beyond10x/ess. An authored scenario in a mutant's suite

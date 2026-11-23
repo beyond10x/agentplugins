@@ -10,13 +10,15 @@ description: Plan work in the governed AEP artifact store; create, relate, move 
 ## The store's version, before the first write
 
 Read `version` in `.engineering/project.yaml` (YAML or JSON; the key is the same). The current store
-is `aep.project/5`, with `store: {git: {}}`. On any other version, tell the user once, before any
-store write, which version the store is on and its upgrade, from this table — `aep` prints a notice
-only for some of them, and a caller may have hidden it:
+is `aep.project/5`, with `store: {git: {}}`, or `aep.project/6`, the same store holding packs. On
+any other version, tell the user once, before any store write, which version the store is on and its
+upgrade, from this table — `aep` prints a notice only for some of them, and a caller may have
+hidden it:
 
 | the store | what works | upgrade |
 |---|---|---|
 | `aep.project/5` | everything | none |
+| `aep.project/6` (from 0.80.0: `.engineering/packs/*.pack` holds closed artifacts and their evidence) | everything from 0.80.0 (an earlier release refuses it): every reader answers over packed and loose records as one store; a write to a packed artifact exits 1 naming `aep plan store unpack <id>` | none; `aep plan store unpack <id>` before a write to that artifact, `--all` returns the store to `/5` |
 | `aep.project/1`, or `.engineering/planning/journal.jsonl` with no `project.yaml` | nothing: every verb that reads or writes the plan exits 1 before any write, with `[unsupported_protocol_version]` (no `project.yaml`: an error naming `journal.jsonl` and the migration); only `aep plan store migrate git` opens it | `aep plan store migrate git --dry-run`, then `--verify`, on a clean `.engineering` (no `project.yaml`: add `--protocols` and `--profile`, § 5), then commit |
 | `aep.project/2`, `/3` or `/4` | nothing: every planning verb refuses it | `cargo install --git https://github.com/beyond10x/aep --rev 9c0f1da44429ff935fa0b2d743457945d51e1c51 aep-cli`, then `aep plan store migrate git --verify` on a clean `.engineering`, commit, then install the current release (`aep:upgrade`) |
 
@@ -25,7 +27,14 @@ the steps. On `/1`, stop store work and report the refusal: do not carry on with
 store with an older `aep`, or edit artifact files by hand. Resume only after the user has approved
 the migration and reviewed what `--dry-run` would write, `--verify` has passed, and the result is
 committed. On `/2`–`/4`, stop store work and report the refusal. Done when the user has been told,
-or `version` is `aep.project/5`.
+or `version` is `aep.project/5` or `/6`.
+
+`aep plan store pack [--dry-run]` moves every closed artifact (a `closed:` state of its lifecycle, or
+one with no successor; `aep plan artifact lifecycle <kind>` prints the set) whose bytes Git has
+committed unchanged, with its evidence, into one `aep.pack/1` file and sets `aep.project/6`;
+`aep plan store unpack <id>… | --all [--from <pack>] [--dry-run]` writes them back byte for byte.
+Pack only when the user asks: an `aep` before 0.80.0 does not read the store afterwards, and a
+protocol tree whose lifecycles declare `closed:` is refused by 0.79.x.
 
 ## 0. When the record is required
 

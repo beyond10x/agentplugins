@@ -16,7 +16,7 @@ change before drafting stories, sends those stories to four critics, and impleme
 approved wave with an independent adversary. Counts and identifiers depend on the resulting model;
 do not copy scenario counts from a different run.
 
-These instructions target AEP 0.79.0 and ESS 0.90.0. The complete
+These instructions target AEP 0.80.2 and ESS 0.98.0. The complete
 [2026-09-28 recording](./first-governed-plan-2026-09-28.md) preserves the earlier Go session and its
 costs as historical evidence.
 
@@ -38,7 +38,8 @@ b10x setup apply --plan plan.json --yes
 Review the plan before applying it, then restart the host so it loads the installed plugins.
 Confirm that the Worktree plugin and `worktree` CLI are available before starting a wave. If
 either is missing, finish setup first, because the host's built-in worktree isolation does not
-provide the managed leases and recovery records this workflow requires.
+provide the managed leases and recovery records this workflow requires. `worktree create` refuses
+with `workspace-not-activated` until a workspace profile is active; `/worktree:init` activates one.
 
 Confirm the starting point:
 

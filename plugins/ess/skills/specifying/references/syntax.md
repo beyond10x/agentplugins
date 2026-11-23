@@ -4,7 +4,7 @@ A small lending library in three files, with every section a specification usual
 validates as written (`ess specify validate --path <directory>` → `library v1 — 3 file(s), valid`).
 Copy the shape, not the domain: name your own entities, commands and events after your system.
 Keep each domain’s first segment equal to `system` and update every qualified reference together.
-It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/35` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
+It is written in `format: ess/1`, the lowest header these constructs need; [later-formats.md](later-formats.md) adds what formats through `ess/37` say. A new document still starts on the newest format the installed `ess` implements ([SKILL.md](../SKILL.md#starting-a-domain-from-nothing)).
 
 ## `system.yaml`
 
@@ -164,6 +164,10 @@ errors:
 # or returns an `error`. `instance:` on `creates:` names a field of an emitted event that carries
 # the new identity (`branch_id` of BranchOpened); on `moves:`/`updates:` it names the input field
 # holding the identity (`copy_id` of LendCopy). Either other way is `undeclared_reference`.
+# Under `ess/1` to `ess/3` that event field is filled without a payload entry, as below; from
+# `ess/4` every emitted field needs a source, so a current header writes `branch_id: {generated: true}`
+# in the payload, or validation refuses it as `missing_declaration` ("emitted payload field has no
+# source").
 commands:
   # `refs:` names the records outside the model that explain a command or an outcome, each as
   # `provider:key`; a projection that knows the provider links it, and never a URL.

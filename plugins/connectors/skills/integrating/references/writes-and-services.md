@@ -84,7 +84,14 @@ Zendesk writes are verified with the `zendesk.basic` profile only. The release's
 `docs/catalog-zendesk.md` (*Writes*), `docs/catalog-jira.md` (*Issue writes*) and
 `docs/catalog-slack.md` (*Files*) are the contract. Since `v0.55.0` a Jira `issue.create` or
 `issue.comment.add` answer that names no new id is `unknown`, not `applied`: check the issue
-before any new attempt.
+before any new attempt. Since `v0.73.0` a required body key, or a `body_any_of` key, given as
+`null` counts as missing and is refused before any request, except where a selection declares
+`body_null_clears: true`: Jira `issue.edit` does, so `assignee`, `description` or `priority`
+given as `null` alone still clears it. Since `v0.74.0` the Slack bot connection's `file.upload`
+sends at most 2 MiB as `content` (`base64`, `sha256`, optional `media_type`) with
+`body.channel_id` and `body.filename`, under one approval that binds the bytes' digest; content
+that is not base64, is empty, too large or does not match its `sha256` is refused before any
+request.
 
 ## Explicit services
 
@@ -99,7 +106,7 @@ refusals (exit 2) that contact nothing. A supplied service endpoint is reached o
   is refused `lifecycle_conflict` naming `endpoint`.
 - Call the service over HTTP (`GET /v1/describe`, `POST /v1/invoke`, and `POST /v1alpha2/invoke`
   for library clients), as the release's
-  [`docs/running-services.md`](https://github.com/beyond10x/connectors/blob/v0.69.0/docs/running-services.md)
+  [`docs/running-services.md`](https://github.com/beyond10x/connectors/blob/v0.76.0/docs/running-services.md)
   shows, with the bearer in a protected file. Its operations' `input_schema` and `output_schema`
   are JSON Schema objects. Enable plaintext only when the deployment and task explicitly
   authorize it.
@@ -124,4 +131,10 @@ operations inside the listed repositories, and keyed writes under `standing_gran
 write needs `idempotency_key` and a covering grant (`approval_required`, `rate_limited` or
 `idempotency_conflict` otherwise, none sent). Never write or widen a grant, a principal or a
 repository list to make a call work. Local placement uses `--config`/`--state-dir`; a service
-is placed by its endpoint.
+is placed by its endpoint. Since `v0.70.0` each release publishes the image
+`ghcr.io/beyond10x/connectors:<version>` (`linux/amd64`, `linux/arm64`), which starts
+`connectors-catalog-provider` and carries no configuration or credential. Since `v0.71.0` a served
+catalog instance may hold a string input to `catalog.allowed_values`, and a value outside a
+non-empty list is `forbidden` before any request. Since `v0.74.0` the git relay sends the
+instance's token only to the origin of its API base (or the reviewed `https://github.com` mapping
+of `https://api.github.com`), and an instance whose `git.upstream` is elsewhere no longer starts.

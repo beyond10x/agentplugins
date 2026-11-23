@@ -42,7 +42,7 @@ curl -fsSL https://api.github.com/repos/beyond10x/ess/releases/latest
 
 Compare its `tag_name` with the installed version and use `ess:upgrade` if behind. Existing
 current-run setup evidence needs no second lookup or GitHub authentication. Then write the newest
-`format:` that release implements; the example below uses `ess/35`. The binary says which one that
+`format:` that release implements; the example below uses `ess/37`. The binary says which one that
 is:
 
 ```console
@@ -65,7 +65,7 @@ Otherwise write the smallest document that validates — two files, and nothing 
 
 ```yaml
 # system.yaml
-format: ess/35
+format: ess/37
 system: warehouse
 version: v1
 
@@ -405,6 +405,14 @@ compares it against `ess specify compile --path <specification> --format json`: 
 fields and their types, every lifecycle's states and transitions, every command's input, every
 event's and error's fields, every view's fields, and every actor's `may` list. Names alone are not
 enough. Replace the hand-written model with the generated one as soon as the release is out.
+Released fixes of such gaps: from 0.98.0 `--target rust`, `go` and `web` carry a finite `Binary64`
+as a field, input, response, event, error or view value, as the checked `primitives::Binary64`
+(Rust) or `primitives.Binary64` (Go) that refuses NaN and infinity, where 0.97.4 refused the
+workspace ("this target has no qualified finite Binary64 codec"); as an identity, view parameter,
+actor attribute, delivery context or conversion it is still `missing-representation`, and
+`--target clap` refuses every `Binary64`. From 0.96.0 Rust and Go generate again for a struct with
+`distinct:` and check it at decode, and a generated view query reads through the storage port's
+`list`, which a hand-written storage must implement.
 
 ## Conformance is a record, not a claim
 

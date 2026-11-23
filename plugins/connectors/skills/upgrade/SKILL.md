@@ -80,10 +80,26 @@ plan uses by default; an older source-only release or `--method cargo` builds Ca
    recover a pinned instance as the integrating skill's setup reference says. `v0.65.0` moves a
    `connectors-local/2` file with no legacy entries to `/5` with `setup migrate --mode apply`
    (a backup is kept).
+   From `v0.71.0` a name that both a legacy `[connectors]` entry and an `[instances]` entry derive
+   is refused `instance_ambiguous`: rename one of them. From `v0.72.0` a Gmail, Calendar or Drive
+   instance that names no profile is read-only (`google.oauth.readonly`); one that writes names
+   `profile = "google.oauth"`. From `v0.73.0` providers see the `User-Agent`
+   `connectors/<version> (https://github.com/beyond10x/connectors)`; an allow-list matching the
+   old value must match the new one. The configuration revisions of Calendar, Drive, Gmail,
+   Slides, HubSpot (`v0.72.0`) and Jira (`v0.73.0`) move, so recover a pinned instance as above.
+   From `v0.74.0` a missing store answers `metadata_missing` (`next_action = initialize_state`)
+   where it answered `metadata_unavailable`, a moved token endpoint needs a new connection, and a
+   served instance whose `git.upstream` is not on its API base's origin (or the reviewed GitHub
+   mapping) no longer starts.
+   **`v0.76.0` changes the store one way:** from its first write, `v0.75.0` and earlier answer
+   `metadata_unavailable` on that store and nothing converts it back. Upgrade every `connectors`
+   binary and every other tool that opens the state directory in the same step, or give an older
+   consumer its own `--state-dir`; going back means moving the state directory aside and
+   connecting again.
    An owner the previous binary started keeps running, and a command that needs it answers
    `owner_build_mismatch` with `next_action = stop_owner`: `connectors --output json setup owner-stop`
    asks it to drain and exit, and the next command starts one from the new binary (the release's
-   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.69.0/website/docs/guides/upgrade-the-cli.md)
+   [Upgrade the CLI](https://github.com/beyond10x/connectors/blob/v0.76.0/website/docs/guides/upgrade-the-cli.md)
    guide).
    A new plugin version loads in a new session; until then
    `b10x skill connectors:<skill>` prints its text.

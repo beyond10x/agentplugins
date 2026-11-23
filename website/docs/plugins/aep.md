@@ -45,8 +45,10 @@ route around.
 
 The store is `aep.project/5`: each artifact file under `.engineering/planning/` is the authority, a
 move appends one line to its `transitions`, and each evidence record is one file under
-`.engineering/evidence/`. When a repository's store is on an older version, the planning and
-delivery skills say so before their first write and name the upgrade. `aep:upgrade` runs it.
+`.engineering/evidence/`. From AEP 0.80.0 `aep plan store pack` can move closed artifacts into
+`.engineering/packs/`, which makes the store `aep.project/6`; an older `aep` refuses it. When a
+repository's store is on an older version, the planning and delivery skills say so before their
+first write and name the upgrade. `aep:upgrade` runs it.
 
 ## Delivery
 

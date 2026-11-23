@@ -37,6 +37,15 @@ object `undeclared_fields: ignored` (`ess/24`) and the free value `Json`. A 3.1
 `type: [string, 'null']` is still a coverage gap at its pointer. Any refusal the import still
 makes is a finding about the contract, so report it rather than editing the contract to pass.
 
+From 0.93.0 a full `ess infra import kubernetes` scan also reads a Gateway API edge (`gateways` and
+`httproutes`, left out with `not served` where the cluster has none), a service account's IRSA role
+and a `LoadBalancer` service's hostnames and scheme; an IR holding any of them is `infra-ir/4`,
+which earlier releases refuse. Served kinds of the watched API groups that the scan does not read
+(NetworkPolicy, Istio, cert-manager, KEDA and others) are listed as `unobserved_kinds` and in the
+report's `coverage_gaps` as `served but not read: <kind>`: carry each into the draft as a finding,
+not as an absence. `ess infra infra graph --format dot` renders the graph as Graphviz DOT, and
+`--out` writes the IR as JSON whatever its extension.
+
 `aep` is optional. Without it, write the domain by hand from the schemas, in the shape the `ess:specifying`
 skill shows.
 
@@ -83,7 +92,10 @@ Retrofit-specific rules:
   (`filter: tool_id == param.tool_id`, the entity's `identity.name`); synthesis reads it with the
   identity a scenario created. A filter naming a field the entity does not declare is refused
   (`ESS-VIEW-003`), and a read a scenario cannot decide is skipped and named (`ESS-SYNTH-005`)
-  while the scenario stays.
+  while the scenario stays: it is written into the suite and runs without that one read, and the
+  summary still counts each skipped read as a refusal. A view filtering a clock-computed due date
+  against `now` (`due_at < now`) is the common case; keep the filter that matches the code and
+  report the refusals ([later-formats.md](../specifying/references/later-formats.md#what-validates-and-still-gets-no-scenario)).
 - **Choose the no-op shape from the actual state behavior.** If every state outside the command’s
   transition is accepted without change, use one `wrong_state: true` outcome with `refuses: false`
   and no error. If some states are ignored and others refused, use held-state branches instead

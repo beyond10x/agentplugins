@@ -22,7 +22,9 @@ No `b10x`? Follow https://github.com/beyond10x/agentplugins/releases/latest/down
 
 ## An older planning store
 
-The current `aep` reads `aep.project/5` (`store: {git: {}}`). Read `version` in the repository's
+The current `aep` reads `aep.project/5` (`store: {git: {}}`) and `aep.project/6`, the same store
+holding closed artifacts in `.engineering/packs/` (from 0.80.0; a release before it refuses `/6` with
+`[unsupported_protocol_version]`, so upgrade the CLI first). Read `version` in the repository's
 `.engineering/project.yaml`, tell the user which it is, and after a clear yes run the steps for it.
 Each migration refuses a dirty `.engineering`, so commit what is there first.
 
@@ -58,7 +60,7 @@ aep plan store migrate git --verify
 git add .engineering && git commit    # message names the repair
 ```
 
-Done when `aep --version` prints the newest release, `version` reads `aep.project/5`, and
+Done when `aep --version` prints the newest release, `version` reads `aep.project/5` or `/6`, and
 `aep plan artifact validate` exits 0. A `--verify` difference exits non-zero: relay it and stop.
 The current release's `--verify` compares every migrated evidence record with the one the old store
 answered, field by field and in order, duplicates included, and names the artifact, the record's

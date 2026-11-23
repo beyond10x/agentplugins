@@ -64,7 +64,11 @@ changed yet.
   or a `Binary64` (`ess-conformance/62`, `/63`); from 0.85.0 a specification on `ess/34` and a
   mutation report or manifest listing unmutated sites or grant mutants (`ess-mutation-report/8`,
   `ess-mutation-manifest/7`); from 0.89.0 a specification on `ess/35` and an
-  `ess-output-state/4` record. Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
+  `ess-output-state/4` record; from 0.91.1 a specification on `ess/36` and a spec diff naming
+  `ordered-changed` (`ess-diff/23`); from 0.93.0 a specification on `ess/37`, an
+  `ess-scenario/7` document with `covers:`, a suite at `ess-conformance/64` or `/65`, an
+  `ess-diff/24` and an `infra-ir/4`; from 0.97.0 a target speaking `ess-conformance-target/1`.
+  Move every reader (a CI job's `ess`, the runner crates or packages) in the same change that
   commits them.
 - From 0.63.0 `validate` refuses a branch whose literal writes break an entity invariant
   (`sets: {capacity: 0}` beside `invariants: [capacity > 0]`) as `conflicting_declaration`; a
@@ -185,6 +189,27 @@ changed yet.
   Library API changes: `ess_http::Request` is no longer `Copy` (0.89.0); a hand-assembled authored
   suite runs through `select_fresh_format_for` and `Runner::run_admitted` (0.84.0) (from the
   release notes).
+- From 0.91.0 through 0.98.0 a specification can stop validating: an ordering comparison
+  (`<`, `<=`, `>`, `>=`) over an enum is `type_mismatch` at every format (0.98.0; list the variants
+  with `in: [...]`), an `exists: false` branch declared below a related refusal one request can
+  also satisfy is refused from `ess/27` (0.98.0; declare it first), a `Decimal` literal binary64
+  cannot hold exactly is `inexact_decimal_literal` (0.95.0), and a command group named like a
+  top-level word of its component or two response fields on one wire name are refused (0.93.0)
+  ([later-formats.md](../specifying/references/later-formats.md#ess37)). A specification with a
+  branch that copies an input into an entity unguarded by its invariant now prints
+  `ESS-SYNTH-025` refusals, and a `--suite-format 5` gate on it exits 1 (0.95.0). Regenerate and
+  re-pin committed suites, reading the change with `ess verify conform diff`: synthesis witnesses
+  many branches it refused before, caller-attribute input guards send other values (0.97.1), and
+  read-grant scenarios no longer copy other views' reads (0.97.3). A `--component` run reports only
+  that component's operations (0.97.3), so a gate that counted its refusals or `outside:` lines
+  changes, and a mutation verdict under `--component` can move. Regenerate generated servers: the
+  Go decoder enforces a newtype's alphabet, prefix and invariants (0.91.0), Rust and Go decoders a
+  struct's invariants and `distinct:` (0.94.0, 0.96.0), so a client sending such a value gets
+  `400`; generated view queries read through the storage port's `list` (0.96.0). Conformance
+  adapters: an await request carries the stated input values (`AwaitRequest::compared` is a map,
+  0.91.0), and a Rust adapter builds exact numbers with `Node::from_json_exact` (0.95.0)
+  (`ess:testing-conformance`). An `infra-ir/4` that 0.93.0 writes is refused by earlier releases
+  (from the release notes).
 - From 0.60.0 `validate` refuses a literal outside its newtype's `alphabet:` or `invariants:` as
   `type_mismatch` (in `sets:`, `payload:`, a binding's `mapping:`, enum `attributes:`), which 0.59.0
   accepted: write a value of the type. An `ess-composition/1` with `conformances:` null is refused
