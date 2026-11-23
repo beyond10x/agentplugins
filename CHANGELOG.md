@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-11-23
+
 ### Added
 
 - Docs site UX gates (`website/ux/`, `task site-ux`, run by `task site-build` and the `Documentation validation` workflow): every page of the built site at 1366x768 and 1280x720 in both themes has no sideways scroll, nothing past its box, the navbar, theme toggle and sidebar in view, and no serious or critical axe-core violation; a lower-is-better ratchet in `website/ux/baseline.json`, round reports in `website/ux/rounds/` and findings in `website/ux/findings/`
@@ -1000,7 +1002,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Publish the curated `beyond10x` marketplace with focused AEP planning, ADP, and ESS schema plugins
 - Publish adopter documentation for discovering, selecting, and installing each plugin
 
-[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.26.1...HEAD
+[Unreleased]: https://github.com/beyond10x/agentplugins/compare/0.27.0...HEAD
+[0.27.0]: https://github.com/beyond10x/agentplugins/compare/0.26.1...0.27.0
 [0.26.1]: https://github.com/beyond10x/agentplugins/compare/0.26.0...0.26.1
 [0.26.0]: https://github.com/beyond10x/agentplugins/compare/0.25.1...0.26.0
 [0.25.1]: https://github.com/beyond10x/agentplugins/compare/0.25.0...0.25.1

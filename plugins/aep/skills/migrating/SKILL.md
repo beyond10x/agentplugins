@@ -3,7 +3,7 @@ name: migrating
 description: Migrate legacy work tracking (story trees, TODO.md, plan and issue documents) into the AEP planning store without deleting or rewriting the sources. Use when asked to migrate, import or convert a backlog into AEP, when adopting AEP where work is already written down, or when a legacy backlog sits unretired beside the store.
 ---
 
-**Skill version 0.26.1** — the version in `.claude-plugin/plugin.json`.
+**Skill version 0.27.0** — the version in `.claude-plugin/plugin.json`.
 
 # Migrating legacy tracking into the store
 
